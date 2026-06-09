@@ -135,7 +135,7 @@ select, input, textarea {
   min-height: 75vh;
 }
 .left { background: rgba(11, 24, 37, 0.9); border-right: 1px solid var(--line); padding: 10px; }
-.qnav { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; max-height: 50vh; overflow: auto; }
+.qnav { display: grid; grid-template-columns: repeat(auto-fit, minmax(48px, 1fr)); gap: 6px; max-height: 50vh; overflow: auto; }
 .qbtn {
   font-family: "JetBrains Mono", monospace;
   font-size: 11px;
@@ -173,6 +173,11 @@ select, input, textarea {
   padding: 4px 10px;
   margin-right: 6px;
   display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
 }
 .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 8px; margin: 11px 0; }
 .meta > div {
@@ -189,6 +194,11 @@ select, input, textarea {
   background: rgba(14,31,48,0.86);
   padding: 9px;
   margin-top: 10px;
+}
+.block, .opt, .meta, h3, .right .scroll {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
 }
 .block.cli { font-family: "JetBrains Mono", monospace; color: #88f8a2; background: #0e0e0e; }
 .block.packet { font-family: "JetBrains Mono", monospace; }
@@ -229,4 +239,27 @@ select, input, textarea {
   .topbar { flex-direction: column; align-items: flex-start; }
   .hero h2 { font-size: 27px; }
   .review-row { grid-template-columns: 1fr; }
+
+  /* Mobile-specific improvements for exam/question layout */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 4px 8px;
+    margin-bottom: 6px;
+    max-width: 100%;
+  }
+
+  .opt { padding: 10px; font-size: 15px; }
+  .opt input[type="radio"], .opt input[type="checkbox"] { transform: scale(1.05); margin-right: 8px; }
+
+  .qbtn { font-size: 12px; height: 36px; }
+  .qnav { grid-template-columns: repeat(auto-fit, minmax(44px, 1fr)); gap: 8px; }
+
+  .inline button { flex: 1 1 auto; min-width: 0; }
+
+  .exam-header { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .meta { grid-template-columns: 1fr; }
+  h3 { font-size: 18px; }
+  .right .scroll { padding: 10px; }
+  .container { padding: 12px; }
 }
