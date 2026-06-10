@@ -6,7 +6,7 @@
   <title>CCNA 200-301 Prep Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
@@ -19,18 +19,19 @@
       </div>
     </div>
     <nav>
-      <button data-page="home">Home</button>
-      <button data-page="labs">Labs</button>
-      <button data-page="subnet">Subnetting</button>
-      <button data-page="analytics">Analytics</button>
+      <button data-page="home" class="ghost">🏠 Home</button>
+      <button data-page="labs" class="ghost">🛠️ Interactive Labs</button>
+      <button data-page="subnet" class="ghost">⚡ Subnetting</button>
+      <button data-page="analytics" class="ghost">📊 Analytics</button>
       <span id="timer" class="timer hidden">120:00</span>
     </nav>
   </header>
 
   <main class="container">
+    <!-- HOME PAGE -->
     <section id="home" class="page active">
       <article class="hero">
-        <h2>Complete CCNA Learning + Assessment Website</h2>
+        <h2>Complete CCNA Learning & Assessment Platform</h2>
         <p>
           Train with adaptive questions, section quizzes, full exam simulation, interactive labs, subnetting drills,
           and readiness analytics designed for real CCNA 200-301 pass preparation.
@@ -40,18 +41,19 @@
 
       <section class="grid modes">
         <article class="card">
-          <h3>Study Mode</h3>
-          <p>Instant feedback with explanation, exam tips, memory tricks, and command-focused guidance.</p>
+          <h3>⚡ Study Mode</h3>
+          <p>Instant feedback with explanations, exam tips, memory tricks, and command-focused guidance.</p>
           <ul>
             <li>Difficulty, domain weight, and exam frequency shown</li>
             <li>Why each wrong option is wrong</li>
             <li>Related commands and real-world context</li>
           </ul>
-          <button id="startStudy" class="primary">Start Study</button>
+          <button id="startStudy" class="primary">Start Study Mode</button>
         </article>
 
         <article class="card">
-          <h3>Section Quiz Mode</h3>
+          <h3>📝 Section Quiz Mode</h3>
+          <p>Target specific learning objectives and domains with custom duration constraints.</p>
           <div class="row">
             <label>Duration
               <select id="quizDuration">
@@ -73,29 +75,33 @@
         </article>
 
         <article class="card">
-          <h3>Real Exam Mode</h3>
+          <h3>🏆 Real Exam Mode</h3>
+          <p>Simulate the actual Pearson VUE exam environment with full constraints.</p>
           <ul>
             <li>120 questions, 120 minutes</li>
-            <li>No feedback during attempt</li>
+            <li>No feedback during the attempt</li>
             <li>Mark for review and final review screen</li>
-            <li>Score shown only after submit</li>
+            <li>Score shown only after final submission</li>
           </ul>
           <button id="startExam" class="primary">Start Real Exam</button>
         </article>
       </section>
 
-      <section class="card">
-        <h3>Question Bank & Distribution</h3>
-        <div id="bankStats" class="grid stats"></div>
-      </section>
+      <section class="grid">
+        <div class="card">
+          <h3>📊 Question Bank & Distribution</h3>
+          <div id="bankStats" class="grid stats"></div>
+        </div>
 
-      <section class="card">
-        <h3>Gamification</h3>
-        <div id="gameStats" class="grid stats"></div>
-        <div id="achievements" class="achievements"></div>
+        <div class="card">
+          <h3>🏅 Gamification & Progress</h3>
+          <div id="gameStats" class="grid stats"></div>
+          <div id="achievements" class="achievements"></div>
+        </div>
       </section>
     </section>
 
+    <!-- INTERACTIVE LABS PAGE -->
     <section id="labs" class="page">
       <article class="hero">
         <h2>Cisco Interactive Labs</h2>
@@ -107,7 +113,7 @@
           <p>Configure VLAN 10, VLAN 20, access ports, and trunk ports.</p>
           <textarea id="vlanInput" rows="8" placeholder="SW1(config)# ..."></textarea>
           <div class="inline">
-            <button class="primary" data-lab="vlan">Grade</button>
+            <button class="primary" data-lab="vlan">Grade Lab</button>
             <button class="ghost" data-hint="vlan">Hint</button>
           </div>
           <div id="vlanOut" class="output"></div>
@@ -118,7 +124,7 @@
           <p>Configure router ospf 1, network statements, and passive interfaces.</p>
           <textarea id="ospfInput" rows="8" placeholder="R1(config)# ..."></textarea>
           <div class="inline">
-            <button class="primary" data-lab="ospf">Grade</button>
+            <button class="primary" data-lab="ospf">Grade Lab</button>
             <button class="ghost" data-hint="ospf">Hint</button>
           </div>
           <div id="ospfOut" class="output"></div>
@@ -129,7 +135,7 @@
           <p>Create and apply extended ACL commands with correct direction.</p>
           <textarea id="aclInput" rows="8" placeholder="R2(config)# ..."></textarea>
           <div class="inline">
-            <button class="primary" data-lab="acl">Grade</button>
+            <button class="primary" data-lab="acl">Grade Lab</button>
             <button class="ghost" data-hint="acl">Hint</button>
           </div>
           <div id="aclOut" class="output"></div>
@@ -137,12 +143,14 @@
       </section>
     </section>
 
+    <!-- SUBNETTING DRILLS PAGE -->
     <section id="subnet" class="page">
       <article class="hero">
         <h2>Subnetting Trainer</h2>
         <p>CIDR, VLSM, wildcard masks, host counts, and timed challenge practice.</p>
       </article>
       <article class="card">
+        <h3>Subnetting Practice</h3>
         <div class="row">
           <label>Mode
             <select id="subnetMode">
@@ -158,13 +166,14 @@
         </div>
         <div id="subnetPrompt" class="output"></div>
         <div class="inline">
-          <button id="subnetSubmit" class="primary">Submit</button>
+          <button id="subnetSubmit" class="primary">Submit Answer</button>
           <button id="subnetSkip" class="ghost">Skip</button>
         </div>
         <div id="subnetOut" class="output"></div>
       </article>
     </section>
 
+    <!-- READINESS DASHBOARD PAGE -->
     <section id="analytics" class="page">
       <article class="hero">
         <h2>Readiness Dashboard</h2>
@@ -181,21 +190,22 @@
       </section>
     </section>
 
+    <!-- EXAM ENGINE PAGE -->
     <section id="engine" class="page">
       <div class="exam-shell">
         <aside class="left">
           <article class="card">
             <h4 id="modeTitle"></h4>
-            <p id="modeDesc"></p>
-            <div class="inline">
-              <button id="openReview" class="ghost">Review</button>
-              <button id="toggleMark" class="ghost">Mark</button>
-              <button id="exitSession" class="ghost">Exit</button>
+            <p id="modeDesc" style="font-size: 12px; margin-top: 4px; color: var(--text-muted);"></p>
+            <div class="inline" style="margin-top: 12px;">
+              <button id="openReview" class="ghost">📋 Review</button>
+              <button id="toggleMark" class="ghost">🚩 Mark</button>
+              <button id="exitSession" class="ghost">🚪 Exit</button>
             </div>
           </article>
-          <article class="card">
-            <h4>Navigator</h4>
-            <p id="navMeta"></p>
+          <article class="card" style="flex: 1; display: flex; flex-direction: column;">
+            <h4 style="margin-bottom: 8px;">Navigator</h4>
+            <p id="navMeta" style="font-size: 11px; margin-bottom: 12px; color: var(--text-muted);"></p>
             <div id="qNav" class="qnav"></div>
           </article>
         </aside>
@@ -210,10 +220,12 @@
           <article id="reviewArea" class="scroll hidden"></article>
           <article id="resultArea" class="scroll hidden"></article>
           <footer class="exam-footer">
-            <button id="prevQ" class="ghost">Previous</button>
-            <button id="saveNext" class="secondary">Save & Next</button>
-            <button id="submitSession" class="primary">Submit</button>
-            <button id="nextQ" class="ghost">Next</button>
+            <button id="prevQ" class="ghost">⬅️ Previous</button>
+            <div class="inline" style="margin-top: 0;">
+              <button id="saveNext" class="secondary">Save & Next ➡️</button>
+              <button id="submitSession" class="primary">Submit Exam</button>
+            </div>
+            <button id="nextQ" class="ghost">Next ➡️</button>
           </footer>
         </section>
       </div>
