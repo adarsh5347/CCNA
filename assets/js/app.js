@@ -92,17 +92,22 @@ function navSetup() {
 
 function readinessScore() {
   const a = state.analytics;
-  const acc = a.totalQ ? (a.correct / a.totalQ) * 100 : 0;
-  const avgSec = a.totalQ ? a.totalTime / a.totalQ : 90;
+  if (!a || !a.totalQ) return 0;
+  const acc = (a.correct / a.totalQ) * 100;
+  const avgSec = a.totalTime / a.totalQ;
   const speed = Math.max(0, Math.min(100, 100 - ((avgSec - 45) * 0.9)));
   return Math.round(acc * 0.75 + speed * 0.25);
 }
 
 function passProbability() {
+  const a = state.analytics;
+  if (!a || !a.totalQ) return 0;
   return Math.max(5, Math.min(98, Math.round(readinessScore() * 0.92 + 5)));
 }
 
 function readinessLabel(score) {
+  const a = state.analytics;
+  if (!a || !a.totalQ) return "Not Started";
   if (score < 50) return "Beginner";
   if (score < 70) return "Intermediate";
   if (score < 85) return "Exam Ready";
@@ -791,6 +796,31 @@ function wireEvents() {
     ensureSubnetQuestion(false);
   });
   byId("subnetMode").addEventListener("change", () => ensureSubnetQuestion(true));
+
+  // Reset progress handler
+  const btnReset = byId("btnResetProgress");
+  if (btnReset) {
+    btnReset.addEventListener("click", () => {
+      if (confirm("Are you sure you want to reset all your progress statistics? This action cannot be undone.")) {
+        const fresh = {
+          attempts: [],
+          domain: {},
+          topic: {},
+          totalQ: 0,
+          correct: 0,
+          totalTime: 0,
+          studyMin: 0,
+          xp: 0,
+          ach: {}
+        };
+        state.analytics = fresh;
+        saveAnalytics();
+        renderHome();
+        renderAnalytics();
+        alert("Progress reset successfully.");
+      }
+    });
+  }
 }
 
 function setupAuth() {
