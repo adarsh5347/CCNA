@@ -383,7 +383,7 @@ function renderQuestion() {
 
   let html = `
     <span class="badge">${q.domain}</span><span class="badge">${q.topic}</span>
-    <div class="block"><strong>Scenario:</strong> ${q.scenario}</div>
+    ${q.scenario ? `<div class="block"><strong>Scenario:</strong> ${q.scenario}</div>` : ""}
     <h3>${q.text}</h3>
     <div class="meta">
       <div><strong>Difficulty</strong><br />${q.difficulty}</div>
@@ -391,9 +391,9 @@ function renderQuestion() {
       <div><strong>Topic Domain</strong><br />${q.domain}</div>
       <div><strong>Expected Frequency</strong><br />${q.frequency}</div>
     </div>
-    <div class="block">${q.topology.replace(/\n/g, "<br />")}</div>
-    <div class="block cli">${q.cli.replace(/\n/g, "<br />")}</div>
-    <div class="block packet">Packet: ${q.packet}</div>
+    ${q.topology ? `<div class="block">${q.topology.replace(/\n/g, "<br />")}</div>` : ""}
+    ${q.cli ? `<div class="block cli">${q.cli.replace(/\n/g, "<br />")}</div>` : ""}
+    ${q.packet ? `<div class="block packet">Packet: ${q.packet}</div>` : ""}
   `;
 
   if (q.type === "single" || q.type === "scenario") {
