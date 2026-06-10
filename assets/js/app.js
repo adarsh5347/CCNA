@@ -1,4 +1,4 @@
-import { blueprint, ranks, generateBank } from "./data.js";
+import { blueprint, generateBank } from "./data.js";
 import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgress, mergeProgress } from "./firebase.js";
 
 const STORE = "ccna_full_site_v1";
@@ -94,15 +94,7 @@ function readinessLabel(score) {
   return "Likely Pass";
 }
 
-function currentRank() {
-  let r = ranks[0];
-  ranks.forEach((x) => { if (state.analytics.xp >= x.xp) r = x; });
-  return r;
-}
-
-function nextRank() {
-  return ranks.find((r) => r.xp > state.analytics.xp) || null;
-}
+// Ranks removed
 
 function calcDomainAccuracy() {
   const out = {};
@@ -126,8 +118,7 @@ function renderHome() {
     { k: "CCNA Pass Probability", v: `${pp}%` },
     { k: "Readiness Level", v: readinessLabel(rs) },
     { k: "Study Hours", v: (state.analytics.studyMin / 60).toFixed(1) },
-    { k: "Average Time Per Question", v: `${avg}s` },
-    { k: "Rank", v: currentRank().title }
+    { k: "Average Time Per Question", v: `${avg}s` }
   ]);
 
   const easy = Math.round(state.bank.length * 0.4);
@@ -141,16 +132,6 @@ function renderHome() {
     { k: "Hard", v: hard },
     { k: "Question Types", v: "Single/Multi/Matching/Drag/Scenario" }
   ]);
-
-  const nr = nextRank();
-  renderStatsCards("gameStats", [
-    { k: "XP", v: state.analytics.xp },
-    { k: "Current Rank", v: currentRank().title },
-    { k: "Next Rank", v: nr ? `${nr.title} @ ${nr.xp}` : "Top Rank" }
-  ]);
-
-  const names = ["OSPF Master", "VLAN Expert", "ACL Ninja", "IPv6 Specialist", "Automation Explorer"];
-  byId("achievements").innerHTML = names.map((n) => `<span style="border-color:${state.analytics.ach[n] ? "#90be6d" : "#496a8b"};color:${state.analytics.ach[n] ? "#daf6c7" : "#9bb1c6"}">${n} ${state.analytics.ach[n] ? "Unlocked" : "Locked"}</span>`).join("");
 }
 
 function renderDomainChecks() {
@@ -327,12 +308,7 @@ function answerEquals(q, ans) {
   return false;
 }
 
-function xpGain(q, ok) {
-  if (!ok) return 1;
-  if (q.difficulty === "Hard") return 16;
-  if (q.difficulty === "Medium") return 10;
-  return 6;
-}
+// xpGain removed
 
 function applyStats(q, ok, sec) {
   const a = state.analytics;
@@ -349,15 +325,7 @@ function applyStats(q, ok, sec) {
   if (ok) a.topic[q.topic].correct += 1;
 }
 
-function refreshAchievements() {
-  const a = state.analytics;
-  const d = calcDomainAccuracy();
-  if ((d["IP Connectivity"] || 0) >= 80) a.ach["OSPF Master"] = true;
-  if ((d["Network Access"] || 0) >= 80) a.ach["VLAN Expert"] = true;
-  if ((d["Security Fundamentals"] || 0) >= 80) a.ach["ACL Ninja"] = true;
-  if ((a.topic.IPv6 && a.topic.IPv6.correct >= 12)) a.ach["IPv6 Specialist"] = true;
-  if ((a.topic["REST APIs"] && a.topic["REST APIs"].correct >= 10)) a.ach["Automation Explorer"] = true;
-}
+// refreshAchievements removed
 
 function explanationBlock(q, ok) {
   if (!state.session.showFeedback) return "";
@@ -492,8 +460,6 @@ function instantStudyFeedback() {
   const ok = answerEquals(q, ans);
   s.feedback[s.idx] = ok;
   applyStats(q, ok, 35);
-  state.analytics.xp += xpGain(q, ok);
-  refreshAchievements();
   saveAnalytics();
   renderQuestion();
   renderHome();
@@ -569,7 +535,6 @@ function submitSession(force) {
     domain[q.domain].total += 1;
     if (ok) domain[q.domain].correct += 1;
     applyStats(q, ok, 55);
-    state.analytics.xp += xpGain(q, ok);
     if (!ok) wrong.push({ i, q });
   });
 
@@ -585,7 +550,6 @@ function submitSession(force) {
   });
   state.analytics.attempts = state.analytics.attempts.slice(-40);
 
-  refreshAchievements();
   saveAnalytics();
   renderHome();
 
@@ -645,41 +609,7 @@ function renderAnalytics() {
     : "No attempts yet.";
 }
 
-function labDefs() {
-  return {
-    vlan: {
-      input: "vlanInput",
-      out: "vlanOut",
-      req: ["vlan 10", "vlan 20", "switchport mode access", "switchport access vlan 10", "switchport mode trunk"],
-      hint: "vlan 10, vlan 20, interface range, switchport mode access, switchport access vlan 10, interface g0/1, switchport mode trunk"
-    },
-    ospf: {
-      input: "ospfInput",
-      out: "ospfOut",
-      req: ["router ospf 1", "network", "area 0", "passive-interface"],
-      hint: "router ospf 1, network x.x.x.x wildcard area 0, passive-interface default, no passive-interface g0/0"
-    },
-    acl: {
-      input: "aclInput",
-      out: "aclOut",
-      req: ["ip access-list extended", "permit tcp", "eq 443", "deny ip any any", "ip access-group"],
-      hint: "ip access-list extended WEB-FILTER, permit tcp any 10.10.10.0 0.0.0.255 eq 443, deny ip any any log, interface g0/0, ip access-group WEB-FILTER in"
-    }
-  };
-}
-
-function gradeLab(name) {
-  const d = labDefs()[name];
-  const txt = byId(d.input).value.toLowerCase();
-  const missing = d.req.filter((k) => !txt.includes(k));
-  const score = Math.round(((d.req.length - missing.length) / d.req.length) * 100);
-  byId(d.out).innerHTML = `<strong>Lab Score:</strong> ${score}%<br />${missing.length ? `<strong>Missing:</strong><br />- ${missing.join("<br />- ")}` : "All required elements found."}`;
-}
-
-function showLabHint(name) {
-  const d = labDefs()[name];
-  byId(d.out).innerHTML = `<strong>Hint:</strong> ${d.hint}`;
-}
+// Lab functions removed
 
 function makeSubnetQuestion(mode) {
   const prefixes = mode === "Easy" ? [24, 25, 26] : mode === "Medium" ? [22, 23, 27, 28] : [19, 20, 29, 30];
@@ -748,8 +678,7 @@ function wireEvents() {
   byId("saveNext").addEventListener("click", saveAndNext);
   byId("submitSession").addEventListener("click", () => submitSession(false));
 
-  document.querySelectorAll("[data-lab]").forEach((b) => b.addEventListener("click", () => gradeLab(b.dataset.lab)));
-  document.querySelectorAll("[data-hint]").forEach((b) => b.addEventListener("click", () => showLabHint(b.dataset.hint)));
+  // Lab listeners removed
 
   byId("subnetSubmit").addEventListener("click", submitSubnet);
   byId("subnetSkip").addEventListener("click", () => {

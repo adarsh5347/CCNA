@@ -20,7 +20,6 @@
     </div>
     <nav>
       <button data-page="home" class="ghost">🏠 Home</button>
-      <button data-page="labs" class="ghost">🛠️ Interactive Labs</button>
       <button data-page="subnet" class="ghost">⚡ Subnetting</button>
       <button data-page="analytics" class="ghost">📊 Analytics</button>
       <span id="timer" class="timer hidden">120:00</span>
@@ -41,7 +40,7 @@
       <article class="hero">
         <h2>Complete CCNA Learning & Assessment Platform</h2>
         <p>
-          Train with adaptive questions, section quizzes, full exam simulation, interactive labs, subnetting drills,
+          Train with adaptive questions, section quizzes, full exam simulation, subnetting drills,
           and readiness analytics designed for real CCNA 200-301 pass preparation.
         </p>
         <div id="heroStats" class="grid stats"></div>
@@ -100,56 +99,9 @@
           <h3>📊 Question Bank & Distribution</h3>
           <div id="bankStats" class="grid stats"></div>
         </div>
-
-        <div class="card">
-          <h3>🏅 Gamification & Progress</h3>
-          <div id="gameStats" class="grid stats"></div>
-          <div id="achievements" class="achievements"></div>
-        </div>
       </section>
     </section>
 
-    <!-- INTERACTIVE LABS PAGE -->
-    <section id="labs" class="page">
-      <article class="hero">
-        <h2>Cisco Interactive Labs</h2>
-        <p>Type configuration commands and get auto-graded feedback with missing steps.</p>
-      </article>
-      <section class="grid labs">
-        <article class="card">
-          <h3>VLAN Lab</h3>
-          <p>Configure VLAN 10, VLAN 20, access ports, and trunk ports.</p>
-          <textarea id="vlanInput" rows="8" placeholder="SW1(config)# ..."></textarea>
-          <div class="inline">
-            <button class="primary" data-lab="vlan">Grade Lab</button>
-            <button class="ghost" data-hint="vlan">Hint</button>
-          </div>
-          <div id="vlanOut" class="output"></div>
-        </article>
-
-        <article class="card">
-          <h3>OSPF Lab</h3>
-          <p>Configure router ospf 1, network statements, and passive interfaces.</p>
-          <textarea id="ospfInput" rows="8" placeholder="R1(config)# ..."></textarea>
-          <div class="inline">
-            <button class="primary" data-lab="ospf">Grade Lab</button>
-            <button class="ghost" data-hint="ospf">Hint</button>
-          </div>
-          <div id="ospfOut" class="output"></div>
-        </article>
-
-        <article class="card">
-          <h3>ACL Lab</h3>
-          <p>Create and apply extended ACL commands with correct direction.</p>
-          <textarea id="aclInput" rows="8" placeholder="R2(config)# ..."></textarea>
-          <div class="inline">
-            <button class="primary" data-lab="acl">Grade Lab</button>
-            <button class="ghost" data-hint="acl">Hint</button>
-          </div>
-          <div id="aclOut" class="output"></div>
-        </article>
-      </section>
-    </section>
 
     <!-- SUBNETTING DRILLS PAGE -->
     <section id="subnet" class="page">

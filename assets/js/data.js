@@ -1,21 +1,12 @@
 export const blueprint = [
-  { name: "Network Fundamentals", weight: 20, topics: ["OSI", "TCP/IP", "IPv4", "IPv6", "Subnetting", "Ethernet", "ARP", "ICMP", "DNS", "DHCP"], count: 25 },
-  { name: "Network Access", weight: 20, topics: ["VLANs", "Trunks", "STP", "EtherChannel", "Wireless"], count: 25 },
-  { name: "IP Connectivity", weight: 25, topics: ["Routing", "OSPF", "Static Routes", "Route Selection"], count: 30 },
-  { name: "IP Services", weight: 10, topics: ["DHCP", "NAT", "NTP", "Syslog", "SNMP"], count: 12 },
-  { name: "Security Fundamentals", weight: 15, topics: ["ACLs", "SSH", "Port Security", "DHCP Snooping", "Wireless Security"], count: 18 },
-  { name: "Automation and Programmability", weight: 10, topics: ["JSON", "REST APIs", "SDN", "DNA Center", "Ansible", "YANG", "NETCONF"], count: 12 }
+  { name: "Network Fundamentals", weight: 20, topics: ["OSI", "TCP/IP", "IPv4", "IPv6", "Subnetting", "Ethernet", "ARP", "ICMP", "DNS", "DHCP"], count: 30 },
+  { name: "Network Access", weight: 20, topics: ["VLANs", "Trunks", "STP", "EtherChannel", "Wireless"], count: 30 },
+  { name: "IP Connectivity", weight: 25, topics: ["Routing", "OSPF", "Static Routes", "Route Selection"], count: 35 },
+  { name: "IP Services", weight: 10, topics: ["DHCP", "NAT", "NTP", "Syslog", "SNMP"], count: 15 },
+  { name: "Security Fundamentals", weight: 15, topics: ["ACLs", "SSH", "Port Security", "DHCP Snooping", "Wireless Security"], count: 25 },
+  { name: "Automation and Programmability", weight: 10, topics: ["JSON", "REST APIs", "SDN", "DNA Center", "Ansible", "YANG", "NETCONF"], count: 15 }
 ];
 
-export const ranks = [
-  { xp: 0, title: "Network Intern" },
-  { xp: 300, title: "Help Desk" },
-  { xp: 700, title: "Network Technician" },
-  { xp: 1300, title: "Junior Network Engineer" },
-  { xp: 2000, title: "Network Engineer" },
-  { xp: 3000, title: "Senior Engineer" },
-  { xp: 4200, title: "CCNA Ready" }
-];
 
 const questionBank = [
   // ==========================================
@@ -3726,6 +3717,846 @@ const questionBank = [
       memory: "login block-for LOCKOUT_TIME attempts FAILED_COUNT within WINDOW.",
       real: "Enable login block-for on your border routers to protect management VTY access from internet scanners.",
       commands: ["login block-for 300 attempts 3 within 60"]
+    }
+  },
+  {
+    id: 123,
+    domain: "Network Fundamentals",
+    topic: "Wireless Deployment",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "High",
+    text: "A network engineer is deploying lightweight access points (LAPs) in a branch office that has a WAN link connecting to the main campus where the WLC is located. Which wireless deployment mode should be configured on the LAPs to allow local client traffic switching if the WAN link to the WLC goes down?",
+    options: [
+      "FlexConnect Mode",
+      "Local Mode",
+      "Bridge Mode",
+      "Monitor Mode"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "FlexConnect is a wireless solution for branch and remote office deployments. It allows the WLC to configure access points over the WAN link, but switch data traffic locally. If the WAN connection fails, the LAP can continue to switch traffic locally for existing clients.",
+      wrong: [
+        "Local Mode is the default mode where all client traffic is tunneled via CAPWAP back to the WLC; if the WLC is unreachable, wireless clients cannot access local network resources.",
+        "Bridge Mode is used to configure APs as outdoor point-to-point or point-to-multipoint mesh nodes.",
+        "Monitor Mode disables transmitter capabilities, allowing the AP to act as a dedicated sensor for location tracking and intrusion detection."
+      ],
+      tip: "FlexConnect allows local switching and local authentication if the link to the WLC is lost.",
+      memory: "FlexConnect = Flexible switching, local switching if WAN fails.",
+      real: "Always use FlexConnect for branch offices with limited WAN bandwidth to keep local printer and server access functional during WAN outages.",
+      commands: []
+    }
+  },
+  {
+    id: 124,
+    domain: "Network Fundamentals",
+    topic: "Cabling Properties",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "Medium",
+    text: "Which optical fiber standard is designed for long-distance transmissions, utilizes a laser light source, and has a typical core size of 9 microns?",
+    options: [
+      "10GBASE-LR (Single-Mode Fiber)",
+      "10GBASE-SR (Multi-Mode Fiber)",
+      "1000BASE-T (Unshielded Twisted Pair)",
+      "1000BASE-SX (Multi-Mode Fiber)"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "Single-mode fiber (SMF) has a very small core diameter (typically 9 microns), which restricts the light to a single path (mode). It uses laser light sources and is suited for high-speed, long-distance transmission, such as 10GBASE-LR (Long Range).",
+      wrong: [
+        "10GBASE-SR (Short Range) uses multi-mode fiber (MMF), which has a larger core (50 or 62.5 microns) and uses LEDs or VCSELs, limiting its distance.",
+        "1000BASE-T is a copper cabling standard using UTP, not optical fiber.",
+        "1000BASE-SX is a multi-mode fiber standard for short distances using 850nm lasers."
+      ],
+      tip: "Single-mode fiber = Small core (9 microns), Laser source, long distances (up to 10km or more).",
+      memory: "SMF = Single mode, Small core, Super-far distance.",
+      real: "When connecting buildings across a campus that are more than 500 meters apart, use Single-Mode Fiber (SMF) to prevent signal attenuation.",
+      commands: []
+    }
+  },
+  {
+    id: 125,
+    domain: "Network Fundamentals",
+    topic: "WAN Topologies",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "Medium",
+    text: "Which WAN service utilizes label switching routers (LSRs) and edge routers (LERs) to forward data using short path labels rather than complex routing table lookups?",
+    options: [
+      "Multiprotocol Label Switching (MPLS)",
+      "Metro Ethernet (MetroE)",
+      "Site-to-Site IPsec VPN",
+      "Dynamic Multipoint VPN (DMVPN)"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "Multiprotocol Label Switching (MPLS) is a high-performance WAN technology that directs data from one network node to another based on short path labels rather than long network addresses, using Label Switch Routers (LSRs) and Label Edge Routers (LERs).",
+      wrong: [
+        "Metro Ethernet is a service that extends Ethernet technology beyond the LAN into metropolitan networks, behaving like a large Layer 2 bridge.",
+        "Site-to-Site IPsec VPN is an encrypted tunnel over the public Internet, not a service provider label-switching technology.",
+        "DMVPN is a Cisco proprietary software solution for building multiple IPsec VPNs in an easy, dynamic, and scalable manner."
+      ],
+      tip: "MPLS relies on labels inserted between Layer 2 and Layer 3 headers (often called a Layer 2.5 protocol).",
+      memory: "MPLS = Multiprotocol Label Switching. Look for LSR and LER keywords.",
+      real: "Enterprise networks often use MPLS to interconnect branch offices with guaranteed Quality of Service (QoS) for voice and video traffic.",
+      commands: []
+    }
+  },
+  {
+    id: 126,
+    domain: "Network Fundamentals",
+    topic: "IPv6 EUI-64",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "20%",
+    frequency: "High",
+    text: "If a Cisco router interface MAC address is 0011:2233:4455, what is the interface ID (last 64 bits) of its IPv6 address when calculated using the EUI-64 process?",
+    options: [
+      "0211:22FF:FE33:4455",
+      "0011:22FF:FE33:4455",
+      "0211:2233:4455:FFFE",
+      "2001:0011:22FF:FE33"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "The EUI-64 process takes a 48-bit MAC address, splits it in half, inserts FFFE in the middle, and flips the 7th bit (universal/local bit) of the first byte. The MAC address 0011:2233:4455 has the first byte 00 (binary 00000000). Flipping the 7th bit results in 00000010 (hex 02). Inserting FFFE in the middle of 0011:2233:4455 results in 0211:22FF:FE33:4455.",
+      wrong: [
+        "0011:22FF:FE33:4455 is incorrect because the 7th bit of the first byte was not flipped.",
+        "0211:2233:4455:FFFE is incorrect because FFFE was appended to the end rather than inserted in the middle.",
+        "2001:0011:22FF:FE33 is a global unicast prefix example, not the host interface identifier."
+      ],
+      tip: "To perform EUI-64: Split MAC, insert FFFE in the middle, change the 2nd hex character of the MAC (e.g. 00 -> 02, 0c -> 0e).",
+      memory: "EUI-64: Split, insert FFFE, flip the 7th bit (add 2 to the first byte in hex).",
+      real: "Review interface configuration using 'show ipv6 interface' to observe the EUI-64 link-local address generation.",
+      commands: ["show ipv6 interface"]
+    }
+  },
+  {
+    id: 127,
+    domain: "Network Fundamentals",
+    topic: "DNS Records",
+    type: "single",
+    difficulty: "Easy",
+    examWeight: "20%",
+    frequency: "Medium",
+    text: "Which type of DNS resource record resolves a domain name to an IPv6 address?",
+    options: [
+      "AAAA record",
+      "A record",
+      "CNAME record",
+      "MX record"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "An AAAA DNS record maps a hostname to a 128-bit IPv6 address, whereas a standard A record maps a hostname to a 32-bit IPv4 address.",
+      wrong: [
+        "A record resolves a domain name to a 32-bit IPv4 address.",
+        "CNAME record (Canonical Name) maps an alias name to the true canonical domain name.",
+        "MX record (Mail Exchanger) specifies the mail server responsible for accepting email messages on behalf of a domain."
+      ],
+      tip: "Think of AAAA as four times the size of A (IPv6 is 128 bits, which is 4 times the size of IPv4's 32 bits).",
+      memory: "A = IPv4, AAAA = IPv6, MX = Mail, CNAME = Alias.",
+      real: "When deploying an IPv6-only public web server, create an AAAA record in your external DNS provider.",
+      commands: []
+    }
+  },
+  {
+    id: 128,
+    domain: "Network Access",
+    topic: "Wireless Roaming",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "Medium",
+    text: "A wireless client moves from the coverage area of AP-A to AP-B. Both APs are connected to different access layer switches, but are managed by the same WLC. If the client maintains its IP address and session state, what type of roaming has occurred?",
+    options: [
+      "Layer 2 Roaming (Intra-Controller)",
+      "Layer 3 Roaming (Inter-Controller)",
+      "Subnet-to-Subnet Roaming",
+      "Autonomous-to-Lightweight Roaming"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "Layer 2 Roaming (or Intra-Controller Roaming) occurs when a client moves between APs that are associated with the same WLC and are configured on the same VLAN/subnet. The WLC updates its database with the client's new AP association without changing the client's IP address.",
+      wrong: [
+        "Layer 3 Roaming (Inter-Controller Roaming) happens when a client roams between APs managed by different WLCs on different subnets, requiring traffic asymmetric tunneling (foreign/anchor relationship) to keep the original IP address.",
+        "Subnet-to-Subnet Roaming is a general concept that typically forces a new DHCP request and IP change unless Layer 3 roaming capabilities are enabled.",
+        "Autonomous-to-Lightweight Roaming describes moving from standalone APs to controller-managed APs, not client movement."
+      ],
+      tip: "In Intra-Controller Roaming, the MAC-to-port mapping is updated inside the WLC, and a gratuitous ARP is sent to update the switch CAM tables.",
+      memory: "Intra-Controller / same VLAN = Layer 2 Roaming.",
+      real: "Configure a mobility group when you need to enable seamless Layer 3 roaming across multiple WLCs.",
+      commands: []
+    }
+  },
+  {
+    id: 129,
+    domain: "Network Access",
+    topic: "WLC Interfaces",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "High",
+    text: "Which WLC interface is used by the controller to relay DHCP messages, perform web authentication, and handle VPN termination, and is typically configured with an out-of-band non-routable IP address?",
+    options: [
+      "Virtual Interface",
+      "Management Interface",
+      "AP-Manager Interface",
+      "Service Port"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "The Virtual Interface on a WLC is used for layer 3 security authentication (web auth), DHCP relay redirection, and mobility management. It must be configured with a non-routable IP address (such as 192.0.2.1) that does not exist in the routing table of the enterprise network.",
+      wrong: [
+        "Management Interface is the default interface for out-of-band and in-band WLC management, and controller-to-WLC communication.",
+        "AP-Manager Interface controls LAP-to-WLC CAPWAP tunnel communications.",
+        "Service Port is a physical interface used only for out-of-band management and recovery."
+      ],
+      tip: "The virtual interface IP must be a unique, non-routable address, and all WLCs in a mobility group should share the same virtual interface IP.",
+      memory: "Virtual Interface = DHCP relay redirection, web auth redirection.",
+      real: "When configuring a WLC for the first time, use 192.0.2.1 as the virtual IP address to comply with RFC 5737 recommendations.",
+      commands: []
+    }
+  },
+  {
+    id: 130,
+    domain: "Network Access",
+    topic: "Rapid PVST+",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "20%",
+    frequency: "High",
+    text: "In a Rapid PVST+ configuration, which port role is assigned to a port that receives superior BPDUs from another switch and acts as an immediate standby interface to the root port?",
+    options: [
+      "Alternate Port",
+      "Backup Port",
+      "Designated Port",
+      "Root Port"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "In RSTP (and Rapid PVST+), an Alternate port receives superior BPDUs from another switch. It acts as an alternate path to the root switch and can transition immediately to a forwarding root port if the active root port fails.",
+      wrong: [
+        "Backup port receives superior BPDUs from its own switch (usually due to a hub connecting two ports on the same switch) and acts as a backup path to a shared segment.",
+        "Designated port is the port on a segment that is elected to forward traffic toward the root bridge.",
+        "Root port is the single port on a non-root switch that has the lowest path cost to the root bridge."
+      ],
+      tip: "Alternate = Backup path to Root (receives BPDU from ANOTHER switch). Backup = Backup path to segment (receives BPDU from SELF).",
+      memory: "Alternate = Alternate Switch. Backup = Same Switch.",
+      real: "Execute 'show spanning-tree' to see RSTP port roles. Alternate ports will display status as 'Altn BLK'.",
+      commands: ["show spanning-tree"]
+    }
+  },
+  {
+    id: 131,
+    domain: "Network Access",
+    topic: "EtherChannel",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "High",
+    text: "Which combination of EtherChannel negotiation modes on two connected switches will successfully form an EtherChannel?",
+    options: [
+      "Switch 1: LACP Active | Switch 2: LACP Passive",
+      "Switch 1: PAgP Desirable | Switch 2: LACP Active",
+      "Switch 1: PAgP Auto | Switch 2: PAgP Auto",
+      "Switch 1: LACP Passive | Switch 2: LACP Passive"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "LACP Active initiates negotiation, while Passive waits for the other side to negotiate. Active-Passive will form a channel. Active-Active will also form a channel.",
+      wrong: [
+        "PAgP Desirable and LACP Active cannot form a channel because PAgP (Cisco proprietary) and LACP (IEEE 802.3ad) are incompatible protocols.",
+        "PAgP Auto and PAgP Auto will not form a channel because both ports are passive and wait for the other side to initiate negotiation.",
+        "LACP Passive and LACP Passive will not form a channel because both ports are passive and will never initiate negotiation."
+      ],
+      tip: "At least one side must be in active negotiation mode (Active for LACP, Desirable for PAgP). Protocols must match.",
+      memory: "PAgP = Auto/Desirable. LACP = Passive/Active. Incompatible protocols never bundle.",
+      real: "Always use LACP (Active on both sides) for cross-vendor EtherChannel deployments to ensure multi-chassis link aggregation compatibility.",
+      commands: ["channel-group 1 mode active", "show etherchannel summary"]
+    }
+  },
+  {
+    id: 132,
+    domain: "Network Access",
+    topic: "VTP Revision",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "20%",
+    frequency: "Medium",
+    text: "A network administrator adds a refurbished switch to an existing network. The switch is configured in VTP Server mode with the correct VTP domain name, but has a VTP revision number of 45. The existing network's VTP Server has a revision number of 30. What will happen to the VLAN configuration of the existing network?",
+    options: [
+      "All switches in the domain will overwrite their VLAN database with the refurbished switch's VLAN database.",
+      "The refurbished switch will update its database with the existing VTP server's configuration.",
+      "The switches will merge their databases and increment the revision to 46.",
+      "VTP synchronization will fail and log a mismatched revision error on all switches."
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "VTP switches overwrite their VLAN database if they receive a VTP advertisement with the same domain name and a higher configuration revision number. If a refurbished switch with a higher revision number (45) is introduced, it will overwrite the database of switches with lower revision numbers (30), which can delete existing VLANs and cause a major outage.",
+      wrong: [
+        "The refurbished switch will not update its database because its revision number is higher, not lower.",
+        "The switches do not merge databases; VTP completely overwrites the database of the lower revision with that of the higher revision.",
+        "No error is logged to block it; VTP automatically accepts the higher revision by design, which is why VTP is considered risky."
+      ],
+      tip: "To prevent VTP disasters, change the VTP domain name to a dummy name and back, or change the mode to VTP Transparent before adding a switch to reset the revision number to 0.",
+      memory: "Higher VTP Revision = Overwrites lower revision. Reset to 0 by changing domain/mode.",
+      real: "Reset the VTP revision number of any switch using 'vtp mode transparent' before introducing it to a production network.",
+      commands: ["vtp mode transparent", "vtp domain dummy", "show vtp status"]
+    }
+  },
+  {
+    id: 133,
+    domain: "IP Connectivity",
+    topic: "OSPF Network Types",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "25%",
+    frequency: "High",
+    text: "Which OSPF network type is the default on physical serial interfaces, does not elect a DR/BDR, and has a default Hello timer of 10 seconds?",
+    options: [
+      "Point-to-Point",
+      "Broadcast",
+      "Non-Broadcast Multi-Access (NBMA)",
+      "Point-to-Multipoint"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "The Point-to-Point OSPF network type is default on serial interfaces running HDLC or PPP encapsulation. It does not perform Designated Router (DR) or Backup Designated Router (BDR) elections because only two routers exist on the link, and its default timers are 10s Hello / 40s Dead.",
+      wrong: [
+        "Broadcast is the default on Ethernet interfaces, elects a DR/BDR, and has a 10s Hello timer.",
+        "Non-Broadcast Multi-Access (NBMA) is default on Frame Relay and ATM interfaces, elects a DR/BDR, and has a 30s Hello timer.",
+        "Point-to-Multipoint does not elect a DR/BDR, but it has a default Hello timer of 30 seconds."
+      ],
+      tip: "OSPF Point-to-Point requires no DR/BDR, meaning adjacencies form faster and database exchange is simpler.",
+      memory: "Point-to-Point = No DR/BDR, 10s Hello. Serial default.",
+      real: "Use 'ip ospf network point-to-point' on subinterfaces and Tunnel interfaces to optimize OSPF convergence and reduce DR overhead.",
+      commands: ["ip ospf network point-to-point", "show ip ospf interface"]
+    }
+  },
+  {
+    id: 134,
+    domain: "IP Connectivity",
+    topic: "OSPF States",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "25%",
+    frequency: "High",
+    text: "During the OSPF neighbor adjacency process, in which state do two routers exchange Database Description (DBD) packets to describe their Link-State Database contents?",
+    options: [
+      "Exchange State",
+      "ExStart State",
+      "Loading State",
+      "2-Way State"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "In the Exchange state, OSPF routers send Database Description (DBD) packets to each other. These packets contain LSA headers that describe the contents of the router's link-state database.",
+      wrong: [
+        "ExStart state is where routers elect a Master/Slave relationship and decide the initial sequence number using empty DBD packets.",
+        "Loading state is where routers request missing or newer LSAs using Link State Request (LSR) packets and receive updates via Link State Update (LSU) packets.",
+        "2-Way state is where bi-directional communication is established, and DR/BDR elections occur on broadcast networks."
+      ],
+      tip: "OSPF State transition flow: Down -> Init -> 2-Way -> ExStart -> Exchange -> Loading -> Full.",
+      memory: "ExStart = Master/Slave election. Exchange = DBD packets. Loading = LSR/LSU.",
+      real: "If OSPF is stuck in ExStart/Exchange, check for MTU mismatches on the connecting interfaces.",
+      commands: ["show ip ospf neighbor", "debug ip ospf adj"]
+    }
+  },
+  {
+    id: 135,
+    domain: "IP Connectivity",
+    topic: "Route Selection",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "25%",
+    frequency: "High",
+    text: "A router receives three routing updates for the destination prefix 10.1.1.0/24: OSPF (AD 110, Metric 50), EIGRP (AD 90, Metric 307200), and a Static Route (AD 1, Metric 0). Which route will the router install in the routing table?",
+    options: [
+      "The Static Route",
+      "The EIGRP Route",
+      "The OSPF Route",
+      "All three routes (Load Balancing)"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "When a router receives paths to the exact same prefix from different routing sources, it compares the Administrative Distance (AD). The route with the lowest AD is installed. A Static Route has a default AD of 1, which is lower than EIGRP (90) and OSPF (110).",
+      wrong: [
+        "EIGRP Route is not selected because its AD (90) is higher than the Static Route (1).",
+        "OSPF Route is not selected because its AD (110) is higher than EIGRP (90) and Static Route (1).",
+        "Load Balancing only happens if paths have the same prefix, protocol, and cost (or via EIGRP unequal cost load balancing), not across different protocols with different ADs."
+      ],
+      tip: "Lowest AD wins when prefix lengths are identical. Lowest Metric wins when comparing routes within the same protocol.",
+      memory: "Route selection priority: 1. Longest Match Prefix, 2. Lowest AD, 3. Lowest Metric.",
+      real: "Verify the routing table using 'show ip route' to check the active protocol code next to the prefix.",
+      commands: ["show ip route", "show ip route 10.1.1.0"]
+    }
+  },
+  {
+    id: 136,
+    domain: "IP Connectivity",
+    topic: "HSRP",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "25%",
+    frequency: "High",
+    text: "What is the virtual MAC address of an HSRP group 10 active router configured for IPv4?",
+    options: [
+      "0000.0c07.ac0a",
+      "0000.0c07.ac10",
+      "0000.0c9f.f00a",
+      "0100.5e00.000a"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "The HSRP version 1 virtual MAC address structure for IPv4 is 0000.0c07.acXX, where XX is the HSRP group number in hexadecimal. Group 10 in decimal is '0a' in hex. Therefore, the virtual MAC is 0000.0c07.ac0a.",
+      wrong: [
+        "0000.0c07.ac10 is incorrect because 10 is in decimal and must be converted to hex ('0a').",
+        "0000.0c9f.f00a is the HSRP version 2 virtual MAC address structure (0000.0c9f.fXXX, where XXX is the hex group number). For group 10, that would be f00a.",
+        "0100.5e00.000a is a multicast MAC address (used for IPv4 multicast routing mapping), not an HSRP virtual MAC."
+      ],
+      tip: "HSRP v1: 0000.0c07.acXX (XX = Hex group). HSRP v2: 0000.0c9f.fXXX (XXX = Hex group). VRRP: 0000.5e00.01XX.",
+      memory: "Convert decimal group to hex! 10 decimal = 0a hex.",
+      real: "When troubleshooting gateway issues, verify client ARP cache using 'arp -a' to see if it shows the HSRP virtual MAC.",
+      commands: ["standby 10 ip 192.168.1.254", "show standby"]
+    }
+  },
+  {
+    id: 137,
+    domain: "IP Connectivity",
+    topic: "IPv6 Static Routing",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "25%",
+    frequency: "Medium",
+    text: "Which command configures a floating static IPv6 route to destination prefix 2001:db8:acad::/64 with a next-hop IP of 2001:db8:feed::1 and an administrative distance of 150?",
+    options: [
+      "ipv6 route 2001:db8:acad::/64 2001:db8:feed::1 150",
+      "ipv6 route 2001:db8:acad::/64 interface g0/1 150",
+      "ipv6 route 2001:db8:acad::/64 2001:db8:feed::1 metric 150",
+      "ip route ipv6 2001:db8:acad::/64 2001:db8:feed::1 150"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "The correct command syntax is 'ipv6 route <prefix/length> <next-hop-ip> [administrative-distance]'. In this case: 'ipv6 route 2001:db8:acad::/64 2001:db8:feed::1 150'. The AD is appended directly after the next-hop address.",
+      wrong: [
+        "ipv6 route ... interface g0/1 150 is a fully specified or directly attached route using an egress interface, which requires extra next-hop config for multi-access links, and was not requested.",
+        "metric 150 is incorrect syntax; Cisco IOS does not use the keyword 'metric' for static route AD assignment.",
+        "ip route ipv6 is invalid command structure; IPv6 static routing uses the 'ipv6 route' command."
+      ],
+      tip: "Floating static routes are configured with an AD higher than the active routing protocol (e.g. OSPF: 110) so they only enter the routing table if the primary route fails.",
+      memory: "ipv6 route PREFIX/LENGTH NEXT_HOP AD",
+      real: "Configure floating static routes to provide backup connectivity in case OSPF adjacencies fail.",
+      commands: ["ipv6 route 2001:db8:acad::/64 2001:db8:feed::1 150"]
+    }
+  },
+  {
+    id: 138,
+    domain: "IP Services",
+    topic: "NAT Overload",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "10%",
+    frequency: "High",
+    text: "What is the theoretical maximum number of concurrent translation sessions that Port Address Translation (PAT) can support using a single inside global IPv4 address?",
+    options: [
+      "65,536",
+      "1,024",
+      "4,096",
+      "16,777,216"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "PAT (NAT Overload) translates inside local IP addresses to a single inside global IP address by utilizing unique source port numbers in the TCP and UDP headers. Since the port field is 16 bits in size, there are 2^16 (65,536) theoretical ports available per inside global IP address.",
+      wrong: [
+        "1,024 is the maximum number of well-known system ports, not the total port availability.",
+        "4,096 is the limit of VLAN IDs, not port translations.",
+        "16,777,216 is the number of IPv4 Class A addresses, unrelated to transport layer port limitations."
+      ],
+      tip: "In practice, PAT reserves some port ranges, but the theoretical limit is dictated by the 16-bit port number field.",
+      memory: "PAT = Port Address Translation. 16-bit port number = 65,536 sessions.",
+      real: "Monitor active NAT translations using 'show ip nat translations' to check for translation exhaustion in busy corporate environments.",
+      commands: ["ip nat inside source list 1 interface GigabitEthernet0/0 overload", "show ip nat translations"]
+    }
+  },
+  {
+    id: 139,
+    domain: "IP Services",
+    topic: "DHCP Snooping",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "10%",
+    frequency: "Medium",
+    text: "Which DHCP Snooping feature inserts information about the switch port and VLAN from which a DHCP request originated into the DHCP packet before forwarding it to the server?",
+    options: [
+      "Option 82 (Relay Agent Information Option)",
+      "Option 150 (TFTP Server Option)",
+      "Option 67 (Bootfile Name Option)",
+      "Option 43 (WLC IP Option)"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "DHCP Option 82 (the Relay Agent Information Option) is inserted by DHCP-snooping-enabled switches or DHCP relay agents to provide the DHCP server with details about the physical switch port, VLAN, and MAC address of the requesting client to facilitate strict IP address allocation policies.",
+      wrong: [
+        "Option 150 specifies TFTP server IP addresses for IP phone configuration downloads.",
+        "Option 67 specifies the bootfile name for network booting clients.",
+        "Option 43 specifies the IP address of wireless LAN controllers to lightweight access points."
+      ],
+      tip: "DHCP Snooping must be globally enabled and active on the client VLAN for Option 82 insertion to occur.",
+      memory: "Option 82 = Switch Port & VLAN identifier (Relay Agent Information).",
+      real: "Cisco switches insert Option 82 by default when DHCP snooping is enabled, which might cause some DHCP servers to reject requests unless configured to handle it.",
+      commands: ["ip dhcp snooping", "ip dhcp snooping information option"]
+    }
+  },
+  {
+    id: 140,
+    domain: "IP Services",
+    topic: "SNMPv3",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "10%",
+    frequency: "High",
+    text: "Which SNMPv3 security level provides authentication using HMAC-MD5 or HMAC-SHA but does not provide encryption of the SNMP data packets?",
+    options: [
+      "authNoPriv",
+      "noAuthNoPriv",
+      "authPriv",
+      "noAuthPriv"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "The SNMPv3 'authNoPriv' security level provides message authentication and integrity checks using MD5 or SHA algorithms, but it does not encrypt (provide privacy for) the payload data.",
+      wrong: [
+        "noAuthNoPriv provides no authentication and no encryption, mimicking older SNMPv1/v2c security but using SNMPv3 headers.",
+        "authPriv provides both authentication (MD5/SHA) and encryption (DES/AES) for maximum security.",
+        "noAuthPriv is not a valid SNMPv3 security level (you cannot encrypt without authenticating first)."
+      ],
+      tip: "SNMPv3 levels: 1) noAuthNoPriv (no security), 2) authNoPriv (password checked), 3) authPriv (password checked + encrypted).",
+      memory: "auth = Authenticated (MD5/SHA). Priv = Private (Encrypted with DES/AES).",
+      real: "Always use SNMPv3 'authPriv' globally to protect network monitoring data from sniffing and spoofing.",
+      commands: ["snmp-server group MONITOR v3 auth"]
+    }
+  },
+  {
+    id: 141,
+    domain: "Security Fundamentals",
+    topic: "TACACS+ vs RADIUS",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "15%",
+    frequency: "High",
+    text: "Which statement accurately describes a key architectural difference between TACACS+ and RADIUS AAA protocols?",
+    options: [
+      "TACACS+ uses TCP port 49 and encrypts the entire packet body, while RADIUS uses UDP ports 1812/1813 and encrypts only the user password.",
+      "TACACS+ uses UDP port 49 and encrypts only the password, while RADIUS uses TCP port 1812 and encrypts the entire packet.",
+      "TACACS+ merges authentication and authorization into one step, while RADIUS separates them.",
+      "TACACS+ is an open standard, while RADIUS is a Cisco proprietary protocol."
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "TACACS+ is a TCP-based protocol (port 49) that separates authentication, authorization, and accounting (AAA) steps, and encrypts the entire packet body (except the header). RADIUS is a UDP-based protocol (ports 1812/1813) that combines authentication and authorization, and only encrypts the password field in the access request.",
+      wrong: [
+        "TACACS+ uses TCP, not UDP, and encrypts the entire packet body. RADIUS uses UDP, not TCP.",
+        "TACACS+ separates authentication and authorization, whereas RADIUS combines them.",
+        "TACACS+ was originally Cisco proprietary (now open), while RADIUS has always been an open standard (RFC-defined)."
+      ],
+      tip: "TACACS+ is best for device administration (router logins) because it allows strict command authorization. RADIUS is best for network access (802.1X, dot1x) due to high throughput.",
+      memory: "TACACS+ = TCP 49, separates AAA, encrypts all. RADIUS = UDP 1812, combines Auth/Authz, encrypts password.",
+      real: "Configure TACACS+ servers for device shell access control to track exactly which administrative commands are executed by users.",
+      commands: ["tacacs server TAC-SERVER", "radius server RAD-SERVER"]
+    }
+  },
+  {
+    id: 142,
+    domain: "Security Fundamentals",
+    topic: "Dynamic ARP Inspection",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "15%",
+    frequency: "High",
+    text: "Dynamic ARP Inspection (DAI) relies on which database to validate IP-to-MAC address bindings of ARP packets on untrusted switch ports?",
+    options: [
+      "DHCP Snooping Binding Database",
+      "MAC Address Table (CAM)",
+      "ARP Cache",
+      "VLAN database"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "Dynamic ARP Inspection (DAI) intercepts all ARP packets on untrusted ports and validates their IP-to-MAC bindings against the DHCP Snooping Binding Database. If a binding is not found, the ARP packet is dropped.",
+      wrong: [
+        "MAC Address Table (CAM) maps Layer 2 MAC addresses to physical switch ports, but does not track IP-to-MAC bindings.",
+        "ARP Cache maps IP addresses to MAC addresses on a Layer 3 device, but is not the security source used by DAI to inspect transit packets.",
+        "VLAN database holds VLAN IDs and names, not host IP/MAC bindings."
+      ],
+      tip: "Before enabling DAI, you must configure DHCP Snooping, or configure static ARP ACLs for hosts with static IP addresses.",
+      memory: "DAI requires DHCP Snooping. No snooping = DAI drops all packets.",
+      real: "Avoid enabling DAI on ports connected to other switches or routers unless those ports are explicitly configured as 'trusted'.",
+      commands: ["ip arp inspection vlan 10", "ip arp inspection trust"]
+    }
+  },
+  {
+    id: 143,
+    domain: "Security Fundamentals",
+    topic: "Port Security",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "15%",
+    frequency: "High",
+    text: "Which port security violation mode drops packets with unknown source MAC addresses, increments the security violation counter, and sends an SNMP trap without shutting down the physical interface?",
+    options: [
+      "Restrict Mode",
+      "Protect Mode",
+      "Shutdown Mode",
+      "Disable Mode"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "Port security has three violation modes: Shutdown, Restrict, and Protect. In Restrict mode, the switch drops violating packets, increments the violation counter, and sends syslog messages/SNMP traps. It does not put the port in errdisable state.",
+      wrong: [
+        "Protect mode drops violating packets, but does not increment the violation counter or send SNMP/syslog alerts.",
+        "Shutdown mode immediately puts the port in errdisable state, disables the port LED, increments the counter, and sends alerts.",
+        "Disable Mode is not a valid port security violation mode."
+      ],
+      tip: "Use Restrict mode if you want alerts but cannot afford network disruption from a port shutdown. Use Shutdown (default) for absolute containment.",
+      memory: "Protect = Silent drop. Restrict = Drop + Alert. Shutdown = Drop + Alert + Disable interface.",
+      real: "Implement errdisable recovery cause port-security to automatically restore ports shut down by security violations after a specific timeout.",
+      commands: ["switchport port-security violation restrict", "errdisable recovery cause port-security"]
+    }
+  },
+  {
+    id: 144,
+    domain: "Security Fundamentals",
+    topic: "Device Hardening",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "15%",
+    frequency: "Medium",
+    text: "Which set of prerequisite configuration steps is required on a Cisco router before generating an RSA key pair for SSH access?",
+    options: [
+      "Configure a hostname and an IP domain name.",
+      "Configure line vty passwords and enable secret.",
+      "Configure interface IP addresses and enable routing.",
+      "Configure local username database and AAA authentication."
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "Cisco IOS requires that a hostname (other than the default 'Router') and an IP domain name ('ip domain-name') be configured before generating the RSA keys used by SSH. The keys are named using the format 'hostname.domainname'.",
+      wrong: [
+        "VTY passwords and enable secret are good security practices, but they are not cryptographic prerequisites for RSA key generation.",
+        "Interface IP configurations are needed to connect, but they do not block key generation.",
+        "Local username database is required for SSH login authentication, but you can generate keys before configuring usernames."
+      ],
+      tip: "If you try to run 'crypto key generate rsa' without a domain name, IOS will display a warning: 'Please define a domain-name first.'",
+      memory: "SSH Key prerequisite = Hostname + Domain Name.",
+      real: "Ensure RSA key size is at least 1024 or 2048 bits. Keys under 768 bits will block SSH version 2 execution.",
+      commands: ["hostname R1", "ip domain-name cisco.local", "crypto key generate rsa modulus 2048"]
+    }
+  },
+  {
+    id: 145,
+    domain: "Security Fundamentals",
+    topic: "SD-Access Security",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "15%",
+    frequency: "Medium",
+    text: "In a Cisco Software-Defined Access (SD-Access) architecture, how are security policies enforced between endpoints without depending on IP addresses or VLANs?",
+    options: [
+      "By assigning Scalable Group Tags (SGT) to endpoints and enforcing Group-Based Policies.",
+      "By dynamically injecting Access Control Lists (dACL) on every physical switch port.",
+      "By setting up MACsec encryption keys between all access layer switches.",
+      "By running dynamic ARP inspection and DHCP snooping on the overlay fabric."
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "Cisco SD-Access uses Scalable Group Tags (SGT) to represent groups of users or endpoints. The SGT is carried in the VXLAN encapsulation header, and Cisco ISE or DNA Center defines policies based on SGT-to-SGT permissions (SGACLs), completely separating policy from IP address or VLAN membership.",
+      wrong: [
+        "dACLs are used in traditional 802.1X, but are not the primary fabric-wide enforcement method of SD-Access.",
+        "MACsec secures physical links (Layer 2 encryption), not endpoint-to-endpoint security policies.",
+        "DAI and DHCP Snooping are Layer 2 security tools, not group policy controllers."
+      ],
+      tip: "SGTs allow policies like 'HR cannot access Finance servers' to persist even if HR users move to different physical branch locations.",
+      memory: "SD-Access Security = SGT (Scalable Group Tag) + SGACL.",
+      real: "Assign SGTs in Cisco ISE based on active directory group membership for consistent policy application.",
+      commands: []
+    }
+  },
+  {
+    id: 146,
+    domain: "Security Fundamentals",
+    topic: "VPN Protocols",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "15%",
+    frequency: "High",
+    text: "Which IPsec protocol provides data origin authentication, data integrity, and anti-replay protection, but does NOT provide confidentiality (encryption) for the payload data?",
+    options: [
+      "Authentication Header (AH)",
+      "Encapsulating Security Payload (ESP)",
+      "Internet Key Exchange (IKE)",
+      "Diffie-Hellman (DH)"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "The Authentication Header (AH) protocol (IP protocol 51) provides data integrity, origin authentication, and optional anti-replay services. However, it does not encrypt the packet payload, meaning data is sent in clear text. Encapsulating Security Payload (ESP) provides both authentication and encryption.",
+      wrong: [
+        "Encapsulating Security Payload (ESP) provides confidentiality (encryption) in addition to authentication.",
+        "Internet Key Exchange (IKE) is the control-plane protocol used to negotiate security associations (SAs) and exchange keys, not data transmission.",
+        "Diffie-Hellman (DH) is a mathematical algorithm used for secure key exchange over an untrusted channel, not a tunnel protocol."
+      ],
+      tip: "AH is rarely used alone today because confidentiality (encryption) is almost always desired. ESP is the standard.",
+      memory: "AH = Authentication only. ESP = Encryption + Authentication.",
+      real: "When configuring IPsec profiles, select ESP-AES for encryption and ESP-SHA-HMAC for hashing.",
+      commands: ["crypto ipsec transform-set MYSET esp-aes esp-sha-hmac"]
+    }
+  },
+  {
+    id: 147,
+    domain: "Security Fundamentals",
+    topic: "Wireless Security",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "15%",
+    frequency: "Medium",
+    text: "Which cryptographic handshake protocol is introduced in WPA3 Personal to replace WPA2 Pre-Shared Key (PSK), preventing offline dictionary attacks on wireless passwords?",
+    options: [
+      "Simultaneous Authentication of Equals (SAE)",
+      "Temporal Key Integrity Protocol (TKIP)",
+      "Extensible Authentication Protocol (EAP-FAST)",
+      "Pre-Shared Key (PSK)"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "WPA3 Personal replaces the 4-way PSK handshake from WPA2 with Simultaneous Authentication of Equals (SAE), also known as the Dragonfly Key Exchange. SAE resists offline dictionary attacks by executing a zero-knowledge proof, ensuring password security even if the user picks a weak password.",
+      wrong: [
+        "TKIP is an older, deprecated encryption protocol used with WPA to replace WEP.",
+        "EAP-FAST is an enterprise authentication protocol using tunnels, not personal PSK replacement.",
+        "PSK (Pre-Shared Key) is the legacy mechanism used in WPA/WPA2 that is vulnerable to offline dictionary attack."
+      ],
+      tip: "SAE makes wireless sniffing useless for password cracking since each exchange uses a unique session key.",
+      memory: "WPA3 Personal = SAE (Simultaneous Authentication of Equals) or Dragonfly.",
+      real: "When designing wireless solutions, configure WPA3 Enterprise (using 802.1X) or WPA3 Personal (with SAE) on new SSIDs.",
+      commands: []
+    }
+  },
+  {
+    id: 148,
+    domain: "Automation and Programmability",
+    topic: "REST APIs",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "10%",
+    frequency: "High",
+    text: "Which HTTP request method is used in a RESTful API to update an existing resource or create it if it does not exist, replacing the entire resource with the payload data?",
+    options: [
+      "PUT",
+      "POST",
+      "PATCH",
+      "GET"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "In RESTful APIs, PUT is used to update an existing resource or create it by overwriting the target resource completely. POST is typically used to create a new resource, while PATCH is used to make partial modifications to an existing resource.",
+      wrong: [
+        "POST is used to create a new resource at a collection URL.",
+        "PATCH is used to apply partial modifications to a resource, rather than replacing it entirely.",
+        "GET is a read-only method used to retrieve a representation of a resource."
+      ],
+      tip: "PUT is idempotent (calling it multiple times with the same payload results in the same state). POST is not idempotent.",
+      memory: "PUT = Replace entirely (Idempotent). PATCH = Partial change. POST = Create new.",
+      real: "When developing scripts to update configuration on Cisco DNA Center APIs, use PUT to update complete structures.",
+      commands: []
+    }
+  },
+  {
+    id: 149,
+    domain: "Automation and Programmability",
+    topic: "Automation Protocols",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "10%",
+    frequency: "High",
+    text: "Which protocol operates over SSH on port 830, uses XML-formatted data payloads, and supports transaction-based configuration commits?",
+    options: [
+      "NETCONF",
+      "RESTCONF",
+      "gRPC",
+      "SNMP"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "NETCONF (RFC 6241) is a network management protocol that runs over SSH on port 830, uses XML for data encoding, and supports operations like <get>, <edit-config>, and transaction commits/rollbacks. RESTCONF runs over HTTP/HTTPS (port 443) and supports JSON/XML.",
+      wrong: [
+        "RESTCONF runs over HTTPS (port 443) and uses REST-like operations (GET, POST, etc.) rather than SSH.",
+        "gRPC is a general RPC framework running over HTTP/2, using Protocol Buffers, not XML over SSH.",
+        "SNMP runs over UDP (port 161) and uses Management Information Bases (MIBs) with ASN.1 encoding."
+      ],
+      tip: "NETCONF has a candidate configuration datastore, allowing you to edit configurations and commit them as a single atomic transaction.",
+      memory: "NETCONF = SSH 830, XML. RESTCONF = HTTPS 443, JSON/XML.",
+      real: "Enable NETCONF on Cisco devices using 'netconf-yang' to allow automated configuration management via Python ncclient.",
+      commands: ["netconf-yang", "show netconf-yang status"]
+    }
+  },
+  {
+    id: 150,
+    domain: "Automation and Programmability",
+    topic: "DevOps Tools",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "10%",
+    frequency: "High",
+    text: "Which configuration management tool is agentless, uses SSH for communication, encodes configuration scripts in YAML (Playbooks), and uses a push model to configure managed nodes?",
+    options: [
+      "Ansible",
+      "Puppet",
+      "Chef",
+      "SaltStack"
+    ],
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "Ansible is agentless (no software needs to be installed on managed devices), communicates over SSH (or netconf/restconf), uses YAML to write its automation blueprints (Playbooks), and operates on a push model where the control node pushes changes to managed hosts.",
+      wrong: [
+        "Puppet uses agent software on managed nodes (usually), ruby-based manifests, and a pull model.",
+        "Chef uses agent software, ruby-based recipes, and a pull model.",
+        "SaltStack is typically agent-based (minions) and written in python, although it has a push option, it is not the classic YAML/SSH agentless standard described."
+      ],
+      tip: "Ansible's agentless architecture makes it perfect for Cisco routers and switches because you cannot install third-party agents on most network operating systems.",
+      memory: "Ansible = Agentless, SSH, YAML Playbooks, Push model.",
+      real: "Deploy Ansible on a Linux VM to automate VLAN provisioning across hundreds of campus switches simultaneously.",
+      commands: []
     }
   }
 ];
