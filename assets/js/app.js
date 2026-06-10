@@ -43,7 +43,8 @@ function loadAnalytics() {
     ach: {}
   };
   try {
-    const raw = localStorage.getItem(STORE);
+    const key = (state && state.user) ? `${STORE}_${state.user.uid}` : STORE;
+    const raw = localStorage.getItem(key);
     if (!raw) return base;
     return { ...base, ...JSON.parse(raw) };
   } catch {
@@ -52,7 +53,8 @@ function loadAnalytics() {
 }
 
 function saveAnalytics() {
-  localStorage.setItem(STORE, JSON.stringify(state.analytics));
+  const key = state.user ? `${STORE}_${state.user.uid}` : STORE;
+  localStorage.setItem(key, JSON.stringify(state.analytics));
   if (state.user) {
     saveUserProgress(state.user.uid, state.analytics);
   }
@@ -63,6 +65,19 @@ function byId(id) {
 }
 
 function setPage(page) {
+  // Clear active study/exam session if navigating away from engine page
+  if (page !== "engine" && state.session && !state.session.submitted) {
+    if (state.session.timer) clearInterval(state.session.timer);
+    byId("timer").classList.add("hidden");
+    state.session = null;
+  }
+
+  // Clear active subnetting challenge timer if leaving subnetting page
+  if (page !== "subnet" && state.subnet && state.subnet.timer) {
+    clearInterval(state.subnet.timer);
+    state.subnet.timer = null;
+  }
+
   document.querySelectorAll(".page").forEach((p) => p.classList.remove("active"));
   byId(page).classList.add("active");
   if (page === "analytics") renderAnalytics();
@@ -132,6 +147,28 @@ function renderHome() {
     { k: "Hard", v: hard },
     { k: "Question Types", v: "Single/Multi/Matching/Drag/Scenario" }
   ]);
+
+  // Identify two weakest domains for Smart Adaptive Quiz
+  const domainAccuracies = blueprint.map((d) => {
+    const s = state.analytics.domain[d.name] || { total: 0, correct: 0 };
+    const acc = s.total ? Math.round((s.correct / s.total) * 100) : 0;
+    return { name: d.name, acc, total: s.total };
+  });
+
+  domainAccuracies.sort((a, b) => {
+    if (a.acc !== b.acc) return a.acc - b.acc;
+    return a.total - b.total; // Prefer fewer attempts for discovery
+  });
+
+  const weakest = domainAccuracies.slice(0, 2);
+  state.weakDomains = weakest.map((w) => w.name);
+
+  const smartQuizInfo = byId("smartQuizInfo");
+  if (smartQuizInfo) {
+    smartQuizInfo.innerHTML = `<strong>Current Focus Areas:</strong><br />
+      1. ${weakest[0].name} (${weakest[0].total ? weakest[0].acc + '%' : 'No attempts'})<br />
+      2. ${weakest[1].name} (${weakest[1].total ? weakest[1].acc + '%' : 'No attempts'})`;
+  }
 }
 
 function renderDomainChecks() {
@@ -206,6 +243,17 @@ function startSession(mode) {
       minutes,
       questions: weightedSelection(count, domains)
     };
+  } else if (mode === "smart") {
+    const count = Number(byId("smartQuizCount").value);
+    const weakDomains = state.weakDomains || [];
+    conf = {
+      title: "Smart Adaptive Quiz",
+      desc: `Focused study on your weakest areas: ${weakDomains.join(" & ")}.`,
+      showFeedback: true,
+      hideScoreUntilEnd: false,
+      minutes: count * 2,
+      questions: weightedSelection(count, weakDomains)
+    };
   } else {
     conf = {
       title: "Real Exam Mode",
@@ -274,10 +322,11 @@ function renderNavigator() {
   }).join("");
 
   byId("qCounter").textContent = `Q ${s.idx + 1} / ${s.questions.length}`;
-  const pct = Math.round(((s.idx + 1) / s.questions.length) * 100);
+  const answeredCount = Object.keys(s.answers).length;
+  const pct = Math.round((answeredCount / s.questions.length) * 100);
   byId("progressFill").style.width = `${pct}%`;
   byId("progressPct").textContent = `${pct}%`;
-  byId("navMeta").textContent = `Answered: ${Object.keys(s.answers).length} | Flagged: ${Object.values(s.flagged).filter(Boolean).length}`;
+  byId("navMeta").textContent = `Answered: ${answeredCount} | Flagged: ${Object.values(s.flagged).filter(Boolean).length}`;
 
   byId("qNav").querySelectorAll("[data-qnav]").forEach((b) => {
     b.addEventListener("click", () => navToQuestion(Number(b.dataset.qnav)));
@@ -632,19 +681,49 @@ function makeSubnetQuestion(mode) {
 
 function ensureSubnetQuestion(force) {
   const mode = byId("subnetMode").value;
+
+  // Clear subnetting timer if not in Timed Challenge
+  if (mode !== "Timed Challenge" && state.subnet.timer) {
+    clearInterval(state.subnet.timer);
+    state.subnet.timer = null;
+  }
+
   if (force || !state.subnet.q) {
     state.subnet.q = makeSubnetQuestion(mode === "Timed Challenge" ? "Hard" : mode);
     if (mode === "Timed Challenge" && force) {
       state.subnet.endAt = Date.now() + 5 * 60 * 1000;
       state.subnet.score = 0;
       state.subnet.attempts = 0;
+
+      // Start live countdown interval
+      if (state.subnet.timer) clearInterval(state.subnet.timer);
+      state.subnet.timer = setInterval(() => {
+        if (byId("subnet").classList.contains("active") && byId("subnetMode").value === "Timed Challenge") {
+          ensureSubnetQuestion(false);
+        } else {
+          clearInterval(state.subnet.timer);
+          state.subnet.timer = null;
+        }
+      }, 1000);
     }
   }
   let timer = "";
+  const subnetSubmit = byId("subnetSubmit");
   if (mode === "Timed Challenge" && state.subnet.endAt) {
     const left = Math.max(0, Math.floor((state.subnet.endAt - Date.now()) / 1000));
     timer = `<br /><strong>Time Left:</strong> ${toMMSS(left)}`;
-    if (left === 0) timer += `<br />Challenge ended. Score: ${state.subnet.score}/${state.subnet.attempts}`;
+    if (left === 0) {
+      timer += `<br />Challenge ended. Score: ${state.subnet.score}/${state.subnet.attempts}`;
+      if (state.subnet.timer) {
+        clearInterval(state.subnet.timer);
+        state.subnet.timer = null;
+      }
+      if (subnetSubmit) subnetSubmit.disabled = true;
+    } else {
+      if (subnetSubmit) subnetSubmit.disabled = false;
+    }
+  } else {
+    if (subnetSubmit) subnetSubmit.disabled = false;
   }
   byId("subnetPrompt").innerHTML = `<strong>Question:</strong> ${state.subnet.q.prompt}${timer}`;
 }
@@ -664,6 +743,7 @@ function submitSubnet() {
 function wireEvents() {
   byId("startStudy").addEventListener("click", () => startSession("study"));
   byId("startQuiz").addEventListener("click", () => startSession("quiz"));
+  byId("startSmartQuiz").addEventListener("click", () => startSession("smart"));
   byId("startExam").addEventListener("click", () => startSession("exam"));
 
   byId("openReview").addEventListener("click", openReview);
@@ -719,11 +799,31 @@ function setupAuth() {
       userPhoto.src = user.photoURL || "";
       userName.textContent = user.displayName || user.email;
 
-      console.log("User logged in. Syncing database progress...");
+      console.log("User logged in. Loading user profile progress...");
       const cloud = await loadUserProgress(user.uid);
-      state.analytics = mergeProgress(state.analytics, cloud);
+      const userKey = `${STORE}_${user.uid}`;
+      const localCached = localStorage.getItem(userKey);
+
+      if (cloud) {
+        state.analytics = cloud;
+      } else if (localCached) {
+        state.analytics = JSON.parse(localCached);
+      } else {
+        // Zero progress for new user
+        state.analytics = {
+          attempts: [],
+          domain: {},
+          topic: {},
+          totalQ: 0,
+          correct: 0,
+          totalTime: 0,
+          studyMin: 0,
+          xp: 0,
+          ach: {}
+        };
+      }
       
-      localStorage.setItem(STORE, JSON.stringify(state.analytics));
+      localStorage.setItem(userKey, JSON.stringify(state.analytics));
       saveUserProgress(user.uid, state.analytics);
       
       renderHome();
@@ -733,6 +833,23 @@ function setupAuth() {
       userProfile.classList.add("hidden");
       userPhoto.src = "";
       userName.textContent = "";
+
+      console.log("User logged out. Restoring guest progress...");
+      const guestData = localStorage.getItem(STORE);
+      state.analytics = guestData ? JSON.parse(guestData) : {
+        attempts: [],
+        domain: {},
+        topic: {},
+        totalQ: 0,
+        correct: 0,
+        totalTime: 0,
+        studyMin: 0,
+        xp: 0,
+        ach: {}
+      };
+
+      renderHome();
+      renderAnalytics();
     }
   });
 }
