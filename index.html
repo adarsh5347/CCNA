@@ -19,9 +19,9 @@
       </div>
     </div>
     <nav>
-      <button data-page="home" class="ghost">🏠 Home</button>
-      <button data-page="subnet" class="ghost">⚡ Subnetting</button>
-      <button data-page="analytics" class="ghost">📊 Analytics</button>
+      <button data-page="home" class="ghost">🏠 <span>Home</span></button>
+      <button data-page="subnet" class="ghost">⚡ <span>Subnetting</span></button>
+      <button data-page="analytics" class="ghost">📊 <span>Analytics</span></button>
       <span id="timer" class="timer hidden">120:00</span>
       <div id="authContainer" class="auth-container" style="display: inline-flex; align-items: center; gap: 8px;">
         <button id="btnSignIn" class="secondary" style="padding: 8px 14px; font-size: 13px;">🔑 Sign In</button>
@@ -170,7 +170,12 @@
     <!-- EXAM ENGINE PAGE -->
     <section id="engine" class="page">
       <div class="exam-shell">
+        <div id="sidebarBackdrop" class="drawer-backdrop"></div>
         <aside class="left">
+          <div class="drawer-header">
+            <h3>Exam Control</h3>
+            <button id="closeSidebar" class="ghost">✕</button>
+          </div>
           <article class="card">
             <h4 id="modeTitle"></h4>
             <p id="modeDesc" style="font-size: 12px; margin-top: 4px; color: var(--text-muted);"></p>
@@ -189,6 +194,7 @@
 
         <section class="right">
           <header class="exam-header">
+            <button id="toggleSidebar" class="ghost">☰ <span>Navigator</span></button>
             <strong id="qCounter"></strong>
             <div class="progress"><div id="progressFill"></div></div>
             <span id="progressPct"></span>
@@ -197,12 +203,12 @@
           <article id="reviewArea" class="scroll hidden"></article>
           <article id="resultArea" class="scroll hidden"></article>
           <footer class="exam-footer">
-            <button id="prevQ" class="ghost">⬅️ Previous</button>
+            <button id="prevQ" class="ghost">⬅️ <span>Previous</span></button>
             <div class="inline" style="margin-top: 0;">
-              <button id="saveNext" class="secondary">Save & Next ➡️</button>
-              <button id="submitSession" class="primary">Submit Exam</button>
+              <button id="saveNext" class="secondary"><span>Save & Next</span> ➡️</button>
+              <button id="submitSession" class="primary">Submit <span>Exam</span></button>
             </div>
-            <button id="nextQ" class="ghost">Next ➡️</button>
+            <button id="nextQ" class="ghost"><span>Next</span> ➡️</button>
           </footer>
         </section>
       </div>

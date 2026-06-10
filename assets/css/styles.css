@@ -292,7 +292,7 @@ button.ghost:hover {
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 .modes {
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   margin-bottom: 20px;
 }
 .labs {
@@ -785,6 +785,17 @@ textarea {
   transform: translateY(-1px);
 }
 
+/* Sidebar drawer defaults for desktop layout */
+#toggleSidebar {
+  display: none;
+}
+.drawer-header {
+  display: none;
+}
+.drawer-backdrop {
+  display: none;
+}
+
 /* Media Queries & Mobile Improvements */
 @media (max-width: 1020px) {
   .exam-shell {
@@ -792,38 +803,111 @@ textarea {
     min-height: auto;
   }
   .left {
-    border-right: none;
+    position: fixed;
+    top: 0;
+    left: -320px;
+    width: 300px;
+    height: 100vh;
+    z-index: 1000;
+    background: var(--bg-panel-solid);
+    box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-right: 1px solid var(--border-color);
+    border-bottom: none;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  .left.active {
+    left: 0;
+  }
+  .drawer-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+  }
+  .drawer-backdrop.active {
+    display: block;
+  }
+  .left .drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
     border-bottom: 1px solid var(--border-color);
-    padding: 16px;
+    padding-bottom: 10px;
+  }
+  .left .drawer-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #00f2fe;
+  }
+  #toggleSidebar {
+    display: inline-flex;
   }
   .qnav {
-    max-height: 25vh;
+    max-height: 50vh;
   }
 }
 
 @media (max-width: 760px) {
   .topbar {
-    padding: 12px 16px;
-    flex-direction: column;
+    padding: 10px 16px;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
   }
   .brand {
-    text-align: center;
-    flex-direction: column;
-    gap: 6px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
   }
-  nav {
-    justify-content: center;
+  .brand h1 {
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+  .brand p {
+    display: none;
+  }
+  .logo {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+    border-radius: 8px;
+  }
+  nav button span {
+    display: none;
+  }
+  nav button {
+    padding: 8px 10px;
+    font-size: 16px;
+    gap: 0;
+  }
+  #userName {
+    display: none !important;
   }
   .container {
+    padding: 12px;
+  }
+  .hero {
     padding: 16px;
   }
   .hero h2 {
-    font-size: 24px;
+    font-size: 22px;
   }
   .hero p {
-    font-size: 14px;
+    font-size: 13.5px;
+  }
+  .card {
+    padding: 16px;
   }
   .review-row {
     grid-template-columns: 1fr;
@@ -836,5 +920,35 @@ textarea {
   }
   .review-row button {
     width: 100%;
+  }
+}
+
+@media (max-width: 500px) {
+  .exam-header {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  .exam-header strong {
+    font-size: 13px;
+  }
+  #progressPct {
+    font-size: 12px;
+  }
+  #toggleSidebar span {
+    display: none;
+  }
+  .scroll {
+    padding: 16px;
+  }
+  .exam-footer {
+    padding: 12px 16px;
+    gap: 6px;
+  }
+  .exam-footer button {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  #prevQ span, #nextQ span, #submitSession span {
+    display: none;
   }
 }

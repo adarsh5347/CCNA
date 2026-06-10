@@ -309,6 +309,16 @@ function navToQuestion(i) {
   state.session.qStartAt = Date.now();
   renderNavigator();
   renderQuestion();
+
+  // Close mobile drawer if it's active
+  const sidebar = document.querySelector(".left");
+  const backdrop = byId("sidebarBackdrop");
+  if (sidebar && sidebar.classList.contains("active")) {
+    sidebar.classList.remove("active");
+  }
+  if (backdrop && backdrop.classList.contains("active")) {
+    backdrop.classList.remove("active");
+  }
 }
 
 function renderNavigator() {
@@ -757,6 +767,21 @@ function wireEvents() {
   byId("nextQ").addEventListener("click", nextQuestion);
   byId("saveNext").addEventListener("click", saveAndNext);
   byId("submitSession").addEventListener("click", () => submitSession(false));
+
+  // Sidebar drawer handlers
+  const sidebar = document.querySelector(".left");
+  const backdrop = byId("sidebarBackdrop");
+  const closeSidebar = () => {
+    sidebar.classList.remove("active");
+    backdrop.classList.remove("active");
+  };
+  const openSidebar = () => {
+    sidebar.classList.add("active");
+    backdrop.classList.add("active");
+  };
+  byId("toggleSidebar").addEventListener("click", openSidebar);
+  byId("closeSidebar").addEventListener("click", closeSidebar);
+  backdrop.addEventListener("click", closeSidebar);
 
   // Lab listeners removed
 
