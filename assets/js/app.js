@@ -1,4 +1,5 @@
 import { blueprint, ranks, generateBank } from "./data.js";
+import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgress, mergeProgress } from "./firebase.js";
 
 const STORE = "ccna_full_site_v1";
 
@@ -7,7 +8,8 @@ const state = {
   bank: [],
   analytics: loadAnalytics(),
   session: null,
-  subnet: { q: null, score: 0, attempts: 0, endAt: 0 }
+  subnet: { q: null, score: 0, attempts: 0, endAt: 0 },
+  user: null
 };
 
 function rand() {
@@ -51,6 +53,9 @@ function loadAnalytics() {
 
 function saveAnalytics() {
   localStorage.setItem(STORE, JSON.stringify(state.analytics));
+  if (state.user) {
+    saveUserProgress(state.user.uid, state.analytics);
+  }
 }
 
 function byId(id) {
@@ -754,6 +759,55 @@ function wireEvents() {
   byId("subnetMode").addEventListener("change", () => ensureSubnetQuestion(true));
 }
 
+function setupAuth() {
+  const btnSignIn = byId("btnSignIn");
+  const btnSignOut = byId("btnSignOut");
+  const userProfile = byId("userProfile");
+  const userPhoto = byId("userPhoto");
+  const userName = byId("userName");
+
+  btnSignIn.addEventListener("click", async () => {
+    try {
+      await loginWithGoogle();
+    } catch (err) {
+      console.error("Login failed:", err);
+    }
+  });
+
+  btnSignOut.addEventListener("click", async () => {
+    try {
+      await logout();
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  });
+
+  onAuthChange(async (user) => {
+    state.user = user;
+    if (user) {
+      btnSignIn.classList.add("hidden");
+      userProfile.classList.remove("hidden");
+      userPhoto.src = user.photoURL || "";
+      userName.textContent = user.displayName || user.email;
+
+      console.log("User logged in. Syncing database progress...");
+      const cloud = await loadUserProgress(user.uid);
+      state.analytics = mergeProgress(state.analytics, cloud);
+      
+      localStorage.setItem(STORE, JSON.stringify(state.analytics));
+      saveUserProgress(user.uid, state.analytics);
+      
+      renderHome();
+      renderAnalytics();
+    } else {
+      btnSignIn.classList.remove("hidden");
+      userProfile.classList.add("hidden");
+      userPhoto.src = "";
+      userName.textContent = "";
+    }
+  });
+}
+
 function init() {
   state.bank = generateBank(rand);
   navSetup();
@@ -761,6 +815,7 @@ function init() {
   renderHome();
   renderAnalytics();
   wireEvents();
+  setupAuth();
   setPage("home");
 }
 

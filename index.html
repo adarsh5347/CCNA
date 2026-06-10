@@ -24,6 +24,14 @@
       <button data-page="subnet" class="ghost">⚡ Subnetting</button>
       <button data-page="analytics" class="ghost">📊 Analytics</button>
       <span id="timer" class="timer hidden">120:00</span>
+      <div id="authContainer" class="auth-container" style="display: inline-flex; align-items: center; gap: 8px;">
+        <button id="btnSignIn" class="secondary" style="padding: 8px 14px; font-size: 13px;">🔑 Sign In</button>
+        <div id="userProfile" class="user-profile hidden" style="display: inline-flex; align-items: center; gap: 8px;">
+          <img id="userPhoto" class="user-photo" src="" alt="User Photo" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border-color);" />
+          <span id="userName" class="user-name" style="font-size: 13px; font-weight: 500;"></span>
+          <button id="btnSignOut" class="ghost" style="padding: 6px 10px; font-size: 11px;">Log Out</button>
+        </div>
+      </div>
     </nav>
   </header>
 
