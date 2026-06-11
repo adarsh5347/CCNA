@@ -82,6 +82,7 @@ function setPage(page) {
   byId(page).classList.add("active");
   if (page === "analytics") renderAnalytics();
   if (page === "subnet") ensureSubnetQuestion(true);
+  window.scrollTo(0, 0);
 }
 
 function navSetup() {
@@ -314,6 +315,11 @@ function navToQuestion(i) {
   state.session.qStartAt = Date.now();
   renderNavigator();
   renderQuestion();
+
+  // Scroll question area and window to top
+  const qa = byId("questionArea");
+  if (qa) qa.scrollTop = 0;
+  window.scrollTo(0, 0);
 
   // Close mobile drawer if it's active
   const sidebar = document.querySelector(".left");
@@ -564,6 +570,10 @@ function openReview() {
   byId("questionArea").classList.add("hidden");
   byId("resultArea").classList.add("hidden");
 
+  const ra = byId("reviewArea");
+  if (ra) ra.scrollTop = 0;
+  window.scrollTo(0, 0);
+
   byId("reviewArea").querySelectorAll("[data-jump]").forEach((b) => {
     b.addEventListener("click", () => {
       byId("reviewArea").classList.add("hidden");
@@ -627,7 +637,18 @@ function submitSession(force) {
   html += `<div class="stat"><div class="k">Pass Probability</div><div class="v">${passProbability()}%</div></div>`;
   html += `</div>`;
 
-  html += `<div class="card"><h3>Domain Performance</h3>${Object.entries(domain).map(([d, v]) => `<div class="output"><strong>${d}</strong>: ${v.correct}/${v.total} (${Math.round((v.correct / v.total) * 100)}%)</div>`).join("")}</div>`;
+  html += `<div class="card"><h3>Domain Performance</h3>${Object.entries(domain).map(([d, v]) => {
+    const pct = Math.round((v.correct / v.total) * 100);
+    return `
+      <div class="domain-item">
+        <div class="domain-header">
+          <strong>${d}</strong>
+          <span class="pct">${v.correct}/${v.total} (${pct}%)</span>
+        </div>
+        <div class="progress"><div style="width:${pct}%"></div></div>
+      </div>
+    `;
+  }).join("")}</div>`;
   html += `<div class="grid stats"><div class="stat"><div class="k">Weak Areas</div><div class="v" style="font-size:16px">${weak.map((x) => `${x.k} (${x.p}%)`).join("<br />")}</div></div><div class="stat"><div class="k">Strong Areas</div><div class="v" style="font-size:16px">${strong.map((x) => `${x.k} (${x.p}%)`).join("<br />")}</div></div><div class="stat"><div class="k">Recommended Next Quiz</div><div class="v" style="font-size:15px">15 questions / 15 mins on ${weak.map((x) => x.k).join(" + ")}</div></div></div>`;
 
   if (s.mode !== "exam") {
@@ -642,6 +663,10 @@ function submitSession(force) {
   byId("resultArea").classList.remove("hidden");
   byId("reviewArea").classList.add("hidden");
   byId("questionArea").classList.add("hidden");
+
+  const rsa = byId("resultArea");
+  if (rsa) rsa.scrollTop = 0;
+  window.scrollTo(0, 0);
 
   byId("backHome").addEventListener("click", () => setPage("home"));
   byId("goAnalytics").addEventListener("click", () => setPage("analytics"));
@@ -664,7 +689,15 @@ function renderAnalytics() {
 
   byId("domainBreakdown").innerHTML = blueprint.map((d) => {
     const p = da[d.name] || 0;
-    return `<div class="output"><strong>${d.name}</strong> (${d.weight}%)<div class="progress"><div style="width:${p}%"></div></div>${p}%</div>`;
+    return `
+      <div class="domain-item">
+        <div class="domain-header">
+          <strong>${d.name} <span class="weight">(${d.weight}%)</span></strong>
+          <span class="pct">${p}%</span>
+        </div>
+        <div class="progress"><div style="width:${p}%"></div></div>
+      </div>
+    `;
   }).join("");
 
   const rec = state.analytics.attempts.slice(-10);
