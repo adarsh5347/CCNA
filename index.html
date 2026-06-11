@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
+  <canvas id="netCanvas"></canvas>
   <header class="topbar">
     <div class="brand">
       <div class="logo">C</div>
@@ -44,101 +45,94 @@
   <main class="container">
     <!-- HOME PAGE -->
     <section id="home" class="page active">
-      <article class="hero">
-        <h2>Complete CCNA Learning & Assessment Platform</h2>
-        <p>
-          Train with adaptive questions, section quizzes, full exam simulation, subnetting drills,
-          and readiness analytics designed for real CCNA 200-301 pass preparation.
-        </p>
-        <div id="heroStats" class="grid stats"></div>
-      </article>
-
-      <!-- Interactive Network Topology -->
+      <!-- NOC Packet Traversal Simulator -->
       <section class="card">
-        <h3>🕸️ Interactive Network Topology</h3>
-        <p>Select any active node on the network map to inspect its running configuration and interface status.</p>
+        <h3>🕸️ NOC Packet Traversal Simulator</h3>
+        <p>Choose a packet type, click "Run Simulation", and watch how data traverses network nodes and gets encapsulated/decapsulated at each hop.</p>
+        
+        <div class="row row-compact" style="margin-bottom: 16px;">
+          <label>Select Packet Type
+            <select id="simPacketType">
+              <option value="dhcp">DHCP Request (Broadcast Drill)</option>
+              <option value="ping">ICMP Echo Request (Ping to 8.8.8.8)</option>
+              <option value="nat">HTTP Web Request (NAT Overload PAT)</option>
+              <option value="stp">STP BPDU Frame (Switch STP Election)</option>
+            </select>
+          </label>
+          <div style="display: flex; align-items: flex-end; gap: 8px; margin-top: 6px;">
+            <button id="btnStartSim" class="primary">▶ Run Simulation</button>
+            <button id="btnResetSim" class="secondary">🛑 Reset</button>
+          </div>
+        </div>
+
         <div class="topology-wrapper">
           <div class="topology-main">
-            <svg viewBox="0 0 800 300" width="100%" height="100%" style="background: rgba(6, 9, 19, 0.5); border-radius: 12px; border: 1px solid var(--border-color);">
-              <!-- Connective Lines with glowing animation -->
-              <line x1="100" y1="150" x2="300" y2="150" stroke="#00f2fe" stroke-width="3" class="cable-link" />
-              <line x1="300" y1="150" x2="500" y2="100" stroke="#00f2fe" stroke-width="3" class="cable-link" />
-              <line x1="300" y1="150" x2="500" y2="200" stroke="#ff9233" stroke-width="2" class="cable-link secondary-link" />
-              <line x1="500" y1="100" x2="700" y2="150" stroke="#10b981" stroke-width="3" class="cable-link" />
-              <line x1="500" y1="200" x2="700" y2="150" stroke="#10b981" stroke-width="3" class="cable-link" />
+            <svg id="topoSvg" viewBox="0 0 700 280" width="100%" height="100%" style="background: rgba(6, 9, 19, 0.5); border-radius: 12px; border: 1px solid var(--border-color); position: relative;">
+              <!-- Cable links -->
+              <line x1="80" y1="140" x2="240" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
+              <line x1="240" y1="140" x2="400" y2="80" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
+              <line x1="240" y1="140" x2="400" y2="200" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
+              <line x1="400" y1="80" x2="600" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
+              <line x1="400" y1="200" x2="600" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
+
+              <!-- Active glowing lines -->
+              <line id="link-pc-sw" x1="80" y1="140" x2="240" y2="140" stroke="#00f2fe" stroke-width="2" class="cable-link" />
+              <line id="link-sw-r1" x1="240" y1="140" x2="400" y2="80" stroke="#00f2fe" stroke-width="2" class="cable-link" />
+              <line id="link-sw-fw" x1="240" y1="140" x2="400" y2="200" stroke="#ff9233" stroke-width="1.5" class="cable-link secondary-link" />
+              <line id="link-r1-wan" x1="400" y1="80" x2="600" y2="140" stroke="#10b981" stroke-width="2" class="cable-link" />
+              <line id="link-fw-wan" x1="400" y1="200" x2="600" y2="140" stroke="#10b981" stroke-width="2" class="cable-link" />
+
+              <!-- Animated Packet -->
+              <circle id="simPacket" cx="80" cy="140" r="8" fill="#00f2fe" style="opacity: 0; filter: drop-shadow(0 0 8px #00f2fe); pointer-events: none;" />
 
               <!-- Nodes -->
-              <!-- PC Host -->
-              <g class="topo-node" data-node="pc" transform="translate(100, 150)">
-                <circle r="22" fill="#0b132b" stroke="#00f2fe" stroke-width="2" />
-                <text y="4" font-family="Space Grotesk" font-size="11" fill="#fff" text-anchor="middle">💻 Host</text>
-                <text y="36" font-family="JetBrains Mono" font-size="9" fill="#94a3b8" text-anchor="middle">192.168.1.10</text>
+              <!-- Host PC -->
+              <g class="topo-node" data-node="pc" transform="translate(80, 140)">
+                <circle r="20" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-pc" />
+                <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">💻 Host</text>
+                <text y="32" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">192.168.1.10</text>
               </g>
 
-              <!-- Switch -->
-              <g class="topo-node" data-node="switch" transform="translate(300, 150)">
-                <rect x="-26" y="-16" width="52" height="32" rx="4" fill="#0b132b" stroke="#00f2fe" stroke-width="2" />
-                <text y="4" font-family="Space Grotesk" font-size="11" fill="#fff" text-anchor="middle">🎛️ SW-1</text>
-                <text y="28" font-family="JetBrains Mono" font-size="9" fill="#94a3b8" text-anchor="middle">VLAN 10</text>
+              <!-- Access Switch -->
+              <g class="topo-node" data-node="switch" transform="translate(240, 140)">
+                <rect x="-24" y="-14" width="48" height="28" rx="4" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-switch" />
+                <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🎛️ SW-1</text>
+                <text y="24" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">VLAN 10</text>
               </g>
 
-              <!-- Router -->
-              <g class="topo-node" data-node="router" transform="translate(500, 100)">
-                <circle r="22" fill="#0b132b" stroke="#10b981" stroke-width="2" />
-                <text y="4" font-family="Space Grotesk" font-size="11" fill="#fff" text-anchor="middle">🌐 R-1</text>
-                <text y="36" font-family="JetBrains Mono" font-size="9" fill="#94a3b8" text-anchor="middle">ISR 4331</text>
+              <!-- Core Router -->
+              <g class="topo-node" data-node="router" transform="translate(400, 80)">
+                <circle r="20" fill="#060913" stroke="#10b981" stroke-width="2" id="node-router" />
+                <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🌐 R-1</text>
+                <text y="32" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">ISR 4331</text>
               </g>
 
               <!-- Firewall -->
-              <g class="topo-node" data-node="firewall" transform="translate(500, 200)">
-                <circle r="22" fill="#0b132b" stroke="#ff5e3a" stroke-width="2" />
-                <text y="4" font-family="Space Grotesk" font-size="11" fill="#fff" text-anchor="middle">🔒 FW-1</text>
-                <text y="36" font-family="JetBrains Mono" font-size="9" fill="#94a3b8" text-anchor="middle">ASA 5506</text>
+              <g class="topo-node" data-node="firewall" transform="translate(400, 200)">
+                <circle r="20" fill="#060913" stroke="#ff5e3a" stroke-width="2" id="node-firewall" />
+                <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🔒 FW-1</text>
+                <text y="32" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">ASA 5506</text>
               </g>
 
-              <!-- WAN Cloud -->
-              <g class="topo-node" data-node="wan" transform="translate(700, 150)">
-                <rect x="-28" y="-16" width="56" height="32" rx="8" fill="#0b132b" stroke="#10b981" stroke-width="2" />
-                <text y="4" font-family="Space Grotesk" font-size="11" fill="#fff" text-anchor="middle">☁️ WAN</text>
-                <text y="28" font-family="JetBrains Mono" font-size="9" fill="#94a3b8" text-anchor="middle">Internet</text>
+              <!-- WAN -->
+              <g class="topo-node" data-node="wan" transform="translate(600, 140)">
+                <rect x="-24" y="-14" width="48" height="28" rx="6" fill="#060913" stroke="#10b981" stroke-width="2" id="node-wan" />
+                <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">☁️ WAN</text>
+                <text y="24" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">8.8.8.8</text>
               </g>
             </svg>
           </div>
-          <div id="topoDetails" class="topo-details" style="border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; background: rgba(6, 9, 19, 0.4); display: flex; flex-direction: column; justify-content: center;">
-            <h4 style="color: #00f2fe; margin-bottom: 6px;">NOC Node Inspector</h4>
-            <div id="topoDetailsContent" style="font-size: 13.5px; color: var(--text-muted); line-height: 1.4;">
-              Click any device on the network map to inspect its running configuration, status, and troubleshooting commands.
+          
+          <div id="simLogPanel" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; background: #02040a; font-family: var(--font-mono); display: flex; flex-direction: column; height: 280px; overflow-y: auto;">
+            <h4 style="color: #00f2fe; margin-bottom: 10px; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">📋 Packet Header & Traversal Logs</h4>
+            <div id="simLogContent" style="font-size: 12.5px; color: #a7f3d0; line-height: 1.5; display: flex; flex-direction: column; gap: 8px;">
+              <div>System Ready. Select a packet simulation and click "Run Simulation" to observe packet flows.</div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Live NOC Terminal Console -->
-      <section class="card">
-        <h3>📟 NOC Command Line Interface (CLI)</h3>
-        <p>Interactive Cisco router shell simulation. Enter CCNA commands to inspect connection states.</p>
-        <div class="terminal-window">
-          <div class="terminal-header">
-            <span class="terminal-dot red"></span>
-            <span class="terminal-dot yellow"></span>
-            <span class="terminal-dot green"></span>
-            <span class="terminal-title">NOC Console Session - CCNA-Router#</span>
-          </div>
-          <div id="terminalBody" class="terminal-body">
-            <div>Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 16.9.4</div>
-            <div>*Jun 11 21:16:30.053: %LINK-3-UPDOWN: Interface GigabitEthernet0/0, changed state to up</div>
-            <div>*Jun 11 21:16:31.054: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/0, changed state to up</div>
-            <div style="color: var(--text-muted);">Type 'help' or 'show ip route' to begin.</div>
-            <br />
-          </div>
-          <div class="terminal-input-line">
-            <span class="terminal-prompt">CCNA-Router#</span>
-            <input type="text" id="terminalInput" placeholder="Enter IOS command (e.g. help, ping, show ip route)..." autofocus autocomplete="off" />
-          </div>
-        </div>
-      </section>
-
-      <!-- Live NOC Status Panel -->
+      <!-- Live NOC Stats Panel -->
       <section class="card">
         <h3>🛰️ Live NOC System Status</h3>
         <div class="grid stats">
@@ -196,12 +190,6 @@
         <article class="card">
           <h3>🏆 Real Exam Mode</h3>
           <p>Simulate the actual Pearson VUE exam environment with full constraints.</p>
-          <ul>
-            <li>120 questions, 120 minutes</li>
-            <li>No feedback during the attempt</li>
-            <li>Mark for review and final review screen</li>
-            <li>Score shown only after final submission</li>
-          </ul>
           <button id="startExam" class="primary">Start Real Exam</button>
         </article>
 
@@ -248,7 +236,6 @@
         </div>
       </section>
     </section>
-
 
     <!-- SUBNETTING DRILLS PAGE -->
     <section id="subnet" class="page">
