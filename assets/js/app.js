@@ -127,7 +127,10 @@ function calcDomainAccuracy() {
 }
 
 function renderStatsCards(targetId, cards) {
-  byId(targetId).innerHTML = cards.map((c) => `<div class="stat"><div class="k">${c.k}</div><div class="v">${c.v}</div></div>`).join("");
+  const el = byId(targetId);
+  if (el) {
+    el.innerHTML = cards.map((c) => `<div class="stat"><div class="k">${c.k}</div><div class="v">${c.v}</div></div>`).join("");
+  }
 }
 
 function renderHome() {
@@ -202,7 +205,9 @@ function renderHome() {
 
 function renderDomainChecks() {
   const wrap = byId("domainChecks");
-  wrap.innerHTML = blueprint.map((d, i) => `<label><input class="qdomain" type="checkbox" value="${d.name}" ${i === 0 ? "checked" : ""} /> ${d.name} (${d.weight}%)</label>`).join("<br />");
+  if (wrap) {
+    wrap.innerHTML = blueprint.map((d, i) => `<label><input class="qdomain" type="checkbox" value="${d.name}" ${i === 0 ? "checked" : ""} /> ${d.name} (${d.weight}%)</label>`).join("<br />");
+  }
 }
 
 function weakTopicBoost(q) {
