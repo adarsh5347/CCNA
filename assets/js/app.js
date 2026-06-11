@@ -1133,7 +1133,7 @@ function updateOsiLabels(osiData) {
 }
 
 function highlightNode(nodeId, isBlocked = false) {
-  const nodes = ["pc", "switch", "router", "firewall", "wan"];
+  const nodes = ["pc", "switch", "router", "firewall", "wan", "pc-sales", "ip-phone", "sw-branch", "r-branch", "hq-core", "fw-branch", "hq-server"];
   nodes.forEach(n => {
     const el = byId(`node-${n}`);
     if (el) {
@@ -1144,13 +1144,23 @@ function highlightNode(nodeId, isBlocked = false) {
           el.setAttribute("stroke", "#ff5e3a");
         } else {
           el.setAttribute("fill", "rgba(0, 242, 254, 0.2)");
-          const origStroke = n === "router" || n === "wan" ? "#10b981" : (n === "firewall" ? "#ff5e3a" : "#00f2fe");
+          let origStroke = "#00f2fe";
+          if (n === "router" || n === "wan" || n === "r-branch" || n === "hq-core" || n === "hq-server") {
+            origStroke = "#10b981";
+          } else if (n === "firewall" || n === "fw-branch") {
+            origStroke = "#ff5e3a";
+          }
           el.setAttribute("stroke", origStroke);
         }
       } else {
         el.setAttribute("stroke-width", "2");
         el.setAttribute("fill", "#060913");
-        const origStroke = n === "router" || n === "wan" ? "#10b981" : (n === "firewall" ? "#ff5e3a" : "#00f2fe");
+        let origStroke = "#00f2fe";
+        if (n === "router" || n === "wan" || n === "r-branch" || n === "hq-core" || n === "hq-server") {
+          origStroke = "#10b981";
+        } else if (n === "firewall" || n === "fw-branch") {
+          origStroke = "#ff5e3a";
+        }
         el.setAttribute("stroke", origStroke);
       }
     }
@@ -1236,6 +1246,103 @@ Use <code>show access-list</code> to check rule hit-counts, and <code>show conn<
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <span style="color: #10b981;">💡 CCNA Command Tip:</span>
 Use <code>tracert 8.8.8.8</code> to map the TTL-expired ICMP hops traversing Internet Autonomous Systems.
+    `,
+    "pc-sales": `
+<strong style="color: #00f2fe; font-size: 13px;">💻 Device: Sales PC (VLAN 10 client)</strong>
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<strong>IP Address:</strong> 10.10.10.10
+<strong>Subnet Mask:</strong> 255.255.255.0
+<strong>Default Gateway:</strong> 10.10.10.1 (R-Branch subinterface Gi0/0.10)
+<strong>MAC Address:</strong> 00aa.bbcc.1010
+<strong>Active Port:</strong> SW-Branch port Fa0/1 (VLAN 10)
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<span style="color: #10b981;">💡 CCNA Command Tip:</span>
+On Windows clients, use <code>route print</code> to verify default gateway settings, and <code>ipconfig /renew</code> to acquire fresh DHCP bindings.
+    `,
+    "ip-phone": `
+<strong style="color: #00f2fe; font-size: 13px;">📞 Device: Voice IP Phone (VLAN 20 voice client)</strong>
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<strong>IP Address:</strong> 10.10.20.10
+<strong>Subnet Mask:</strong> 255.255.255.0
+<strong>Default Gateway:</strong> 10.10.20.1 (R-Branch subinterface Gi0/0.20)
+<strong>MAC Address:</strong> 00bb.ccdd.2020
+<strong>Active Port:</strong> SW-Branch port Fa0/2 (VLAN 20 - Voice VLAN)
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<span style="color: #10b981;">💡 CCNA Command Tip:</span>
+Use <code>show interface <id> switchport</code> on the switch to verify that a port has both a data VLAN and a voice VLAN tag assigned.
+    `,
+    "sw-branch": `
+<strong style="color: #00f2fe; font-size: 13px;">🎛️ Device: Branch Switch SW-Branch (Catalyst 2960)</strong>
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<strong>Interface Configurations:</strong>
+  - Fa0/1: Access VLAN 10 (Sales PC)
+  - Fa0/2: Access VLAN 10, Voice VLAN 20 (IP Phone)
+  - Gi0/1: 802.1Q Trunk to R-Branch (Allowed: 10,20)
+<strong>802.1Q Native VLAN:</strong> VLAN 1 (Default)
+<strong>VLAN Database:</strong>
+  - VLAN 10: Sales (10.10.10.0/24)
+  - VLAN 20: Voice (10.10.20.0/24)
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<span style="color: #10b981;">💡 CCNA Command Tip:</span>
+Use <code>switchport trunk allowed vlan add <vlan></code> to specify active broadcast boundaries over trunks, protecting switch backplane performance.
+    `,
+    "r-branch": `
+<strong style="color: #00f2fe; font-size: 13px;">🌐 Device: Branch Router R-Branch (ISR 4321)</strong>
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<strong>Router-on-a-Stick Subinterfaces:</strong>
+  - Gi0/0.10 (VLAN 10): 10.10.10.1/24 (encapsulation dot1Q 10)
+  - Gi0/0.20 (VLAN 20): 10.10.20.1/24 (encapsulation dot1Q 20)
+<strong>EtherChannel LACP Config:</strong>
+  - Port-Channel 1: Gi0/1, Gi0/2 (mode active)
+  - IP Address Po1: 192.168.100.1/30
+<strong>Crypto Map Config (VPN):</strong>
+  - crypto map MYMAP 10 ipsec-isakmp
+  - match address VPN_ACL (permit 10.10.10.0/24 to 172.16.100.0/24)
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<span style="color: #10b981;">💡 CCNA Command Tip:</span>
+Use <code>show interface port-channel 1</code> to audit bundle status, and <code>show crypto ipsec sa</code> to check active security tunnels.
+    `,
+    "hq-core": `
+<strong style="color: #00f2fe; font-size: 13px;">🎛️ Device: HQ Core L3 Switch (Catalyst 3850)</strong>
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<strong>EtherChannel Config:</strong>
+  - Port-Channel 1: Gi1/0/1, Gi1/0/2 (mode active - LACP)
+  - IP Address: 192.168.100.2/30 (no switchport)
+<strong>Routing Table (OSPF Area 0):</strong>
+  - O 10.10.10.0/24 [110/2] via 192.168.100.1
+  - C 172.16.100.0/24 is directly connected, Gi1/0/24
+<strong>Inter-VLAN SVI Interfaces:</strong>
+  - Interface VLAN 100: 172.16.100.1/24
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<span style="color: #10b981;">💡 CCNA Command Tip:</span>
+Use <code>show etherchannel summary</code> to audit LACP member ports. State code (P) means bundled, (D) means down/suspended.
+    `,
+    "fw-branch": `
+<strong style="color: #00f2fe; font-size: 13px;">🔒 Device: HQ Firewall FW-Branch (ASA 5515)</strong>
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<strong>IPSec VPN Tunnel Configuration:</strong>
+  - Crypto map outside_map 10 match VPN_ACL
+  - Peer IP address: 192.0.2.1 (R-Branch outside IP)
+  - Transform Set: ESP-AES-256 ESP-SHA-HMAC
+<strong>Security Policies:</strong>
+  - permit esp any any
+  - permit udp any any eq 500 (ISAKMP)
+  - permit udp any any eq 4500 (NAT Traversal)
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<span style="color: #10b981;">💡 CCNA Command Tip:</span>
+Use <code>show crypto isakmp sa</code> to inspect Phase 1 negotiation state (should read MM_ACTIVE).
+    `,
+    "hq-server": `
+<strong style="color: #00f2fe; font-size: 13px;">🖥️ Device: HQ Server (Private Datacenter Host)</strong>
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<strong>IP Address:</strong> 172.16.100.5
+<strong>Subnet Mask:</strong> 255.255.255.0
+<strong>Default Gateway:</strong> 172.16.100.1 (HQ-Core switch)
+<strong>Supported Services:</strong> HTTPS (443), SSH (22), Database (3306)
+<strong>Access Policy:</strong> Private subnets only (VPN/Trunk routing required)
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<span style="color: #10b981;">💡 CCNA Command Tip:</span>
+Server hosting requires static routing or local gateway configuration. Audit with <code>netstat -ano</code> to view active listening ports.
     `
   };
 
@@ -1264,18 +1371,39 @@ Use <code>tracert 8.8.8.8</code> to map the TTL-expired ICMP hops traversing Int
   });
 }
 
+// Global active topology state
+let activeTopology = 1;
+
+function resetTopology2Links() {
+  const link1 = byId("link-rbranch-hq1");
+  const link2 = byId("link-rbranch-hq2");
+  if (link1) {
+    link1.setAttribute("stroke", "#10b981");
+    link1.setAttribute("stroke-width", "2");
+  }
+  if (link2) {
+    link2.setAttribute("stroke", "#10b981");
+    link2.setAttribute("stroke-width", "2");
+  }
+}
+
 function setupTraversalSimulator() {
   const btnStart = byId("btnStartSim");
   const btnReset = byId("btnResetSim");
   const logContent = byId("simLogContent");
-  const pkt = byId("simPacket");
+  
+  const btnTopo1 = byId("btnTopo1");
+  const btnTopo2 = byId("btnTopo2");
+  const svg1 = byId("topoSvg");
+  const svg2 = byId("topoSvg2");
 
-  if (!btnStart || !btnReset || !logContent || !pkt) return;
+  if (!btnStart || !btnReset || !logContent) return;
 
   const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
   setupNodeConfigInspector();
 
+  // OSI Stack click handlers
   document.querySelectorAll(".osi-layer").forEach(layerEl => {
     layerEl.addEventListener("click", () => {
       playNetSound("click");
@@ -1286,9 +1414,78 @@ function setupTraversalSimulator() {
     });
   });
 
+  // Dynamic selector updates
+  function updatePacketTypeSelect() {
+    const select = byId("simPacketType");
+    if (!select) return;
+    select.innerHTML = "";
+    
+    if (activeTopology === 1) {
+      select.innerHTML = `
+        <option value="dhcp">DHCP Request (Broadcast Drill)</option>
+        <option value="ping">ICMP Echo Request (Ping to 8.8.8.8)</option>
+        <option value="nat">HTTP Web Request (NAT Overload PAT)</option>
+        <option value="stp">STP BPDU Frame (Switch STP Election)</option>
+        <option value="arp">ARP Request/Reply (MAC Address Resolution)</option>
+        <option value="ospf">OSPF Hello Adjacency (Link State Update)</option>
+        <option value="acl">Firewall ACL Block (Telnet Access Denied)</option>
+      `;
+    } else {
+      select.innerHTML = `
+        <option value="roas">Router-on-a-Stick (ROAS Inter-VLAN Routing)</option>
+        <option value="lacp">LACP EtherChannel (Link Bundling & Failover)</option>
+        <option value="vpn">IPSec VPN Tunnel (Site-to-Site Encapsulation)</option>
+      `;
+    }
+  }
+
+  function switchTopology(topoNum) {
+    activeTopology = topoNum;
+    playNetSound("click");
+    
+    btnStart.disabled = false;
+    const pkt1 = byId("simPacket");
+    const pkt2 = byId("simPacket2");
+    if (pkt1) pkt1.style.opacity = "0";
+    if (pkt2) pkt2.style.opacity = "0";
+    
+    logContent.innerHTML = "<div>System Ready. Select a packet simulation and click 'Run Simulation'.</div>";
+    currentOsiData = null;
+    updateOsiLabels(null);
+    const descBox = byId("osiLayerDescBox");
+    if (descBox) {
+      descBox.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">Run a simulation and click any OSI layer tab above to inspect the active hop encapsulation details.</span>`;
+    }
+    document.querySelectorAll(".osi-layer").forEach(el => el.classList.remove("active"));
+    highlightNode(null);
+    resetTopology2Links();
+
+    if (activeTopology === 1) {
+      if (svg1) svg1.style.display = "block";
+      if (svg2) svg2.style.display = "none";
+      if (btnTopo1) { btnTopo1.className = "primary"; }
+      if (btnTopo2) { btnTopo2.className = "secondary"; }
+    } else {
+      if (svg1) svg1.style.display = "none";
+      if (svg2) svg2.style.display = "block";
+      if (btnTopo1) { btnTopo1.className = "secondary"; }
+      if (btnTopo2) { btnTopo2.className = "primary"; }
+    }
+    
+    updatePacketTypeSelect();
+  }
+
+  if (btnTopo1) btnTopo1.addEventListener("click", () => switchTopology(1));
+  if (btnTopo2) btnTopo2.addEventListener("click", () => switchTopology(2));
+
   btnStart.addEventListener("click", async () => {
     btnStart.disabled = true;
     const type = byId("simPacketType").value;
+    const activePkt = activeTopology === 1 ? byId("simPacket") : byId("simPacket2");
+    if (!activePkt) return;
+
+    // Reset member links in case of LACP simulation rerun
+    resetTopology2Links();
 
     let path = [];
     if (type === "dhcp") {
@@ -1400,7 +1597,7 @@ function setupTraversalSimulator() {
         },
         {
           node: "switch", x: 240, y: 140, name: "Switch SW-1", color: "#00f2fe",
-          headers: "L2: Standard Unicast Forwarding",
+          headers: "L2: Forwarding to R-1",
           desc: "SW-1 forwards the frame directly towards the Core Router gateway port.",
           osi: {
             l4: { val: "TCP 49152 -> 80", desc: "TCP segment encapsulated." },
@@ -1598,9 +1795,150 @@ function setupTraversalSimulator() {
           }
         }
       ];
+    } else if (type === "roas") {
+      path = [
+        {
+          node: "pc-sales", x: 60, y: 180, name: "Sales PC (VLAN 10)", color: "#00f2fe",
+          headers: "L2: Tag 10 | L3: 10.10.10.10 -> 10.10.20.10 | TCP: 51000 -> 80",
+          desc: "PC-Sales (VLAN 10) targets a web service on IP-Phone (VLAN 20). Since they are on different subnets, the PC targets its gateway IP 10.10.10.1.",
+          osi: {
+            l4: { val: "TCP Src 51000 -> Dst 80", desc: "TCP Layer: Client initiates HTTP connection request to voice device." },
+            l3: { val: "10.10.10.10 -> 10.10.20.10", desc: "IP Layer: Source IP is Sales client (10.10.10.10), Destination is Phone (10.10.20.10)." },
+            l2: { val: "00aa.bbcc.1010 -> Gateway MAC", desc: "Data Link: Frame matches PC-Sales source MAC and targets default gateway interface." },
+            l1: { val: "Copper Ethernet (Fa0/1)", desc: "Physical Layer: Tx over Category 6 copper access cable." }
+          }
+        },
+        {
+          node: "sw-branch", x: 200, y: 130, name: "SW-Branch Switch", color: "#00f2fe",
+          headers: "L2 Trunk: VLAN Tag 10",
+          desc: "SW-Branch receives the frame on access port Fa0/1, adds an 802.1Q tag for VLAN 10, and forwards it over the Trunk Gi0/1 uplink towards the router.",
+          osi: {
+            l4: { val: "TCP Src 51000 -> Dst 80", desc: "Payload remains encapsulated." },
+            l3: { val: "10.10.10.10 -> 10.10.20.10", desc: "IP header untouched." },
+            l2: { val: "802.1Q Tag: VLAN 10", desc: "SW-Branch inserts the VLAN 10 tag to identify traffic source across shared trunk trunks." },
+            l1: { val: "Trunk Link (Gi0/1)", desc: "Physical: Gigabit Trunk fiber transceiver." }
+          }
+        },
+        {
+          node: "r-branch", x: 360, y: 130, name: "R-Branch Router", color: "#10b981",
+          headers: "L3 Routing: Gi0/0.10 -> Gi0/0.20 | Tag rewritten to VLAN 20",
+          desc: "R-Branch processes the tagged frame on subinterface Gi0/0.10. It strips the VLAN tag, decapsulates L2, routes the packet to virtual subinterface Gi0/0.20, and re-encapsulates it with a VLAN 20 tag.",
+          osi: {
+            l4: { val: "TCP Src 51000 -> Dst 80", desc: "Payload remains encapsulated." },
+            l3: { val: "10.10.10.10 -> 10.10.20.10", desc: "R-Branch performs routing lookup, forwarding packets between subnet subinterfaces Gi0/0.10 and Gi0/0.20." },
+            l2: { val: "802.1Q Tag: VLAN 20", desc: "Data Link: Re-encapsulated with R-Branch interface MAC as source and a VLAN 20 trunk tag." },
+            l1: { val: "Trunk Link (Gi0/1)", desc: "Physical: Sent back down the same physical port channel (Router-on-a-Stick loop)." }
+          }
+        },
+        {
+          node: "sw-branch", x: 200, y: 130, name: "SW-Branch Switch", color: "#10b981",
+          headers: "L2 Access: VLAN tag stripped",
+          desc: "SW-Branch receives the VLAN 20 tagged frame. It checks its MAC table, finds the IP-Phone on access port Fa0/2, strips the 802.1Q tag, and forwards the standard frame.",
+          osi: {
+            l4: { val: "TCP Src 51000 -> Dst 80", desc: "Payload remains encapsulated." },
+            l3: { val: "10.10.10.10 -> 10.10.20.10", desc: "IP header untouched." },
+            l2: { val: "Untagged Access Frame", desc: "SW-Branch strips the VLAN 20 tag prior to final delivery to access port Fa0/2." },
+            l1: { val: "Access Link (Fa0/2)", desc: "Physical: Downlink FastEthernet cable." }
+          }
+        },
+        {
+          node: "ip-phone", x: 60, y: 80, name: "Voice IP Phone", color: "#10b981",
+          headers: "L3: Connection Accepted",
+          desc: "The IP-Phone (VLAN 20) receives the frame, decapsulates the TCP segment, and processes the HTTP request. ROAS traversal successful!",
+          osi: {
+            l4: { val: "TCP Dst 80", desc: "TCP Layer: Service accepts connection on port 80." },
+            l3: { val: "10.10.10.10 -> 10.10.20.10", desc: "IP Layer: Destination matches voice IP address." },
+            l2: { val: "00bb.ccdd.2020 MAC Match", desc: "Data Link: Unicast frame matches target device NIC MAC address." },
+            l1: { val: "Copper Ethernet", desc: "Physical: NIC converts electrical pulses." }
+          }
+        }
+      ];
+    } else if (type === "lacp") {
+      path = [
+        {
+          node: "r-branch", x: 360, y: 130, name: "R-Branch Router", color: "#10b981",
+          headers: "L2 LACP: Channel-Group 1 Active",
+          desc: "R-Branch load-balances outbound traffic to the Core network over bundled Port-Channel 1. Traffic exits Member Link 1.",
+          osi: {
+            l4: { val: "TCP Src 50123 -> Dst 443", desc: "Transport Layer: TCP HTTPS traffic." },
+            l3: { val: "10.10.10.10 -> 172.16.100.5", desc: "IP Layer: Destination is HQ Server." },
+            l2: { val: "Port-Channel 1 (LACP)", desc: "Data Link: LACP bundles multiple physical interfaces into a logical Port-Channel to increase bandwidth and redundancy." },
+            l1: { val: "Gigabit Link 1", desc: "Physical Layer: Traffic is hash-balanced to Member Interface Gi0/2." }
+          }
+        },
+        {
+          node: "r-branch", x: 360, y: 130, name: "R-Branch (LACP Member Failure)", color: "#ff5e3a",
+          headers: "LACP Alert: Member Link 1 DOWN | Egress switchover",
+          desc: "Member Link 1 experiences a physical failure. LACP immediately redirects all traffic to active Member Link 2. Transmission continues seamlessly without session drops.",
+          osi: {
+            l4: { val: "TCP Src 50123 -> Dst 443", desc: "TCP session remains alive without timeouts." },
+            l3: { val: "10.10.10.10 -> 172.16.100.5", desc: "Routing table path remains unchanged." },
+            l2: { val: "LACP Dynamic Failover", desc: "LACP removes Member Link 1 from the channel bundle and immediately redirects traffic to active Member Link 2." },
+            l1: { val: "Gigabit Link 2 (Failover)", desc: "Physical Layer: Egress traffic shifts dynamically to Member Interface Gi0/3." }
+          }
+        },
+        {
+          node: "hq-core", x: 520, y: 80, name: "HQ Core L3 Switch", color: "#10b981",
+          headers: "L2: Port-Channel 1 Received | Forwarding to Server",
+          desc: "HQ-Core receives the packet on Port-Channel 1. The LACP failover was transparent to the routing layer, avoiding any packet drops.",
+          osi: {
+            l4: { val: "TCP Src 50123 -> Dst 443", desc: "TCP session remains fully established." },
+            l3: { val: "10.10.10.10 -> 172.16.100.5", desc: "HQ-Core acts as L3 router for core subnets." },
+            l2: { val: "Port-Channel 1 (LACP)", desc: "LACP processes logical incoming frame; MAC database resolves destination on local Gi0/24." },
+            l1: { val: "Gigabit Link 2", desc: "Physical: Incoming signals processed on Gi0/2." }
+          }
+        },
+        {
+          node: "hq-server", x: 640, y: 80, name: "HQ Server", color: "#10b981",
+          headers: "L3: Destination Reached",
+          desc: "HQ Server receives the packet. EtherChannel ensured high availability even during a physical fiber link break.",
+          osi: {
+            l4: { val: "TCP Dst 443", desc: "TCP Layer: HTTPS handshake completed." },
+            l3: { val: "10.10.10.10 -> 172.16.100.5", desc: "IP Layer: Matches datacenter host." },
+            l2: { val: "Unicast Frame", desc: "Data Link: Datacenter standard frame." },
+            l1: { val: "Copper Ethernet", desc: "Physical Layer: Server NIC reception." }
+          }
+        }
+      ];
+    } else if (type === "vpn") {
+      path = [
+        {
+          node: "r-branch", x: 360, y: 130, name: "R-Branch Router", color: "#00f2fe",
+          headers: "L3: Crypto Map Match | IPSec Encapsulation",
+          desc: "R-Branch inspects outbound packet. Traffic matches the Crypto ACL (10.10.10.0/24 to 172.16.100.0/24). R-Branch initiates IPSec Tunnel Mode encryption.",
+          osi: {
+            l4: { val: "IPSec ESP (Protocol 50)", desc: "Transport Layer: Original TCP header is encrypted and encapsulated inside an Encapsulating Security Payload (ESP) header." },
+            l3: { val: "WAN IP 192.0.2.1 -> 198.51.100.1", desc: "IP Layer: Private source/destination IPs are encrypted. A new public IP header is prepended (R-Branch WAN to FW-Branch WAN)." },
+            l2: { val: "WAN MAC Gateway", desc: "Data Link: Unicast frame directed to outside ISP router." },
+            l1: { val: "WAN Carrier", desc: "Physical: Sent over public ISP uplink." }
+          }
+        },
+        {
+          node: "fw-branch", x: 520, y: 180, name: "FW-Branch Firewall (VPN Peer)", color: "#10b981",
+          headers: "L3: IPSec Decapsulation",
+          desc: "The VPN Gateway (FW-Branch) intercepts the ESP packet. Finding a valid Security Association (SA), it decapsulates the ESP wrapper, decrypts the payload, and reveals the original private IP headers.",
+          osi: {
+            l4: { val: "TCP Src 50123 -> Dst 443", desc: "Transport Layer: Original TCP header decrypted and exposed." },
+            l3: { val: "10.10.10.10 -> 172.16.100.5", desc: "IP Layer: Original private IP headers are revealed and routed to internal interface." },
+            l2: { val: "Internal MAC Rewrite", desc: "Data Link: Framed for core forwarding." },
+            l1: { val: "Gigabit Link", desc: "Physical: Decoded packet routed internally." }
+          }
+        },
+        {
+          node: "hq-server", x: 640, y: 80, name: "HQ Server", color: "#10b981",
+          headers: "L3: Destination Reached | Private Session Secured",
+          desc: "HQ Server receives the decrypted private packet. Site-to-site IPSec VPN secured the transaction across the untrusted public Internet.",
+          osi: {
+            l4: { val: "TCP Dst 443", desc: "TCP Layer: Secure web service receives transaction." },
+            l3: { val: "10.10.10.10 -> 172.16.100.5", desc: "IP Layer: Datacenter Server private destination match." },
+            l2: { val: "Unicast Frame", desc: "Data Link: Private LAN framing." },
+            l1: { val: "Copper Ethernet", desc: "Physical Layer: NIC reception." }
+          }
+        }
+      ];
     }
 
-    pkt.style.opacity = "1";
+    activePkt.style.opacity = "1";
     logContent.innerHTML = "";
     let blocked = false;
 
@@ -1628,15 +1966,31 @@ function setupTraversalSimulator() {
 
       highlightNode(step.node, step.isBlocked);
 
-      pkt.setAttribute("cx", step.x);
-      pkt.setAttribute("cy", step.y);
+      // Check for special LACP member link failure styling
+      if (type === "lacp" && activeTopology === 2) {
+        if (i === 1) {
+          const link1 = byId("link-rbranch-hq1");
+          if (link1) {
+            link1.setAttribute("stroke", "#ff5e3a");
+            link1.setAttribute("stroke-width", "3");
+          }
+          const link2 = byId("link-rbranch-hq2");
+          if (link2) {
+            link2.setAttribute("stroke", "#10b981");
+            link2.setAttribute("stroke-width", "3");
+          }
+        }
+      }
+
+      activePkt.setAttribute("cx", step.x);
+      activePkt.setAttribute("cy", step.y);
       if (step.isBlocked) {
-        pkt.setAttribute("fill", "#ff5e3a");
-        pkt.style.filter = "drop-shadow(0 0 8px #ff5e3a)";
+        activePkt.setAttribute("fill", "#ff5e3a");
+        activePkt.style.filter = "drop-shadow(0 0 8px #ff5e3a)";
         playNetSound("block");
       } else {
-        pkt.setAttribute("fill", step.color || "#00f2fe");
-        pkt.style.filter = `drop-shadow(0 0 8px ${step.color || "#00f2fe"})`;
+        activePkt.setAttribute("fill", step.color || "#00f2fe");
+        activePkt.style.filter = `drop-shadow(0 0 8px ${step.color || "#00f2fe"})`;
         playNetSound("hop");
       }
 
@@ -1689,9 +2043,18 @@ function setupTraversalSimulator() {
 
   btnReset.addEventListener("click", () => {
     btnStart.disabled = false;
-    pkt.style.opacity = "0";
-    pkt.setAttribute("cx", "80");
-    pkt.setAttribute("cy", "140");
+    const pkt1 = byId("simPacket");
+    const pkt2 = byId("simPacket2");
+    if (pkt1) {
+      pkt1.style.opacity = "0";
+      pkt1.setAttribute("cx", "80");
+      pkt1.setAttribute("cy", "140");
+    }
+    if (pkt2) {
+      pkt2.style.opacity = "0";
+      pkt2.setAttribute("cx", "60");
+      pkt2.setAttribute("cy", "180");
+    }
     logContent.innerHTML = "<div>System Ready. Select a packet simulation and click 'Run Simulation'.</div>";
     currentOsiData = null;
     updateOsiLabels(null);
@@ -1701,6 +2064,7 @@ function setupTraversalSimulator() {
     }
     document.querySelectorAll(".osi-layer").forEach(el => el.classList.remove("active"));
     highlightNode(null);
+    resetTopology2Links();
   });
 }
 
