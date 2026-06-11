@@ -35,6 +35,12 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -50,7 +56,6 @@ body {
     linear-gradient(145deg, var(--bg-dark), #091220 50%, #03060c);
   min-height: 100vh;
   line-height: 1.6;
-  overflow-x: hidden;
 }
 
 /* Float Topbar Header */
@@ -609,6 +614,8 @@ textarea {
   padding: 14px;
   margin-top: 14px;
   font-size: 14.5px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .block.cli {
@@ -860,8 +867,8 @@ textarea {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
     z-index: 999;
