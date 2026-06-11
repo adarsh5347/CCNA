@@ -28,6 +28,7 @@
       <button data-page="home" class="ghost" aria-label="Home Navigation">🏠 <span>Home</span></button>
       <button data-page="subnet" class="ghost" aria-label="Subnetting Practice">⚡ <span>Subnetting</span></button>
       <button data-page="analytics" class="ghost" aria-label="Readiness Analytics">📊 <span>Analytics</span></button>
+      <button data-page="support" class="ghost" aria-label="Support Helpdesk">🛠️ <span>Support</span></button>
       <span id="timer" class="timer hidden" aria-live="polite">120:00</span>
       <div id="authContainer" class="auth-container">
         <button id="btnSignIn" class="secondary">🔑 Sign In</button>
@@ -52,22 +53,127 @@
         <div id="heroStats" class="grid stats"></div>
       </article>
 
+      <!-- Interactive Network Topology -->
+      <section class="card">
+        <h3>🕸️ Interactive Network Topology</h3>
+        <p>Select any active node on the network map to inspect its running configuration and interface status.</p>
+        <div class="topology-wrapper">
+          <div class="topology-main">
+            <svg viewBox="0 0 800 300" width="100%" height="100%" style="background: rgba(6, 9, 19, 0.5); border-radius: 12px; border: 1px solid var(--border-color);">
+              <!-- Connective Lines with glowing animation -->
+              <line x1="100" y1="150" x2="300" y2="150" stroke="#00f2fe" stroke-width="3" class="cable-link" />
+              <line x1="300" y1="150" x2="500" y2="100" stroke="#00f2fe" stroke-width="3" class="cable-link" />
+              <line x1="300" y1="150" x2="500" y2="200" stroke="#ff9233" stroke-width="2" class="cable-link secondary-link" />
+              <line x1="500" y1="100" x2="700" y2="150" stroke="#10b981" stroke-width="3" class="cable-link" />
+              <line x1="500" y1="200" x2="700" y2="150" stroke="#10b981" stroke-width="3" class="cable-link" />
+
+              <!-- Nodes -->
+              <!-- PC Host -->
+              <g class="topo-node" data-node="pc" transform="translate(100, 150)">
+                <circle r="22" fill="#0b132b" stroke="#00f2fe" stroke-width="2" />
+                <text y="4" font-family="Space Grotesk" font-size="11" fill="#fff" text-anchor="middle">💻 Host</text>
+                <text y="36" font-family="JetBrains Mono" font-size="9" fill="#94a3b8" text-anchor="middle">192.168.1.10</text>
+              </g>
+
+              <!-- Switch -->
+              <g class="topo-node" data-node="switch" transform="translate(300, 150)">
+                <rect x="-26" y="-16" width="52" height="32" rx="4" fill="#0b132b" stroke="#00f2fe" stroke-width="2" />
+                <text y="4" font-family="Space Grotesk" font-size="11" fill="#fff" text-anchor="middle">🎛️ SW-1</text>
+                <text y="28" font-family="JetBrains Mono" font-size="9" fill="#94a3b8" text-anchor="middle">VLAN 10</text>
+              </g>
+
+              <!-- Router -->
+              <g class="topo-node" data-node="router" transform="translate(500, 100)">
+                <circle r="22" fill="#0b132b" stroke="#10b981" stroke-width="2" />
+                <text y="4" font-family="Space Grotesk" font-size="11" fill="#fff" text-anchor="middle">🌐 R-1</text>
+                <text y="36" font-family="JetBrains Mono" font-size="9" fill="#94a3b8" text-anchor="middle">ISR 4331</text>
+              </g>
+
+              <!-- Firewall -->
+              <g class="topo-node" data-node="firewall" transform="translate(500, 200)">
+                <circle r="22" fill="#0b132b" stroke="#ff5e3a" stroke-width="2" />
+                <text y="4" font-family="Space Grotesk" font-size="11" fill="#fff" text-anchor="middle">🔒 FW-1</text>
+                <text y="36" font-family="JetBrains Mono" font-size="9" fill="#94a3b8" text-anchor="middle">ASA 5506</text>
+              </g>
+
+              <!-- WAN Cloud -->
+              <g class="topo-node" data-node="wan" transform="translate(700, 150)">
+                <rect x="-28" y="-16" width="56" height="32" rx="8" fill="#0b132b" stroke="#10b981" stroke-width="2" />
+                <text y="4" font-family="Space Grotesk" font-size="11" fill="#fff" text-anchor="middle">☁️ WAN</text>
+                <text y="28" font-family="JetBrains Mono" font-size="9" fill="#94a3b8" text-anchor="middle">Internet</text>
+              </g>
+            </svg>
+          </div>
+          <div id="topoDetails" class="topo-details" style="border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; background: rgba(6, 9, 19, 0.4); display: flex; flex-direction: column; justify-content: center;">
+            <h4 style="color: #00f2fe; margin-bottom: 6px;">NOC Node Inspector</h4>
+            <div id="topoDetailsContent" style="font-size: 13.5px; color: var(--text-muted); line-height: 1.4;">
+              Click any device on the network map to inspect its running configuration, status, and troubleshooting commands.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live NOC Terminal Console -->
+      <section class="card">
+        <h3>📟 NOC Command Line Interface (CLI)</h3>
+        <p>Interactive Cisco router shell simulation. Enter CCNA commands to inspect connection states.</p>
+        <div class="terminal-window">
+          <div class="terminal-header">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot yellow"></span>
+            <span class="terminal-dot green"></span>
+            <span class="terminal-title">NOC Console Session - CCNA-Router#</span>
+          </div>
+          <div id="terminalBody" class="terminal-body">
+            <div>Cisco IOS Software, IOS-XE Software (X86_64_LINUX_IOSD-UNIVERSALK9-M), Version 16.9.4</div>
+            <div>*Jun 11 21:16:30.053: %LINK-3-UPDOWN: Interface GigabitEthernet0/0, changed state to up</div>
+            <div>*Jun 11 21:16:31.054: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet0/0, changed state to up</div>
+            <div style="color: var(--text-muted);">Type 'help' or 'show ip route' to begin.</div>
+            <br />
+          </div>
+          <div class="terminal-input-line">
+            <span class="terminal-prompt">CCNA-Router#</span>
+            <input type="text" id="terminalInput" placeholder="Enter IOS command (e.g. help, ping, show ip route)..." autofocus autocomplete="off" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Live NOC Status Panel -->
+      <section class="card">
+        <h3>🛰️ Live NOC System Status</h3>
+        <div class="grid stats">
+          <div class="stat">
+            <div class="k">Link Status</div>
+            <div class="v"><span class="pulse-green"></span> Operational</div>
+          </div>
+          <div class="stat">
+            <div class="k">Ping Latency</div>
+            <div class="v">12 ms (Local Host)</div>
+          </div>
+          <div class="stat">
+            <div class="k">Active Route AD</div>
+            <div class="v">AD 110 (OSPF Area 0)</div>
+          </div>
+          <div class="stat">
+            <div class="k">Interface Duplex</div>
+            <div class="v">Full / 1 Gbps Link</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Operations Simulator Modules -->
+      <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 22px;">🛠️ Practice & Simulation Modules</h3>
       <section class="grid modes">
         <article class="card">
           <h3>⚡ Study Mode</h3>
           <p>Instant feedback with explanations, exam tips, memory tricks, and command-focused guidance.</p>
-          <ul>
-            <li>Difficulty, domain weight, and exam frequency shown</li>
-            <li>Why each wrong option is wrong</li>
-            <li>Related commands and real-world context</li>
-          </ul>
           <button id="startStudy" class="primary">Start Study Mode</button>
         </article>
 
         <article class="card">
           <h3>📝 Section Quiz Mode</h3>
           <p>Target specific learning objectives and domains with custom duration constraints.</p>
-          <div class="row">
+          <div class="row row-compact">
             <label>Duration
               <select id="quizDuration">
                 <option value="10">10 mins</option>
@@ -190,6 +296,55 @@
         <h3>Improvement Trend</h3>
         <div id="trend"></div>
       </section>
+    </section>
+
+    <!-- HELP & SUPPORT PAGE -->
+    <section id="support" class="page">
+      <article class="hero">
+        <h2>IT Support Desk & Network Operations Center</h2>
+        <p>Submit incident tickets or reach out directly to the Network Administrator for CCNA Platform issues.</p>
+      </article>
+
+      <div class="grid labs">
+        <article class="card">
+          <h3>Network Administrator Contacts</h3>
+          <p>For urgent network configurations or issues, contact the administrator directly:</p>
+          <div class="output">
+            <strong>📞 Phone / WhatsApp:</strong> <a href="tel:9136398778" style="color: #00f2fe; text-decoration: none;">9136398778</a><br />
+            <strong>📧 NOC Email:</strong> <a href="mailto:adarshpoojari8630@gmail.com" style="color: #00f2fe; text-decoration: none;">adarshpoojari8630@gmail.com</a>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Open Incident Ticket</h3>
+          <p>Describe the issue or ask a technical question. The incident tracking system will capture the details.</p>
+          <form id="supportForm" onsubmit="return false;">
+            <div class="row row-compact" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0;">
+              <label>Your Name
+                <input id="supportName" type="text" placeholder="John Doe" required />
+              </label>
+              <label>Contact Email
+                <input id="supportEmail" type="email" placeholder="john@domain.com" required style="width: 100%; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; background: rgba(6, 9, 19, 0.65); color: var(--text-main); font-size: 14px; padding: 11px 14px; margin-top: 6px;" />
+              </label>
+            </div>
+            <label>Incident Priority
+              <select id="supportPriority" style="margin-top: 6px;">
+                <option>Severity 4 - Low</option>
+                <option>Severity 3 - Medium</option>
+                <option>Severity 2 - High</option>
+                <option>Severity 1 - Critical</option>
+              </select>
+            </label>
+            <label style="margin-top: 12px;">Description / Query
+              <textarea id="supportDesc" rows="4" placeholder="Detail your issue here..." required></textarea>
+            </label>
+            <div class="inline mt-12">
+              <button id="btnSubmitSupport" class="primary">Open Ticket</button>
+            </div>
+          </form>
+          <div id="supportOut" class="output hidden"></div>
+        </article>
+      </div>
     </section>
 
     <!-- EXAM ENGINE PAGE -->

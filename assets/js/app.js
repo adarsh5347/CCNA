@@ -1007,6 +1007,200 @@ function setupAuth() {
   });
 }
 
+function setupTopologyInteractions() {
+  document.querySelectorAll("[data-node]").forEach((nodeEl) => {
+    nodeEl.addEventListener("click", () => {
+      const node = nodeEl.dataset.node;
+      const detailsTitle = byId("topoDetails");
+      const detailsContent = byId("topoDetailsContent");
+      if (!detailsTitle || !detailsContent) return;
+
+      let title = "";
+      let html = "";
+
+      if (node === "pc") {
+        title = "💻 Host PC - 192.168.1.10";
+        html = `
+          <strong>Status:</strong> Operational (Link Up)<br />
+          <strong>Default Gateway:</strong> 192.168.1.1<br />
+          <strong>MAC Address:</strong> 0050.7966.6800<br />
+          <strong>Config Details:</strong> Received configuration from SW-1 via VLAN 10 (DHCP).<br />
+          <strong>CCNA Verification command:</strong> <code>ipconfig /all</code>
+        `;
+      } else if (node === "switch") {
+        title = "🎛️ Catalyst 2960 Switch - SW-1";
+        html = `
+          <strong>Status:</strong> Active<br />
+          <strong>Spanning Tree:</strong> Root Bridge for VLAN 10<br />
+          <strong>VLAN Configuration:</strong> Ports 1-10 VLAN 10, Port 24 Trunk to R-1<br />
+          <strong>MAC Table:</strong> 4 Active MAC Entries detected.<br />
+          <strong>CCNA Verification command:</strong> <code>show mac address-table</code>
+        `;
+      } else if (node === "router") {
+        title = "🌐 ISR 4331 Core Router - R-1";
+        html = `
+          <strong>Status:</strong> Active (Primary Gateway)<br />
+          <strong>Routing protocol:</strong> OSPF 1 (Area 0)<br />
+          <strong>Interfaces:</strong> Gi0/0 (192.168.1.2/24), Gi0/1 (ROAS Subinterfaces VLAN 10/20)<br />
+          <strong>OSPF Neighbors:</strong> Full adjacency with WAN Link.<br />
+          <strong>CCNA Verification command:</strong> <code>show ip route</code>
+        `;
+      } else if (node === "firewall") {
+        title = "🔒 ASA 5506-X Firewall - FW-1";
+        html = `
+          <strong>Status:</strong> Standby (Firewall Policies Active)<br />
+          <strong>Security levels:</strong> Inside (100), Outside (0)<br />
+          <strong>Active Translation:</strong> Dynamic Port Address Translation (PAT) active.<br />
+          <strong>CCNA Verification command:</strong> <code>show access-list</code>
+        `;
+      } else if (node === "wan") {
+        title = "☁️ External WAN Gateway / Internet";
+        html = `
+          <strong>Status:</strong> Connected<br />
+          <strong>Gateway route:</strong> Static Route (0.0.0.0/0) pointing to WAN IP.<br />
+          <strong>Public Services:</strong> DNS servers (8.8.8.8, 1.1.1.1) reachable.<br />
+          <strong>CCNA Verification command:</strong> <code>ping 8.8.8.8</code>
+        `;
+      }
+
+      detailsTitle.querySelector("h4").textContent = title;
+      detailsContent.innerHTML = html;
+    });
+  });
+}
+
+function setupTerminalConsole() {
+  const terminalInput = byId("terminalInput");
+  const terminalBody = byId("terminalBody");
+  if (!terminalInput || !terminalBody) return;
+
+  terminalInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      const val = terminalInput.value.trim();
+      terminalInput.value = "";
+      if (!val) return;
+
+      // Add echo of the command
+      const lineEcho = document.createElement("div");
+      lineEcho.innerHTML = `<span style="color:#38bdf8; font-weight:bold;">CCNA-Router#</span> ${val}`;
+      terminalBody.appendChild(lineEcho);
+
+      const outputEl = document.createElement("div");
+      const cleanVal = val.toLowerCase().replace(/\s+/g, " ");
+
+      if (cleanVal === "help") {
+        outputEl.innerHTML = `
+          Available Commands:<br />
+          - <strong>help</strong> : Displays this helper menu<br />
+          - <strong>show ip route</strong> : Displays the IPv4 routing table<br />
+          - <strong>show ip interface brief</strong> : Displays interface summary<br />
+          - <strong>ping [address]</strong> : Sends ICMP Echo messages (e.g. ping 8.8.8.8)<br />
+          - <strong>traceroute [address]</strong> : Trace routes hop-by-hop (e.g. traceroute 8.8.8.8)<br />
+          - <strong>show running-config</strong> : Displays current active configurations<br />
+          - <strong>clear</strong> : Clears the console logs
+        `;
+      } else if (cleanVal === "show ip route" || cleanVal === "show ip rotue") {
+        outputEl.innerHTML = `
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area<br /><br />
+Gateway of last resort is 192.168.1.1 to network 0.0.0.0<br /><br />
+S*&nbsp;&nbsp;&nbsp;&nbsp;0.0.0.0/0 [1/0] via 192.168.1.1, GigabitEthernet0/0<br />
+C&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;192.168.1.0/24 is directly connected, GigabitEthernet0/1<br />
+L&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;192.168.1.10/32 is directly connected, GigabitEthernet0/1<br />
+O&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;10.10.10.0/24 [110/2] via 192.168.1.1, 00:14:32, GigabitEthernet0/0
+        `;
+      } else if (cleanVal === "show ip interface brief" || cleanVal === "show ip int brief" || cleanVal === "sh ip int br") {
+        outputEl.innerHTML = `
+Interface&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IP-Address&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OK? Method Status&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Protocol<br />
+GigabitEthernet0/0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;192.168.1.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;YES manual up&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;up<br />
+GigabitEthernet0/1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;192.168.1.10&nbsp;&nbsp;&nbsp;&nbsp;YES manual up&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;up<br />
+Vlan10&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;192.168.10.1&nbsp;&nbsp;&nbsp;&nbsp;YES manual up&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;up<br />
+Vlan20&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;192.168.20.1&nbsp;&nbsp;&nbsp;&nbsp;YES manual up&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;up
+        `;
+      } else if (cleanVal.startsWith("ping")) {
+        const dest = val.split(" ")[1] || "8.8.8.8";
+        outputEl.innerHTML = `
+Sending 5, 100-byte ICMP Echos to ${dest}, timeout is 2 seconds:<br />
+!!!!!<br />
+Success rate is 100 percent (5/5), round-trip min/avg/max = 8/12/16 ms
+        `;
+      } else if (cleanVal.startsWith("traceroute") || cleanVal.startsWith("trace")) {
+        const dest = val.split(" ")[1] || "8.8.8.8";
+        outputEl.innerHTML = `
+Type escape sequence to abort.<br />
+Tracing the route to ${dest}<br /><br />
+&nbsp;&nbsp;1 192.168.1.1 2 msec 1 msec 1 msec<br />
+&nbsp;&nbsp;2 10.10.10.1 4 msec 3 msec 3 msec<br />
+&nbsp;&nbsp;3 ${dest} 12 msec 11 msec 12 msec
+        `;
+      } else if (cleanVal === "show running-config" || cleanVal === "show run" || cleanVal === "sh run") {
+        outputEl.innerHTML = `
+Building configuration...<br />
+Current configuration : 1382 bytes<br />
+!<br />
+hostname CCNA-Router<br />
+!<br />
+interface GigabitEthernet0/0<br />
+&nbsp;ip address 192.168.1.2 255.255.255.0<br />
+&nbsp;duplex full<br />
+&nbsp;speed 1000<br />
+!<br />
+interface GigabitEthernet0/1<br />
+&nbsp;no ip address<br />
+&nbsp;duplex auto<br />
+&nbsp;speed auto<br />
+!<br />
+router ospf 1<br />
+&nbsp;network 192.168.1.0 0.0.0.255 area 0<br />
+!<br />
+end
+        `;
+      } else if (cleanVal === "clear") {
+        terminalBody.innerHTML = `<div>Terminal output cleared. Type 'help' to show commands.</div><br />`;
+        return;
+      } else {
+        outputEl.innerHTML = `<span style="color:#f43f5e;">% Invalid input detected at '^' marker.</span>`;
+      }
+
+      terminalBody.appendChild(outputEl);
+      terminalBody.appendChild(document.createElement("br"));
+      terminalBody.scrollTop = terminalBody.scrollHeight;
+    }
+  });
+}
+
+function setupSupportDesk() {
+  const btn = byId("btnSubmitSupport");
+  const out = byId("supportOut");
+  if (!btn || !out) return;
+
+  btn.addEventListener("click", () => {
+    const name = byId("supportName").value.trim();
+    const email = byId("supportEmail").value.trim();
+    const priority = byId("supportPriority").value;
+    const desc = byId("supportDesc").value.trim();
+
+    if (!name || !email || !desc) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    out.innerHTML = `
+      <strong style="color: #10b981;">Incident Logged Successfully!</strong><br />
+      <strong>Ticket ID:</strong> INC-${Math.floor(100000 + Math.random() * 900000)}<br />
+      <strong>Severity:</strong> ${priority}<br />
+      <strong>Status:</strong> Assigned to Adarsh Poojari (Admin)<br />
+      <span style="font-size: 12px; color: var(--text-muted);">A confirmation ticket detail was logged in local session cache. Administrator contact 9136398778 / adarshpoojari8630@gmail.com has been referenced.</span>
+    `;
+    out.classList.remove("hidden");
+
+    // Reset inputs
+    byId("supportName").value = "";
+    byId("supportEmail").value = "";
+    byId("supportDesc").value = "";
+  });
+}
+
 function init() {
   state.bank = generateBank(rand);
   navSetup();
@@ -1015,6 +1209,9 @@ function init() {
   renderAnalytics();
   wireEvents();
   setupAuth();
+  setupTopologyInteractions();
+  setupTerminalConsole();
+  setupSupportDesk();
   setPage("home");
 }
 
