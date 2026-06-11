@@ -50,83 +50,140 @@
         <h3>🕸️ NOC Packet Traversal Simulator</h3>
         <p>Choose a packet type, click "Run Simulation", and watch how data traverses network nodes and gets encapsulated/decapsulated at each hop.</p>
         
-        <div class="row row-compact" style="margin-bottom: 16px;">
-          <label>Select Packet Type
-            <select id="simPacketType">
+        <div class="row row-compact" style="margin-bottom: 16px; display: flex; gap: 16px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 200px;">
+            <label for="simPacketType" style="margin-bottom: 4px; display: block; font-size: 12px; font-weight: 600;">Select Packet Type</label>
+            <select id="simPacketType" style="width: 100%;">
               <option value="dhcp">DHCP Request (Broadcast Drill)</option>
               <option value="ping">ICMP Echo Request (Ping to 8.8.8.8)</option>
               <option value="nat">HTTP Web Request (NAT Overload PAT)</option>
               <option value="stp">STP BPDU Frame (Switch STP Election)</option>
+              <option value="arp">ARP Request/Reply (MAC Address Resolution)</option>
+              <option value="ospf">OSPF Hello Adjacency (Link State Update)</option>
+              <option value="acl">Firewall ACL Block (Telnet Access Denied)</option>
             </select>
-          </label>
-          <div style="display: flex; align-items: flex-end; gap: 8px; margin-top: 6px;">
+          </div>
+          <div style="width: 150px;">
+            <label for="simSpeed" style="margin-bottom: 4px; display: block; font-size: 12px; font-weight: 600;">Simulation Speed</label>
+            <select id="simSpeed" style="width: 100%;">
+              <option value="2200">Normal (2.2s)</option>
+              <option value="1200">Fast (1.2s)</option>
+              <option value="3500">Slow (3.5s)</option>
+            </select>
+          </div>
+          <div style="display: flex; align-items: flex-end; gap: 8px; margin-top: auto; height: 38px;">
             <button id="btnStartSim" class="primary">▶ Run Simulation</button>
             <button id="btnResetSim" class="secondary">🛑 Reset</button>
           </div>
         </div>
 
         <div class="topology-wrapper">
-          <div class="topology-main">
-            <svg id="topoSvg" viewBox="0 0 700 280" width="100%" height="100%" style="background: rgba(6, 9, 19, 0.5); border-radius: 12px; border: 1px solid var(--border-color); position: relative;">
-              <!-- Cable links -->
-              <line x1="80" y1="140" x2="240" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-              <line x1="240" y1="140" x2="400" y2="80" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-              <line x1="240" y1="140" x2="400" y2="200" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-              <line x1="400" y1="80" x2="600" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-              <line x1="400" y1="200" x2="600" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
+          <div class="topology-left" style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="topology-main">
+              <svg id="topoSvg" viewBox="0 0 700 280" width="100%" height="100%" style="background: rgba(6, 9, 19, 0.5); border-radius: 12px; border: 1px solid var(--border-color); position: relative;">
+                <!-- Cable links -->
+                <line x1="80" y1="140" x2="240" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
+                <line x1="240" y1="140" x2="400" y2="80" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
+                <line x1="240" y1="140" x2="400" y2="200" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
+                <line x1="400" y1="80" x2="600" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
+                <line x1="400" y1="200" x2="600" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
 
-              <!-- Active glowing lines -->
-              <line id="link-pc-sw" x1="80" y1="140" x2="240" y2="140" stroke="#00f2fe" stroke-width="2" class="cable-link" />
-              <line id="link-sw-r1" x1="240" y1="140" x2="400" y2="80" stroke="#00f2fe" stroke-width="2" class="cable-link" />
-              <line id="link-sw-fw" x1="240" y1="140" x2="400" y2="200" stroke="#ff9233" stroke-width="1.5" class="cable-link secondary-link" />
-              <line id="link-r1-wan" x1="400" y1="80" x2="600" y2="140" stroke="#10b981" stroke-width="2" class="cable-link" />
-              <line id="link-fw-wan" x1="400" y1="200" x2="600" y2="140" stroke="#10b981" stroke-width="2" class="cable-link" />
+                <!-- Active glowing lines -->
+                <line id="link-pc-sw" x1="80" y1="140" x2="240" y2="140" stroke="#00f2fe" stroke-width="2" class="cable-link" />
+                <line id="link-sw-r1" x1="240" y1="140" x2="400" y2="80" stroke="#00f2fe" stroke-width="2" class="cable-link" />
+                <line id="link-sw-fw" x1="240" y1="140" x2="400" y2="200" stroke="#ff9233" stroke-width="1.5" class="cable-link secondary-link" />
+                <line id="link-r1-wan" x1="400" y1="80" x2="600" y2="140" stroke="#10b981" stroke-width="2" class="cable-link" />
+                <line id="link-fw-wan" x1="400" y1="200" x2="600" y2="140" stroke="#10b981" stroke-width="2" class="cable-link" />
 
-              <!-- Animated Packet -->
-              <circle id="simPacket" cx="80" cy="140" r="8" fill="#00f2fe" style="opacity: 0; filter: drop-shadow(0 0 8px #00f2fe); pointer-events: none;" />
+                <!-- Animated Packet -->
+                <circle id="simPacket" cx="80" cy="140" r="8" fill="#00f2fe" style="opacity: 0; filter: drop-shadow(0 0 8px #00f2fe); pointer-events: none;" />
 
-              <!-- Nodes -->
-              <!-- Host PC -->
-              <g class="topo-node" data-node="pc" transform="translate(80, 140)">
-                <circle r="20" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-pc" />
-                <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">💻 Host</text>
-                <text y="32" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">192.168.1.10</text>
-              </g>
+                <!-- Nodes -->
+                <!-- Host PC -->
+                <g class="topo-node" data-node="pc" transform="translate(80, 140)">
+                  <circle r="20" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-pc" />
+                  <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">💻 Host</text>
+                  <text y="32" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">192.168.1.10</text>
+                </g>
 
-              <!-- Access Switch -->
-              <g class="topo-node" data-node="switch" transform="translate(240, 140)">
-                <rect x="-24" y="-14" width="48" height="28" rx="4" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-switch" />
-                <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🎛️ SW-1</text>
-                <text y="24" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">VLAN 10</text>
-              </g>
+                <!-- Access Switch -->
+                <g class="topo-node" data-node="switch" transform="translate(240, 140)">
+                  <rect x="-24" y="-14" width="48" height="28" rx="4" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-switch" />
+                  <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🎛️ SW-1</text>
+                  <text y="24" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">VLAN 10</text>
+                </g>
 
-              <!-- Core Router -->
-              <g class="topo-node" data-node="router" transform="translate(400, 80)">
-                <circle r="20" fill="#060913" stroke="#10b981" stroke-width="2" id="node-router" />
-                <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🌐 R-1</text>
-                <text y="32" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">ISR 4331</text>
-              </g>
+                <!-- Core Router -->
+                <g class="topo-node" data-node="router" transform="translate(400, 80)">
+                  <circle r="20" fill="#060913" stroke="#10b981" stroke-width="2" id="node-router" />
+                  <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🌐 R-1</text>
+                  <text y="32" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">ISR 4331</text>
+                </g>
 
-              <!-- Firewall -->
-              <g class="topo-node" data-node="firewall" transform="translate(400, 200)">
-                <circle r="20" fill="#060913" stroke="#ff5e3a" stroke-width="2" id="node-firewall" />
-                <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🔒 FW-1</text>
-                <text y="32" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">ASA 5506</text>
-              </g>
+                <!-- Firewall -->
+                <g class="topo-node" data-node="firewall" transform="translate(400, 200)">
+                  <circle r="20" fill="#060913" stroke="#ff5e3a" stroke-width="2" id="node-firewall" />
+                  <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🔒 FW-1</text>
+                  <text y="32" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">ASA 5506</text>
+                </g>
 
-              <!-- WAN -->
-              <g class="topo-node" data-node="wan" transform="translate(600, 140)">
-                <rect x="-24" y="-14" width="48" height="28" rx="6" fill="#060913" stroke="#10b981" stroke-width="2" id="node-wan" />
-                <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">☁️ WAN</text>
-                <text y="24" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">8.8.8.8</text>
-              </g>
-            </svg>
+                <!-- WAN -->
+                <g class="topo-node" data-node="wan" transform="translate(600, 140)">
+                  <rect x="-24" y="-14" width="48" height="28" rx="6" fill="#060913" stroke="#10b981" stroke-width="2" id="node-wan" />
+                  <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">☁️ WAN</text>
+                  <text y="24" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">8.8.8.8</text>
+                </g>
+              </svg>
+            </div>
+
+            <!-- Device config console panel -->
+            <div id="nodeConfigPanel" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; background: #02040a; font-family: var(--font-mono); display: flex; flex-direction: column; min-height: 140px;">
+              <h4 style="color: #00f2fe; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">🖥️ Device Running Configuration & Status</h4>
+              <div id="nodeConfigContent" style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
+                <span style="color: var(--text-muted); font-style: italic;">Click on any network node in the diagram (Host, SW-1, R-1, FW-1, WAN) to inspect interfaces, MAC/routing tables, security policies, and CCNA CLI commands.</span>
+              </div>
+            </div>
           </div>
-          
-          <div id="simLogPanel" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; background: #02040a; font-family: var(--font-mono); display: flex; flex-direction: column; height: 280px; overflow-y: auto;">
-            <h4 style="color: #00f2fe; margin-bottom: 10px; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">📋 Packet Header & Traversal Logs</h4>
-            <div id="simLogContent" style="font-size: 12.5px; color: #a7f3d0; line-height: 1.5; display: flex; flex-direction: column; gap: 8px;">
-              <div>System Ready. Select a packet simulation and click "Run Simulation" to observe packet flows.</div>
+
+          <div class="topology-right" style="display: flex; flex-direction: column; gap: 16px;">
+            <!-- Traversal Logs -->
+            <div id="simLogPanel" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; background: #02040a; font-family: var(--font-mono); display: flex; flex-direction: column; height: 180px; overflow-y: auto;">
+              <h4 style="color: #00f2fe; margin-bottom: 10px; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">📋 Packet Traversal Logs</h4>
+              <div id="simLogContent" style="font-size: 12.5px; color: #a7f3d0; line-height: 1.5; display: flex; flex-direction: column; gap: 8px;">
+                <div>System Ready. Select a packet simulation and click "Run Simulation" to observe packet flows.</div>
+              </div>
+            </div>
+
+            <!-- OSI Stack Inspector -->
+            <div id="simOsiPanel" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; background: #02040a; display: flex; flex-direction: column; height: auto;">
+              <h4 style="color: #00f2fe; margin-bottom: 10px; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">🛡️ OSI Stack Inspector (Active Hop)</h4>
+              
+              <div class="osi-stack">
+                <div class="osi-layer" data-layer="4">
+                  <span class="osi-layer-num">L4</span>
+                  <span class="osi-layer-name">Transport</span>
+                  <span id="osi-l4-val" class="osi-layer-val">-</span>
+                </div>
+                <div class="osi-layer" data-layer="3">
+                  <span class="osi-layer-num">L3</span>
+                  <span class="osi-layer-name">Network</span>
+                  <span id="osi-l3-val" class="osi-layer-val">-</span>
+                </div>
+                <div class="osi-layer" data-layer="2">
+                  <span class="osi-layer-num">L2</span>
+                  <span class="osi-layer-name">Data Link</span>
+                  <span id="osi-l2-val" class="osi-layer-val">-</span>
+                </div>
+                <div class="osi-layer" data-layer="1">
+                  <span class="osi-layer-num">L1</span>
+                  <span class="osi-layer-name">Physical</span>
+                  <span id="osi-l1-val" class="osi-layer-val">-</span>
+                </div>
+              </div>
+              
+              <div id="osiLayerDescBox" class="osi-layer-desc-box">
+                <span style="color: var(--text-muted); font-style: italic;">Run a simulation and click any OSI layer tab above to inspect the active hop encapsulation details.</span>
+              </div>
             </div>
           </div>
         </div>

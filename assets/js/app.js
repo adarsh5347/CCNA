@@ -1012,19 +1012,255 @@ function setupAuth() {
   });
 }
 
-function highlightNode(nodeId) {
+// Web Audio API Helpers for NOC sound effects
+let audioCtx = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function playNetSound(type) {
+  try {
+    initAudio();
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    
+    if (type === "hop") {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(800, now);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } else if (type === "success") {
+      const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+      notes.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+        gain.gain.setValueAtTime(0.06, now + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.2);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 0.2);
+      });
+    } else if (type === "block") {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "square";
+      osc.frequency.setValueAtTime(150, now);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.setValueAtTime(0.12, now + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } else if (type === "click") {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(1000, now);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.05);
+    }
+  } catch (e) {
+    console.warn("Web Audio API failed or blocked:", e);
+  }
+}
+
+let currentOsiData = null; // Holds the active step's OSI details
+
+function showOsiLayerDetail(layerNum) {
+  const descBox = byId("osiLayerDescBox");
+  if (!descBox) return;
+  
+  if (!currentOsiData) {
+    descBox.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">No active packet simulation. Run a simulation to inspect layers.</span>`;
+    return;
+  }
+  
+  const layerKey = "l" + layerNum;
+  const data = currentOsiData[layerKey];
+  
+  if (data && data.val !== "-") {
+    descBox.innerHTML = `
+      <strong style="color: #00f2fe;">Layer ${layerNum} details:</strong><br/>
+      <div style="margin-top: 4px; font-family: var(--font-mono); color: #a7f3d0; font-size:12px;">Field Value: ${data.val}</div>
+      <div style="margin-top: 6px;">${data.desc}</div>
+    `;
+  } else {
+    descBox.innerHTML = `
+      <strong style="color: var(--text-muted);">Layer ${layerNum} details:</strong><br/>
+      <div style="margin-top: 4px; font-style: italic;">Not applicable / Not encapsulated at this hop.</div>
+    `;
+  }
+}
+
+function updateOsiLabels(osiData) {
+  const l4Val = byId("osi-l4-val");
+  const l3Val = byId("osi-l3-val");
+  const l2Val = byId("osi-l2-val");
+  const l1Val = byId("osi-l1-val");
+  
+  if (!osiData) {
+    if (l4Val) l4Val.textContent = "-";
+    if (l3Val) l3Val.textContent = "-";
+    if (l2Val) l2Val.textContent = "-";
+    if (l1Val) l1Val.textContent = "-";
+    return;
+  }
+  
+  if (l4Val) l4Val.textContent = osiData.l4 ? osiData.l4.val : "-";
+  if (l3Val) l3Val.textContent = osiData.l3 ? osiData.l3.val : "-";
+  if (l2Val) l2Val.textContent = osiData.l2 ? osiData.l2.val : "-";
+  if (l1Val) l1Val.textContent = osiData.l1 ? osiData.l1.val : "-";
+}
+
+function highlightNode(nodeId, isBlocked = false) {
   const nodes = ["pc", "switch", "router", "firewall", "wan"];
   nodes.forEach(n => {
     const el = byId(`node-${n}`);
     if (el) {
       if (n === nodeId) {
         el.setAttribute("stroke-width", "4");
-        el.setAttribute("fill", "rgba(0, 242, 254, 0.2)");
+        if (isBlocked) {
+          el.setAttribute("fill", "rgba(255, 94, 58, 0.25)");
+          el.setAttribute("stroke", "#ff5e3a");
+        } else {
+          el.setAttribute("fill", "rgba(0, 242, 254, 0.2)");
+          const origStroke = n === "router" || n === "wan" ? "#10b981" : (n === "firewall" ? "#ff5e3a" : "#00f2fe");
+          el.setAttribute("stroke", origStroke);
+        }
       } else {
         el.setAttribute("stroke-width", "2");
         el.setAttribute("fill", "#060913");
+        const origStroke = n === "router" || n === "wan" ? "#10b981" : (n === "firewall" ? "#ff5e3a" : "#00f2fe");
+        el.setAttribute("stroke", origStroke);
       }
     }
+  });
+}
+
+function setupNodeConfigInspector() {
+  const nodes = document.querySelectorAll(".topo-node");
+  const configContent = byId("nodeConfigContent");
+  if (!nodes || !configContent) return;
+
+  const configs = {
+    pc: `
+<strong style="color: #00f2fe; font-size: 13px;">💻 Device: Host PC (End Station)</strong>
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<strong>IP Address:</strong> 192.168.1.10
+<strong>Subnet Mask:</strong> 255.255.255.0
+<strong>Default Gateway:</strong> 192.168.1.1 (R-1)
+<strong>MAC Address:</strong> 0050.7966.6800
+<strong>NIC Status:</strong> UP (1000BASE-T Full)
+<strong>Active Connections:</strong> TCP 192.168.1.10:49152 -> 8.8.8.8:80 (ESTABLISHED)
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<span style="color: #10b981;">💡 CCNA Command Tip:</span>
+Use <code>ipconfig /all</code> to inspect network adapters, and <code>arp -a</code> to view the local ARP table.
+    `,
+    switch: `
+<strong style="color: #00f2fe; font-size: 13px;">🎛️ Device: Switch SW-1 (Catalyst 2960)</strong>
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<strong>VLAN Database:</strong>
+  - VLAN 10 (LAN Users): Ports Fa0/1, Fa0/2
+  - VLAN 99 (Management): IP 192.168.1.250/24
+<strong>Spanning Tree Protocol (STP):</strong>
+  - Mode: PVST+ (Rapid)
+  - Bridge ID Priority: 32768 (MAC: 00e0.f901.abcd)
+  - Status: Root Bridge for VLAN 10
+<strong>MAC Address Table:</strong>
+  - 0050.7966.6800 -> Port Fa0/1 [Dynamic, Age: 42s]
+  - 0011.2233.4455 -> Port Gi0/1 [Dynamic, Age: 120s]
+  - 55aa.bbcc.ddee -> Port Gi0/2 [Dynamic, Age: 88s]
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<span style="color: #10b981;">💡 CCNA Command Tip:</span>
+Use <code>show mac address-table</code> to verify bridging learning, and <code>show vlan brief</code> to view port memberships.
+    `,
+    router: `
+<strong style="color: #00f2fe; font-size: 13px;">🌐 Device: Router R-1 (Cisco ISR 4331)</strong>
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<strong>Interfaces:</strong>
+  - Gi0/0/0 (LAN Gateway): 192.168.1.1/24 (UP) - <i>ip helper-address 10.10.10.1</i>
+  - Gi0/0/1 (WAN Uplink): 192.168.1.2/30 (UP) - <i>ip nat outside</i>
+<strong>Routing Table (OSPF Area 0):</strong>
+  - C 192.168.1.0/24 is directly connected, Gi0/0/0
+  - C 192.168.1.2/30 is directly connected, Gi0/0/1
+  - O*E2 0.0.0.0/0 [110/1] via 192.168.1.2, 00:45:12, Gi0/0/1
+<strong>Dynamic NAT Table:</strong>
+  - Inside Local: 192.168.1.10:49152 <-> Inside Global: 192.168.1.2:1024
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<span style="color: #10b981;">💡 CCNA Command Tip:</span>
+Use <code>show ip route</code> to inspect routing decisions, and <code>show ip interface brief</code> to verify line protocol status.
+    `,
+    firewall: `
+<strong style="color: #00f2fe; font-size: 13px;">🔒 Device: Firewall FW-1 (Cisco ASA 5506-X)</strong>
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<strong>Security Zones:</strong>
+  - Inside: Security Level 100 (Trust) - IP: 192.168.1.254/24
+  - Outside: Security Level 0 (Untrust) - IP: 192.168.1.3/30
+<strong>Active Access-Control List (OUTSIDE_IN):</strong>
+  - 10 permit tcp any host 192.168.1.10 eq 80 (HTTP)
+  - 20 permit tcp any host 192.168.1.10 eq 443 (HTTPS)
+  - 30 deny tcp any any eq 23 (Telnet block) [Matches: 14 hits]
+  - 40 deny ip any any (Implicit Deny)
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<span style="color: #10b981;">💡 CCNA Command Tip:</span>
+Use <code>show access-list</code> to check rule hit-counts, and <code>show conn</code> to audit stateful sessions.
+    `,
+    wan: `
+<strong style="color: #00f2fe; font-size: 13px;">☁️ WAN Cloud Server (Destination 8.8.8.8)</strong>
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<strong>Endpoint IP:</strong> 8.8.8.8 (Google DNS / Public Web Host)
+<strong>Autonomous System:</strong> AS 15169 (Google LLC)
+<strong>BGP Peerings:</strong> Established with ISP Edge Routers
+<strong>Supported Protocols:</strong> ICMP (Echo), TCP (80, 443), UDP (53)
+<strong>Route Path:</strong> 192.168.1.2 -> ISP Edge AS65001 -> Core WAN -> 8.8.8.8
+<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
+<span style="color: #10b981;">💡 CCNA Command Tip:</span>
+Use <code>tracert 8.8.8.8</code> to map the TTL-expired ICMP hops traversing Internet Autonomous Systems.
+    `
+  };
+
+  nodes.forEach(node => {
+    node.addEventListener("click", () => {
+      playNetSound("click");
+      const nodeName = node.getAttribute("data-node");
+      if (configs[nodeName]) {
+        configContent.innerHTML = configs[nodeName];
+        
+        document.querySelectorAll(".topo-node circle, .topo-node rect").forEach(el => {
+          el.style.stroke = "";
+          el.style.strokeWidth = "";
+        });
+        const innerEl = byId(`node-${nodeName}`);
+        if (innerEl) {
+          innerEl.style.stroke = "#00f2fe";
+          innerEl.style.strokeWidth = "4px";
+          setTimeout(() => {
+            innerEl.style.stroke = "";
+            innerEl.style.strokeWidth = "";
+          }, 1500);
+        }
+      }
+    });
   });
 }
 
@@ -1038,6 +1274,18 @@ function setupTraversalSimulator() {
 
   const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 
+  setupNodeConfigInspector();
+
+  document.querySelectorAll(".osi-layer").forEach(layerEl => {
+    layerEl.addEventListener("click", () => {
+      playNetSound("click");
+      document.querySelectorAll(".osi-layer").forEach(el => el.classList.remove("active"));
+      layerEl.classList.add("active");
+      const layerNum = layerEl.getAttribute("data-layer");
+      showOsiLayerDetail(layerNum);
+    });
+  });
+
   btnStart.addEventListener("click", async () => {
     btnStart.disabled = true;
     const type = byId("simPacketType").value;
@@ -1047,69 +1295,141 @@ function setupTraversalSimulator() {
       path = [
         {
           node: "pc", x: 80, y: 140, name: "Host PC", color: "#00f2fe",
-          headers: "L2: 0050.7966.6800 -> FFFF.FFFF.FFFF | L3: 0.0.0.0 -> 255.255.255.255 | UDP: 68 -> 67",
-          desc: "Host PC has no IP address yet. It broadcasts a <strong>DHCPDISCOVER</strong> packet out of its interface to request local configurations."
+          headers: "L2: Broadcast | L3: 0.0.0.0 -> 255.255.255.255 | UDP: 68 -> 67",
+          desc: "Host PC has no IP address yet. It broadcasts a <strong>DHCPDISCOVER</strong> packet out of its interface to request local configurations.",
+          osi: {
+            l4: { val: "UDP 68 -> 67", desc: "UDP Transport layer: Client port 68 communicates with server port 67." },
+            l3: { val: "0.0.0.0 -> 255.255.255.255", desc: "IP Network layer: Source is 0.0.0.0 (DHCP client holds no IP) and Destination is 255.255.255.255 (local broadcast)." },
+            l2: { val: "0050.7966.6800 -> FFFF.FFFF.FFFF", desc: "Ethernet Data Link layer: Frame carries source MAC address and targets the broadcast address FFFF.FFFF.FFFF." },
+            l1: { val: "Copper Ethernet (Fa0/1)", desc: "Physical Layer: Electrical signals travel through Cat6 Twisted Pair copper wiring at 100 Mbps (Full Duplex)." }
+          }
         },
         {
           node: "switch", x: 240, y: 140, name: "Switch SW-1", color: "#00f2fe",
-          headers: "L2: 0050.7966.6800 -> FFFF.FFFF.FFFF | VLAN: Tag 10 (Access)",
-          desc: "SW-1 receives the Layer 2 broadcast. Since it is a broadcast MAC destination, the switch floods the frame out all active access ports within VLAN 10."
+          headers: "L2: Broadcast MAC | VLAN: Tag 10",
+          desc: "SW-1 receives the Layer 2 broadcast. Since it is a broadcast MAC destination, the switch floods the frame out all active access ports within VLAN 10.",
+          osi: {
+            l4: { val: "UDP 68 -> 67", desc: "UDP segment remains encapsulated inside the IP packet." },
+            l3: { val: "0.0.0.0 -> 255.255.255.255", desc: "Layer 3 payload is not examined by the Layer 2 switch." },
+            l2: { val: "0050.7966.6800 -> FFFF.FFFF.FFFF", desc: "SW-1 checks its MAC table. Finding a broadcast destination, it floods the frame to all active ports on VLAN 10." },
+            l1: { val: "Trunk Link (Gi0/1)", desc: "Trunk connection transmits frame with an 802.1Q tag identifying it as VLAN 10." }
+          }
         },
         {
           node: "router", x: 400, y: 80, name: "Core Router R-1", color: "#10b981",
-          headers: "L2: Router Interface -> Unicast Gateway | L3: 192.168.1.1 -> 10.10.10.1 (Unicast)",
-          desc: "R-1 intercepts the broadcast. Since <code>ip helper-address 10.10.10.1</code> is configured, R-1 decapsulates the L2 broadcast, updates Src/Dst IPs, and routes it to the WAN as a unicast packet."
+          headers: "L2: Router Interface -> Unicast Gateway | L3: 192.168.1.1 -> 10.10.10.1",
+          desc: "R-1 intercepts the broadcast. Since <code>ip helper-address 10.10.10.1</code> is configured, R-1 decapsulates the L2 broadcast, updates Src/Dst IPs, and routes it to the WAN as a unicast packet.",
+          osi: {
+            l4: { val: "UDP 67 -> 67", desc: "UDP layer: R-1 decapsulates the packet and acts as a DHCP Relay agent (helper address)." },
+            l3: { val: "192.168.1.1 -> 10.10.10.1", desc: "R-1 updates the Source IP to its gateway IP (192.168.1.1) and unicasts the packet to the DHCP Server (10.10.10.1)." },
+            l2: { val: "0011.2233.4455 -> WAN MAC", desc: "Data Link Layer: Re-encapsulated with WAN interface Source MAC and WAN Gateway Destination MAC." },
+            l1: { val: "Gigabit WAN (Gi0/2)", desc: "Physical transmission: Fiber/Copper carrier link towards WAN Gateway." }
+          }
         },
         {
           node: "wan", x: 600, y: 140, name: "WAN Gateway", color: "#10b981",
           headers: "L2: Unicast WAN | L3: 10.10.10.1 -> 10.10.10.10 | UDP: 67 -> 68",
-          desc: "The DHCP server receives the request, reserves an IP, and replies back with a <strong>DHCPOFFER</strong>. The configuration returns back along the path."
+          desc: "The DHCP server receives the request, reserves an IP, and replies back with a <strong>DHCPOFFER</strong>. The configuration returns back along the path.",
+          osi: {
+            l4: { val: "UDP 67 -> 68", desc: "The DHCP server processes the request, reserves an IP config, and replies with a DHCPOFFER segment." },
+            l3: { val: "10.10.10.10 -> 192.168.1.1", desc: "IP Layer: Source is Server (10.10.10.10) and Destination is R-1's relay IP (192.168.1.1)." },
+            l2: { val: "WAN MAC -> 0011.2233.4455", desc: "WAN Layer 2 encapsulation handles unicast forwarding back to the router's outside WAN interface." },
+            l1: { val: "WAN Carrier", desc: "Physical: Transit across public WAN infrastructure." }
+          }
         }
       ];
     } else if (type === "ping") {
       path = [
         {
           node: "pc", x: 80, y: 140, name: "Host PC", color: "#00f2fe",
-          headers: "L2: 0050.7966.6800 -> 0011.2233.4455 | L3: 192.168.1.10 -> 8.8.8.8 | ICMP: Type 8 Code 0",
-          desc: "Host PC initiates an ICMP Echo Request (Ping) to Google DNS. Since the destination is on a foreign subnet, the PC targets the default gateway MAC address."
+          headers: "L2: Unicast Gateway | L3: 192.168.1.10 -> 8.8.8.8 | ICMP: Type 8 Code 0",
+          desc: "Host PC initiates an ICMP Echo Request (Ping) to Google DNS. Since the destination is on a foreign subnet, the PC targets the default gateway MAC address.",
+          osi: {
+            l4: { val: "ICMP Type 8 Code 0", desc: "ICMP Protocol: Echo Request packet created to verify end-to-end IP reachability." },
+            l3: { val: "192.168.1.10 -> 8.8.8.8", desc: "IP Layer: Dest IP (8.8.8.8) is outside local subnet; routing table targets default gateway 192.168.1.1." },
+            l2: { val: "0050.7966.6800 -> 0011.2233.4455", desc: "Ethernet Frame: Source MAC is Host, Destination MAC is R-1's gateway interface (resolved via ARP)." },
+            l1: { val: "Copper Ethernet (Fa0/1)", desc: "Physical Layer: Tx over copper Cat5e cabling." }
+          }
         },
         {
           node: "switch", x: 240, y: 140, name: "Switch SW-1", color: "#00f2fe",
-          headers: "L2: 0050.7966.6800 -> 0011.2233.4455",
-          desc: "SW-1 queries its MAC address table. It finds R-1's MAC address on the uplink trunk interface and forwards the frame directly."
+          headers: "L2: Forwarding to R-1 Uplink",
+          desc: "SW-1 queries its MAC address table. It finds R-1's MAC address on the uplink trunk interface and forwards the frame directly.",
+          osi: {
+            l4: { val: "ICMP Type 8 Code 0", desc: "ICMP payload is carried transparently." },
+            l3: { val: "192.168.1.10 -> 8.8.8.8", desc: "Layer 3 IP headers are unread by the bridge." },
+            l2: { val: "0050.7966.6800 -> 0011.2233.4455", desc: "SW-1 checks its MAC table. Finds R-1's MAC on Gi0/1 and forwards the frame directly." },
+            l1: { val: "Trunk Link (Gi0/1)", desc: "Physical: Gigabit Ethernet uplink trunk." }
+          }
         },
         {
           node: "router", x: 400, y: 80, name: "Core Router R-1", color: "#10b981",
-          headers: "L2: Gateway -> WAN Gateway | L3: 192.168.1.10 -> 8.8.8.8 | Route Lookup: LPM Match",
-          desc: "R-1 decapsulates Layer 2. It performs a Routing Table lookup. Finding a route for 8.8.8.8/32 via OSPF/Static towards WAN, it re-encapsulates the frame and sends it."
+          headers: "L3: Route Lookup LPM | WAN Interface",
+          desc: "R-1 decapsulates Layer 2. It performs a Routing Table lookup. Finding a route for 8.8.8.8/32 via OSPF/Static towards WAN, it re-encapsulates the frame and sends it.",
+          osi: {
+            l4: { val: "ICMP Type 8 Code 0", desc: "ICMP payload is carried transparently." },
+            l3: { val: "192.168.1.10 -> 8.8.8.8", desc: "R-1 decapsulates L2, performs LPM route lookup, matches default route 0.0.0.0/0 via Gi0/1 WAN interface." },
+            l2: { val: "0011.2233.4455 -> ISP MAC", desc: "L2 header rewritten: Source is R-1 WAN MAC, Destination is next-hop ISP gateway MAC." },
+            l1: { val: "Fiber WAN (Gi0/1)", desc: "Physical: WAN optical transceiver conversion." }
+          }
         },
         {
           node: "wan", x: 600, y: 140, name: "WAN Server", color: "#10b981",
           headers: "L3: 8.8.8.8 -> 192.168.1.10 | ICMP: Type 0 Code 0 (Echo Reply)",
-          desc: "Google Server processes the ping request and replies back with an <strong>ICMP Echo Reply</strong>, returning the expected <code>!!!!!</code> output in the console."
+          desc: "Google Server processes the ping request and replies back with an <strong>ICMP Echo Reply</strong>, returning the expected <code>!!!!!</code> output in the console.",
+          osi: {
+            l4: { val: "ICMP Type 0 Code 0", desc: "ICMP Protocol: Server receives Echo Request and responds with an Echo Reply." },
+            l3: { val: "8.8.8.8 -> 192.168.1.10", desc: "IP Layer: Source is 8.8.8.8, Destination is the PC IP (returning back through NAT/PAT router)." },
+            l2: { val: "ISP MAC -> 0011.2233.4455", desc: "Data Link: Framed for return delivery to the Router's WAN interface." },
+            l1: { val: "WAN Fiber", desc: "Physical: Optical link transit." }
+          }
         }
       ];
     } else if (type === "nat") {
       path = [
         {
           node: "pc", x: 80, y: 140, name: "Host PC", color: "#00f2fe",
-          headers: "L3: 192.168.1.10 -> 8.8.8.8 | L4: TCP Src Port 49152 -> Dst Port 80 (HTTP)",
-          desc: "PC requests a webpage. It allocates a random private source port (49152) and initiates a TCP handshake request."
+          headers: "L3: 192.168.1.10 -> 8.8.8.8 | TCP Src Port 49152 -> Dst Port 80 (HTTP)",
+          desc: "PC requests a webpage. It allocates a random private source port (49152) and initiates a TCP handshake request.",
+          osi: {
+            l4: { val: "TCP 49152 -> 80", desc: "TCP Layer: Random high-source port 49152 initiates a 3-way handshake (SYN) to HTTP port 80." },
+            l3: { val: "192.168.1.10 -> 8.8.8.8", desc: "IP Layer: Private inside source IP targeted to public web server." },
+            l2: { val: "0050.7966.6800 -> 0011.2233.4455", desc: "Ethernet Frame directed to default gateway." },
+            l1: { val: "Copper Ethernet (Fa0/1)", desc: "Physical Layer: Local LAN copper cabling." }
+          }
         },
         {
           node: "switch", x: 240, y: 140, name: "Switch SW-1", color: "#00f2fe",
           headers: "L2: Standard Unicast Forwarding",
-          desc: "SW-1 forwards the frame directly towards the Core Router gateway port."
+          desc: "SW-1 forwards the frame directly towards the Core Router gateway port.",
+          osi: {
+            l4: { val: "TCP 49152 -> 80", desc: "TCP segment encapsulated." },
+            l3: { val: "192.168.1.10 -> 8.8.8.8", desc: "IP header untouched." },
+            l2: { val: "0050.7966.6800 -> 0011.2233.4455", desc: "Forwarded via MAC table entry for R-1." },
+            l1: { val: "Uplink trunk", desc: "Physical: LAN uplink." }
+          }
         },
         {
           node: "router", x: 400, y: 80, name: "Core Router R-1", color: "#10b981",
           headers: "L3 NAT Translation: 192.168.1.10:49152 -> 192.168.1.2:1024 | TCP Src Port translated to 1024",
-          desc: "R-1 performs <strong>Network Address Translation (NAT Overload/PAT)</strong>. It translates the private source IP to the public WAN IP, and maps the port to 1024 to support multiple internal hosts."
+          desc: "R-1 performs <strong>Network Address Translation (NAT Overload/PAT)</strong>. It translates the private source IP to the public WAN IP, and maps the port to 1024 to support multiple internal hosts.",
+          osi: {
+            l4: { val: "TCP 1024 -> 80", desc: "TCP Layer: Source Port translated from 49152 to 1024 (PAT) to uniquely map the local host." },
+            l3: { val: "192.168.1.2 -> 8.8.8.8", desc: "IP Layer: Source IP translated from Private (192.168.1.10) to Router WAN Public IP (192.168.1.2)." },
+            l2: { val: "0011.2233.4455 -> ISP MAC", desc: "Ethernet: Rewritten with WAN Source MAC." },
+            l1: { val: "WAN Uplink", desc: "Physical: WAN transmission." }
+          }
         },
         {
           node: "wan", x: 600, y: 140, name: "WAN Web Server", color: "#10b981",
           headers: "L3: 8.8.8.8 -> 192.168.1.2 | L4: TCP Src 80 -> Dst 1024",
-          desc: "The public server receives the request, processes the TCP segment, and responds back to public gateway IP 192.168.1.2. R-1 will translate this back to the private host."
+          desc: "The public server receives the request, processes the TCP segment, and responds back to public gateway IP 192.168.1.2. R-1 will translate this back to the private host.",
+          osi: {
+            l4: { val: "TCP 80 -> 1024", desc: "TCP Layer: Web Server replies with TCP SYN-ACK segment to translated port 1024." },
+            l3: { val: "8.8.8.8 -> 192.168.1.2", desc: "IP Layer: Destined to the Router's public IP address. R-1 will translate it back to the PC." },
+            l2: { val: "ISP MAC -> WAN MAC", desc: "Data Link: Unicast delivery to router's outside MAC." },
+            l1: { val: "WAN Carrier", desc: "Physical: Public WAN transit." }
+          }
         }
       ];
     } else if (type === "stp") {
@@ -1117,37 +1437,215 @@ function setupTraversalSimulator() {
         {
           node: "pc", x: 80, y: 140, name: "Host PC", color: "#ff5e3a",
           headers: "STP Status: Edge Port (PortFast)",
-          desc: "PC does not process Spanning Tree BPDUs. The switch port is configured with PortFast to transition immediately to the forwarding state."
+          desc: "PC does not process Spanning Tree BPDUs. The switch port is configured with PortFast to transition immediately to the forwarding state.",
+          osi: {
+            l4: { val: "-", desc: "Not applicable: Spanning Tree operates at Layer 2." },
+            l3: { val: "-", desc: "Not applicable: STP does not use Layer 3 IP routing." },
+            l2: { val: "-", desc: "STP PortFast: Host PC interface immediately bypasses Listening/Learning states to prevent DHCP timeouts." },
+            l1: { val: "Ethernet copper", desc: "Physical: Link remains active." }
+          }
         },
         {
           node: "switch", x: 240, y: 140, name: "Switch SW-1", color: "#00f2fe",
           headers: "L2 BPDU Multicast: 0180.C200.0000 | STP Role: ROOT BRIDGE",
-          desc: "SW-1 periodically generates STP BPDUs. Having the lowest Bridge ID, SW-1 is elected as the Root Bridge for VLAN 10."
+          desc: "SW-1 periodically generates STP BPDUs. Having the lowest Bridge ID, SW-1 is elected as the Root Bridge for VLAN 10.",
+          osi: {
+            l4: { val: "-", desc: "Not applicable." },
+            l3: { val: "-", desc: "Not applicable." },
+            l2: { val: "BPDU Bridge Priority 32768", desc: "SW-1 transmits Configuration Bridge Protocol Data Units (BPDUs) to multicast MAC 0180.C200.0000. It claims to be Root Bridge." },
+            l1: { val: "Trunk link (Gi0/2)", desc: "Physical: BPDU frames broadcasted out trunk interface." }
+          }
         },
         {
           node: "firewall", x: 400, y: 200, name: "Firewall FW-1", color: "#ff5e3a",
           headers: "STP Role: Blocking Port / Non-Root Port",
-          desc: "FW-1's backup interface receives the BPDU. To prevent a physical loop in the network, STP transitions this interface to the <strong>Blocking</strong> state."
+          desc: "FW-1's backup interface receives the BPDU. To prevent a physical loop in the network, STP transitions this interface to the <strong>Blocking</strong> state.",
+          osi: {
+            l4: { val: "-", desc: "Not applicable." },
+            l3: { val: "-", desc: "Not applicable." },
+            l2: { val: "BPDU Blocked", desc: "FW-1's backup interface receives the BPDU. To prevent a physical loop, the interface transitions to the BLOCKING state." },
+            l1: { val: "Trunk link", desc: "Physical: Blocking applied logically at port interface." }
+          }
+        }
+      ];
+    } else if (type === "arp") {
+      path = [
+        {
+          node: "pc", x: 80, y: 140, name: "Host PC", color: "#00f2fe",
+          headers: "L2: MAC Broadcast | L3: ARP Request",
+          desc: "Host PC needs to send a packet to a remote address, but doesn't know its gateway's MAC address. It broadcasts an **ARP Request**.",
+          osi: {
+            l4: { val: "-", desc: "Not applicable: ARP handles IP-to-MAC resolution and has no L4 transport header." },
+            l3: { val: "ARP Request (Target IP: 192.168.1.1)", desc: "ARP Protocol: Query payload asking for the MAC address associated with gateway IP 192.168.1.1." },
+            l2: { val: "0050.7966.6800 -> FFFF.FFFF.FFFF", desc: "Data Link: Frame sent to Broadcast MAC (FFFF.FFFF.FFFF) to reach all nodes in the local broadcast domain." },
+            l1: { val: "Copper Ethernet (Fa0/1)", desc: "Physical: Electrical signals transmitted over Cat6 copper wire." }
+          }
+        },
+        {
+          node: "switch", x: 240, y: 140, name: "Switch SW-1", color: "#00f2fe",
+          headers: "L2: Flood Broadcast | VLAN: Tag 10",
+          desc: "SW-1 receives the broadcast frame, learns Host's MAC on port Fa0/1, and floods the frame out all ports in VLAN 10.",
+          osi: {
+            l4: { val: "-", desc: "Not applicable." },
+            l3: { val: "ARP Request (Target IP: 192.168.1.1)", desc: "ARP request payload unchanged." },
+            l2: { val: "0050.7966.6800 -> FFFF.FFFF.FFFF", desc: "SW-1 receives the broadcast frame, learns Host's MAC on port Fa0/1, and floods the frame out all ports in VLAN 10." },
+            l1: { val: "Trunk Link (Gi0/1)", desc: "Trunk link transmits frame with VLAN 10 802.1Q header tag." }
+          }
+        },
+        {
+          node: "router", x: 400, y: 80, name: "Core Router R-1", color: "#10b981",
+          headers: "L2: MAC Unicast Reply | L3: ARP Reply",
+          desc: "R-1 identifies itself as the owner of 192.168.1.1 and replies back with an **ARP Reply** containing its MAC address.",
+          osi: {
+            l4: { val: "-", desc: "Not applicable." },
+            l3: { val: "ARP Reply (Sender IP: 192.168.1.1)", desc: "ARP Protocol: R-1 identifies itself as the owner of 192.168.1.1 and compiles an ARP Reply payload." },
+            l2: { val: "0011.2233.4455 -> 0050.7966.6800", desc: "Data Link: Frame is unicast directly back to the Host PC MAC address since its location is now known." },
+            l1: { val: "Gigabit Ethernet (Gi0/0)", desc: "Physical: Fast transmission over router copper interface." }
+          }
+        },
+        {
+          node: "switch", x: 240, y: 140, name: "Switch SW-1", color: "#10b981",
+          headers: "L2: Forwarding Unicast Reply",
+          desc: "SW-1 checks its MAC table, finds the PC on Fa0/1, and forwards the ARP Reply directly to the PC.",
+          osi: {
+            l4: { val: "-", desc: "Not applicable." },
+            l3: { val: "ARP Reply (Sender IP: 192.168.1.1)", desc: "ARP payload remains encapsulated." },
+            l2: { val: "0011.2233.4455 -> 0050.7966.6800", desc: "SW-1 checks its MAC table. Finds 0050.7966.6800 is on port Fa0/1, and forwards the frame only to that port." },
+            l1: { val: "Access Link (Fa0/1)", desc: "Physical: Sent down local port Fa0/1 towards Host." }
+          }
+        },
+        {
+          node: "pc", x: 80, y: 140, name: "Host PC", color: "#10b981",
+          headers: "ARP Cache Updated",
+          desc: "The Host PC decapsulates the reply and updates its local ARP table. It can now send unicast packets.",
+          osi: {
+            l4: { val: "-", desc: "Not applicable." },
+            l3: { val: "ARP Reply Processed", desc: "ARP Protocol: PC decapsulates the reply and updates its local ARP Cache table (associates 192.168.1.1 with 0011.2233.4455)." },
+            l2: { val: "0011.2233.4455 -> 0050.7966.6800", desc: "Data Link: Unicast frame successfully received and verified." },
+            l1: { val: "Copper Ethernet", desc: "Physical: Host NIC receives electrical signals." }
+          }
+        }
+      ];
+    } else if (type === "ospf") {
+      path = [
+        {
+          node: "router", x: 400, y: 80, name: "Core Router R-1", color: "#10b981",
+          headers: "L2: Multicast MAC | L3: Multicast 224.0.0.5 | OSPF Hello",
+          desc: "R-1 multicasts an **OSPF Hello** packet to discover potential neighbors on the local segment. It uses multicast IP 224.0.0.5.",
+          osi: {
+            l4: { val: "OSPF Protocol 89", desc: "Transport Layer: OSPF runs directly over IP (IP Protocol 89). Sends an OSPF Hello packet." },
+            l3: { val: "192.168.1.1 -> 224.0.0.5", desc: "IP Layer: Source IP is R-1, Destination is multicast 224.0.0.5 (All OSPF Routers)." },
+            l2: { val: "0011.2233.4455 -> 0100.5E00.0005", desc: "Data Link: IP multicast 224.0.0.5 maps to OSPF multicast MAC 0100.5E00.0005." },
+            l1: { val: "Trunk Link (Gi0/1)", desc: "Physical: Gigabit uplink interface." }
+          }
+        },
+        {
+          node: "switch", x: 240, y: 140, name: "Switch SW-1", color: "#10b981",
+          headers: "L2: OSPF Multicast Forwarding",
+          desc: "SW-1 forwards the OSPF multicast packet out all ports participating in OSPF Area 0.",
+          osi: {
+            l4: { val: "OSPF Protocol 89", desc: "OSPF payload remains encapsulated." },
+            l3: { val: "192.168.1.1 -> 224.0.0.5", desc: "IP header untouched." },
+            l2: { val: "0011.2233.4455 -> 0100.5E00.0005", desc: "SW-1 forwards OSPF multicast frames to all ports participating in OSPF Area 0." },
+            l1: { val: "Trunk Link (Gi0/2)", desc: "Physical: Forwarded out the interface leading to FW-1." }
+          }
+        },
+        {
+          node: "firewall", x: 400, y: 200, name: "Firewall FW-1", color: "#ff5e3a",
+          headers: "L3: OSPF Adjacency Established",
+          desc: "FW-1 validates area configuration parameters, and replies with its Hello packet. Bidirectional relationship (2-WAY state) is established.",
+          osi: {
+            l4: { val: "OSPF Hello Reply", desc: "OSPF Protocol: FW-1 processes the Hello packet, validates area configurations, and replies with its Hello packet." },
+            l3: { val: "192.168.1.254 -> 224.0.0.5", desc: "IP Layer: FW-1 sends OSPF Hello back to multicast address 224.0.0.5." },
+            l2: { val: "55aa.bbcc.ddee -> 0100.5E00.0005", desc: "Data Link: Multicast MAC addressing is used to target all neighboring OSPF routers." },
+            l1: { val: "Gigabit Link", desc: "Physical: Signals travel over firewall interface." }
+          }
+        }
+      ];
+    } else if (type === "acl") {
+      path = [
+        {
+          node: "pc", x: 80, y: 140, name: "Host PC", color: "#00f2fe",
+          headers: "L3: 192.168.1.10 -> 8.8.8.8 | TCP Dst Port 23 (Telnet)",
+          desc: "Host PC attempts to open a Telnet session (port 23) to a remote server. The packet goes through SW-1.",
+          osi: {
+            l4: { val: "TCP Src 51234 -> Dst 23", desc: "TCP Layer: Host attempts a connection to Telnet port 23 (unencrypted administration)." },
+            l3: { val: "192.168.1.10 -> 8.8.8.8", desc: "IP Layer: Unicast packet targeted to remote server 8.8.8.8." },
+            l2: { val: "0050.7966.6800 -> 55aa.bbcc.ddee", desc: "Data Link: Framed to FW-1's inside interface MAC address." },
+            l1: { val: "Copper Ethernet (Fa0/1)", desc: "Physical: Data converted into copper Ethernet signals." }
+          }
+        },
+        {
+          node: "switch", x: 240, y: 140, name: "Switch SW-1", color: "#00f2fe",
+          headers: "L2: Forwarding to FW-1",
+          desc: "SW-1 forwards the frame directly towards the default gateway FW-1 based on MAC table mapping.",
+          osi: {
+            l4: { val: "TCP Src 51234 -> Dst 23", desc: "TCP segment remains encapsulated." },
+            l3: { val: "192.168.1.10 -> 8.8.8.8", desc: "IP routing data unread." },
+            l2: { val: "0050.7966.6800 -> 55aa.bbcc.ddee", desc: "SW-1 forwards unicast frame directly towards FW-1's interface based on MAC lookup." },
+            l1: { val: "Trunk Link (Gi0/2)", desc: "Physical: Gigabit link transit." }
+          }
+        },
+        {
+          node: "firewall", x: 400, y: 200, name: "Firewall FW-1", color: "#ff5e3a", isBlocked: true,
+          headers: "ACL Denied Rule 30 | PACKET DROPPED",
+          desc: "FW-1 inspects the incoming traffic. The rule <code>deny tcp any any eq 23</code> matches. <strong>The packet is dropped immediately.</strong>",
+          osi: {
+            l4: { val: "TCP Src 51234 -> Dst 23", desc: "TCP segment is inspected. Destination Port 23 matches deny policy." },
+            l3: { val: "192.168.1.10 -> 8.8.8.8", desc: "IP Layer: Firewall denies traffic from inside network to outside for Telnet." },
+            l2: { val: "0050.7966.6800 -> 55aa.bbcc.ddee", desc: "Data Link: Frame is discarded immediately. No Layer 2 transmission occurs on the WAN uplink." },
+            l1: { val: "No Transmission", desc: "Physical Layer: The packet is dropped in memory; no electrical signals are sent on the egress interface." }
+          }
         }
       ];
     }
 
     pkt.style.opacity = "1";
     logContent.innerHTML = "";
+    let blocked = false;
 
     for (let i = 0; i < path.length; i++) {
       const step = path[i];
-      highlightNode(step.node);
+      currentOsiData = step.osi || null;
+      
+      updateOsiLabels(step.osi);
+
+      let highestLayer = 1;
+      if (step.osi) {
+        if (step.osi.l4 && step.osi.l4.val !== "-") highestLayer = 4;
+        else if (step.osi.l3 && step.osi.l3.val !== "-") highestLayer = 3;
+        else if (step.osi.l2 && step.osi.l2.val !== "-") highestLayer = 2;
+      }
+      
+      document.querySelectorAll(".osi-layer").forEach(el => {
+        if (el.getAttribute("data-layer") == highestLayer) {
+          el.classList.add("active");
+        } else {
+          el.classList.remove("active");
+        }
+      });
+      showOsiLayerDetail(highestLayer);
+
+      highlightNode(step.node, step.isBlocked);
 
       pkt.setAttribute("cx", step.x);
       pkt.setAttribute("cy", step.y);
+      if (step.isBlocked) {
+        pkt.setAttribute("fill", "#ff5e3a");
+        pkt.style.filter = "drop-shadow(0 0 8px #ff5e3a)";
+        playNetSound("block");
+      } else {
+        pkt.setAttribute("fill", step.color || "#00f2fe");
+        pkt.style.filter = `drop-shadow(0 0 8px ${step.color || "#00f2fe"})`;
+        playNetSound("hop");
+      }
 
       const stepDiv = document.createElement("div");
-      stepDiv.style.borderLeft = `3px solid ${step.color}`;
+      stepDiv.style.borderLeft = `3px solid ${step.isBlocked ? "#ff5e3a" : step.color}`;
       stepDiv.style.paddingLeft = "8px";
       stepDiv.style.marginBottom = "6px";
       stepDiv.innerHTML = `
-        <strong style="color:${step.color};">[HOP ${i + 1}: ${step.name}]</strong><br/>
+        <strong style="color:${step.isBlocked ? "#ff5e3a" : step.color};">[HOP ${i + 1}: ${step.name}]</strong><br/>
         <span style="font-size:11px; color:#94a3b8; font-family:var(--font-mono);">${step.headers}</span><br/>
         <span>${step.desc}</span>
       `;
@@ -1156,19 +1654,37 @@ function setupTraversalSimulator() {
       const logPanel = byId("simLogPanel");
       if (logPanel) logPanel.scrollTop = logPanel.scrollHeight;
 
-      await sleep(2400);
+      if (step.isBlocked) {
+        blocked = true;
+        break;
+      }
+
+      const speed = Number(byId("simSpeed")?.value || 2200);
+      await sleep(speed);
     }
 
-    const finishDiv = document.createElement("div");
-    finishDiv.style.textAlign = "center";
-    finishDiv.style.marginTop = "8px";
-    finishDiv.style.color = "#10b981";
-    finishDiv.style.fontWeight = "bold";
-    finishDiv.innerHTML = `✔ Traversal Completed Successfully.`;
-    logContent.appendChild(finishDiv);
-    
-    // Reset highlights
+    if (blocked) {
+      const finishDiv = document.createElement("div");
+      finishDiv.style.textAlign = "center";
+      finishDiv.style.marginTop = "8px";
+      finishDiv.style.color = "#ff5e3a";
+      finishDiv.style.fontWeight = "bold";
+      finishDiv.innerHTML = `❌ Traversal Blocked by Security Policy.`;
+      logContent.appendChild(finishDiv);
+    } else {
+      playNetSound("success");
+      const finishDiv = document.createElement("div");
+      finishDiv.style.textAlign = "center";
+      finishDiv.style.marginTop = "8px";
+      finishDiv.style.color = "#10b981";
+      finishDiv.style.fontWeight = "bold";
+      finishDiv.innerHTML = `✔ Traversal Completed Successfully.`;
+      logContent.appendChild(finishDiv);
+    }
+
+    await sleep(1000);
     highlightNode(null);
+    btnStart.disabled = false;
   });
 
   btnReset.addEventListener("click", () => {
@@ -1177,6 +1693,13 @@ function setupTraversalSimulator() {
     pkt.setAttribute("cx", "80");
     pkt.setAttribute("cy", "140");
     logContent.innerHTML = "<div>System Ready. Select a packet simulation and click 'Run Simulation'.</div>";
+    currentOsiData = null;
+    updateOsiLabels(null);
+    const descBox = byId("osiLayerDescBox");
+    if (descBox) {
+      descBox.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">Run a simulation and click any OSI layer tab above to inspect the active hop encapsulation details.</span>`;
+    }
+    document.querySelectorAll(".osi-layer").forEach(el => el.classList.remove("active"));
     highlightNode(null);
   });
 }
