@@ -109,6 +109,24 @@
           </div>
           <button id="startSmartQuiz" class="primary">Start Smart Quiz</button>
         </article>
+
+        <article class="card">
+          <h3>🔁 Spaced Repetition Quiz</h3>
+          <p>Review and master your weak spots. This mode targets only the questions you have previously answered incorrectly.</p>
+          <div id="missedQuizInfo" style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; min-height: 18px; line-height: 1.4;">
+            You have 0 incorrect questions to review.
+          </div>
+          <div class="row" style="margin-bottom: 12px;">
+            <label>Questions
+              <select id="missedQuizCount">
+                <option value="10">10 questions</option>
+                <option value="15">15 questions</option>
+                <option value="20">20 questions</option>
+              </select>
+            </label>
+          </div>
+          <button id="startMissedQuiz" class="primary">Start Review Quiz</button>
+        </article>
       </section>
 
       <section class="grid">

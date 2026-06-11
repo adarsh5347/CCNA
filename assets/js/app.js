@@ -175,6 +175,29 @@ function renderHome() {
       1. ${weakest[0].name} (${weakest[0].total ? weakest[0].acc + '%' : 'No attempts'})<br />
       2. ${weakest[1].name} (${weakest[1].total ? weakest[1].acc + '%' : 'No attempts'})`;
   }
+
+  // Render Spaced Repetition information
+  const missedCount = (state.analytics.missedIds || []).length;
+  const missedQuizInfo = byId("missedQuizInfo");
+  if (missedQuizInfo) {
+    if (missedCount === 0) {
+      missedQuizInfo.innerHTML = `<strong>Status:</strong> Clear!<br />You have 0 incorrect questions to review. Great job!`;
+      const btn = byId("startMissedQuiz");
+      if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = 0.5;
+        btn.style.pointerEvents = "none";
+      }
+    } else {
+      missedQuizInfo.innerHTML = `<strong>Status:</strong> Needs review.<br />You have ${missedCount} incorrect question${missedCount > 1 ? 's' : ''} pending.`;
+      const btn = byId("startMissedQuiz");
+      if (btn) {
+        btn.disabled = false;
+        btn.style.opacity = 1;
+        btn.style.pointerEvents = "auto";
+      }
+    }
+  }
 }
 
 function renderDomainChecks() {
@@ -259,6 +282,17 @@ function startSession(mode) {
       hideScoreUntilEnd: false,
       minutes: count * 2,
       questions: weightedSelection(count, weakDomains)
+    };
+  } else if (mode === "missed") {
+    const count = Number(byId("missedQuizCount").value);
+    const missedList = state.bank.filter((q) => (state.analytics.missedIds || []).includes(q.id));
+    conf = {
+      title: "Spaced Repetition Quiz",
+      desc: "Reviewing questions you previously answered incorrectly.",
+      showFeedback: true,
+      hideScoreUntilEnd: false,
+      minutes: count * 2,
+      questions: shuffle(missedList).slice(0, count)
     };
   } else {
     conf = {
@@ -530,6 +564,17 @@ function instantStudyFeedback() {
   const ok = answerEquals(q, ans);
   s.feedback[s.idx] = ok;
   applyStats(q, ok, 35);
+
+  // Update missedIds list
+  if (!state.analytics.missedIds) state.analytics.missedIds = [];
+  if (ok) {
+    state.analytics.missedIds = state.analytics.missedIds.filter(id => id !== q.id);
+  } else {
+    if (!state.analytics.missedIds.includes(q.id)) {
+      state.analytics.missedIds.push(q.id);
+    }
+  }
+
   saveAnalytics();
   renderQuestion();
   renderHome();
@@ -602,9 +647,17 @@ function submitSession(force) {
   const domain = {};
   const wrong = [];
 
+  if (!state.analytics.missedIds) state.analytics.missedIds = [];
   s.questions.forEach((q, i) => {
     const ok = answerEquals(q, s.answers[i]);
-    if (ok) correct += 1;
+    if (ok) {
+      correct += 1;
+      state.analytics.missedIds = state.analytics.missedIds.filter(id => id !== q.id);
+    } else {
+      if (!state.analytics.missedIds.includes(q.id)) {
+        state.analytics.missedIds.push(q.id);
+      }
+    }
     if (!domain[q.domain]) domain[q.domain] = { total: 0, correct: 0 };
     domain[q.domain].total += 1;
     if (ok) domain[q.domain].correct += 1;
@@ -806,6 +859,11 @@ function wireEvents() {
   byId("saveNext").addEventListener("click", saveAndNext);
   byId("submitSession").addEventListener("click", () => submitSession(false));
 
+  const btnMissed = byId("startMissedQuiz");
+  if (btnMissed) {
+    btnMissed.addEventListener("click", () => startSession("missed"));
+  }
+
   // Sidebar drawer handlers
   const sidebar = document.querySelector(".left");
   const backdrop = byId("sidebarBackdrop");
@@ -844,7 +902,8 @@ function wireEvents() {
           totalTime: 0,
           studyMin: 0,
           xp: 0,
-          ach: {}
+          ach: {},
+          missedIds: []
         };
         state.analytics = fresh;
         saveAnalytics();
@@ -907,9 +966,11 @@ function setupAuth() {
           totalTime: 0,
           studyMin: 0,
           xp: 0,
-          ach: {}
+          ach: {},
+          missedIds: []
         };
       }
+      state.analytics.missedIds = state.analytics.missedIds || [];
       
       localStorage.setItem(userKey, JSON.stringify(state.analytics));
       saveUserProgress(user.uid, state.analytics);
@@ -933,8 +994,10 @@ function setupAuth() {
         totalTime: 0,
         studyMin: 0,
         xp: 0,
-        ach: {}
+        ach: {},
+        missedIds: []
       };
+      state.analytics.missedIds = state.analytics.missedIds || [];
 
       renderHome();
       renderAnalytics();
