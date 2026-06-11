@@ -85,7 +85,17 @@
         <div class="topology-wrapper">
           <div class="topology-left" style="display: flex; flex-direction: column; gap: 16px;">
             <div class="topology-main">
-              <svg id="topoSvg" viewBox="0 0 700 280" width="100%" height="100%" style="background: rgba(6, 9, 19, 0.5); border-radius: 12px; border: 1px solid var(--border-color); position: relative;">
+              <svg id="topoSvg" viewBox="0 0 700 280" width="100%" height="100%" style="background: rgba(6, 9, 19, 0.65); border-radius: 12px; border: 1px solid rgba(0, 242, 254, 0.2); position: relative;">
+                <defs>
+                  <!-- Cyberpunk grid background pattern -->
+                  <pattern id="gridPattern" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255, 255, 255, 0.025)" stroke-width="0.5" />
+                  </pattern>
+                </defs>
+
+                <!-- Grid Overlay -->
+                <rect width="100%" height="100%" fill="url(#gridPattern)" rx="12" />
+
                 <!-- Cable links -->
                 <line x1="80" y1="140" x2="240" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
                 <line x1="240" y1="140" x2="400" y2="80" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
@@ -100,48 +110,85 @@
                 <line id="link-r1-wan" x1="400" y1="80" x2="600" y2="140" stroke="#10b981" stroke-width="2" class="cable-link" />
                 <line id="link-fw-wan" x1="400" y1="200" x2="600" y2="140" stroke="#10b981" stroke-width="2" class="cable-link" />
 
+                <!-- Interface Link Status Triangles (Packet Tracer Style) -->
+                <!-- PC port -->
+                <polygon points="108,137 114,140 108,143" fill="#10b981" />
+                <!-- SW-1 ports -->
+                <polygon points="212,137 206,140 212,143" fill="#10b981" />
+                <polygon points="256,128 252,123 258,121" fill="#10b981" />
+                <polygon points="256,152 252,157 258,159" fill="#10b981" />
+                <!-- R1 ports -->
+                <polygon points="380,95 385,90 380,87" fill="#10b981" />
+                <polygon points="420,90 425,93 420,97" fill="#10b981" />
+                <!-- FW1 ports -->
+                <polygon points="380,185 385,190 380,193" fill="#10b981" />
+                <polygon points="420,190 425,187 420,183" fill="#10b981" />
+
+                <!-- Port interface labels -->
+                <text x="115" y="135" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Fa0/1</text>
+                <text x="200" y="135" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Fa0/1</text>
+                <text x="260" y="118" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi0/1</text>
+                <text x="260" y="168" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi0/2</text>
+                <text x="370" y="100" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi0/0</text>
+                <text x="435" y="100" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi0/1</text>
+                <text x="370" y="180" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi0/0</text>
+                <text x="435" y="180" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi0/1</text>
+                <text x="575" y="130" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi0/24</text>
+
                 <!-- Animated Packet -->
                 <circle id="simPacket" cx="80" cy="140" r="8" fill="#00f2fe" style="opacity: 0; filter: drop-shadow(0 0 8px #00f2fe); pointer-events: none;" />
 
                 <!-- Nodes -->
                 <!-- Host PC -->
                 <g class="topo-node" data-node="pc" transform="translate(80, 140)">
+                  <circle r="25" class="topo-orbit" stroke="rgba(0, 242, 254, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
                   <circle r="20" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-pc" />
                   <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">💻 Host</text>
-                  <text y="32" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">192.168.1.10</text>
+                  <text y="35" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">192.168.1.10</text>
                 </g>
 
                 <!-- Access Switch -->
                 <g class="topo-node" data-node="switch" transform="translate(240, 140)">
+                  <rect x="-28" y="-18" width="56" height="36" rx="6" class="topo-orbit" stroke="rgba(0, 242, 254, 0.15)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
                   <rect x="-24" y="-14" width="48" height="28" rx="4" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-switch" />
                   <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🎛️ SW-1</text>
-                  <text y="24" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">VLAN 10</text>
+                  <text y="26" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">VLAN 10</text>
                 </g>
 
                 <!-- Core Router -->
                 <g class="topo-node" data-node="router" transform="translate(400, 80)">
+                  <circle r="25" class="topo-orbit" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
                   <circle r="20" fill="#060913" stroke="#10b981" stroke-width="2" id="node-router" />
                   <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🌐 R-1</text>
-                  <text y="32" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">ISR 4331</text>
+                  <text y="35" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">ISR 4331</text>
                 </g>
 
                 <!-- Firewall -->
                 <g class="topo-node" data-node="firewall" transform="translate(400, 200)">
+                  <circle r="25" class="topo-orbit" stroke="rgba(255, 94, 58, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
                   <circle r="20" fill="#060913" stroke="#ff5e3a" stroke-width="2" id="node-firewall" />
                   <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🔒 FW-1</text>
-                  <text y="32" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">ASA 5506</text>
+                  <text y="35" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">ASA 5506</text>
                 </g>
 
                 <!-- WAN -->
                 <g class="topo-node" data-node="wan" transform="translate(600, 140)">
+                  <rect x="-28" y="-18" width="56" height="36" rx="8" class="topo-orbit" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
                   <rect x="-24" y="-14" width="48" height="28" rx="6" fill="#060913" stroke="#10b981" stroke-width="2" id="node-wan" />
                   <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">☁️ WAN</text>
-                  <text y="24" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">8.8.8.8</text>
+                  <text y="26" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">8.8.8.8</text>
                 </g>
               </svg>
 
               <!-- SECOND TOPOLOGY SVG MAP -->
-              <svg id="topoSvg2" viewBox="0 0 700 280" width="100%" height="100%" style="background: rgba(6, 9, 19, 0.5); border-radius: 12px; border: 1px solid var(--border-color); position: relative; display: none;">
+              <svg id="topoSvg2" viewBox="0 0 700 280" width="100%" height="100%" style="background: rgba(6, 9, 19, 0.65); border-radius: 12px; border: 1px solid rgba(0, 242, 254, 0.2); position: relative; display: none;">
+                <defs>
+                  <pattern id="gridPattern2" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255, 255, 255, 0.025)" stroke-width="0.5" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#gridPattern2)" rx="12" />
+
                 <!-- Cable links -->
                 <line x1="60" y1="180" x2="200" y2="130" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
                 <line x1="60" y1="80" x2="200" y2="130" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
@@ -160,57 +207,99 @@
                 <line id="link-rbranch-fwbranch" x1="360" y1="130" x2="520" y2="180" stroke="#ff9233" stroke-width="1.5" class="cable-link secondary-link" />
                 <line id="link-hq-server" x1="520" y1="80" x2="640" y2="80" stroke="#10b981" stroke-width="2" class="cable-link" />
 
+                <!-- Interface Link Status Triangles (Packet Tracer Style) -->
+                <!-- PC / Phone ports -->
+                <polygon points="80,175 85,172 80,168" fill="#10b981" />
+                <polygon points="80,90 85,93 80,97" fill="#10b981" />
+                <!-- SW-Branch ports -->
+                <polygon points="178,138 174,143 180,145" fill="#10b981" />
+                <polygon points="178,122 174,117 180,115" fill="#10b981" />
+                <polygon points="216,130 222,130 219,125" fill="#10b981" />
+                <!-- R-Branch ports -->
+                <polygon points="340,130 334,130 337,135" fill="#10b981" />
+                <!-- LACP Links Status -->
+                <polygon points="380,121 385,116 380,113" fill="#10b981" />
+                <polygon id="status-lacp-link1" points="495,82 490,85 495,89" fill="#10b981" />
+                
+                <polygon points="380,141 385,146 380,149" fill="#10b981" />
+                <polygon points="495,95 490,92 495,88" fill="#10b981" />
+                <!-- VPN tunnel link status -->
+                <polygon points="378,137 382,142 384,137" fill="#10b981" />
+
+                <!-- Port interface labels -->
+                <text x="82" y="172" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Fa0/1</text>
+                <text x="82" y="96" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Fa0/2</text>
+                <text x="160" y="148" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Fa0/1</text>
+                <text x="160" y="112" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Fa0/2</text>
+                <text x="225" y="125" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/1</text>
+                <text x="330" y="125" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/0</text>
+                
+                <text x="382" y="112" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/1</text>
+                <text x="382" y="156" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/2</text>
+                <text x="382" y="180" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/3</text>
+                
+                <text x="485" y="68" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Po1</text>
+                <text x="485" y="172" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/0</text>
+                <text x="595" y="75" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/24</text>
+
                 <!-- Animated Packet -->
                 <circle id="simPacket2" cx="60" cy="180" r="8" fill="#00f2fe" style="opacity: 0; filter: drop-shadow(0 0 8px #00f2fe); pointer-events: none;" />
 
                 <!-- Nodes -->
                 <!-- PC-Sales -->
                 <g class="topo-node" data-node="pc-sales" transform="translate(60, 180)">
+                  <circle r="23" class="topo-orbit" stroke="rgba(0, 242, 254, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
                   <circle r="18" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-pc-sales" />
                   <text y="4" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">💻 Sales</text>
-                  <text y="28" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">10.10.10.10</text>
+                  <text y="32" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">10.10.10.10</text>
                 </g>
 
                 <!-- IP-Phone -->
                 <g class="topo-node" data-node="ip-phone" transform="translate(60, 80)">
+                  <circle r="23" class="topo-orbit" stroke="rgba(0, 242, 254, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
                   <circle r="18" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-ip-phone" />
                   <text y="4" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">📞 Phone</text>
-                  <text y="28" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">10.10.20.10</text>
+                  <text y="32" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">10.10.20.10</text>
                 </g>
 
                 <!-- SW-Branch -->
                 <g class="topo-node" data-node="sw-branch" transform="translate(200, 130)">
+                  <rect x="-28" y="-16" width="56" height="32" rx="6" class="topo-orbit" stroke="rgba(0, 242, 254, 0.15)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
                   <rect x="-24" y="-12" width="48" height="24" rx="4" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-sw-branch" />
                   <text y="3" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">🎛️ SW-Br</text>
-                  <text y="22" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">VLAN 10/20</text>
+                  <text y="24" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">VLAN 10/20</text>
                 </g>
 
                 <!-- R-Branch -->
                 <g class="topo-node" data-node="r-branch" transform="translate(360, 130)">
+                  <circle r="23" class="topo-orbit" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
                   <circle r="18" fill="#060913" stroke="#10b981" stroke-width="2" id="node-r-branch" />
                   <text y="4" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">🌐 R-Br</text>
-                  <text y="28" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">ROAS</text>
+                  <text y="32" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">ROAS</text>
                 </g>
 
                 <!-- HQ-Core -->
                 <g class="topo-node" data-node="hq-core" transform="translate(520, 80)">
+                  <rect x="-28" y="-16" width="56" height="32" rx="6" class="topo-orbit" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
                   <rect x="-24" y="-12" width="48" height="24" rx="4" fill="#060913" stroke="#10b981" stroke-width="2" id="node-hq-core" />
                   <text y="3" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">🎛️ L3-HQ</text>
-                  <text y="22" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">EtherChan</text>
+                  <text y="24" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">EtherChan</text>
                 </g>
 
                 <!-- FW-Branch -->
                 <g class="topo-node" data-node="fw-branch" transform="translate(520, 180)">
+                  <circle r="23" class="topo-orbit" stroke="rgba(255, 94, 58, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
                   <circle r="18" fill="#060913" stroke="#ff5e3a" stroke-width="2" id="node-fw-branch" />
                   <text y="4" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">🔒 FW-HQ</text>
-                  <text y="28" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">VPN Peer</text>
+                  <text y="32" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">VPN Peer</text>
                 </g>
 
                 <!-- HQ Server -->
                 <g class="topo-node" data-node="hq-server" transform="translate(640, 80)">
+                  <rect x="-28" y="-16" width="56" height="32" rx="6" class="topo-orbit" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
                   <rect x="-24" y="-12" width="48" height="24" rx="4" fill="#060913" stroke="#10b981" stroke-width="2" id="node-hq-server" />
                   <text y="3" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">🖥️ Server</text>
-                  <text y="22" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">172.16.100.5</text>
+                  <text y="24" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">172.16.100.5</text>
                 </g>
               </svg>
             </div>
@@ -394,12 +483,12 @@
             <input id="subnetAnswer" type="text" placeholder="Enter answer" />
           </label>
         </div>
-        <div id="subnetPrompt" class="output"></div>
+        <div id="subnetPrompt" class="output terminal-box"></div>
         <div class="inline">
           <button id="subnetSubmit" class="primary">Submit Answer</button>
           <button id="subnetSkip" class="ghost">Skip</button>
         </div>
-        <div id="subnetOut" class="output"></div>
+        <div id="subnetOut" class="output terminal-box"></div>
       </article>
     </section>
 

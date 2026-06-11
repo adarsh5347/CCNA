@@ -80,6 +80,12 @@ function setPage(page) {
 
   document.querySelectorAll(".page").forEach((p) => p.classList.remove("active"));
   byId(page).classList.add("active");
+
+  // Update nav buttons active highlight
+  document.querySelectorAll("[data-page]").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.page === page);
+  });
+
   if (page === "analytics") renderAnalytics();
   if (page === "subnet") ensureSubnetQuestion(true);
   window.scrollTo(0, 0);
@@ -1353,19 +1359,13 @@ Server hosting requires static routing or local gateway configuration. Audit wit
       if (configs[nodeName]) {
         configContent.innerHTML = configs[nodeName];
         
-        document.querySelectorAll(".topo-node circle, .topo-node rect").forEach(el => {
-          el.style.stroke = "";
-          el.style.strokeWidth = "";
+        document.querySelectorAll(".topo-node").forEach(el => {
+          el.classList.remove("inspected");
         });
-        const innerEl = byId(`node-${nodeName}`);
-        if (innerEl) {
-          innerEl.style.stroke = "#00f2fe";
-          innerEl.style.strokeWidth = "4px";
-          setTimeout(() => {
-            innerEl.style.stroke = "";
-            innerEl.style.strokeWidth = "";
-          }, 1500);
-        }
+        node.classList.add("inspected");
+        setTimeout(() => {
+          node.classList.remove("inspected");
+        }, 1500);
       }
     });
   });
@@ -1384,6 +1384,10 @@ function resetTopology2Links() {
   if (link2) {
     link2.setAttribute("stroke", "#10b981");
     link2.setAttribute("stroke-width", "2");
+  }
+  const statusLink1 = byId("status-lacp-link1");
+  if (statusLink1) {
+    statusLink1.setAttribute("fill", "#10b981");
   }
 }
 
@@ -1978,6 +1982,10 @@ function setupTraversalSimulator() {
           if (link2) {
             link2.setAttribute("stroke", "#10b981");
             link2.setAttribute("stroke-width", "3");
+          }
+          const statusLink1 = byId("status-lacp-link1");
+          if (statusLink1) {
+            statusLink1.setAttribute("fill", "#ff5e3a");
           }
         }
       }
