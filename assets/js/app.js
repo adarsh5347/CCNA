@@ -1230,8 +1230,8 @@ Use <code>show ip route</code> to inspect routing decisions, and <code>show ip i
 <strong style="color: #00f2fe; font-size: 13px;">🔒 Device: Firewall FW-1 (Cisco ASA 5506-X)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>Security Zones:</strong>
-  - Inside: Security Level 100 (Trust) - IP: 192.168.1.254/24
-  - Outside: Security Level 0 (Untrust) - IP: 192.168.1.3/30
+  - Inside (Gi1/1): Security Level 100 (Trust) - IP: 192.168.1.254/24
+  - Outside (Gi1/2): Security Level 0 (Untrust) - IP: 192.168.1.3/30
 <strong>Active Access-Control List (OUTSIDE_IN):</strong>
   - 10 permit tcp any host 192.168.1.10 eq 80 (HTTP)
   - 20 permit tcp any host 192.168.1.10 eq 443 (HTTPS)
