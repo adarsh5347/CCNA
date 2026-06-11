@@ -1,10 +1,10 @@
 export const blueprint = [
-  { name: "Network Fundamentals", weight: 20, topics: ["OSI", "TCP/IP", "IPv4", "IPv6", "Subnetting", "Ethernet", "ARP", "ICMP", "DNS", "DHCP"], count: 30 },
-  { name: "Network Access", weight: 20, topics: ["VLANs", "Trunks", "STP", "EtherChannel", "Wireless"], count: 30 },
-  { name: "IP Connectivity", weight: 25, topics: ["Routing", "OSPF", "Static Routes", "Route Selection"], count: 35 },
-  { name: "IP Services", weight: 10, topics: ["DHCP", "NAT", "NTP", "Syslog", "SNMP"], count: 15 },
-  { name: "Security Fundamentals", weight: 15, topics: ["ACLs", "SSH", "Port Security", "DHCP Snooping", "Wireless Security"], count: 25 },
-  { name: "Automation and Programmability", weight: 10, topics: ["JSON", "REST APIs", "SDN", "DNA Center", "Ansible", "YANG", "NETCONF"], count: 15 }
+  { name: "Network Fundamentals", weight: 20, topics: ["OSI", "TCP/IP", "IPv4", "IPv6", "Subnetting", "Ethernet", "ARP", "ICMP", "DNS", "DHCP"], count: 40 },
+  { name: "Network Access", weight: 20, topics: ["VLANs", "Trunks", "STP", "EtherChannel", "Wireless"], count: 40 },
+  { name: "IP Connectivity", weight: 25, topics: ["Routing", "OSPF", "Static Routes", "Route Selection"], count: 50 },
+  { name: "IP Services", weight: 10, topics: ["DHCP", "NAT", "NTP", "Syslog", "SNMP"], count: 20 },
+  { name: "Security Fundamentals", weight: 15, topics: ["ACLs", "SSH", "Port Security", "DHCP Snooping", "Wireless Security"], count: 30 },
+  { name: "Automation and Programmability", weight: 10, topics: ["JSON", "REST APIs", "SDN", "DNA Center", "Ansible", "YANG", "NETCONF"], count: 20 }
 ];
 
 
@@ -4556,6 +4556,1651 @@ const questionBank = [
       tip: "Ansible's agentless architecture makes it perfect for Cisco routers and switches because you cannot install third-party agents on most network operating systems.",
       memory: "Ansible = Agentless, SSH, YAML Playbooks, Push model.",
       real: "Deploy Ansible on a Linux VM to automate VLAN provisioning across hundreds of campus switches simultaneously.",
+      commands: []
+    }
+  },
+
+  {
+    id: 151,
+    domain: "Network Fundamentals",
+    topic: "TCP/IP Model",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "High",
+    text: "During the TCP three-way handshake, which combination of flags is set in the header of the second packet sent between hosts?",
+    options: [
+          "SYN only",
+          "SYN and ACK",
+          "ACK only",
+          "RST and ACK"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "The second packet of the TCP handshake is sent from the server back to the client, carrying both the SYN flag (to synchronize sequence numbers) and the ACK flag (to acknowledge the client's initial SYN). Reference: RFC 793.",
+      wrong: [
+              "SYN only is the flag set in the first packet sent by the initiator.",
+              "ACK only is the flag set in the third packet of the handshake to finalize connection establishment.",
+              "RST and ACK are used to abruptly terminate or refuse a connection, not during normal connection setup."
+      ],
+      tip: "Handshake sequence: 1) SYN, 2) SYN-ACK, 3) ACK.",
+      memory: "S-SA-A (SYN, SYN-ACK, ACK).",
+      real: "When troubleshooting connection establishment issues using Wireshark, checking for a SYN-ACK response helps determine if the server is active on that port.",
+      commands: ["show tcp brief"]
+    }
+  },
+
+  {
+    id: 152,
+    domain: "Network Fundamentals",
+    topic: "IPv4",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "Medium",
+    text: "An engineer wants to summarize the following four subnets into a single advertisement: 192.168.4.0/24, 192.168.5.0/24, 192.168.6.0/24, and 192.168.7.0/24. What is the most specific summary route?",
+    options: [
+          "192.168.4.0/22",
+          "192.168.4.0/23",
+          "192.168.0.0/21",
+          "192.168.4.0/21"
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "Looking at the third octet of the subnets (4, 5, 6, 7), in binary these are: 4 = 00000100, 5 = 00000101, 6 = 00000110, 7 = 00000111. The first 6 bits are identical (000001). Since the first two octets are identical, we have 8 + 8 + 6 = 22 matching bits. The summary route is 192.168.4.0/22. Reference: RFC 4632.",
+      wrong: [
+              "192.168.4.0/23 only summarizes 192.168.4.0/24 and 192.168.5.0/24.",
+              "192.168.0.0/21 is a valid summary but is not the most specific (it encompasses subnets from 192.168.0.0 to 192.168.7.255).",
+              "192.168.4.0/21 is an invalid subnet boundary because a /21 block starting at .4 is mathematically incorrect."
+      ],
+      tip: "To find the summary route, list the boundary octets in binary and count the matching bits from left to right.",
+      memory: "A /22 summary block has size of 4 (e.g. 4, 5, 6, 7).",
+      real: "Configuring summary routes on corporate WAN routers reduces the routing table size and limits the query scope for routing protocols.",
+      commands: ["ip route 192.168.4.0 255.255.252.0 null0"]
+    }
+  },
+
+  {
+    id: 153,
+    domain: "Network Fundamentals",
+    topic: "IPv6",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "20%",
+    frequency: "High",
+    text: "Which IPv6 address type is automatically generated based on the prefix FF02::1:FF00:0/104 and is used to resolve Layer 2 addresses on the local link?",
+    options: [
+          "Anycast address",
+          "Solicited-Node Multicast address",
+          "Unique Local address",
+          "Link-Local Unicast address"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "A Solicited-Node Multicast address is automatically created for every configured unicast address by appending the last 24 bits of the interface ID to the prefix FF02::1:FF00:0/104. It is used by NDP to perform MAC address resolution without broadcasting. Reference: RFC 4291.",
+      wrong: [
+              "Anycast addresses are assigned to multiple interfaces and do not use a specific FF02::1:FF00:0/104 prefix.",
+              "Unique Local addresses use the FC00::/7 prefix and represent private IPv6 addresses.",
+              "Link-Local Unicast addresses use the FE80::/10 prefix, not a multicast prefix."
+      ],
+      tip: "IPv6 completely eliminates Layer 2 broadcasts by using Solicited-Node Multicast addresses for MAC resolution.",
+      memory: "FF02::1:FF = Solicited-Node Multicast.",
+      real: "When configuring IPv6, switches use MLD snooping to forward NDP neighbor solicitations only to the ports interested in that Solicited-Node Multicast address.",
+      commands: ["show ipv6 interface"]
+    }
+  },
+
+  {
+    id: 154,
+    domain: "Network Fundamentals",
+    topic: "Subnetting",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "20%",
+    frequency: "High",
+    text: "What is the subnet ID and the broadcast address for the IP address 172.16.82.140/22?",
+    options: [
+          "Subnet: 172.16.80.0, Broadcast: 172.16.83.255",
+          "Subnet: 172.16.82.0, Broadcast: 172.16.82.255",
+          "Subnet: 172.16.80.0, Broadcast: 172.16.81.255",
+          "Subnet: 172.16.82.128, Broadcast: 172.16.82.255"
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "A /22 subnet mask has a block increment of 4 in the third octet (256 - 252 = 4). The subnets in this range start at 172.16.80.0, 172.16.84.0, etc. Host 172.16.82.140 falls inside the 172.16.80.0 subnet. The broadcast address is one less than the next subnet: 172.16.84.0 - 1 = 172.16.83.255. Reference: RFC 4632.",
+      wrong: [
+              "172.16.82.0/22 is not a valid subnet ID boundary (82 is not a multiple of 4).",
+              "172.16.81.255 is the broadcast of the 172.16.80.0/23 subnet, not /22.",
+              "172.16.82.128 is a subnet ID for a /25 or higher mask, not a /22 mask."
+      ],
+      tip: "/22 has block size 4 in the 3rd octet. Multiples of 4: 0, 4, ..., 80, 84. The host is in the 80 block.",
+      memory: "/22 = block size of 4 in 3rd octet.",
+      real: "When configuring a router subinterface for inter-VLAN routing, verify the IP subnet ranges overlap to prevent address conflicts.",
+      commands: ["show ip route"]
+    }
+  },
+
+  {
+    id: 155,
+    domain: "Network Fundamentals",
+    topic: "Ethernet",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "Medium",
+    text: "Which of the following standards specifies 10 Gigabit Ethernet over single-mode fiber (SMF) with a maximum distance of up to 10 kilometers?",
+    options: [
+          "10GBASE-SR",
+          "10GBASE-LR",
+          "10GBASE-ER",
+          "10GBASE-T"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "10GBASE-LR (Long Range) is designed for single-mode fiber (SMF) using a 1310 nm laser source. It supports transmission distances up to 10 kilometers. Reference: IEEE 802.3ae.",
+      wrong: [
+              "10GBASE-SR (Short Range) is designed for multimode fiber (MMF) with a maximum distance of ~300 meters.",
+              "10GBASE-ER (Extended Range) supports distances up to 40 kilometers over SMF.",
+              "10GBASE-T specifies copper twisted-pair cabling up to 100 meters, not fiber."
+      ],
+      tip: "LR = Long Range = Single-mode (10 km). SR = Short Range = Multimode (300m).",
+      memory: "LR = Laser/Long Range. SR = Short Range.",
+      real: "When connecting aggregation switches between two campus buildings 3 km apart, choose 10GBASE-LR SFP+ transceivers on single-mode fiber.",
+      commands: ["show interfaces transceiver"]
+    }
+  },
+
+  {
+    id: 156,
+    domain: "Network Fundamentals",
+    topic: "TCP/IP Model",
+    type: "single",
+    difficulty: "Easy",
+    examWeight: "20%",
+    frequency: "Medium",
+    text: "What are the default header sizes of TCP and UDP packets at the Transport Layer, assuming no optional fields are present?",
+    options: [
+          "TCP: 8 bytes, UDP: 20 bytes",
+          "TCP: 20 bytes, UDP: 8 bytes",
+          "TCP: 20 bytes, UDP: 20 bytes",
+          "TCP: 40 bytes, UDP: 16 bytes"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "A TCP header has a minimum size of 20 bytes (containing Source/Destination Ports, Sequence/ACK numbers, flags, window, checksum, etc.). A UDP header is fixed at 8 bytes (Source/Destination Ports, Length, and Checksum). Reference: RFC 793 and RFC 768.",
+      wrong: [
+              "TCP has a larger header (20 bytes) than UDP (8 bytes) due to its reliability features.",
+              "UDP has only 8 bytes of overhead, not 20.",
+              "A 40-byte header is the size of the base IPv6 header, not TCP/UDP."
+      ],
+      tip: "UDP's small 8-byte header makes it perfect for applications like DNS and VoIP that require low overhead.",
+      memory: "TCP = 20, UDP = 8.",
+      real: "When designing WAN networks, keep the 20-byte TCP overhead in mind when configuring maximum segment size (MSS) to prevent fragmentation.",
+      commands: []
+    }
+  },
+
+  {
+    id: 157,
+    domain: "Network Fundamentals",
+    topic: "DHCP",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "High",
+    text: "What action does a router perform on a DHCP Discover broadcast when the command 'ip helper-address 10.1.1.5' is configured on the ingress interface?",
+    options: [
+          "It drops the broadcast packet to prevent broadcast storms.",
+          "It unicasts the DHCP Discover packet to 10.1.1.5, changing the source IP to its own interface IP.",
+          "It floods the DHCP Discover packet out of all interfaces in the routing table.",
+          "It replies to the client directly with a leased IP address."
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "The 'ip helper-address' command configures a router to act as a DHCP Relay Agent. It intercepts local DHCP broadcasts, encapsulates them into unicast UDP packets, changes the source IP to its local interface IP (giaddr), and forwards them to the specified DHCP server. Reference: RFC 2131.",
+      wrong: [
+              "It does not drop the packet; it relays it.",
+              "It does not flood it as a broadcast; it unicasts it directly to the helper address.",
+              "It does not lease addresses itself; that is the DHCP server's role."
+      ],
+      tip: "An ip helper-address redirects UDP broadcasts including DHCP (67/68), DNS (53), Time (37), TACACS (49), TFTP (69), and NetBIOS.",
+      memory: "Helper = Relay = Broadcast to Unicast.",
+      real: "In enterprise networks, DHCP servers are centralized in the server farm. Routers at the access layer must use helper addresses to relay requests from local users.",
+      commands: ["ip helper-address 10.1.1.5"]
+    }
+  },
+
+  {
+    id: 158,
+    domain: "Network Fundamentals",
+    topic: "ARP",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "Medium",
+    text: "Which feature allows a router to answer an ARP request on behalf of a remote destination host when the router knows how to route to that destination?",
+    options: [
+          "Reverse ARP (RARP)",
+          "Proxy ARP",
+          "Gratuitous ARP",
+          "ARP Snooping"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "Proxy ARP (RFC 1027) allows a gateway device (like a router) to reply to local ARP queries for hosts on remote subnets, sending its own MAC address to the requester. This occurs if Proxy ARP is enabled and the router has a route to the target IP.",
+      wrong: [
+              "RARP is used by hosts to learn their IP address from a MAC address, obsolete now.",
+              "Gratuitous ARP is sent by a host to announce its own MAC/IP binding to the local link to prevent conflicts.",
+              "ARP Snooping is not a routing protocol or standard ARP behavior."
+      ],
+      tip: "Proxy ARP is enabled by default in Cisco IOS, but it is often disabled for security to prevent MAC table spoofing.",
+      memory: "Proxy = acting on behalf of someone else.",
+      real: "If a local host has an incorrect subnet mask, it may try to ARP for a remote IP. If the router has Proxy ARP enabled, it replies with its own MAC, making communication work anyway.",
+      commands: ["ip proxy-arp","no ip proxy-arp"]
+    }
+  },
+
+  {
+    id: 159,
+    domain: "Network Fundamentals",
+    topic: "ICMP",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "Medium",
+    text: "When a router receives a packet that it cannot forward because no route exists in the routing table, which ICMP Type and Code does it send back to the source host?",
+    options: [
+          "Type 3, Code 0 (Net Unreachable)",
+          "Type 3, Code 1 (Host Unreachable)",
+          "Type 3, Code 3 (Port Unreachable)",
+          "Type 11, Code 0 (TTL Expired)"
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "When a router lacks a route to the destination network, it discards the packet and sends an ICMP Destination Unreachable message back to the source, specified as Type 3, Code 0 (Net Unreachable). Reference: RFC 792.",
+      wrong: [
+              "Code 1 (Host Unreachable) is sent when the router can reach the subnet but the host does not respond to ARP.",
+              "Code 3 (Port Unreachable) is sent by a destination host when a UDP port is closed.",
+              "Type 11, Code 0 is sent when a packet's TTL count reaches 0 to prevent routing loops."
+      ],
+      tip: "ICMP Type 3 = Destination Unreachable. Code 0 = Network, Code 1 = Host, Code 3 = Port.",
+      memory: "Type 3 Code 0 = Network Unreachable.",
+      real: "When debugging network path outages, seeing 'Destination Net Unreachable' in your ping output indicates a missing route on an upstream gateway.",
+      commands: []
+    }
+  },
+
+  {
+    id: 160,
+    domain: "Network Fundamentals",
+    topic: "DNS",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "Medium",
+    text: "In DNS resolution, what is the difference between a recursive query and an iterative query?",
+    options: [
+          "A recursive query requires the DNS server to return the final IP address; an iterative query allows the server to return the address of another DNS server.",
+          "A recursive query is sent over UDP; an iterative query is sent over TCP.",
+          "A recursive query resolves external domains; an iterative query resolves local domains.",
+          "A recursive query caches responses; an iterative query does not cache."
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "In a recursive query (typically sent by a client to its local DNS resolver), the server must return the resolved address or an error. In an iterative query (sent between DNS servers), a queried server returns the best answer it has or refers the requester to an authoritative server. Reference: RFC 1034.",
+      wrong: [
+              "Both query types can use UDP or TCP (standard queries use port 53 UDP).",
+              "The difference lies in resolution behavior, not whether the domain is local or external.",
+              "Caching is supported in both models to speed up lookup times."
+      ],
+      tip: "Clients send Recursive queries to their resolver. Resolvers send Iterative queries to root and TLD servers.",
+      memory: "Recursive = server does all the work. Iterative = server gives directions.",
+      real: "When configuring DNS servers, you can disable recursive queries to prevent open DNS resolver DDoS reflection attacks.",
+      commands: ["ip dns server"]
+    }
+  },
+
+  {
+    id: 161,
+    domain: "Network Access",
+    topic: "VLANs",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "High",
+    text: "An administrator configures a switch port connected to an IP Phone and a PC. How is the traffic from the IP Phone separated from the PC traffic at Layer 2?",
+    options: [
+          "The IP Phone traffic is tagged with an 802.1Q VLAN ID, while the PC traffic is sent untagged.",
+          "Both device payloads are encapsulated in an ISL header.",
+          "The switch port operates in full trunk mode and requires a subnet route.",
+          "All voice packets are encrypted using WPA3 enterprise."
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "A Cisco switch port with a Voice VLAN configured (e.g. 'switchport voice vlan 50') operates in a special multi-VLAN access mode. The IP Phone sends its voice traffic tagged with the voice VLAN ID (using 802.1Q), while the PC sends its data traffic untagged (assumed to belong to the access VLAN). Reference: Cisco Voice VLAN designs.",
+      wrong: [
+              "ISL is a legacy, proprietary Cisco encapsulation protocol that is obsolete.",
+              "Trunk mode is not required for standard IP Phone attachments; access mode with a voice VLAN is preferred.",
+              "WPA3 is a wireless security standard and does not apply to wired switch ports."
+      ],
+      tip: "Voice VLAN configuration: 'switchport access vlan 10' and 'switchport voice vlan 20'.",
+      memory: "Voice VLAN = Tagged. Access VLAN = Untagged.",
+      real: "Configuring a voice VLAN separates IP phone traffic from PC traffic, allowing you to prioritize voice traffic using Class of Service (CoS) values.",
+      commands: ["switchport voice vlan 50"]
+    }
+  },
+
+  {
+    id: 162,
+    domain: "Network Access",
+    topic: "Trunks",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "High",
+    text: "A switch port is configured with 'switchport mode dynamic desirable'. What state will the link negotiate to if the neighboring switch port is set to 'dynamic auto'?",
+    options: [
+          "The link will become an access link.",
+          "The link will become an 802.1Q trunk link.",
+          "The link will remain in a down state.",
+          "The link will negotiation an EtherChannel."
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "Dynamic Desirable actively negotiates to become a trunk. Dynamic Auto only listens. Since one side is desirable (actively asking) and the other is auto (willing to respond), they will negotiate and establish an 802.1Q trunk. Reference: Cisco DTP specification.",
+      wrong: [
+              "The link will only become an access link if both sides are set to 'dynamic auto' or configured as 'access'.",
+              "The link will negotiate successfully, so it will not remain down.",
+              "DTP negotiates trunking, not EtherChannel (which uses LACP/PAGP)."
+      ],
+      tip: "Trunk negotiations: Desirable + Auto = Trunk. Desirable + Desirable = Trunk. Auto + Auto = Access.",
+      memory: "Desirable actively starts the trunk talk. Auto just waits.",
+      real: "Disable trunk negotiation on links to end devices using 'switchport nonegotiate' to prevent security breaches and unauthorized trunking.",
+      commands: ["switchport nonegotiate","show dtp interface"]
+    }
+  },
+
+  {
+    id: 163,
+    domain: "Network Access",
+    topic: "STP",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "High",
+    text: "A switch port configured with PortFast receives a Bridge Protocol Data Unit (BPDU). What happens to the port if BPDU Guard is enabled globally on that port?",
+    options: [
+          "The port transitions immediately to the forwarding state.",
+          "The port is placed into the err-disabled state to prevent loops.",
+          "The port ignores the BPDU and continues forwarding traffic.",
+          "The port becomes the new root port."
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "BPDU Guard protects the network from loops. If a BPDU is received on an edge port configured with PortFast and BPDU Guard, the switch assumes an unauthorized switch has been connected and disables the port, placing it in the 'err-disabled' state. Reference: IEEE 802.1D.",
+      wrong: [
+              "PortFast allows ports to bypass learning/listening, but BPDU Guard shuts the port down if a BPDU is received.",
+              "The BPDU is not ignored; receiving it triggers the loop protection shutdown.",
+              "Edge ports cannot become root ports."
+      ],
+      tip: "Always enable BPDU Guard on all access ports where PortFast is configured.",
+      memory: "BPDU Guard + BPDU = Err-disabled.",
+      real: "When a user connects a rogue switch to a wall jack, BPDU Guard detects the switch's BPDUs and shuts down the port, protecting the spanning tree.",
+      commands: ["spanning-tree portfast bpduguard default","show interfaces status err-disabled"]
+    }
+  },
+
+  {
+    id: 164,
+    domain: "Network Access",
+    topic: "STP",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "Medium",
+    text: "Which of the following ports states is present in IEEE 802.1D Spanning Tree Protocol but is merged into the Discarding state in 802.1w (RSTP)?",
+    options: [
+          "Blocking and Listening",
+          "Learning and Forwarding",
+          "Disabled and Forwarding",
+          "Listening and Learning"
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "RSTP (802.1w) simplifies STP states by merging the Disabled, Blocking, and Listening states from 802.1D into a single 'Discarding' state. In this state, the port does not forward frames or learn MAC addresses. Reference: IEEE 802.1w.",
+      wrong: [
+              "Learning and Forwarding are still distinct states in RSTP.",
+              "Disabled is merged, but Forwarding is still a core state in RSTP.",
+              "Listening is merged, but Learning remains a distinct transition state in RSTP."
+      ],
+      tip: "STP States: Blocking, Listening, Learning, Forwarding. RSTP States: Discarding, Learning, Forwarding.",
+      memory: "BLD in 802.1D becomes Discarding in RSTP.",
+      real: "RSTP's simplified state model, combined with proposal-agreement handshakes, allows links to transition to forwarding in milliseconds instead of 30-50 seconds.",
+      commands: ["spanning-tree mode rapid-pvst"]
+    }
+  },
+
+  {
+    id: 165,
+    domain: "Network Access",
+    topic: "EtherChannel",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "High",
+    text: "Which port mode configuration is required to initiate an EtherChannel negotiation using the Link Aggregation Control Protocol (LACP)?",
+    options: [
+          "Desirable",
+          "Active",
+          "Passive",
+          "Auto"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "LACP is the industry-standard (IEEE 802.3ad) link aggregation protocol. The 'active' mode actively negotiates the port aggregation, while 'passive' only responds. The 'desirable' and 'auto' modes belong to PAgP (Port Aggregation Protocol), which is Cisco-proprietary. Reference: IEEE 802.3ad.",
+      wrong: [
+              "Desirable and Auto are PAgP modes, not LACP.",
+              "Passive is an LACP mode, but it does not initiate the negotiation (it only listens)."
+      ],
+      tip: "LACP = Active / Passive. PAgP = Desirable / Auto.",
+      memory: "LACP Active/Passive. PAgP Desirable/Auto.",
+      real: "When configuring a multi-chassis link bundle to a non-Cisco server or switch, use LACP 'active' mode on the switch interfaces.",
+      commands: ["channel-group 1 mode active","show etherchannel summary"]
+    }
+  },
+
+  {
+    id: 166,
+    domain: "Network Access",
+    topic: "Wireless",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "High",
+    text: "A remote branch office has lightweight APs (LAPs) connected to the corporate WLC over a WAN link. If the WAN link fails, what happens to local client traffic if the APs are configured in FlexConnect mode?",
+    options: [
+          "Clients lose all network access immediately.",
+          "The APs switch to local switching mode, allowing local traffic to continue flowing normally.",
+          "The APs reboot and establish a standalone mesh network.",
+          "The APs coordinate with the local router to start DHCP service."
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "FlexConnect (formerly HREAP) is designed for branch office deployments. It allows lightweight APs to switch traffic locally on the branch switch, rather than tunneling it back to the WLC. If the WAN connection to the central WLC drops, the AP can continue to bridge local SSID traffic. Reference: Cisco FlexConnect configuration guides.",
+      wrong: [
+              "Local client traffic does not fail if local switching is enabled.",
+              "APs do not form a mesh network automatically.",
+              "APs do not run DHCP services."
+      ],
+      tip: "FlexConnect allows: 1) Central switching (default), 2) Local switching (survivable WAN).",
+      memory: "FlexConnect = Flexible branch connection that survives WAN failure.",
+      real: "Configure FlexConnect on remote warehouse APs to ensure local barcode scanners can communicate with the local server even if the main headquarters link is down.",
+      commands: ["show ap config general"]
+    }
+  },
+
+  {
+    id: 167,
+    domain: "Network Access",
+    topic: "STP",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "High",
+    text: "Two switches have the default spanning-tree bridge priority of 32768. Which parameter is used as a tie-breaker to select the Spanning Tree Root Bridge?",
+    options: [
+          "The switch with the lowest MAC address",
+          "The switch with the highest MAC address",
+          "The switch with the fastest physical interface speeds",
+          "The switch with the longest uptime"
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "The Spanning Tree Bridge ID consists of Priority + MAC Address. If the priorities match, the switch with the lowest MAC address wins the election and becomes the Root Bridge. Reference: IEEE 802.1D.",
+      wrong: [
+              "The highest MAC address loses the Root Bridge election.",
+              "Physical interface speeds and uptime are not included in the Bridge ID calculation."
+      ],
+      tip: "Bridge ID = Priority (2 bytes) + MAC (6 bytes). The lowest ID always wins.",
+      memory: "Lowest MAC is the tie-breaker.",
+      real: "To keep Root Bridge placement predictable, engineers manually lower the priority of core switches (e.g. to 4096 or 8192) to prevent a random edge switch from winning the election.",
+      commands: ["spanning-tree vlan 1 root primary","spanning-tree vlan 1 priority 4096"]
+    }
+  },
+
+  {
+    id: 168,
+    domain: "Network Access",
+    topic: "EtherChannel",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "Medium",
+    text: "Which command must be executed on a Cisco switch interface before it can be configured as a member of a Layer 3 (routed) EtherChannel?",
+    options: [
+          "switchport mode trunk",
+          "no switchport",
+          "ip routing",
+          "channel-group 1 mode on"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "By default, switch ports are Layer 2 interfaces. To configure a Layer 3 EtherChannel, you must first turn off Layer 2 functionality on the physical member interfaces using the 'no switchport' command, and then assign the IP address directly to the logical port-channel interface. Reference: Cisco Layer 3 EtherChannel guides.",
+      wrong: [
+              "Trunk mode is a Layer 2 configuration.",
+              "ip routing enables routing globally on the switch, not on the individual interface interface.",
+              "channel-group establishes the EtherChannel but does not convert the interface to Layer 3."
+      ],
+      tip: "L3 EtherChannel steps: 1) 'no switchport' on physical member interfaces. 2) 'interface port-channel X' followed by 'no switchport' and the IP configuration.",
+      memory: "no switchport = Layer 3 routed interface.",
+      real: "Layer 3 EtherChannels are common between distribution and core switches to allow ECMP load balancing and eliminate spanning-tree loops on inter-switch links.",
+      commands: ["no switchport","interface port-channel 1"]
+    }
+  },
+
+  {
+    id: 169,
+    domain: "Network Access",
+    topic: "Wireless",
+    type: "single",
+    difficulty: "Easy",
+    examWeight: "20%",
+    frequency: "High",
+    text: "Which of the following channel selections represents the three non-overlapping channels available in the 2.4 GHz wireless band?",
+    options: [
+          "Channels 1, 2, and 3",
+          "Channels 1, 6, and 11",
+          "Channels 36, 40, and 44",
+          "Channels 6, 11, and 14"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "The 2.4 GHz Wi-Fi band has channels spaced 5 MHz apart, but each channel requires 20-22 MHz of bandwidth. Therefore, only channels 1, 6, and 11 have enough frequency separation to prevent adjacent-channel interference. Reference: IEEE 802.11 standards.",
+      wrong: [
+              "Channels 1, 2, and 3 overlap heavily and cause co-channel interference.",
+              "Channels 36, 40, and 44 are located in the 5 GHz band, not 2.4 GHz.",
+              "Channel 14 is not allowed for commercial use in most countries, including the US."
+      ],
+      tip: "Always design 2.4 GHz channel layouts using ONLY channels 1, 6, and 11.",
+      memory: "1-6-11 is the gold standard of 2.4 GHz Wi-Fi.",
+      real: "When configuring access points in an office floor plan, stagger channels 1, 6, and 11 to avoid overlapping coverage zones.",
+      commands: ["channel 6"]
+    }
+  },
+
+  {
+    id: 170,
+    domain: "Network Access",
+    topic: "VLANs",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "20%",
+    frequency: "High",
+    text: "Which command is used to restrict a trunk link to forward traffic only for VLANs 10 and 20?",
+    options: [
+          "switchport access vlan 10,20",
+          "switchport trunk allowed vlan 10,20",
+          "switchport trunk native vlan 10",
+          "switchport trunk allowed vlan add 10,20"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "The command 'switchport trunk allowed vlan 10,20' sets the allowed VLAN list on the trunk port to exactly 10 and 20, filtering out all other VLAN traffic. Reference: Cisco IOS Command Reference.",
+      wrong: [
+              "switchport access vlan configures an access port, not a trunk port.",
+              "switchport trunk native vlan sets the untagged native VLAN, not the allowed list.",
+              "Using the 'add' keyword adds those VLANs to the existing list, which might still contain other allowed VLANs (e.g. VLAN 1)."
+      ],
+      tip: "Be careful! Running 'switchport trunk allowed vlan X' overwrites the previous list. Use the 'add' keyword to add a new VLAN without wiping the existing list.",
+      memory: "allowed vlan X,Y overrides the list.",
+      real: "Pruning unused VLANs from trunk lines is a security best practice that prevents broadcast propagation to parts of the network that don't host those devices.",
+      commands: ["switchport trunk allowed vlan 10,20"]
+    }
+  },
+
+  {
+    id: 171,
+    domain: "IP Connectivity",
+    topic: "Routing",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "25%",
+    frequency: "High",
+    text: "An engineer wants to configure a floating static route to act as a backup to an OSPF route. OSPF has an administrative distance of 110. Which AD should be configured on the static route?",
+    options: [
+          "1",
+          "90",
+          "115",
+          "110"
+    ],
+    
+    
+    correct: [2],
+    expl: {
+      correct: "C",
+      why: "A floating static route is a backup route configured with a higher administrative distance (AD) than the primary routing source. Since the primary OSPF route has an AD of 110, the backup static route must have an AD greater than 110 (such as 115 or 120) to ensure it is only active if the OSPF route is lost. Reference: Cisco routing guides.",
+      wrong: [
+              "An AD of 1 is the default for static routes. Since 1 < 110, the static route would override the OSPF route.",
+              "90 is the AD of EIGRP, which would also override OSPF.",
+              "Setting the AD to 110 creates AD parity, which can cause erratic routing table selections."
+      ],
+      tip: "To float a static route, append the backup AD to the end of the route command (e.g., 'ip route 0.0.0.0 0.0.0.0 10.1.1.1 120').",
+      memory: "Floating route = Backup route = Higher AD.",
+      real: "Configure a floating static route pointing to an LTE modem gateway with an AD of 130 to ensure it only activates if the primary fiber link (OSPF/BGP) fails.",
+      commands: ["ip route 0.0.0.0 0.0.0.0 192.168.1.1 120"]
+    }
+  },
+
+  {
+    id: 172,
+    domain: "IP Connectivity",
+    topic: "OSPF",
+    type: "dragdrop",
+    difficulty: "Hard",
+    examWeight: "25%",
+    frequency: "High",
+    text: "Order the OSPF neighbor state transitions from Down to Full adjacency.",
+    
+    order: [
+          "Init: Hello packet received from neighbor, but sender ID is not in it.",
+          "Two-Way: Bi-directional communication is established (DR/BDR elected here).",
+          "ExStart: Neighbors determine master/slave roles and initial DD sequence numbers.",
+          "Exchange: Neighbors exchange Database Description (DD) packets.",
+          "Loading: Link-state request (LSR) and update (LSU) packets are exchanged.",
+          "Full: Link-state databases are fully synchronized."
+    ],
+    
+    correct: [0,1,2,3,4,5],
+    expl: {
+      correct: "Correct Order",
+      why: "OSPF neighbors transition through Down -> Init -> Two-Way -> ExStart -> Exchange -> Loading -> Full to establish a complete routing adjacency. Reference: RFC 2328.",
+      wrong: [
+              "DR/BDR elections must happen at Two-Way before the database synchronization starts in ExStart.",
+              "Exchange of DD packets must precede the Loading phase where actual link-state updates are requested."
+      ],
+      tip: "Remember: ExStart comes before Exchange. ExStart decides who speaks first; Exchange actually sends the summaries.",
+      memory: "I-2-E-E-L-F (Init, Two-Way, ExStart, Exchange, Loading, Full).",
+      real: "When troubleshooting OSPF neighbor issues, a neighbor stuck in the 'Init' state indicates it is receiving hello packets but not seeing its own Router ID returned.",
+      commands: ["show ip ospf neighbor"]
+    }
+  },
+
+  {
+    id: 173,
+    domain: "IP Connectivity",
+    topic: "Route Selection",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "25%",
+    frequency: "High",
+    text: "A router has a packet destined for 10.1.1.37. The routing table contains three matching entries: 10.1.1.0/24 [110/20] via OSPF, 10.1.1.32/28 [110/30] via OSPF, and 10.1.1.32/27 [90/10] via EIGRP. Which route will be selected?",
+    options: [
+          "10.1.1.32/27 via EIGRP because EIGRP has a lower AD (90) than OSPF (110).",
+          "10.1.1.32/28 via OSPF because it has the longest prefix match (/28).",
+          "10.1.1.0/24 via OSPF because it has the lowest metric (20).",
+          "The router will load-balance across all three routes."
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "When a router selects a route, it always evaluates matches in this order: 1) Longest Prefix Match (most specific subnet mask), 2) Lowest Administrative Distance, 3) Lowest Metric. The prefix /28 is longer and more specific than /27 and /24, so it is chosen first, regardless of AD or metric. Reference: Cisco route selection algorithm.",
+      wrong: [
+              "AD is only evaluated if there is a prefix length tie.",
+              "Metric is only evaluated if both the prefix length and the AD match.",
+              "Load balancing only occurs between routes with identical prefix lengths, ADs, and metrics."
+      ],
+      tip: "Longest Prefix Match (LPM) wins every time. Mask length is the ultimate tie-breaker.",
+      memory: "LPM -> AD -> Metric.",
+      real: "If a static default route (0.0.0.0/0) has AD 1, and an OSPF route (10.0.0.0/8) has AD 110, traffic to 10.1.1.1 will take the OSPF route because /8 is more specific than /0.",
+      commands: ["show ip route 10.1.1.37"]
+    }
+  },
+
+  {
+    id: 174,
+    domain: "IP Connectivity",
+    topic: "OSPF",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "25%",
+    frequency: "High",
+    text: "In OSPFv2, which method has the highest priority for selecting the Router ID (RID)?",
+    options: [
+          "The highest IPv4 address on any active loopback interface",
+          "The highest IPv4 address on any active physical interface",
+          "The manually configured router-id command value under the OSPF process",
+          "The MAC address of the active native VLAN"
+    ],
+    
+    
+    correct: [2],
+    expl: {
+      correct: "C",
+      why: "The OSPF Router ID selection priority is: 1) Manual configuration via the 'router-id' command, 2) Highest IPv4 address on an active loopback interface, 3) Highest IPv4 address on any active physical interface. Reference: RFC 2328.",
+      wrong: [
+              "Loopback IP is used only if no manual router ID is configured.",
+              "Physical interface IP is the last resort used if no manual RID or loopback exists.",
+              "MAC addresses are not used to determine the OSPF Router ID."
+      ],
+      tip: "Always manually configure the Router ID in OSPF to prevent it from changing if interfaces flap.",
+      memory: "Manual RID > Loopback IP > Physical IP.",
+      real: "When setting up a new OSPF area, standard practice is to configure the router ID to match the loopback address for network management tracking.",
+      commands: ["router-id 1.1.1.1","show ip ospf"]
+    }
+  },
+
+  {
+    id: 175,
+    domain: "IP Connectivity",
+    topic: "OSPF",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "25%",
+    frequency: "High",
+    text: "Which OSPF network type is the default when OSPF is enabled on a standard Ethernet interface, and what is its default Hello timer value?",
+    options: [
+          "Point-to-Point, Hello: 10 seconds",
+          "Broadcast, Hello: 10 seconds",
+          "Broadcast, Hello: 30 seconds",
+          "Non-Broadcast Multi-Access (NBMA), Hello: 30 seconds"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "Ethernet interfaces default to the Broadcast network type in OSPF. The default Hello timer for broadcast networks is 10 seconds (Dead timer is 40 seconds). Reference: RFC 2328.",
+      wrong: [
+              "Point-to-Point is the default for serial interfaces, not Ethernet.",
+              "Broadcast interfaces use a 10-second hello timer, not 30.",
+              "NBMA is the default for Frame Relay interfaces, using a 30-second Hello timer."
+      ],
+      tip: "Broadcast and Point-to-Point OSPF networks default to a 10-second Hello timer. NBMA and Point-to-Multipoint default to 30 seconds.",
+      memory: "Ethernet = Broadcast = 10s Hello.",
+      real: "Changing the OSPF network type to point-to-point on links where only two routers are connected speeds up convergence because it bypasses DR/BDR election.",
+      commands: ["ip ospf network point-to-point","show ip ospf interface"]
+    }
+  },
+
+  {
+    id: 176,
+    domain: "IP Connectivity",
+    topic: "Routing",
+    type: "single",
+    difficulty: "Easy",
+    examWeight: "25%",
+    frequency: "High",
+    text: "Which destination subnet mask combination represents a default route (gateway of last resort) in an IPv4 routing table?",
+    options: [
+          "255.255.255.255/32",
+          "0.0.0.0/0",
+          "127.0.0.1/8",
+          "255.0.0.0/8"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "A default route matches all traffic that does not have a more specific destination route in the routing table. It is represented by 0.0.0.0 with mask 0.0.0.0 (or 0.0.0.0/0 in CIDR). Reference: RFC 1812.",
+      wrong: [
+              "255.255.255.255/32 represents a host route for the local subnet broadcast.",
+              "127.0.0.1/8 is the local host loopback subnet.",
+              "255.0.0.0/8 is a Class A network mask."
+      ],
+      tip: "The default route is the fallback route used when no other matching entry exists.",
+      memory: "0.0.0.0/0 = Default Route = Gateway of Last Resort.",
+      real: "Configure a default static route pointing out the internet-facing WAN interface to ensure branch hosts can reach external sites.",
+      commands: ["ip route 0.0.0.0 0.0.0.0 203.0.113.1"]
+    }
+  },
+
+  {
+    id: 177,
+    domain: "IP Connectivity",
+    topic: "OSPF",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "25%",
+    frequency: "Medium",
+    text: "What is the result of configuring the command 'passive-interface GigabitEthernet 0/1' under the active OSPF process?",
+    options: [
+          "The interface is disabled and no longer routes IP traffic.",
+          "The interface continues to send hello packets but ignores incoming updates.",
+          "The interface advertises its network prefix, but stops sending and receiving OSPF Hello packets.",
+          "The interface is configured to run OSPF over SSL."
+    ],
+    
+    
+    correct: [2],
+    expl: {
+      correct: "C",
+      why: "A passive OSPF interface stops sending and receiving OSPF Hello packets, preventing adjacencies from forming on that port. However, OSPF still advertises the interface's subnet to other OSPF neighbors. Reference: RFC 2328.",
+      wrong: [
+              "The interface still forwards standard IP traffic normally.",
+              "Hello packets are completely blocked, preventing neighbor discovery.",
+              "OSPF does not use SSL for interface security."
+      ],
+      tip: "Use passive interfaces on LAN-facing ports to prevent users from connecting rogue OSPF routers.",
+      memory: "Passive interface = Advertised, but no Hellos.",
+      real: "When configuring OSPF on a branch router, set client-facing access interfaces as passive to secure the control plane.",
+      commands: ["passive-interface default","no passive-interface gig0/0"]
+    }
+  },
+
+  {
+    id: 178,
+    domain: "IP Connectivity",
+    topic: "OSPF",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "25%",
+    frequency: "High",
+    text: "Why does multi-area OSPF design require all non-backbone areas to connect directly to Area 0 (Backbone Area)?",
+    options: [
+          "To prevent routing loops by enforcing a hub-and-spoke topology for inter-area updates",
+          "To allow switches to run Rapid Spanning Tree Protocol across area boundaries",
+          "Because Area 0 is the only area that supports OSPF MD5 authentication",
+          "To reduce the OSPF hello timer values"
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "OSPF prevents inter-area routing loops by requiring a loop-free, logical hub-and-spoke topology. Area 0 acts as the hub, and all non-backbone areas must connect to it. Inter-area traffic must traverse the backbone to prevent loops. Reference: RFC 2328.",
+      wrong: [
+              "Spanning Tree handles Layer 2 loops and does not cross Layer 3 OSPF area boundaries.",
+              "MD5 authentication is supported in all OSPF areas.",
+              "OSPF hello timers are configured per-interface and do not depend on backbone routing."
+      ],
+      tip: "All OSPF inter-area traffic must pass through Area 0. Non-backbone areas cannot exchange routing updates directly.",
+      memory: "Area 0 = Hub = Loop Prevention.",
+      real: "If a physical connection to Area 0 is impossible, configure an OSPF virtual link across a transit area to restore routing paths.",
+      commands: ["area 1 virtual-link 2.2.2.2"]
+    }
+  },
+
+  {
+    id: 179,
+    domain: "IP Connectivity",
+    topic: "Routing",
+    type: "single",
+    difficulty: "Easy",
+    examWeight: "25%",
+    frequency: "High",
+    text: "Which of the following lists the correct default administrative distances (AD) for connected, static, OSPF, and RIP routes in Cisco IOS?",
+    options: [
+          "Connected: 0, Static: 1, OSPF: 110, RIP: 120",
+          "Connected: 1, Static: 0, OSPF: 120, RIP: 110",
+          "Connected: 0, Static: 1, OSPF: 90, RIP: 120",
+          "Connected: 10, Static: 20, OSPF: 110, RIP: 120"
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "Cisco IOS default AD values are: Connected: 0, Static: 1, EIGRP: 90, OSPF: 110, and RIP: 120. Lower AD is preferred. Reference: Cisco Administrative Distance guides.",
+      wrong: [
+              "Static has AD 1 and Connected has AD 0, not vice versa.",
+              "90 is EIGRP's AD, not OSPF's.",
+              "Connected routes have the highest trust level (AD 0)."
+      ],
+      tip: "Memorize: Connected (0), Static (1), EIGRP (90), OSPF (110), RIP (120).",
+      memory: "C(0) -> S(1) -> E(90) -> O(110) -> R(120).",
+      real: "When comparing routing protocol behaviors on a core switch, OSPF routes will always override RIP routes because of OSPF's lower AD (110 vs 120).",
+      commands: ["show ip protocols"]
+    }
+  },
+
+  {
+    id: 180,
+    domain: "IP Connectivity",
+    topic: "OSPF",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "25%",
+    frequency: "High",
+    text: "What is the default OSPF cost for a FastEthernet interface (100 Mbps) assuming the default reference bandwidth of 100 Mbps is configured?",
+    options: [
+          "1",
+          "10",
+          "100",
+          "1000"
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "OSPF interface cost is calculated using the formula: Cost = Reference Bandwidth / Interface Bandwidth. The default reference bandwidth is 100 Mbps (10^8). For FastEthernet (100 Mbps), Cost = 100 / 100 = 1. Reference: RFC 2328.",
+      wrong: [
+              "10 is the OSPF cost for a 10 Mbps interface (100 / 10 = 10).",
+              "OSPF cost cannot be less than 1. FastEthernet and GigabitEthernet both default to a cost of 1 unless the reference bandwidth is increased."
+      ],
+      tip: "Because Gigabit and 10-Gigabit interfaces default to a cost of 1, you must increase the reference bandwidth to allow proper cost distinctions.",
+      memory: "Default cost of 100M interface = 1.",
+      real: "Configure 'auto-cost reference-bandwidth 100000' (100 Gbps) on all OSPF routers in modern fiber-optic LANs to prevent path calculation ties.",
+      commands: ["auto-cost reference-bandwidth 100000"]
+    }
+  },
+
+  {
+    id: 181,
+    domain: "IP Connectivity",
+    topic: "Routing",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "25%",
+    frequency: "High",
+    text: "When configuring Inter-VLAN routing using a Router-on-a-Stick (ROAS) design, which command is required on each subinterface to enable proper trunk VLAN processing?",
+    options: [
+          "switchport mode trunk",
+          "encapsulation dot1q <vlan-id>",
+          "ip routing",
+          "switchport trunk allowed vlan"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "To route traffic for a VLAN on a router subinterface (e.g. g0/0.10), you must tell the router which VLAN tag to bind to the interface using the 'encapsulation dot1q <vlan-id>' command before assigning an IP address. Reference: Cisco ROAS configuration guides.",
+      wrong: [
+              "Routers do not support Layer 2 'switchport' commands.",
+              "ip routing is a global configuration command, not an interface-specific encapsulation command.",
+              "allowed vlan is a switch configuration command."
+      ],
+      tip: "Configure ROAS: 1) Create subinterface (e.g. g0/0.10). 2) Bind VLAN (e.g. 'encapsulation dot1q 10'). 3) Add IP address.",
+      memory: "Subinterface = encapsulation dot1q VLAN_ID.",
+      real: "When configuring a firewall for inter-VLAN routing, configure subinterfaces with 802.1Q tagging matching the switch trunk ports.",
+      commands: ["encapsulation dot1q 10","interface gigabitethernet 0/0.10"]
+    }
+  },
+
+  {
+    id: 182,
+    domain: "IP Connectivity",
+    topic: "Routing",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "25%",
+    frequency: "Medium",
+    text: "What is the primary feature of Policy-Based Routing (PBR) compared to standard routing?",
+    options: [
+          "It routes packets based on source IP and other matching criteria in access-lists, overriding destination-only routing.",
+          "It uses Spanning Tree to forward Layer 3 frames.",
+          "It automatically disables OSPF neighbor state checks.",
+          "It uses MAC addresses instead of IP addresses to make forwarding decisions."
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "Policy-Based Routing (PBR) allows administrators to configure routing policies based on source IP addresses, protocol, or port numbers defined in route-maps, overriding default destination-based routing lookup. Reference: Cisco PBR configuration guides.",
+      wrong: [
+              "Spanning Tree operates at Layer 2, while PBR is a Layer 3 routing policy tool.",
+              "PBR does not affect OSPF neighbor adjacencies.",
+              "Forwarding is still IP-based, not MAC-based."
+      ],
+      tip: "PBR uses route-maps containing match statements (ACLs) and set statements (next-hop IPs).",
+      memory: "PBR = Policy routing based on Source IP.",
+      real: "Deploy PBR on a corporate border router to direct VoIP traffic over a high-speed lease line while forwarding guest internet traffic over a cheaper broadband link.",
+      commands: ["route-map PBR_POLICY permit 10","set ip next-hop 10.1.1.1"]
+    }
+  },
+
+  {
+    id: 183,
+    domain: "IP Connectivity",
+    topic: "OSPF",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "25%",
+    frequency: "High",
+    text: "Which of the following interface configuration parameters must match exactly between two OSPFv2 routers to establish a neighbor relationship?",
+    options: [
+          "Router ID and OSPF Process ID",
+          "Hello/Dead Timers and Subnet Mask/Area ID",
+          "Loopback IP addresses",
+          "Hostnames and switch port priority"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "To establish an OSPFv2 adjacency, several interface parameters must match exactly: 1) Hello/Dead Timers, 2) Area ID, 3) Subnet Mask/Subnet ID, 4) Authentication credentials, and 5) Stub area flag. Reference: RFC 2328.",
+      wrong: [
+              "Process ID is locally significant and does not need to match between routers. Router ID must be unique (if they match, neighbor relationship fails).",
+              "Loopback IPs must be unique, not identical.",
+              "Hostnames have no effect on routing adjacency negotiation."
+      ],
+      tip: "Common OSPF troubleshooting areas: mismatched areas, mismatched hello/dead timers, and mismatched MTUs.",
+      memory: "TIMERS + AREA + SUBNET + AUTH = OSPF Adjacency.",
+      real: "If you change the OSPF Hello timer to 5 seconds on one side of a link to speed up convergence, you must change it to 5 seconds on the peer router to prevent the adjacency from dropping.",
+      commands: ["ip ospf hello-interval 5","show ip ospf interface"]
+    }
+  },
+
+  {
+    id: 184,
+    domain: "IP Connectivity",
+    topic: "Routing",
+    type: "single",
+    difficulty: "Hard",
+    examWeight: "25%",
+    frequency: "Medium",
+    text: "When configuring a static IPv6 route pointing to a next-hop Link-Local address, what additional parameter must be specified in the command?",
+    options: [
+          "The administrative distance",
+          "The local exit interface",
+          "The destination MAC address",
+          "The global unicast prefix"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "Because IPv6 Link-Local addresses (FE80::/10) are link-specific and can exist on multiple interfaces of the same router, you must specify the local exit interface (e.g. Serial0/0 or GigabitEthernet0/0) alongside the next-hop Link-Local IP to resolve route ambiguity. Reference: RFC 4291.",
+      wrong: [
+              "Administrative distance is optional, not mandatory for Link-Local resolution.",
+              "Routing tables do not accept destination MAC addresses directly.",
+              "The prefix is part of the destination network definition, but the exit interface is what must accompany the link-local next-hop."
+      ],
+      tip: "Command format: 'ipv6 route <prefix> <exit-interface> <next-hop-link-local-ip>'.",
+      memory: "Link-Local next-hop needs exit interface.",
+      real: "When configuring static routes over point-to-point connections, using the exit interface and neighbor link-local address saves routing table memory.",
+      commands: ["ipv6 route 2001:db8::/64 gigabitethernet0/0 fe80::2"]
+    }
+  },
+
+  {
+    id: 185,
+    domain: "IP Connectivity",
+    topic: "Routing",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "25%",
+    frequency: "High",
+    text: "A network engineer deploys a Layer 3 Switch (Multilayer Switch) and configures several SVIs, but the switch fails to forward packets between the subnets. Which global command must be enabled?",
+    options: [
+          "switchport mode trunk",
+          "ip routing",
+          "router ospf 1",
+          "sdn enable"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "By default, Cisco multilayer switches operate as Layer 2 devices with IP routing disabled. To allow the switch to forward packets between SVIs or routed interfaces, you must enable the IP routing engine globally using the 'ip routing' command. Reference: Cisco switching guides.",
+      wrong: [
+              "Trunk mode is a Layer 2 configuration.",
+              "Dynamic routing (OSPF) is not required for basic inter-VLAN routing.",
+              "SDN features are not required for standard multilayer routing."
+      ],
+      tip: "To turn a switch into a router: 1) Enable global 'ip routing'. 2) Turn off Layer 2 on interfaces using 'no switchport'.",
+      memory: "ip routing = Switch acts as a router.",
+      real: "When setting up SVIs on a core campus switch, verify that 'ip routing' is in the running configuration to enable local routing paths.",
+      commands: ["ip routing","show ip route"]
+    }
+  },
+
+  {
+    id: 186,
+    domain: "IP Services",
+    topic: "NAT",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "10%",
+    frequency: "High",
+    text: "Which type of Network Address Translation (NAT) maps multiple private IP addresses to a single public IP address by utilizing unique Layer 4 source port numbers?",
+    options: [
+          "Static NAT",
+          "Dynamic NAT",
+          "Port Address Translation (PAT) / Overload",
+          "Destination NAT"
+    ],
+    
+    
+    correct: [2],
+    expl: {
+      correct: "C",
+      why: "Port Address Translation (PAT), also known as NAT Overload, allows thousands of internal hosts to share a single public IP address by tracking translation sessions using unique source port numbers in the TCP/UDP headers. Reference: RFC 2663.",
+      wrong: [
+              "Static NAT performs a fixed one-to-one mapping, which does not conserve IP addresses.",
+              "Dynamic NAT maps private hosts to a pool of public IPs on a first-come, first-served basis, but still requires one public IP per active session.",
+              "Destination NAT is used to map incoming traffic to internal servers (like Port Forwarding)."
+      ],
+      tip: "NAT Overload uses the 'overload' keyword at the end of the NAT translation command.",
+      memory: "PAT = Port translation = Overload.",
+      real: "Home routers utilize PAT to allow all connected devices (phones, laptops, TVs) to share the single public IP address provided by the ISP.",
+      commands: ["ip nat inside source list 1 interface gig0/0 overload"]
+    }
+  },
+
+  {
+    id: 187,
+    domain: "IP Services",
+    topic: "NTP",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "10%",
+    frequency: "High",
+    text: "What does the Network Time Protocol (NTP) stratum level indicate about a time source?",
+    options: [
+          "The precision of the local hardware clock",
+          "The distance (hop count) the server is from the authoritative reference clock",
+          "The administrative distance of the time source",
+          "The encryption level of the NTP packet"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "NTP uses stratum levels to define the distance from the reference clock (Stratum 0: atomic clock or GPS receiver). A server connected directly to a Stratum 0 source is Stratum 1. A client syncing from a Stratum 1 server is Stratum 2, and so on. Reference: RFC 5905.",
+      wrong: [
+              "Stratum does not measure physical clock precision directly, but rather network distance.",
+              "Administrative distance belongs to routing protocols, not NTP.",
+              "NTP stratum does not relate to cryptography or packet encryption."
+      ],
+      tip: "Lower stratum numbers indicate a more reliable, closer time source. Stratum 16 is considered unsynchronized/invalid.",
+      memory: "Stratum 0 = Reference Clock. Stratum 1 = Connected to 0. Stratum 2 = Connected to 1.",
+      real: "When configuring switch clock synchronization, point to a local Stratum 2 or 3 NTP server to ensure consistent log timestamps across the network.",
+      commands: ["ntp server 10.1.1.5","show ntp status"]
+    }
+  },
+
+  {
+    id: 188,
+    domain: "IP Services",
+    topic: "Syslog",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "10%",
+    frequency: "High",
+    text: "A router is configured with the command 'logging trap 4'. Which levels of syslog messages will be forwarded to the syslog server?",
+    options: [
+          "Only messages with severity level 4",
+          "Messages with severity levels 0 through 4",
+          "Messages with severity levels 4 through 7",
+          "All syslog messages"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "When a syslog logging level is configured, the device forwards all messages at that severity level and lower (more severe). Level 4 is 'Warning'. Therefore, the router will send levels 0 (Emergency), 1 (Alert), 2 (Critical), 3 (Error), and 4 (Warning). Reference: RFC 5424.",
+      wrong: [
+              "Syslog filters are inclusive of all more-severe levels.",
+              "Levels 5 (Notification), 6 (Informational), and 7 (Debugging) are less severe and will be filtered out."
+      ],
+      tip: "Syslog levels: 0: Emerg, 1: Alert, 2: Crit, 3: Error, 4: Warn, 5: Notice, 6: Info, 7: Debug.",
+      memory: "Every Awesome Cat Eats Wet Nice Individual Dinners (0 to 7).",
+      real: "Set 'logging trap warning' on switches to ensure you receive critical hardware alerts without flooding the monitoring server with informational link flaps.",
+      commands: ["logging trap 4","show logging"]
+    }
+  },
+
+  {
+    id: 189,
+    domain: "IP Services",
+    topic: "SNMP",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "10%",
+    frequency: "High",
+    text: "Which security model configuration in SNMPv3 provides both packet source authentication and encryption of the SNMP data payload?",
+    options: [
+          "noAuthNoPriv",
+          "authNoPriv",
+          "authPriv",
+          "privOnly"
+    ],
+    
+    
+    correct: [2],
+    expl: {
+      correct: "C",
+      why: "SNMPv3 introduces security levels. 'authPriv' (Authentication and Privacy) is the highest level, requiring MD5/SHA for source authentication and DES/AES to encrypt the monitored data payload. Reference: RFC 3414.",
+      wrong: [
+              "noAuthNoPriv has no authentication or encryption (uses username match only).",
+              "authNoPriv provides MD5/SHA authentication, but does not encrypt packet data.",
+              "privOnly is an invalid SNMPv3 security parameter."
+      ],
+      tip: "SNMPv1 and v2c use cleartext 'community strings'. SNMPv3 introduces cryptographic usernames, authentication, and encryption.",
+      memory: "authPriv = Authentication + Privacy (encryption).",
+      real: "When configuring device monitoring over a public network, always use SNMPv3 authPriv to prevent attackers from intercepting interface data.",
+      commands: ["snmp-server group monitorGroup v3 priv"]
+    }
+  },
+
+  {
+    id: 190,
+    domain: "IP Services",
+    topic: "DHCP",
+    type: "single",
+    difficulty: "Easy",
+    examWeight: "10%",
+    frequency: "High",
+    text: "Which command is used to reserve a block of IP addresses so they are not leased out by a Cisco IOS DHCP server?",
+    options: [
+          "ip dhcp reserved-address",
+          "ip dhcp excluded-address",
+          "no ip dhcp pool",
+          "ip dhcp lease static"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "The 'ip dhcp excluded-address' global command configures a Cisco IOS router to reserve specific IP addresses (like gateway and server static IPs) so they are not assigned to DHCP clients. Reference: Cisco DHCP server configuration guides.",
+      wrong: [
+              "reserved-address is an invalid Cisco IOS command.",
+              "no ip dhcp pool deletes the entire DHCP pool.",
+              "lease static is used for static MAC bindings, not general address exclusions."
+      ],
+      tip: "Always configure the excluded-address list BEFORE creating the DHCP pool to prevent immediate address conflicts.",
+      memory: "Excluded address = Excluded from the lease pool.",
+      real: "When configuring a DHCP scope for local clients, exclude the gateway address (.1) and printer addresses (.2 to .10) from the pool.",
+      commands: ["ip dhcp excluded-address 192.168.1.1 192.168.1.10"]
+    }
+  },
+
+  {
+    id: 191,
+    domain: "Security Fundamentals",
+    topic: "ACLs",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "15%",
+    frequency: "High",
+    text: "What is the correct configuration placement rule for standard and extended Access Control Lists (ACLs)?",
+    options: [
+          "Standard ACLs should be placed close to the destination; Extended ACLs should be placed close to the source.",
+          "Standard ACLs should be placed close to the source; Extended ACLs should be placed close to the destination.",
+          "Both standard and extended ACLs should be placed only on outbound WAN interfaces.",
+          "ACLs must be placed only on console lines."
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "Standard ACLs filter based on source IP only; placing them close to the source would filter traffic to other legitimate destinations. Thus, place them close to the destination. Extended ACLs filter based on source/destination IP, protocol, and port; placing them close to the source conserves bandwidth by dropping unwanted traffic immediately. Reference: Cisco ACL guidelines.",
+      wrong: [
+              "Placing standard ACLs close to the source drops all traffic from that host, not just traffic to the blocked destination.",
+              "Placing extended ACLs close to the destination wastes WAN link bandwidth.",
+              "ACL placement is interface-specific, not restricted to WAN or console interfaces."
+      ],
+      tip: "Standard = Close to Destination. Extended = Close to Source.",
+      memory: "S-D (Standard-Destination), E-S (Extended-Source).",
+      real: "When creating an ACL to block access to a finance server VLAN, apply an extended ACL on the access router interface closest to the user hosts.",
+      commands: ["ip access-group 101 in"]
+    }
+  },
+
+  {
+    id: 192,
+    domain: "Security Fundamentals",
+    topic: "Port Security",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "15%",
+    frequency: "High",
+    text: "A switch port configured with Port Security experiences a security violation. If the violation mode is set to 'Restrict', what actions does the switch perform?",
+    options: [
+          "The switch drops the violating traffic, increments the security violation counter, and generates a syslog message, but keeps the link up.",
+          "The switch shuts down the interface immediately, placing it into the err-disabled state.",
+          "The switch drops the violating traffic but does not increment the counter or send any log alerts.",
+          "The switch forwards the frame and alerts the destination host."
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "The 'restrict' violation mode drops unauthorized frames, increments the violation counter, and sends SNMP trap/syslog alerts, keeping the port operational for authorized MACs. The 'shutdown' mode disables the port. The 'protect' mode drops traffic silently without logs or counter increments. Reference: Cisco Port Security guidelines.",
+      wrong: [
+              "Shutdown mode disables the port into err-disabled state, not Restrict.",
+              "Protect mode drops traffic silently without logs or incrementing the counter.",
+              "Violating traffic is dropped, never forwarded."
+      ],
+      tip: "Port security modes: Shutdown (disables interface, logs, counter), Restrict (drops traffic, logs, counter), Protect (drops traffic silently).",
+      memory: "Restrict = Restricts access, drops traffic, increments counter, logs. Shutdown = Shuts down port.",
+      real: "Use Restrict mode on public-facing access ports to prevent unauthorized MACs while keeping existing authorized devices (like IP phones) online.",
+      commands: ["switchport port-security violation restrict"]
+    }
+  },
+
+  {
+    id: 193,
+    domain: "Security Fundamentals",
+    topic: "DHCP Snooping",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "15%",
+    frequency: "High",
+    text: "When configuring DHCP Snooping on a switch, which port type should be configured as 'trusted' to allow DHCP Offer and Acknowledge replies from the DHCP server?",
+    options: [
+          "Ports connected to user workstations",
+          "Ports connected to the authorized DHCP server or uplink routers",
+          "All ports on the access switch by default",
+          "Ports connected to wireless access points"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "DHCP Snooping blocks rogue DHCP servers by categorizing switch ports. Ports connected to downstream clients are 'untrusted' and block server messages (Offer, ACK). Ports connected to the authorized server or uplinks are configured as 'trusted' to allow server responses. Reference: Cisco DHCP Snooping security guides.",
+      wrong: [
+              "Workstation ports are untrusted to prevent users from running rogue DHCP servers.",
+              "All ports default to untrusted when DHCP snooping is enabled globally.",
+              "AP ports are typically untrusted unless the AP is also acting as a DHCP server."
+      ],
+      tip: "Configure 'ip dhcp snooping limit rate' on untrusted ports to prevent DHCP starvation exhaustion attacks.",
+      memory: "Trusted = Server/Uplinks. Untrusted = Clients.",
+      real: "When configuring access switches, run 'ip dhcp snooping trust' on the trunk ports linking back to the core routing layer.",
+      commands: ["ip dhcp snooping trust","ip dhcp snooping vlan 10"]
+    }
+  },
+
+  {
+    id: 194,
+    domain: "Security Fundamentals",
+    topic: "Wireless Security",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "15%",
+    frequency: "High",
+    text: "Which cryptographic handshake mechanism is introduced in WPA3 to replace the WPA2 Pre-Shared Key (PSK) exchange, protecting against offline dictionary brute-force attacks?",
+    options: [
+          "Temporal Key Integrity Protocol (TKIP)",
+          "Simultaneous Authentication of Equals (SAE)",
+          "Wired Equivalent Privacy (WEP)",
+          "Pre-Shared Key Exchange (PSKE)"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "WPA3 replaces WPA2 PSK with Simultaneous Authentication of Equals (SAE), which is a secure key exchange based on Dragonfly cryptography. SAE prevents offline dictionary attacks by making each handshake session unique. Reference: WPA3 Specification.",
+      wrong: [
+              "TKIP is a legacy WPA1 protocol that is deprecated.",
+              "WEP is an obsolete, insecure encryption standard.",
+              "PSKE is not a standard security protocol."
+      ],
+      tip: "SAE prevents attackers from capturing the wireless handshake and cracking the passphrase offline.",
+      memory: "SAE = WPA3 key exchange.",
+      real: "When upgrading an office network to WPA3-Personal, the authentication changes from WPA2 PSK to SAE to protect remote client sessions.",
+      commands: []
+    }
+  },
+
+  {
+    id: 195,
+    domain: "Security Fundamentals",
+    topic: "SSH",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "15%",
+    frequency: "High",
+    text: "An engineer is configuring a switch to allow management access via SSH. Which line-level command must be applied under the VTY lines to disable unencrypted Telnet access?",
+    options: [
+          "login local",
+          "transport input ssh",
+          "transport input telnet ssh",
+          "no privilege level"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "The command 'transport input ssh' restricts incoming VTY access to SSH only, disabling Telnet and other unencrypted cleartext management protocols on the virtual terminal lines. Reference: Cisco VTY configuration guides.",
+      wrong: [
+              "login local enables local database authentication, but does not block Telnet packets.",
+              "transport input telnet ssh allows BOTH SSH and Telnet, keeping Telnet vulnerabilities active.",
+              "privilege level changes access rights, not protocol support."
+      ],
+      tip: "Always run 'transport input ssh' on VTY lines to meet standard security audits.",
+      memory: "transport input ssh = SSH only.",
+      real: "Disable Telnet by applying 'transport input ssh' on VTY lines 0 to 15 to encrypt administrator credentials over the local network.",
+      commands: ["transport input ssh","line vty 0 15"]
+    }
+  },
+
+  {
+    id: 196,
+    domain: "Automation and Programmability",
+    topic: "REST APIs",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "10%",
+    frequency: "High",
+    text: "Which HTTP request method is mapped to the 'Create' database action in a standard REST API application?",
+    options: [
+          "GET",
+          "POST",
+          "PUT",
+          "DELETE"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "In RESTful APIs, HTTP verbs map to CRUD actions: POST maps to Create (create resource), GET maps to Read (retrieve resource), PUT/PATCH map to Update (modify resource), and DELETE maps to Delete. Reference: RFC 7231.",
+      wrong: [
+              "GET is used for Read operations.",
+              "PUT is used for Update or Replace operations.",
+              "DELETE is used for Delete operations."
+      ],
+      tip: "CRUD mapping: Create (POST), Read (GET), Update (PUT/PATCH), Delete (DELETE).",
+      memory: "POST = Create new entry.",
+      real: "When sending an API payload to Cisco DNA Center to provision a new VLAN, use the POST method containing the configuration JSON.",
+      commands: []
+    }
+  },
+
+  {
+    id: 197,
+    domain: "Automation and Programmability",
+    topic: "JSON",
+    type: "single",
+    difficulty: "Easy",
+    examWeight: "10%",
+    frequency: "High",
+    text: "Which of the following character combinations is used to enclose a key-value dictionary (object) and a list (array) in a standard JSON file?",
+    options: [
+          "Dictionary: Curly braces { }, Array: Square brackets [ ]",
+          "Dictionary: Square brackets [ ], Array: Curly braces { }",
+          "Dictionary: Parentheses ( ), Array: Angle brackets < >",
+          "Dictionary: Angle brackets < >, Array: Parentheses ( )"
+    ],
+    
+    
+    correct: [0],
+    expl: {
+      correct: "A",
+      why: "JSON (JavaScript Object Notation) uses curly braces { } to define objects/dictionaries containing key-value pairs, and square brackets [ ] to define ordered arrays/lists of elements. Reference: RFC 8259.",
+      wrong: [
+              "Square brackets define arrays, curly braces define objects (dictionaries), not vice versa.",
+              "Parentheses and angle brackets are not used to structure JSON files."
+      ],
+      tip: "JSON objects use { } and key-value pairs. JSON arrays use [ ] and comma-separated lists.",
+      memory: "Curly { Object }, Square [ Array ].",
+      real: "When parsing configuration output from a Cisco router using a Python script, check that JSON structures start with { for dictionaries and [ for lists.",
+      commands: []
+    }
+  },
+
+  {
+    id: 198,
+    domain: "Automation and Programmability",
+    topic: "SDN",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "10%",
+    frequency: "High",
+    text: "Which API connection direction is utilized by an SDN controller to communicate with network management applications and orchestration scripts?",
+    options: [
+          "Southbound APIs",
+          "Northbound APIs",
+          "Eastbound APIs",
+          "Westbound APIs"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "Northbound APIs connect the SDN controller to applications, scripts, and business logic tools, allowing programmers to automate network actions. Southbound APIs (like OpenFlow, NETCONF) connect the controller downwards to physical hardware. Reference: SDN architecture standards.",
+      wrong: [
+              "Southbound APIs link the controller to the network devices.",
+              "Eastbound and Westbound APIs are used for communication between multiple controller clusters to sync data."
+      ],
+      tip: "Northbound = Upwards to Apps (REST). Southbound = Downwards to Devices (NETCONF/OpenFlow).",
+      memory: "North = Up to Apps. South = Down to Switches.",
+      real: "When writing a Python script to request network health data from Cisco DNA Center, your script queries the controller's Northbound REST API.",
+      commands: []
+    }
+  },
+
+  {
+    id: 199,
+    domain: "Automation and Programmability",
+    topic: "DevOps Tools",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "10%",
+    frequency: "High",
+    text: "Which configuration management tool uses a pull-based model where managed nodes install local agent software that queries the server at regular intervals to download configuration states?",
+    options: [
+          "Ansible",
+          "Puppet",
+          "Terraform",
+          "Cisco NSO"
+    ],
+    
+    
+    correct: [1],
+    expl: {
+      correct: "B",
+      why: "Puppet is a pull-based tool. It requires agents to be installed on managed devices. These agents pull configurations periodically from a master server. Ansible and Terraform use a push-based agentless model over SSH or APIs.",
+      wrong: [
+              "Ansible is push-based and agentless.",
+              "Terraform is agentless and uses a push model to provision cloud or network architecture.",
+              "Cisco NSO is agentless, managing devices via CLI/NETCONF push."
+      ],
+      tip: "Pull-based: Puppet, Chef. Push-based: Ansible, SaltStack (can do both).",
+      memory: "Puppet Agent pulls strings from the master.",
+      real: "In large virtual server farms, Puppet agents run on Linux VMs to pull updates from the central master server every 30 minutes, ensuring configuration consistency.",
+      commands: []
+    }
+  },
+
+  {
+    id: 200,
+    domain: "Automation and Programmability",
+    topic: "DNA Center",
+    type: "single",
+    difficulty: "Medium",
+    examWeight: "10%",
+    frequency: "High",
+    text: "Which area of the Cisco DNA Center dashboard allows network engineers to monitor network device health, client experiences, and troubleshoot connectivity issues using machine learning analytics?",
+    options: [
+          "Design",
+          "Policy",
+          "Provision",
+          "Assurance"
+    ],
+    
+    
+    correct: [3],
+    expl: {
+      correct: "D",
+      why: "Cisco DNA Center Assurance provides proactive monitoring, client health statistics, network health scores, and automated troubleshooting recommendations based on telemetry and AI analytics. Reference: Cisco DNA Center Assurance guides.",
+      wrong: [
+              "Design is used to create site profiles, device templates, and IP pools.",
+              "Policy is used to configure access control lists, QoS policies, and virtual networks.",
+              "Provision is used to deploy configurations and assign devices to sites."
+      ],
+      tip: "Assurance = Monitoring, Health, Analytics, Troubleshooting.",
+      memory: "Assurance assures the network health is optimal.",
+      real: "Open DNA Center Assurance to view a visual client experience graph showing why a specific user is experiencing slow DHCP response times in the building.",
       commands: []
     }
   }
