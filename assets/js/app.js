@@ -218,8 +218,9 @@ function weightedSelection(count, domains) {
   const out = [];
   const used = new Set();
 
+  let total = scored.reduce((s, x) => s + x.w, 0);
+
   while (out.length < count && used.size < scored.length) {
-    const total = scored.reduce((s, x) => s + (used.has(x.q.id) ? 0 : x.w), 0);
     let r = rand() * total;
     for (const item of scored) {
       if (used.has(item.q.id)) continue;
@@ -227,6 +228,7 @@ function weightedSelection(count, domains) {
       if (r <= 0) {
         used.add(item.q.id);
         out.push(item.q);
+        total -= item.w;
         break;
       }
     }

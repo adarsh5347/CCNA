@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CCNA 200-301 Prep Platform</title>
+  <meta name="description" content="Master the Cisco CCNA 200-301 exam with our premium prep platform. Features adaptive quizzes, detailed command tips, and timed exam simulators." />
+  <meta name="keywords" content="Cisco, CCNA, 200-301, OSPF, Subnetting, Routing, VLANs, Switch, Exam Simulation, Prep" />
+  <meta property="og:title" content="CCNA 200-301 Prep Platform" />
+  <meta property="og:description" content="Prepare for your Cisco certification with realistic simulated exams, spaced-repetition quizzes, and in-depth command explanations." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -19,16 +25,16 @@
       </div>
     </div>
     <nav>
-      <button data-page="home" class="ghost">🏠 <span>Home</span></button>
-      <button data-page="subnet" class="ghost">⚡ <span>Subnetting</span></button>
-      <button data-page="analytics" class="ghost">📊 <span>Analytics</span></button>
-      <span id="timer" class="timer hidden">120:00</span>
-      <div id="authContainer" class="auth-container" style="display: inline-flex; align-items: center; gap: 8px;">
-        <button id="btnSignIn" class="secondary" style="padding: 8px 14px; font-size: 13px;">🔑 Sign In</button>
-        <div id="userProfile" class="user-profile hidden" style="display: inline-flex; align-items: center; gap: 8px;">
-          <img id="userPhoto" class="user-photo" src="" alt="User Photo" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border-color);" />
-          <span id="userName" class="user-name" style="font-size: 13px; font-weight: 500;"></span>
-          <button id="btnSignOut" class="ghost" style="padding: 6px 10px; font-size: 11px;">Log Out</button>
+      <button data-page="home" class="ghost" aria-label="Home Navigation">🏠 <span>Home</span></button>
+      <button data-page="subnet" class="ghost" aria-label="Subnetting Practice">⚡ <span>Subnetting</span></button>
+      <button data-page="analytics" class="ghost" aria-label="Readiness Analytics">📊 <span>Analytics</span></button>
+      <span id="timer" class="timer hidden" aria-live="polite">120:00</span>
+      <div id="authContainer" class="auth-container">
+        <button id="btnSignIn" class="secondary">🔑 Sign In</button>
+        <div id="userProfile" class="user-profile hidden">
+          <img id="userPhoto" class="user-photo" src="" alt="User Photo" />
+          <span id="userName" class="user-name"></span>
+          <button id="btnSignOut" class="ghost">Log Out</button>
         </div>
       </div>
     </nav>
@@ -96,10 +102,10 @@
         <article class="card">
           <h3>🧠 Smart Adaptive Quiz</h3>
           <p>Target your weaknesses. The system automatically finds your two weakest domains and builds a focused custom quiz.</p>
-          <div id="smartQuizInfo" style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; min-height: 18px; line-height: 1.4;">
+          <div id="smartQuizInfo" class="quiz-info-text">
             Analyzing performance history...
           </div>
-          <div class="row" style="margin-bottom: 12px;">
+          <div class="row row-compact">
             <label>Questions
               <select id="smartQuizCount">
                 <option value="15">15 questions</option>
@@ -113,10 +119,10 @@
         <article class="card">
           <h3>🔁 Spaced Repetition Quiz</h3>
           <p>Review and master your weak spots. This mode targets only the questions you have previously answered incorrectly.</p>
-          <div id="missedQuizInfo" style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; min-height: 18px; line-height: 1.4;">
+          <div id="missedQuizInfo" class="quiz-info-text">
             You have 0 incorrect questions to review.
           </div>
-          <div class="row" style="margin-bottom: 12px;">
+          <div class="row row-compact">
             <label>Questions
               <select id="missedQuizCount">
                 <option value="10">10 questions</option>
@@ -173,7 +179,7 @@
       <article class="hero">
         <h2>Readiness Dashboard</h2>
         <p>Track pass probability, readiness score, weak domains, and trend across attempts.</p>
-        <button id="btnResetProgress" class="secondary" style="margin-top: 12px; padding: 6px 12px; font-size: 12px; color: var(--color-danger); border-color: rgba(244, 63, 94, 0.3);">⚠️ Reset Progress</button>
+        <button id="btnResetProgress" class="secondary">⚠️ Reset Progress</button>
       </article>
       <section id="analyticsStats" class="grid stats"></section>
       <section class="card">
@@ -195,18 +201,18 @@
             <h3>Exam Control</h3>
             <button id="closeSidebar" class="ghost">✕</button>
           </div>
-          <article class="card">
+          <article class="card card-sidebar">
             <h4 id="modeTitle"></h4>
-            <p id="modeDesc" style="font-size: 12px; margin-top: 4px; color: var(--text-muted);"></p>
-            <div class="inline" style="margin-top: 12px;">
+            <p id="modeDesc"></p>
+            <div class="inline mt-12">
               <button id="openReview" class="ghost">📋 Review</button>
               <button id="toggleMark" class="ghost">🚩 Mark</button>
               <button id="exitSession" class="ghost">🚪 Exit</button>
             </div>
           </article>
-          <article class="card" style="flex: 1; display: flex; flex-direction: column;">
-            <h4 style="margin-bottom: 8px;">Navigator</h4>
-            <p id="navMeta" style="font-size: 11px; margin-bottom: 12px; color: var(--text-muted);"></p>
+          <article class="card card-navigator">
+            <h4>Navigator</h4>
+            <p id="navMeta"></p>
             <div id="qNav" class="qnav"></div>
           </article>
         </aside>
@@ -223,7 +229,7 @@
           <article id="resultArea" class="scroll hidden"></article>
           <footer class="exam-footer">
             <button id="prevQ" class="ghost">⬅️ <span>Previous</span></button>
-            <div class="inline" style="margin-top: 0;">
+            <div class="inline mt-0">
               <button id="saveNext" class="secondary"><span>Save & Next</span> ➡️</button>
               <button id="submitSession" class="primary">Submit <span>Exam</span></button>
             </div>
