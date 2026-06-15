@@ -1,5 +1,7 @@
 import { blueprint, generateBank } from "./data.js";
 import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgress, mergeProgress } from "./firebase.js";
+import { labs } from "./labs.js";
+import { bugsData, cliOutputs } from "./cli.js";
 
 const STORE = "ccna_full_site_v1";
 
@@ -8,8 +10,13 @@ const state = {
   bank: [],
   analytics: loadAnalytics(),
   session: null,
-  subnet: { q: null, score: 0, attempts: 0, endAt: 0 },
-  user: null
+  subnet: { mode: "Easy", q: null, score: 0, attempts: 0, streak: 0, timerVal: 30, timerInterval: null, leaderboard: JSON.parse(localStorage.getItem("subnet_leaderboard")) || [] },
+  lab: { currentLabId: 1, mode: "step", completedSteps: {}, userCommands: [], currentPrompt: "Switch(config)#" },
+  user: null,
+  muted: localStorage.getItem("ccna_muted") === "true",
+  highContrast: localStorage.getItem("ccna_high_contrast") === "true",
+  simBugsFixed: {},
+  simPathsRun: { ospf: false, roas: false }
 };
 
 function rand() {
@@ -40,6 +47,9 @@ function loadAnalytics() {
     totalTime: 0,
     studyMin: 0,
     xp: 0,
+    streak: 0,
+    labsCompleted: 0,
+    subnetMaxStreak: 0,
     ach: {}
   };
   try {
@@ -121,7 +131,39 @@ function readinessLabel(score) {
   return "Likely Pass";
 }
 
-// Ranks removed
+function getLevelInfo(xp) {
+  const lvl = Math.floor((xp || 0) / 100) + 1;
+  const level = Math.min(5, lvl);
+  const labels = {
+    1: "Cable Puller",
+    2: "Jr. Network Administrator",
+    3: "Network Security Associate",
+    4: "Senior Infrastructure Engineer",
+    5: "Lead Network Architect"
+  };
+  return {
+    level,
+    label: labels[level] || "Lead Network Architect",
+    currentXP: (xp || 0) % 100,
+    nextXP: 100
+  };
+}
+
+function gainXP(amount) {
+  state.analytics.xp = (state.analytics.xp || 0) + amount;
+  saveAnalytics();
+  updateHeaderProfile();
+  renderAchievements();
+}
+
+function updateHeaderProfile() {
+  const xp = state.analytics.xp || 0;
+  const info = getLevelInfo(xp);
+  const badge = byId("headerXPBadge");
+  if (badge) {
+    badge.textContent = `Lvl ${info.level} (${info.label}) - ${xp} XP`;
+  }
+}
 
 function calcDomainAccuracy() {
   const out = {};
@@ -142,14 +184,20 @@ function renderStatsCards(targetId, cards) {
 function renderHome() {
   const rs = readinessScore();
   const pp = passProbability();
-  const avg = state.analytics.totalQ ? Math.round(state.analytics.totalTime / state.analytics.totalQ) : 0;
-  renderStatsCards("heroStats", [
-    { k: "Overall Readiness Score", v: `${rs}%` },
-    { k: "CCNA Pass Probability", v: `${pp}%` },
-    { k: "Readiness Level", v: readinessLabel(rs) },
-    { k: "Study Hours", v: (state.analytics.studyMin / 60).toFixed(1) },
-    { k: "Average Time Per Question", v: `${avg}s` }
-  ]);
+  
+  const heroReadiness = byId("heroReadiness");
+  const heroReadinessBar = byId("heroReadinessBar");
+  const heroQuestions = byId("heroQuestions");
+  const heroStreak = byId("heroStreak");
+  const heroLabs = byId("heroLabs");
+  
+  if (heroReadiness) heroReadiness.textContent = `${rs}%`;
+  if (heroReadinessBar) heroReadinessBar.style.width = `${rs}%`;
+  if (heroQuestions) heroQuestions.textContent = state.analytics.totalQ || 0;
+  if (heroStreak) heroStreak.textContent = `${state.analytics.streak || 0} Days`;
+  if (heroLabs) heroLabs.textContent = `${state.analytics.labsCompleted || 0} / 10`;
+  
+  updateHeaderProfile();
 
   const easy = Math.round(state.bank.length * 0.4);
   const medium = Math.round(state.bank.length * 0.4);
@@ -582,6 +630,7 @@ function instantStudyFeedback() {
   if (!state.analytics.missedIds) state.analytics.missedIds = [];
   if (ok) {
     state.analytics.missedIds = state.analytics.missedIds.filter(id => id !== q.id);
+    gainXP(10);
   } else {
     if (!state.analytics.missedIds.includes(q.id)) {
       state.analytics.missedIds.push(q.id);
@@ -654,7 +703,8 @@ function submitSession(force) {
 
   s.submitted = true;
   clearInterval(s.timer);
-  byId("timer").classList.add("hidden");
+  const timer = byId("timer");
+  if (timer) timer.classList.add("hidden");
 
   let correct = 0;
   const domain = {};
@@ -666,6 +716,9 @@ function submitSession(force) {
     if (ok) {
       correct += 1;
       state.analytics.missedIds = state.analytics.missedIds.filter(id => id !== q.id);
+      if (s.mode !== "study") {
+        gainXP(10);
+      }
     } else {
       if (!state.analytics.missedIds.includes(q.id)) {
         state.analytics.missedIds.push(q.id);
@@ -680,6 +733,10 @@ function submitSession(force) {
 
   const total = s.questions.length;
   const pct = Math.round((correct / total) * 100);
+  
+  if (pct >= 80) gainXP(30);
+  updateStreakOnAttempt();
+  
   state.analytics.studyMin += Math.round((Date.now() - s.startedAt) / 60000);
   state.analytics.attempts.push({
     mode: s.mode,
@@ -705,13 +762,14 @@ function submitSession(force) {
 
   html += `<div class="card"><h3>Domain Performance</h3>${Object.entries(domain).map(([d, v]) => {
     const pct = Math.round((v.correct / v.total) * 100);
+    const color = pct >= 80 ? "#10b981" : pct >= 50 ? "#f59e0b" : "#ff5e3a";
     return `
       <div class="domain-item">
         <div class="domain-header">
           <strong>${d}</strong>
           <span class="pct">${v.correct}/${v.total} (${pct}%)</span>
         </div>
-        <div class="progress"><div style="width:${pct}%"></div></div>
+        <div class="progress"><div style="width:${pct}%; background:${color};"></div></div>
       </div>
     `;
   }).join("")}</div>`;
@@ -738,15 +796,35 @@ function submitSession(force) {
   byId("goAnalytics").addEventListener("click", () => setPage("analytics"));
 }
 
+function updateStreakOnAttempt() {
+  const todayStr = new Date().toDateString();
+  const lastAttemptDateStr = state.analytics.lastAttemptDate;
+  if (!lastAttemptDateStr) {
+    state.analytics.streak = 1;
+  } else {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toDateString();
+    
+    if (lastAttemptDateStr === yesterdayStr) {
+      state.analytics.streak = (state.analytics.streak || 0) + 1;
+    } else if (lastAttemptDateStr !== todayStr) {
+      state.analytics.streak = 1;
+    }
+  }
+  state.analytics.lastAttemptDate = todayStr;
+}
+
 function renderAnalytics() {
   const da = calcDomainAccuracy();
   const weak = Object.entries(da).sort((a, b) => a[1] - b[1])[0];
   const strong = Object.entries(da).sort((a, b) => b[1] - a[1])[0];
   const avg = state.analytics.totalQ ? Math.round(state.analytics.totalTime / state.analytics.totalQ) : 0;
+  const pp = passProbability();
 
   renderStatsCards("analyticsStats", [
     { k: "Overall Readiness Score", v: `${readinessScore()}%` },
-    { k: "CCNA Pass Probability", v: `${passProbability()}%` },
+    { k: "CCNA Pass Probability", v: `${pp}%` },
     { k: "Study Hours", v: (state.analytics.studyMin / 60).toFixed(1) },
     { k: "Average Time Per Question", v: `${avg}s` },
     { k: "Weakest Domain", v: weak ? `${weak[0]} (${weak[1]}%)` : "N/A" },
@@ -755,13 +833,14 @@ function renderAnalytics() {
 
   byId("domainBreakdown").innerHTML = blueprint.map((d) => {
     const p = da[d.name] || 0;
+    const color = p >= 80 ? "#10b981" : p >= 50 ? "#f59e0b" : "#ff5e3a";
     return `
       <div class="domain-item">
         <div class="domain-header">
           <strong>${d.name} <span class="weight">(${d.weight}%)</span></strong>
           <span class="pct">${p}%</span>
         </div>
-        <div class="progress"><div style="width:${p}%"></div></div>
+        <div class="progress"><div style="width:${p}%; background:${color};"></div></div>
       </div>
     `;
   }).join("");
@@ -770,88 +849,851 @@ function renderAnalytics() {
   byId("trend").innerHTML = rec.length
     ? rec.map((a, i) => `<div class="output">Attempt ${i + 1}: ${a.mode.toUpperCase()} | ${a.score}% (${a.correct}/${a.total}) | ${new Date(a.at).toLocaleString()}</div>`).join("")
     : "No attempts yet.";
+    
+  renderAchievements();
 }
 
-// Lab functions removed
+const distractorCommands = {
+  1: ["vlan 999", "switchport mode trunk", "interface FastEthernet0/24", "no switchport"],
+  2: ["encapsulation dot1Q 99", "ip address 10.10.10.1 255.0.0.0", "interface GigabitEthernet0/0", "no ip routing"],
+  3: ["router ospf 100", "router-id 2.2.2.2", "network 192.168.1.0 0.0.0.0 area 0", "ip route 0.0.0.0 0.0.0.0 10.10.10.1"],
+  4: ["access-list 10 permit 192.168.20.0 0.0.0.255", "ip access-group 10 out", "access-list 10 deny any", "interface GigabitEthernet0/1"],
+  5: ["ip dhcp pool WAN_POOL", "default-router 192.168.1.254", "dns-server 1.1.1.1", "ip dhcp excluded-address 192.168.1.1 192.168.1.254"],
+  6: ["ip nat outside", "ip nat inside", "access-list 1 permit any", "ip nat inside source static 192.168.1.10 192.168.1.2"],
+  7: ["spanning-tree vlan 10 priority 4000", "spanning-tree mode pvst", "no spanning-tree vlan 10", "spanning-tree root primary"],
+  8: ["interface range GigabitEthernet0/1 - 2", "channel-group 1 mode passive", "channel-group 1 mode on", "no channel-group 1"],
+  9: ["wlan Corporate_WiFi 1", "security wpa wpa2 key-mgmt wpa", "security wpa wpa2 akm psk set-key ascii WrongPassword", "wlan Corporate_WiFi 2 shutdown"],
+  10: ["crypto isakmp policy 1", "encryption aes 128", "crypto ipsec transform-set MY_SET esp-3des esp-sha-hmac", "crypto isakmp key WrongKey address 198.51.100.1"]
+};
 
-function makeSubnetQuestion(mode) {
-  const prefixes = mode === "Easy" ? [24, 25, 26] : mode === "Medium" ? [22, 23, 27, 28] : [19, 20, 29, 30];
-  const p = pick(prefixes);
-  const t = pick(["hosts", "wild"]);
-  if (t === "hosts") {
-    const hosts = Math.pow(2, 32 - p) - 2;
-    return { prompt: `How many usable hosts are in /${p}?`, answer: String(hosts), note: "Usable hosts = 2^(32-prefix)-2." };
+function initLabSelector() {
+  const sel = byId("labSelector");
+  if (!sel) return;
+  sel.innerHTML = labs.map((l) => `<option value="${l.id}">Lab ${l.id}: ${l.title}</option>`).join("");
+  sel.addEventListener("change", () => {
+    state.lab.currentLabId = Number(sel.value);
+    loadLab(state.lab.currentLabId);
+  });
+}
+
+function initLabModes() {
+  const modes = [
+    { id: "btnModeStep", mode: "step" },
+    { id: "btnModeChallenge", mode: "challenge" },
+    { id: "btnModeExam", mode: "exam" }
+  ];
+  modes.forEach(m => {
+    const btn = byId(m.id);
+    if (btn) {
+      btn.addEventListener("click", () => {
+        playNetSound("click");
+        modes.forEach(o => {
+          const b = byId(o.id);
+          if (b) b.className = "ghost";
+        });
+        btn.className = "primary";
+        state.lab.mode = m.mode;
+        loadLab(state.lab.currentLabId);
+      });
+    }
+  });
+}
+
+function drawLabTopology(lab) {
+  const container = byId("labTopologyContainer");
+  if (!container) return;
+  
+  let svg = `
+    <svg viewBox="0 0 500 160" width="100%" height="100%" style="background: rgba(0,0,0,0.2); border-radius: 8px;">
+      <line x1="100" y1="80" x2="250" y2="80" stroke="#00f2fe" stroke-width="2" />
+      <line x1="250" y1="80" x2="400" y2="80" stroke="#10b981" stroke-width="2" />
+      
+      <g transform="translate(100, 80)">
+        <circle r="16" fill="#060913" stroke="#00f2fe" stroke-width="2" />
+        <text y="4" font-family="Space Grotesk" font-size="8" fill="#fff" text-anchor="middle">💻 Host</text>
+      </g>
+      
+      <g transform="translate(250, 80)">
+        <rect x="-18" y="-12" width="36" height="24" rx="4" fill="#060913" stroke="#00f2fe" stroke-width="2" />
+        <text y="4" font-family="Space Grotesk" font-size="8" fill="#fff" text-anchor="middle">🎛️ SW-1</text>
+      </g>
+      
+      <g transform="translate(400, 80)">
+        <circle r="16" fill="#060913" stroke="#10b981" stroke-width="2" />
+        <text y="4" font-family="Space Grotesk" font-size="8" fill="#fff" text-anchor="middle">🌐 R-1</text>
+      </g>
+    </svg>
+  `;
+  container.innerHTML = svg;
+}
+
+function renderLabObjectives(lab) {
+  const list = byId("labObjectivesList");
+  if (!list) return;
+  
+  list.innerHTML = lab.objectives.map((obj, idx) => {
+    const done = state.lab.completedSteps[idx];
+    const icon = done ? "✔" : "⏳";
+    const color = done ? "#10b981" : "var(--text-muted)";
+    return `
+      <div style="display: flex; align-items: flex-start; gap: 8px; color: ${color};">
+        <span>${icon}</span>
+        <span>${obj}</span>
+      </div>
+    `;
+  }).join("");
+}
+
+function loadLab(labId) {
+  const lab = labs.find(l => l.id === labId);
+  if (!lab) return;
+  
+  state.lab.currentLabId = labId;
+  state.lab.completedSteps = {};
+  state.lab.userCommands = [];
+  state.lab.currentPrompt = (labId === 1 || labId === 7 || labId === 8) ? "Switch(config)#" : "Router(config)#";
+  
+  drawLabTopology(lab);
+  renderLabObjectives(lab);
+  
+  const output = byId("labCliOutput");
+  const prompt = byId("labCliPrompt");
+  const inputs = byId("labInteractiveInputs");
+  const feedback = byId("labFeedbackBox");
+  
+  if (feedback) feedback.style.display = "none";
+  
+  const initialHost = (labId === 1 || labId === 7 || labId === 8) ? "Switch" : "Router";
+  
+  if (state.lab.mode === "step" || state.lab.mode === "challenge") {
+    if (output) {
+      output.textContent = `Cisco IOS Software, Catalyst L3 Switch Software, Version 15.2...\n\n${initialHost}# configure terminal\nEnter configuration commands, one per line. End with CNTL/Z.\n`;
+    }
+    if (prompt) prompt.textContent = `${initialHost}(config)#`;
+    
+    let cmds = lab.commands.map((c, i) => ({ cmd: c.cmd, idx: i, correct: true }));
+    if (state.lab.mode === "challenge") {
+      const dists = distractorCommands[lab.id] || [];
+      dists.forEach(d => {
+        cmds.push({ cmd: d, idx: -1, correct: false });
+      });
+    }
+    cmds = shuffle(cmds);
+    
+    if (inputs) {
+      inputs.innerHTML = cmds.map(c => `
+        <button class="secondary btn-lab-cmd" data-cmd="${c.cmd}" style="padding: 4px 8px; font-size: 11px; font-family: var(--font-mono); text-transform: none; margin: 2px;">${c.cmd}</button>
+      `).join("");
+      
+      inputs.querySelectorAll(".btn-lab-cmd").forEach(btn => {
+        btn.addEventListener("click", () => {
+          handleLabCommandClick(btn.dataset.cmd, lab);
+        });
+      });
+    }
+  } else if (state.lab.mode === "exam") {
+    if (output) {
+      output.innerHTML = `<div style="font-size:12px; color:#fff; font-style:italic; margin-bottom:8px;">Match each configuration objective to its correct Cisco IOS command. Click an objective, then click its matching command below.</div>`;
+    }
+    if (prompt) prompt.textContent = "Exam Mode";
+    
+    renderExamMatchInterface(lab);
   }
+}
+
+function handleLabCommandClick(cmd, lab) {
+  const nextExpectedIdx = state.lab.userCommands.length;
+  const nextExpectedCmd = lab.commands[nextExpectedIdx].cmd;
+  const output = byId("labCliOutput");
+  const prompt = byId("labCliPrompt");
+  const feedback = byId("labFeedbackBox");
+  
+  if (feedback) feedback.style.display = "none";
+  
+  const currentHost = (lab.id === 1 || lab.id === 7 || lab.id === 8) ? "Switch" : "Router";
+  
+  if (cmd === nextExpectedCmd) {
+    playNetSound("hop");
+    state.lab.userCommands.push(cmd);
+    
+    if (cmd.startsWith("interface") || cmd.startsWith("int ")) {
+      state.lab.currentPrompt = `${currentHost}(config-if)#`;
+    } else if (cmd.startsWith("router ospf") || cmd.startsWith("router rip")) {
+      state.lab.currentPrompt = `${currentHost}(config-router)#`;
+    } else if (cmd.startsWith("vlan ")) {
+      state.lab.currentPrompt = `${currentHost}(config-vlan)#`;
+    } else if (cmd.startsWith("wlan ")) {
+      state.lab.currentPrompt = `${currentHost}(config-wlan)#`;
+    } else if (cmd.startsWith("crypto isakmp") || cmd.startsWith("crypto ipsec")) {
+      state.lab.currentPrompt = `${currentHost}(config-crypto)#`;
+    } else if (cmd.startsWith("exit")) {
+      state.lab.currentPrompt = `${currentHost}(config)#`;
+    }
+    
+    if (output) {
+      output.textContent += `${prompt.textContent} ${cmd}\n`;
+      output.scrollTop = output.scrollHeight;
+    }
+    if (prompt) prompt.textContent = state.lab.currentPrompt;
+    
+    const completedCount = state.lab.userCommands.length;
+    lab.objectives.forEach((obj, idx) => {
+      const threshold = Math.min(lab.commands.length, Math.ceil((idx + 1) * (lab.commands.length / lab.objectives.length)));
+      if (completedCount >= threshold) {
+        if (!state.lab.completedSteps[idx]) {
+          state.lab.completedSteps[idx] = true;
+          playNetSound("success");
+        }
+      }
+    });
+    
+    renderLabObjectives(lab);
+    
+    if (state.lab.userCommands.length === lab.commands.length) {
+      playNetSound("success");
+      if (output) {
+        output.textContent += `\n%CONFIG-5-SUCCESS: Laboratory configuration completed successfully. All objectives met.\n`;
+        output.scrollTop = output.scrollHeight;
+      }
+      if (feedback) {
+        feedback.style.display = "block";
+        feedback.style.background = "#10b981";
+        feedback.style.color = "#000";
+        feedback.textContent = `✔ Lab Completed! +50 XP Awarded.`;
+      }
+      gainXP(50);
+      
+      state.analytics.labsCompleted = Math.min(10, (state.analytics.labsCompleted || 0) + 1);
+      saveAnalytics();
+      renderHome();
+      
+      const inputs = byId("labInteractiveInputs");
+      if (inputs) inputs.innerHTML = `<span style="color:#10b981; font-weight:bold;">✔ Lab Passed!</span>`;
+    }
+  } else {
+    playNetSound("block");
+    if (output) {
+      output.textContent += `${prompt.textContent} ${cmd}\n% Invalid input detected or command mismatch.\n`;
+      output.scrollTop = output.scrollHeight;
+    }
+    if (feedback) {
+      feedback.style.display = "block";
+      feedback.style.background = "#ff5e3a";
+      feedback.style.color = "#fff";
+      feedback.textContent = `❌ Incorrect command sequence. Try again.`;
+    }
+  }
+}
+
+function renderExamMatchInterface(lab) {
+  const output = byId("labCliOutput");
+  const inputs = byId("labInteractiveInputs");
+  if (!output || !inputs) return;
+  
+  state.lab.selectedObjIdx = null;
+  state.lab.selectedCmdText = null;
+  state.lab.matches = {};
+  
+  const shuffledCmds = shuffle(lab.commands.map((c, i) => ({ text: c.cmd, originalIdx: i })));
+  
+  output.innerHTML = `
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;">
+      <div>
+        <h5 style="color: #00f2fe; margin-top: 0; margin-bottom: 6px;">Objectives / Steps</h5>
+        <div id="examObjColumn" style="display: flex; flex-direction: column; gap: 4px; overflow-y:auto; max-height:160px;">
+          ${lab.commands.map((c, i) => `
+            <div class="exam-item exam-obj-item" data-obj-idx="${i}" style="border: 1px solid var(--border-color); padding: 4px; border-radius: 4px; font-size: 10px; cursor: pointer; background: rgba(255,255,255,0.02); min-height: 36px;">
+              ${i+1}. ${c.desc}
+              <div class="matched-val" id="matchedVal-${i}" style="color: #10b981; font-weight: bold; font-family: var(--font-mono); font-size: 9.5px; margin-top: 2px;"></div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+      <div>
+        <h5 style="color: #00f2fe; margin-top: 0; margin-bottom: 6px;">IOS Commands</h5>
+        <div id="examCmdColumn" style="display: flex; flex-direction: column; gap: 4px; overflow-y:auto; max-height:160px;">
+          ${shuffledCmds.map((c, i) => `
+            <div class="exam-item exam-cmd-item" data-cmd-text="${c.text}" style="border: 1px solid var(--border-color); padding: 4px; border-radius: 4px; font-size: 10px; cursor: pointer; font-family: var(--font-mono); background: rgba(255,255,255,0.02); min-height: 36px; display:flex; align-items:center;">
+              ${c.text}
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    </div>
+  `;
+  
+  inputs.innerHTML = `
+    <button id="btnSubmitExamMatches" class="primary" style="width: 100%; height: 32px; font-size: 12px;">Submit Configuration Matches</button>
+  `;
+  
+  const objItems = output.querySelectorAll(".exam-obj-item");
+  const cmdItems = output.querySelectorAll(".exam-cmd-item");
+  
+  objItems.forEach(item => {
+    item.addEventListener("click", () => {
+      playNetSound("click");
+      objItems.forEach(el => el.style.borderColor = "var(--border-color)");
+      item.style.borderColor = "#00f2fe";
+      state.lab.selectedObjIdx = Number(item.dataset.objIdx);
+      checkAndApplyMatch();
+    });
+  });
+  
+  cmdItems.forEach(item => {
+    item.addEventListener("click", () => {
+      playNetSound("click");
+      cmdItems.forEach(el => el.style.borderColor = "var(--border-color)");
+      item.style.borderColor = "#00f2fe";
+      state.lab.selectedCmdText = item.dataset.cmdText;
+      checkAndApplyMatch();
+    });
+  });
+  
+  function checkAndApplyMatch() {
+    if (state.lab.selectedObjIdx !== null && state.lab.selectedCmdText !== null) {
+      const objIdx = state.lab.selectedObjIdx;
+      const cmdText = state.lab.selectedCmdText;
+      
+      state.lab.matches[objIdx] = cmdText;
+      
+      const matchLabel = byId(`matchedVal-${objIdx}`);
+      if (matchLabel) {
+        matchLabel.textContent = `Matched: ${cmdText}`;
+      }
+      
+      objItems.forEach(el => el.style.borderColor = "var(--border-color)");
+      cmdItems.forEach(el => el.style.borderColor = "var(--border-color)");
+      state.lab.selectedObjIdx = null;
+      state.lab.selectedCmdText = null;
+    }
+  }
+  
+  const btnSubmit = byId("btnSubmitExamMatches");
+  if (btnSubmit) {
+    btnSubmit.addEventListener("click", () => {
+      let correctCount = 0;
+      lab.commands.forEach((c, idx) => {
+        if (state.lab.matches[idx] === c.cmd) {
+          correctCount++;
+        }
+      });
+      
+      const total = lab.commands.length;
+      const feedback = byId("labFeedbackBox");
+      
+      if (correctCount === total) {
+        playNetSound("success");
+        if (feedback) {
+          feedback.style.display = "block";
+          feedback.style.background = "#10b981";
+          feedback.style.color = "#000";
+          feedback.textContent = `✔ Exam passed! ${correctCount}/${total} correct matches. +50 XP Awarded.`;
+        }
+        gainXP(50);
+        
+        lab.objectives.forEach((_, i) => {
+          state.lab.completedSteps[i] = true;
+        });
+        renderLabObjectives(lab);
+        
+        state.analytics.labsCompleted = Math.min(10, (state.analytics.labsCompleted || 0) + 1);
+        saveAnalytics();
+        renderHome();
+        
+        inputs.innerHTML = `<span style="color:#10b981; font-weight:bold;">✔ Lab Passed!</span>`;
+      } else {
+        playNetSound("block");
+        if (feedback) {
+          feedback.style.display = "block";
+          feedback.style.background = "#ff5e3a";
+          feedback.style.color = "#fff";
+          feedback.textContent = `❌ Exam failed. ${correctCount}/${total} correct matches. Try again.`;
+        }
+      }
+    });
+  }
+}
+
+function renderAchievements() {
+  const a = state.analytics;
+  const rs = readinessScore();
+  const da = calcDomainAccuracy();
+  
+  const badges = [
+    {
+      id: "first_lab",
+      title: "First Lab",
+      desc: "Complete your first virtual configuration lab.",
+      unlocked: (a.labsCompleted || 0) >= 1,
+      icon: "🧪"
+    },
+    {
+      id: "100_questions",
+      title: "100 Questions",
+      desc: "Solve 100 or more questions in the preparation engine.",
+      unlocked: (a.totalQ || 0) >= 100,
+      icon: "📚"
+    },
+    {
+      id: "subnet_master",
+      title: "Subnet Master",
+      desc: "Achieve a subnetting streak multiplier of x10 in arcade mode.",
+      unlocked: (a.subnetMaxStreak || 0) >= 10,
+      icon: "⚡"
+    },
+    {
+      id: "ospf_expert",
+      title: "OSPF Expert",
+      desc: "Reach 80% or higher accuracy in the IP Connectivity domain.",
+      unlocked: (da["IP Connectivity"] || 0) >= 80 && (a.domain["IP Connectivity"]?.total || 0) >= 5,
+      icon: "🕸️"
+    },
+    {
+      id: "routing_champion",
+      title: "Routing Champion",
+      desc: "Successfully run OSPF and ROAS packet traversal paths.",
+      unlocked: state.simPathsRun && state.simPathsRun.ospf && state.simPathsRun.roas,
+      icon: "🏆"
+    },
+    {
+      id: "streaks",
+      title: "Streak Fanatic",
+      desc: "Maintain a study streak of 3 or more consecutive days.",
+      unlocked: (a.streak || 0) >= 3,
+      icon: "🔥"
+    },
+    {
+      id: "ccna_ready",
+      title: "CCNA Ready",
+      desc: "Achieve an Overall Readiness Score of 85% or higher.",
+      unlocked: rs >= 85,
+      icon: "🎓"
+    }
+  ];
+  
+  let html = `
+    <h3 style="margin-bottom:12px;">🏆 Professional Certification Badges</h3>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+  `;
+  
+  badges.forEach(b => {
+    const border = b.unlocked ? "border: 1px solid #10b981; background: rgba(16,185,129,0.03);" : "border: 1px solid rgba(255,255,255,0.05); opacity:0.5;";
+    const badgeColor = b.unlocked ? "#10b981" : "#64748b";
+    html += `
+      <div style="padding:12px; border-radius:10px; ${border} display:flex; align-items:center; gap:12px;">
+        <span style="font-size:24px; color:${badgeColor}">${b.icon}</span>
+        <div>
+          <h5 style="margin:0 0 2px 0; font-size:13px; color:${b.unlocked ? '#fff' : '#64748b'};">${b.title}</h5>
+          <p style="margin:0; font-size:10.5px; color:var(--text-muted); line-height:1.3;">${b.desc}</p>
+        </div>
+      </div>
+    `;
+  });
+  
+  html += `</div>`;
+  
+  let panel = byId("achievementsPanel");
+  if (!panel) {
+    panel = document.createElement("section");
+    panel.id = "achievementsPanel";
+    panel.className = "card";
+    panel.style.marginTop = "20px";
+    
+    const analyticsPage = byId("analytics");
+    if (analyticsPage) {
+      analyticsPage.appendChild(panel);
+    }
+  }
+  
+  if (panel) {
+    panel.innerHTML = html;
+  }
+}
+
+function ipToNum(ip) {
+  return ip.split(".").reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+}
+
+function numToIp(num) {
+  return [
+    (num >>> 24) & 255,
+    (num >>> 16) & 255,
+    (num >>> 8) & 255,
+    num & 255
+  ].join(".");
+}
+
+function getSubnetMask(prefix) {
   const mask = [0, 0, 0, 0];
-  let bits = p;
+  let bits = prefix;
   for (let i = 0; i < 4; i++) {
     const use = Math.max(0, Math.min(8, bits));
     mask[i] = use === 0 ? 0 : 256 - Math.pow(2, 8 - use);
     bits -= use;
   }
-  const wild = mask.map((m) => 255 - m).join(".");
-  return { prompt: `What wildcard mask corresponds to /${p}?`, answer: wild, note: "Wildcard = 255.255.255.255 - subnet mask." };
+  return mask.join(".");
+}
+
+function getSubnetDetails(ipStr, prefix) {
+  const ipNum = ipToNum(ipStr);
+  const maskNum = (prefix === 0 ? 0 : (0xffffffff << (32 - prefix)) >>> 0);
+  const netNum = (ipNum & maskNum) >>> 0;
+  const broadNum = (netNum | ~maskNum) >>> 0;
+  
+  return {
+    ip: ipStr,
+    prefix: prefix,
+    mask: numToIp(maskNum),
+    wildcard: numToIp(~maskNum >>> 0),
+    network: numToIp(netNum),
+    broadcast: numToIp(broadNum),
+    firstUsable: numToIp((netNum + 1) >>> 0),
+    lastUsable: numToIp((broadNum - 1) >>> 0),
+    totalHosts: Math.pow(2, 32 - prefix),
+    usableHosts: prefix >= 31 ? 0 : Math.pow(2, 32 - prefix) - 2
+  };
+}
+
+function generateRandomIP() {
+  const octets = [];
+  const type = Math.random();
+  if (type < 0.3) {
+    octets.push(10);
+    octets.push(Math.floor(Math.random() * 256));
+    octets.push(Math.floor(Math.random() * 256));
+    octets.push(Math.floor(Math.random() * 256));
+  } else if (type < 0.6) {
+    octets.push(172);
+    octets.push(16 + Math.floor(Math.random() * 16));
+    octets.push(Math.floor(Math.random() * 256));
+    octets.push(Math.floor(Math.random() * 256));
+  } else {
+    octets.push(192);
+    octets.push(168);
+    octets.push(Math.floor(Math.random() * 256));
+    octets.push(Math.floor(Math.random() * 256));
+  }
+  return octets.join(".");
+}
+
+function makeSubnetQuestion(mode) {
+  const prefixes = mode === "Easy" ? [24, 25, 26, 27, 28, 29, 30] :
+                   mode === "Medium" ? [20, 21, 22, 23, 24, 25, 26, 27, 28] :
+                   [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
+  const prefix = pick(prefixes);
+  const qTypes = ["mask", "wildcard", "hosts", "network", "broadcast", "first", "last"];
+  const qType = pick(qTypes);
+  const ip = generateRandomIP();
+  const details = getSubnetDetails(ip, prefix);
+
+  let prompt = "";
+  let answer = "";
+  let note = "";
+
+  switch (qType) {
+    case "mask":
+      prompt = `What subnet mask corresponds to /${prefix}?`;
+      answer = details.mask;
+      note = `For /${prefix}, the subnet mask is ${details.mask}.`;
+      break;
+    case "wildcard":
+      prompt = `What wildcard mask corresponds to /${prefix}?`;
+      answer = details.wildcard;
+      note = `Wildcard mask is calculated as 255.255.255.255 minus subnet mask (${details.mask}), which is ${details.wildcard}.`;
+      break;
+    case "hosts":
+      prompt = `How many usable hosts are in /${prefix}?`;
+      answer = String(details.usableHosts);
+      note = `Usable hosts formula: 2^(32 - prefix) - 2. For /${prefix}, 2^(32 - ${prefix}) - 2 = ${details.usableHosts}.`;
+      break;
+    case "network":
+      prompt = `What is the Network ID (Subnet ID) for IP address ${ip}/${prefix}?`;
+      answer = details.network;
+      note = `Perform bitwise AND of IP ${ip} and mask ${details.mask} to get Network ID: ${details.network}.`;
+      break;
+    case "broadcast":
+      prompt = `What is the Broadcast IP address for IP address ${ip}/${prefix}?`;
+      answer = details.broadcast;
+      note = `Broadcast IP is the last address in the subnet block (Network ID + block size - 1): ${details.broadcast}.`;
+      break;
+    case "first":
+      prompt = `What is the first usable IP address for IP address ${ip}/${prefix}?`;
+      answer = details.firstUsable;
+      note = `First usable host IP is Network ID + 1: ${details.firstUsable}.`;
+      break;
+    case "last":
+      prompt = `What is the last usable IP address for IP address ${ip}/${prefix}?`;
+      answer = details.lastUsable;
+      note = `Last usable host IP is Broadcast IP - 1: ${details.lastUsable}.`;
+      break;
+  }
+
+  return { prompt, answer, note, details };
+}
+
+function getSubnetMultiplier() {
+  const streak = state.subnet.streak || 0;
+  if (streak >= 9) return 5;
+  if (streak >= 6) return 4;
+  if (streak >= 3) return 2;
+  return 1;
+}
+
+function updateSubnetLeaderboard(score) {
+  let list = [];
+  try {
+    list = JSON.parse(localStorage.getItem("ccna_subnet_leaderboard")) || [];
+  } catch (e) {
+    list = [];
+  }
+  const dateStr = new Date().toLocaleDateString();
+  list.push({ date: dateStr, score: score, mode: "Timed" });
+  list.sort((a, b) => b.score - a.score);
+  list = list.slice(0, 5); // top 5
+  localStorage.setItem("ccna_subnet_leaderboard", JSON.stringify(list));
+  renderSubnetLeaderboard();
+}
+
+function renderSubnetLeaderboard() {
+  const container = byId("subnetLeaderboard");
+  if (!container) return;
+  let list = [];
+  try {
+    list = JSON.parse(localStorage.getItem("ccna_subnet_leaderboard")) || [];
+  } catch (e) {}
+  
+  if (list.length === 0) {
+    container.innerHTML = `<span style="font-style: italic;">No high scores registered yet. Complete a Timed Challenge!</span>`;
+    return;
+  }
+  
+  let html = `<ol style="margin: 0; padding-left: 20px; color: var(--text-muted);">`;
+  list.forEach((item) => {
+    html += `<li style="margin-bottom: 4px;"><strong>${item.score} correct</strong> - ${item.date} (${item.mode})</li>`;
+  });
+  html += `</ol>`;
+  container.innerHTML = html;
 }
 
 function ensureSubnetQuestion(force) {
-  const mode = byId("subnetMode").value;
+  const mode = state.subnet.mode || "Easy";
+  
+  // Update tabs buttons active styling
+  const btns = {
+    Easy: byId("btnSubnetEasy"),
+    Medium: byId("btnSubnetMedium"),
+    Hard: byId("btnSubnetHard"),
+    Timed: byId("btnSubnetTimed")
+  };
+  Object.keys(btns).forEach(m => {
+    const btn = btns[m];
+    if (btn) {
+      if (m === mode) {
+        btn.classList.add("primary");
+        btn.classList.remove("secondary");
+      } else {
+        btn.classList.remove("primary");
+        btn.classList.add("secondary");
+      }
+    }
+  });
 
-  // Clear subnetting timer if not in Timed Challenge
-  if (mode !== "Timed Challenge" && state.subnet.timer) {
-    clearInterval(state.subnet.timer);
-    state.subnet.timer = null;
+  const timerDisplay = byId("subnetTimerDisplay");
+  const streakDisplay = byId("subnetStreakDisplay");
+  const xpDisplay = byId("subnetXPDisplay");
+  const subnetSubmit = byId("subnetSubmit");
+  const subnetSkip = byId("subnetSkip");
+  const subnetAnswer = byId("subnetAnswer");
+
+  if (xpDisplay) {
+    xpDisplay.textContent = `XP: ${state.analytics.xp || 0}`;
   }
 
-  if (force || !state.subnet.q) {
-    state.subnet.q = makeSubnetQuestion(mode === "Timed Challenge" ? "Hard" : mode);
-    if (mode === "Timed Challenge" && force) {
-      state.subnet.endAt = Date.now() + 5 * 60 * 1000;
+  if (mode === "Timed") {
+    if (timerDisplay) {
+      timerDisplay.style.display = "block";
+      timerDisplay.textContent = `Time Left: ${state.subnet.timeLeft || 30}s`;
+    }
+    if (force) {
+      state.subnet.timeLeft = 30;
       state.subnet.score = 0;
       state.subnet.attempts = 0;
-
-      // Start live countdown interval
+      state.subnet.streak = 0;
+      if (subnetSubmit) subnetSubmit.disabled = false;
+      if (subnetSkip) subnetSkip.disabled = false;
+      if (subnetAnswer) subnetAnswer.disabled = false;
+      if (timerDisplay) timerDisplay.textContent = `Time Left: 30s`;
+      
       if (state.subnet.timer) clearInterval(state.subnet.timer);
       state.subnet.timer = setInterval(() => {
-        if (byId("subnet").classList.contains("active") && byId("subnetMode").value === "Timed Challenge") {
-          ensureSubnetQuestion(false);
+        const isSubnetPage = byId("subnet") && byId("subnet").classList.contains("active");
+        if (isSubnetPage && state.subnet.mode === "Timed") {
+          state.subnet.timeLeft -= 1;
+          if (state.subnet.timeLeft <= 0) {
+            state.subnet.timeLeft = 0;
+            clearInterval(state.subnet.timer);
+            state.subnet.timer = null;
+            
+            playNetSound("block");
+            if (subnetSubmit) subnetSubmit.disabled = true;
+            if (subnetSkip) subnetSkip.disabled = true;
+            if (subnetAnswer) subnetAnswer.disabled = true;
+            
+            byId("subnetOut").innerHTML = `
+              <strong style="color: #ff5e3a;">Challenge Ended!</strong><br/>
+              Your Score: <strong>${state.subnet.score}</strong> correct out of <strong>${state.subnet.attempts}</strong> attempts.<br/>
+              Streak Max Multiplier reached: <strong>x${state.subnet.multiplier || 1}</strong>
+            `;
+            
+            updateSubnetLeaderboard(state.subnet.score);
+            
+            if (state.subnet.score > (state.analytics.subnetMaxStreak || 0)) {
+              state.analytics.subnetMaxStreak = state.subnet.score;
+              saveAnalytics();
+            }
+          }
+          if (timerDisplay) {
+            timerDisplay.textContent = `Time Left: ${state.subnet.timeLeft}s`;
+          }
         } else {
           clearInterval(state.subnet.timer);
           state.subnet.timer = null;
         }
       }, 1000);
     }
-  }
-  let timer = "";
-  const subnetSubmit = byId("subnetSubmit");
-  if (mode === "Timed Challenge" && state.subnet.endAt) {
-    const left = Math.max(0, Math.floor((state.subnet.endAt - Date.now()) / 1000));
-    timer = `<br /><strong>Time Left:</strong> ${toMMSS(left)}`;
-    if (left === 0) {
-      timer += `<br />Challenge ended. Score: ${state.subnet.score}/${state.subnet.attempts}`;
-      if (state.subnet.timer) {
-        clearInterval(state.subnet.timer);
-        state.subnet.timer = null;
-      }
-      if (subnetSubmit) subnetSubmit.disabled = true;
-    } else {
-      if (subnetSubmit) subnetSubmit.disabled = false;
-    }
   } else {
+    if (state.subnet.timer) {
+      clearInterval(state.subnet.timer);
+      state.subnet.timer = null;
+    }
+    if (timerDisplay) {
+      timerDisplay.style.display = "none";
+    }
     if (subnetSubmit) subnetSubmit.disabled = false;
+    if (subnetSkip) subnetSkip.disabled = false;
+    if (subnetAnswer) subnetAnswer.disabled = false;
   }
-  byId("subnetPrompt").innerHTML = `<strong>Question:</strong> ${state.subnet.q.prompt}${timer}`;
+
+  const mult = getSubnetMultiplier();
+  state.subnet.multiplier = mult;
+  if (streakDisplay) {
+    streakDisplay.textContent = `Multiplier: x${mult} (Streak: ${state.subnet.streak})`;
+  }
+
+  if (force || !state.subnet.q) {
+    state.subnet.q = makeSubnetQuestion(mode === "Timed" ? "Hard" : mode);
+    byId("subnetPrompt").innerHTML = `<strong>Question:</strong> ${state.subnet.q.prompt}`;
+    if (force) {
+      byId("subnetOut").innerHTML = "";
+      const diagram = byId("subnetRangeDiagram");
+      if (diagram) {
+        diagram.innerHTML = `<span style="font-style: italic;">Submit an answer to visualize host ranges, network ID, and broadcast boundaries.</span>`;
+      }
+    }
+  }
 }
 
 function submitSubnet() {
-  const mode = byId("subnetMode").value;
-  const ans = byId("subnetAnswer").value.trim();
-  const ok = ans === state.subnet.q.answer;
-  state.subnet.attempts += 1;
-  if (ok) state.subnet.score += 1;
-  byId("subnetOut").innerHTML = `Result: ${ok ? "Correct" : "Incorrect"}<br />Expected: ${state.subnet.q.answer}<br />${state.subnet.q.note}<br />Score: ${state.subnet.score}/${state.subnet.attempts}`;
-  byId("subnetAnswer").value = "";
-  state.subnet.q = makeSubnetQuestion(mode === "Timed Challenge" ? "Hard" : mode);
-  ensureSubnetQuestion(false);
+  const ansInput = byId("subnetAnswer");
+  if (!ansInput) return;
+  const ans = ansInput.value.trim();
+  if (!ans) return;
+
+  const q = state.subnet.q;
+  if (!q) return;
+
+  const isCorrect = ans.toLowerCase() === q.answer.toLowerCase();
+  state.subnet.attempts = (state.subnet.attempts || 0) + 1;
+
+  const diagram = byId("subnetRangeDiagram");
+
+  if (isCorrect) {
+    playNetSound("success");
+    state.subnet.score = (state.subnet.score || 0) + 1;
+    state.subnet.streak = (state.subnet.streak || 0) + 1;
+    
+    const mult = getSubnetMultiplier();
+    const baseXP = state.subnet.mode === "Easy" ? 5 : state.subnet.mode === "Medium" ? 10 : 15;
+    const gainedXP = baseXP * mult;
+    
+    gainXP(gainedXP);
+    
+    if (state.subnet.mode === "Timed") {
+      state.subnet.timeLeft = Math.min(30, state.subnet.timeLeft + 5);
+      const timerDisplay = byId("subnetTimerDisplay");
+      if (timerDisplay) {
+        timerDisplay.textContent = `Time Left: ${state.subnet.timeLeft}s`;
+      }
+    }
+
+    byId("subnetOut").innerHTML = `
+      <span style="color:#10b981; font-weight:bold;">✔ Correct!</span> (+${gainedXP} XP)<br />
+      Expected: <strong>${q.answer}</strong><br />
+      ${q.note}
+    `;
+
+    if (diagram && q.details) {
+      const d = q.details;
+      diagram.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 11px;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-color); color: #00f2fe;">
+              <th style="padding: 4px;">Property</th>
+              <th style="padding: 4px;">IP Address Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding: 4px; color: #a7f3d0;">Network ID</td><td style="padding: 4px; font-weight:bold;">${d.network}</td></tr>
+            <tr><td style="padding: 4px; color: #a7f3d0;">Usable Range</td><td style="padding: 4px;">${d.firstUsable} - ${d.lastUsable}</td></tr>
+            <tr><td style="padding: 4px; color: #a7f3d0;">Broadcast IP</td><td style="padding: 4px; font-weight:bold;">${d.broadcast}</td></tr>
+            <tr><td style="padding: 4px; color: #a7f3d0;">Subnet Mask</td><td style="padding: 4px;">${d.mask}</td></tr>
+            <tr><td style="padding: 4px; color: #a7f3d0;">Wildcard Mask</td><td style="padding: 4px;">${d.wildcard}</td></tr>
+            <tr><td style="padding: 4px; color: #a7f3d0;">Usable Hosts</td><td style="padding: 4px;">${d.usableHosts}</td></tr>
+          </tbody>
+        </table>
+      `;
+    }
+  } else {
+    playNetSound("block");
+    state.subnet.streak = 0;
+    
+    byId("subnetOut").innerHTML = `
+      <span style="color:#ff5e3a; font-weight:bold;">❌ Incorrect</span><br />
+      Expected: <strong>${q.answer}</strong><br />
+      ${q.note}
+    `;
+
+    if (diagram && q.details) {
+      const d = q.details;
+      diagram.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 11px;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-color); color: #00f2fe;">
+              <th style="padding: 4px;">Property</th>
+              <th style="padding: 4px;">IP Address Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding: 4px; color: #a7f3d0;">Network ID</td><td style="padding: 4px; font-weight:bold;">${d.network}</td></tr>
+            <tr><td style="padding: 4px; color: #a7f3d0;">Usable Range</td><td style="padding: 4px;">${d.firstUsable} - ${d.lastUsable}</td></tr>
+            <tr><td style="padding: 4px; color: #a7f3d0;">Broadcast IP</td><td style="padding: 4px; font-weight:bold;">${d.broadcast}</td></tr>
+            <tr><td style="padding: 4px; color: #a7f3d0;">Subnet Mask</td><td style="padding: 4px;">${d.mask}</td></tr>
+            <tr><td style="padding: 4px; color: #a7f3d0;">Wildcard Mask</td><td style="padding: 4px;">${d.wildcard}</td></tr>
+            <tr><td style="padding: 4px; color: #a7f3d0;">Usable Hosts</td><td style="padding: 4px;">${d.usableHosts}</td></tr>
+          </tbody>
+        </table>
+      `;
+    }
+  }
+
+  ansInput.value = "";
+  renderAchievements();
+
+  state.subnet.q = makeSubnetQuestion(state.subnet.mode === "Timed" ? "Hard" : state.subnet.mode);
+  setTimeout(() => {
+    byId("subnetPrompt").innerHTML = `<strong>Question:</strong> ${state.subnet.q.prompt}`;
+    ansInput.focus();
+  }, 1800);
 }
 
 function wireEvents() {
@@ -859,6 +1701,98 @@ function wireEvents() {
   byId("startQuiz").addEventListener("click", () => startSession("quiz"));
   byId("startSmartQuiz").addEventListener("click", () => startSession("smart"));
   byId("startExam").addEventListener("click", () => startSession("exam"));
+
+  // Dashboard Launch controls
+  const btnLaunchStudy = byId("btnLaunchStudy");
+  const btnLaunchExam = byId("btnLaunchExam");
+  const btnLaunchLabs = byId("btnLaunchLabs");
+
+  if (btnLaunchStudy) {
+    btnLaunchStudy.addEventListener("click", () => {
+      setPage("engine");
+      startSession("study");
+    });
+  }
+  if (btnLaunchExam) {
+    btnLaunchExam.addEventListener("click", () => {
+      setPage("engine");
+      startSession("exam");
+    });
+  }
+  if (btnLaunchLabs) {
+    btnLaunchLabs.addEventListener("click", () => {
+      setPage("labs");
+    });
+  }
+
+  // Audio/Contrast controls
+  const btnMute = byId("btnMuteToggle");
+  if (btnMute) {
+    btnMute.addEventListener("click", () => {
+      state.muted = !state.muted;
+      localStorage.setItem("ccna_muted", state.muted);
+      updateMuteButton();
+      playNetSound("click");
+    });
+  }
+
+  const btnContrast = byId("btnToggleContrast");
+  if (btnContrast) {
+    btnContrast.addEventListener("click", () => {
+      state.highContrast = !state.highContrast;
+      localStorage.setItem("ccna_high_contrast", state.highContrast);
+      updateContrastButton();
+      playNetSound("click");
+    });
+  }
+
+  // Troubleshooting mode updates
+  const chkTrouble = byId("chkTroubleshooting");
+  if (chkTrouble) {
+    chkTrouble.addEventListener("change", () => {
+      playNetSound("click");
+      state.solvedBugs = {}; // reset solved states to allow fresh testing
+      if (state.inspectedNode) {
+        renderCLI(state.inspectedNode);
+      }
+    });
+  }
+
+  const selectPacket = byId("simPacketType");
+  if (selectPacket) {
+    selectPacket.addEventListener("change", () => {
+      if (state.inspectedNode) {
+        renderCLI(state.inspectedNode);
+      }
+    });
+  }
+
+  // Subnetting arcade difficulty tabs
+  const btnEasy = byId("btnSubnetEasy");
+  const btnMedium = byId("btnSubnetMedium");
+  const btnHard = byId("btnSubnetHard");
+  const btnTimed = byId("btnSubnetTimed");
+
+  if (btnEasy) btnEasy.addEventListener("click", () => { playNetSound("click"); state.subnet.mode = "Easy"; ensureSubnetQuestion(true); });
+  if (btnMedium) btnMedium.addEventListener("click", () => { playNetSound("click"); state.subnet.mode = "Medium"; ensureSubnetQuestion(true); });
+  if (btnHard) btnHard.addEventListener("click", () => { playNetSound("click"); state.subnet.mode = "Hard"; ensureSubnetQuestion(true); });
+  if (btnTimed) btnTimed.addEventListener("click", () => { playNetSound("click"); state.subnet.mode = "Timed"; ensureSubnetQuestion(true); });
+
+  byId("subnetSubmit").addEventListener("click", submitSubnet);
+  byId("subnetSkip").addEventListener("click", () => {
+    playNetSound("click");
+    state.subnet.q = makeSubnetQuestion(state.subnet.mode === "Timed" ? "Hard" : state.subnet.mode);
+    ensureSubnetQuestion(false);
+  });
+
+  const ansInput = byId("subnetAnswer");
+  if (ansInput) {
+    ansInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        submitSubnet();
+      }
+    });
+  }
 
   byId("openReview").addEventListener("click", openReview);
   byId("toggleMark").addEventListener("click", markCurrent);
@@ -891,15 +1825,6 @@ function wireEvents() {
   byId("toggleSidebar").addEventListener("click", openSidebar);
   byId("closeSidebar").addEventListener("click", closeSidebar);
   backdrop.addEventListener("click", closeSidebar);
-
-  // Lab listeners removed
-
-  byId("subnetSubmit").addEventListener("click", submitSubnet);
-  byId("subnetSkip").addEventListener("click", () => {
-    state.subnet.q = makeSubnetQuestion(byId("subnetMode").value === "Timed Challenge" ? "Hard" : byId("subnetMode").value);
-    ensureSubnetQuestion(false);
-  });
-  byId("subnetMode").addEventListener("change", () => ensureSubnetQuestion(true));
 
   // Reset progress handler
   const btnReset = byId("btnResetProgress");
@@ -1031,6 +1956,7 @@ function initAudio() {
 }
 
 function playNetSound(type) {
+  if (state.muted) return;
   try {
     initAudio();
     if (!audioCtx) return;
@@ -1173,13 +2099,8 @@ function highlightNode(nodeId, isBlocked = false) {
   });
 }
 
-function setupNodeConfigInspector() {
-  const nodes = document.querySelectorAll(".topo-node");
-  const configContent = byId("nodeConfigContent");
-  if (!nodes || !configContent) return;
-
-  const configs = {
-    pc: `
+const deviceConfigs = {
+  pc: `
 <strong style="color: #00f2fe; font-size: 13px;">💻 Device: Host PC (End Station)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>IP Address:</strong> 192.168.1.10
@@ -1191,8 +2112,8 @@ function setupNodeConfigInspector() {
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <span style="color: #10b981;">💡 CCNA Command Tip:</span>
 Use <code>ipconfig /all</code> to inspect network adapters, and <code>arp -a</code> to view the local ARP table.
-    `,
-    switch: `
+  `,
+  switch: `
 <strong style="color: #00f2fe; font-size: 13px;">🎛️ Device: Switch SW-1 (Catalyst 2960)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>VLAN Database:</strong>
@@ -1209,8 +2130,8 @@ Use <code>ipconfig /all</code> to inspect network adapters, and <code>arp -a</co
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <span style="color: #10b981;">💡 CCNA Command Tip:</span>
 Use <code>show mac address-table</code> to verify bridging learning, and <code>show vlan brief</code> to view port memberships.
-    `,
-    router: `
+  `,
+  router: `
 <strong style="color: #00f2fe; font-size: 13px;">🌐 Device: Router R-1 (Cisco ISR 4331)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>Interfaces:</strong>
@@ -1225,8 +2146,8 @@ Use <code>show mac address-table</code> to verify bridging learning, and <code>s
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <span style="color: #10b981;">💡 CCNA Command Tip:</span>
 Use <code>show ip route</code> to inspect routing decisions, and <code>show ip interface brief</code> to verify line protocol status.
-    `,
-    firewall: `
+  `,
+  firewall: `
 <strong style="color: #00f2fe; font-size: 13px;">🔒 Device: Firewall FW-1 (Cisco ASA 5506-X)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>Security Zones:</strong>
@@ -1240,8 +2161,8 @@ Use <code>show ip route</code> to inspect routing decisions, and <code>show ip i
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <span style="color: #10b981;">💡 CCNA Command Tip:</span>
 Use <code>show access-list</code> to check rule hit-counts, and <code>show conn</code> to audit stateful sessions.
-    `,
-    wan: `
+  `,
+  wan: `
 <strong style="color: #00f2fe; font-size: 13px;">☁️ WAN Cloud Server (Destination 8.8.8.8)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>Endpoint IP:</strong> 8.8.8.8 (Google DNS / Public Web Host)
@@ -1252,8 +2173,8 @@ Use <code>show access-list</code> to check rule hit-counts, and <code>show conn<
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <span style="color: #10b981;">💡 CCNA Command Tip:</span>
 Use <code>tracert 8.8.8.8</code> to map the TTL-expired ICMP hops traversing Internet Autonomous Systems.
-    `,
-    "pc-sales": `
+  `,
+  "pc-sales": `
 <strong style="color: #00f2fe; font-size: 13px;">💻 Device: Sales PC (VLAN 10 client)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>IP Address:</strong> 10.10.10.10
@@ -1264,8 +2185,8 @@ Use <code>tracert 8.8.8.8</code> to map the TTL-expired ICMP hops traversing Int
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <span style="color: #10b981;">💡 CCNA Command Tip:</span>
 On Windows clients, use <code>route print</code> to verify default gateway settings, and <code>ipconfig /renew</code> to acquire fresh DHCP bindings.
-    `,
-    "ip-phone": `
+  `,
+  "ip-phone": `
 <strong style="color: #00f2fe; font-size: 13px;">📞 Device: Voice IP Phone (VLAN 20 voice client)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>IP Address:</strong> 10.10.20.10
@@ -1275,9 +2196,9 @@ On Windows clients, use <code>route print</code> to verify default gateway setti
 <strong>Active Port:</strong> SW-Branch port Fa0/2 (VLAN 20 - Voice VLAN)
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <span style="color: #10b981;">💡 CCNA Command Tip:</span>
-Use <code>show interface <id> switchport</code> on the switch to verify that a port has both a data VLAN and a voice VLAN tag assigned.
-    `,
-    "sw-branch": `
+Use <code>show interface &lt;id&gt; switchport</code> on the switch to verify that a port has both a data VLAN and a voice VLAN tag assigned.
+  `,
+  "sw-branch": `
 <strong style="color: #00f2fe; font-size: 13px;">🎛️ Device: Branch Switch SW-Branch (Catalyst 2960)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>Interface Configurations:</strong>
@@ -1290,9 +2211,9 @@ Use <code>show interface <id> switchport</code> on the switch to verify that a p
   - VLAN 20: Voice (10.10.20.0/24)
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <span style="color: #10b981;">💡 CCNA Command Tip:</span>
-Use <code>switchport trunk allowed vlan add <vlan></code> to specify active broadcast boundaries over trunks, protecting switch backplane performance.
-    `,
-    "r-branch": `
+Use <code>switchport trunk allowed vlan add &lt;vlan&gt;</code> to specify active broadcast boundaries over trunks, protecting switch backplane performance.
+  `,
+  "r-branch": `
 <strong style="color: #00f2fe; font-size: 13px;">🌐 Device: Branch Router R-Branch (ISR 4321)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>Router-on-a-Stick Subinterfaces:</strong>
@@ -1307,8 +2228,8 @@ Use <code>switchport trunk allowed vlan add <vlan></code> to specify active broa
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <span style="color: #10b981;">💡 CCNA Command Tip:</span>
 Use <code>show interface port-channel 1</code> to audit bundle status, and <code>show crypto ipsec sa</code> to check active security tunnels.
-    `,
-    "hq-core": `
+  `,
+  "hq-core": `
 <strong style="color: #00f2fe; font-size: 13px;">🎛️ Device: HQ Core L3 Switch (Catalyst 3850)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>EtherChannel Config:</strong>
@@ -1322,8 +2243,8 @@ Use <code>show interface port-channel 1</code> to audit bundle status, and <code
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <span style="color: #10b981;">💡 CCNA Command Tip:</span>
 Use <code>show etherchannel summary</code> to audit LACP member ports. State code (P) means bundled, (D) means down/suspended.
-    `,
-    "fw-branch": `
+  `,
+  "fw-branch": `
 <strong style="color: #00f2fe; font-size: 13px;">🔒 Device: HQ Firewall FW-Branch (ASA 5515)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>IPSec VPN Tunnel Configuration:</strong>
@@ -1337,8 +2258,8 @@ Use <code>show etherchannel summary</code> to audit LACP member ports. State cod
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <span style="color: #10b981;">💡 CCNA Command Tip:</span>
 Use <code>show crypto isakmp sa</code> to inspect Phase 1 negotiation state (should read MM_ACTIVE).
-    `,
-    "hq-server": `
+  `,
+  "hq-server": `
 <strong style="color: #00f2fe; font-size: 13px;">🖥️ Device: HQ Server (Private Datacenter Host)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>IP Address:</strong> 172.16.100.5
@@ -1349,24 +2270,170 @@ Use <code>show crypto isakmp sa</code> to inspect Phase 1 negotiation state (sho
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <span style="color: #10b981;">💡 CCNA Command Tip:</span>
 Server hosting requires static routing or local gateway configuration. Audit with <code>netstat -ano</code> to view active listening ports.
-    `
-  };
+  `
+};
+
+function renderCLI(nodeName) {
+  const container = byId("nodeConfigContent");
+  if (!container) return;
+
+  const isTrouble = byId("chkTroubleshooting")?.checked;
+  const currentPacketType = byId("simPacketType")?.value;
+  const bug = bugsData[currentPacketType];
+
+  if (isTrouble && bug && bug.node === nodeName && !state.simBugsFixed[currentPacketType]) {
+    let optionsHtml = bug.options.map((opt, idx) => `
+      <option value="${idx}">${opt.label}</option>
+    `).join("");
+
+    container.innerHTML = `
+      <div style="background:#090d16; border:1px solid #ff5e3a; padding:12px; border-radius:8px;">
+        <div style="color:#ff5e3a; font-weight:bold; margin-bottom:6px; font-size:13px; text-transform:uppercase;">⚠ TROUBLESHOOTING INJECTOR - ${nodeName.toUpperCase()}</div>
+        <p style="margin:0 0 10px 0; color:#cbd5e1; font-size:12.5px;">${bug.desc}</p>
+        <div style="background:#000; padding:8px; border-radius:4px; font-family:var(--font-mono); color:#f87171; font-size:11px; margin-bottom:12px; white-space:pre-wrap;">% Error Log: ${bug.errorLog}</div>
+        
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <label style="font-size:11px; color:#94a3b8; font-weight:bold;">Select correct Cisco configuration to apply:</label>
+          <select id="cliTroubleFixSelect" style="width:100%; font-family:var(--font-mono); font-size:11px; background:#111827; border:1px solid #374151; color:#fff; padding:6px; border-radius:6px;">
+            ${optionsHtml}
+          </select>
+          <button id="btnApplyTroubleFix" class="primary" style="align-self:flex-start; margin-top:4px; padding:6px 14px; font-size:11.5px; border-radius:6px;">Apply Configuration</button>
+        </div>
+        <div id="cliTroubleResult" style="margin-top:12px; font-family:var(--font-mono); font-size:11px; white-space:pre-wrap; display:none;"></div>
+      </div>
+    `;
+
+    const btnApply = byId("btnApplyTroubleFix");
+    if (btnApply) {
+      btnApply.addEventListener("click", () => {
+        const select = byId("cliTroubleFixSelect");
+        const selectedIdx = select.value;
+        const option = bug.options[selectedIdx];
+        const resultDiv = byId("cliTroubleResult");
+
+        if (option.correct) {
+          playNetSound("success");
+          state.simBugsFixed[currentPacketType] = true;
+          
+          if (resultDiv) {
+            resultDiv.style.display = "block";
+            resultDiv.style.color = "#10b981";
+            resultDiv.innerHTML = `
+${nodeName.toUpperCase()}# configure terminal
+Enter configuration commands, one per line. End with CNTL/Z.
+${nodeName.toUpperCase()}(config)# ${option.cmd.trim().replace(/\n/g, '\n' + nodeName.toUpperCase() + '(config)# ')}
+${nodeName.toUpperCase()}(config)# end
+${nodeName.toUpperCase()}# write memory
+% Building configuration...
+% [OK] Configuration applied successfully. Status: synchronized.
+✔ Bug resolved! +30 XP rewarded.
+            `;
+          }
+          
+          gainXP(30);
+          
+          // Re-render standard CLI after 2.5 seconds
+          setTimeout(() => {
+            renderCLI(nodeName);
+          }, 2500);
+        } else {
+          playNetSound("block");
+          if (resultDiv) {
+            resultDiv.style.display = "block";
+            resultDiv.style.color = "#ff5e3a";
+            resultDiv.innerHTML = `
+${nodeName.toUpperCase()}# configure terminal
+${nodeName.toUpperCase()}(config)# ${option.cmd.trim().replace(/\n/g, '\n' + nodeName.toUpperCase() + '(config)# ')}
+% Invalid command configuration. Rejected by Cisco IOS CLI syntax analyzer.
+            `;
+          }
+        }
+      });
+    }
+  } else {
+    const cmdList = cliOutputs[nodeName];
+    if (!cmdList) {
+      container.innerHTML = `
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); padding:12px; border-radius:8px;">
+            ${deviceConfigs[nodeName] || 'No configuration data available.'}
+          </div>
+          <div style="background:#090d16; border:1px solid rgba(255,255,255,0.08); padding:12px; border-radius:8px; display:flex; justify-content:center; align-items:center; color:var(--text-muted); font-style:italic; font-size:11.5px;">
+            CLI terminal access disabled / not supported on WAN endpoints.
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    const commandOptions = Object.keys(cmdList).map(cmd => `
+      <option value="${cmd}">${cmd}</option>
+    `).join("");
+
+    container.innerHTML = `
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
+        <!-- Left: Static Config Info -->
+        <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); padding:12px; border-radius:8px; font-size:11.5px; line-height:1.5; color:#94a3b8;">
+          ${deviceConfigs[nodeName] || 'No configuration data available.'}
+        </div>
+        
+        <!-- Right: Interactive CLI Console -->
+        <div style="background:#090d16; border:1px solid rgba(255,255,255,0.08); padding:12px; border-radius:8px; display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="color:#00f2fe; font-size:12px;">Cisco IOS CLI - ${nodeName.toUpperCase()}</strong>
+            <span style="font-family:var(--font-mono); font-size:10.5px; color:#10b981;">STATUS: Online</span>
+          </div>
+          
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span style="font-family:var(--font-mono); font-size:11px; color:#cbd5e1;">${nodeName.toUpperCase()}#</span>
+            <select id="cliCommandSelect" style="flex:1; font-family:var(--font-mono); font-size:11px; background:#111827; border:1px solid #374151; color:#fff; padding:6px; border-radius:6px;">
+              <option value="">-- Run show command --</option>
+              ${commandOptions}
+            </select>
+          </div>
+
+          <div id="cliOutputTerminal" style="background:#000; border:1px solid rgba(255,255,255,0.05); padding:10px; border-radius:6px; font-family:var(--font-mono); color:#a7f3d0; font-size:11px; height:120px; overflow-y:auto; white-space:pre-wrap;">${nodeName.toUpperCase()}# </div>
+        </div>
+      </div>
+    `;
+
+    const select = byId("cliCommandSelect");
+    const terminal = byId("cliOutputTerminal");
+    if (select && terminal) {
+      select.addEventListener("change", () => {
+        const cmd = select.value;
+        if (!cmd) {
+          terminal.innerHTML = `${nodeName.toUpperCase()}# `;
+          return;
+        }
+        playNetSound("click");
+        const output = cmdList[cmd];
+        terminal.innerHTML = `${nodeName.toUpperCase()}# ${cmd}\n${output}`;
+        terminal.scrollTop = terminal.scrollHeight;
+      });
+    }
+  }
+}
+
+function setupNodeConfigInspector() {
+  const nodes = document.querySelectorAll(".topo-node");
+  if (!nodes) return;
 
   nodes.forEach(node => {
     node.addEventListener("click", () => {
       playNetSound("click");
       const nodeName = node.getAttribute("data-node");
-      if (configs[nodeName]) {
-        configContent.innerHTML = configs[nodeName];
-        
-        document.querySelectorAll(".topo-node").forEach(el => {
-          el.classList.remove("inspected");
-        });
-        node.classList.add("inspected");
-        setTimeout(() => {
-          node.classList.remove("inspected");
-        }, 1500);
-      }
+      state.inspectedNode = nodeName;
+      
+      document.querySelectorAll(".topo-node").forEach(el => {
+        el.classList.remove("inspected");
+      });
+      node.classList.add("inspected");
+      setTimeout(() => {
+        node.classList.remove("inspected");
+      }, 1500);
+
+      renderCLI(nodeName);
     });
   });
 }
@@ -1490,6 +2557,10 @@ function setupTraversalSimulator() {
 
     // Reset member links in case of LACP simulation rerun
     resetTopology2Links();
+
+    const isTrouble = byId("chkTroubleshooting")?.checked;
+    const bug = bugsData[type];
+    const isBugActive = isTrouble && bug && !state.simBugsFixed[type];
 
     let path = [];
     if (type === "dhcp") {
@@ -1948,6 +3019,14 @@ function setupTraversalSimulator() {
 
     for (let i = 0; i < path.length; i++) {
       const step = path[i];
+      
+      const isBlockedHop = isBugActive && (i === bug.failureHopIndex);
+      if (isBlockedHop) {
+        step.isBlocked = true;
+        step.headers = `L3: ERROR | ${bug.errorLog}`;
+        step.desc = `<strong>[DROPPED]</strong> Packet dropped at ${step.name}. Reason: ${bug.desc}`;
+      }
+
       currentOsiData = step.osi || null;
       
       updateOsiLabels(step.osi);
@@ -2083,6 +3162,7 @@ function setupCanvasConstellation() {
   
   let particles = [];
   const count = 45;
+  let mouse = { x: null, y: null, radius: 120 };
 
   const resize = () => {
     canvas.width = window.innerWidth;
@@ -2090,6 +3170,16 @@ function setupCanvasConstellation() {
   };
   window.addEventListener("resize", resize);
   resize();
+
+  window.addEventListener("mousemove", (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  window.addEventListener("mouseout", () => {
+    mouse.x = null;
+    mouse.y = null;
+  });
 
   class Particle {
     constructor() {
@@ -2100,16 +3190,103 @@ function setupCanvasConstellation() {
       this.radius = Math.random() * 2 + 1;
     }
     update() {
+      if (mouse.x !== null && mouse.y !== null) {
+        const dx = this.x - mouse.x;
+        const dy = this.y - mouse.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < mouse.radius) {
+          const force = (mouse.radius - dist) / mouse.radius;
+          const angle = Math.atan2(dy, dx);
+          this.vx += Math.cos(angle) * force * 0.2;
+          this.vy += Math.sin(angle) * force * 0.2;
+        }
+      }
+
+      this.vx *= 0.95;
+      this.vy *= 0.95;
+
+      this.vx += (Math.random() - 0.5) * 0.05;
+      this.vy += (Math.random() - 0.5) * 0.05;
+
+      const speed = Math.hypot(this.vx, this.vy);
+      if (speed > 1.5) {
+        this.vx = (this.vx / speed) * 1.5;
+        this.vy = (this.vy / speed) * 1.5;
+      }
+
       this.x += this.vx;
       this.y += this.vy;
+
       if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
       if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
     }
     draw() {
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(0, 242, 254, 0.4)";
+      ctx.fillStyle = "rgba(0, 242, 254, 0.45)";
       ctx.fill();
+    }
+  }
+
+  class NetworkPacket {
+    constructor(p1, p2) {
+      this.p1 = p1;
+      this.p2 = p2;
+      this.progress = Math.random();
+      this.speed = Math.random() * 0.005 + 0.002;
+    }
+    update() {
+      this.progress += this.speed;
+      if (this.progress >= 1) {
+        this.progress = 0;
+        this.p1 = pick(particles);
+        this.p2 = pick(particles);
+      }
+    }
+    draw() {
+      const x = this.p1.x + (this.p2.x - this.p1.x) * this.progress;
+      const y = this.p1.y + (this.p2.y - this.p1.y) * this.progress;
+      ctx.beginPath();
+      ctx.arc(x, y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = "#10b981";
+      ctx.shadowColor = "#10b981";
+      ctx.shadowBlur = 4;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  class BinaryColumn {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * -canvas.height;
+      this.vy = Math.random() * 1.5 + 0.8;
+      this.chars = [];
+      this.length = Math.floor(Math.random() * 8) + 4;
+      for (let i = 0; i < this.length; i++) {
+        this.chars.push(Math.random() < 0.5 ? "0" : "1");
+      }
+    }
+    update() {
+      this.y += this.vy;
+      if (this.y > canvas.height) {
+        this.y = -100;
+        this.x = Math.random() * canvas.width;
+        this.vy = Math.random() * 1.5 + 0.8;
+      }
+      if (Math.random() < 0.05) {
+        this.chars[Math.floor(Math.random() * this.chars.length)] = Math.random() < 0.5 ? "0" : "1";
+      }
+    }
+    draw() {
+      ctx.font = "9px monospace";
+      for (let i = 0; i < this.chars.length; i++) {
+        const charY = this.y + i * 12;
+        if (charY < 0 || charY > canvas.height) continue;
+        const opacity = (i / this.chars.length) * 0.12;
+        ctx.fillStyle = `rgba(16, 185, 129, ${opacity})`;
+        ctx.fillText(this.chars[i], this.x, charY);
+      }
     }
   }
 
@@ -2117,8 +3294,44 @@ function setupCanvasConstellation() {
     particles.push(new Particle());
   }
 
+  let floatPackets = [];
+  for (let i = 0; i < 15; i++) {
+    floatPackets.push(new NetworkPacket(pick(particles), pick(particles)));
+  }
+
+  let binaryColumns = [];
+  for (let i = 0; i < 20; i++) {
+    binaryColumns.push(new BinaryColumn());
+  }
+
   const animate = () => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => p.draw());
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dist = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
+          if (dist < 100) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(0, 242, 254, 0.05)`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      setTimeout(() => requestAnimationFrame(animate), 500);
+      return;
+    }
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    binaryColumns.forEach(col => {
+      col.update();
+      col.draw();
+    });
+
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
       p.update();
@@ -2137,6 +3350,12 @@ function setupCanvasConstellation() {
         }
       }
     }
+
+    floatPackets.forEach(pkt => {
+      pkt.update();
+      pkt.draw();
+    });
+
     requestAnimationFrame(animate);
   };
   animate();
@@ -2174,6 +3393,22 @@ function setupSupportDesk() {
   });
 }
 
+function updateMuteButton() {
+  const btn = byId("btnMuteToggle");
+  if (btn) {
+    btn.textContent = state.muted ? "🔇" : "🔊";
+    btn.setAttribute("title", state.muted ? "Unmute Sound" : "Mute Sound");
+  }
+}
+
+function updateContrastButton() {
+  document.body.classList.toggle("high-contrast", state.highContrast);
+  const btn = byId("btnToggleContrast");
+  if (btn) {
+    btn.setAttribute("title", state.highContrast ? "Disable High Contrast" : "Enable High Contrast");
+  }
+}
+
 function init() {
   state.bank = generateBank(rand);
   navSetup();
@@ -2185,6 +3420,17 @@ function init() {
   setupCanvasConstellation();
   setupTraversalSimulator();
   setupSupportDesk();
+  
+  // Custom load sequence
+  updateMuteButton();
+  updateContrastButton();
+  renderSubnetLeaderboard();
+  ensureSubnetQuestion(true);
+  
+  if (typeof loadLab === "function") {
+    loadLab(1);
+  }
+  
   setPage("home");
 }
 

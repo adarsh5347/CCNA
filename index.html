@@ -26,10 +26,15 @@
       </div>
     </div>
     <nav>
+    <nav>
       <button data-page="home" class="ghost" aria-label="Home Navigation">🏠 <span>Home</span></button>
-      <button data-page="subnet" class="ghost" aria-label="Subnetting Practice">⚡ <span>Subnetting</span></button>
+      <button data-page="subnet" class="ghost" aria-label="Subnetting Academy">⚡ <span>Subnetting</span></button>
+      <button data-page="labs" class="ghost" aria-label="CCNA Lab Center">🧪 <span>Lab Center</span></button>
       <button data-page="analytics" class="ghost" aria-label="Readiness Analytics">📊 <span>Analytics</span></button>
       <button data-page="support" class="ghost" aria-label="Support Helpdesk">🛠️ <span>Support</span></button>
+      <button id="btnMuteToggle" class="ghost" aria-label="Toggle Sound" style="padding: 8px;">🔊</button>
+      <button id="btnToggleContrast" class="ghost" aria-label="Toggle High Contrast" style="padding: 8px;">🌓</button>
+      <span id="headerXPBadge" class="timer" style="background: rgba(0, 242, 254, 0.08); border-color: rgba(0, 242, 254, 0.3); color: #00f2fe; font-size: 12px; padding: 4px 10px;">Lvl 1 (0 XP)</span>
       <span id="timer" class="timer hidden" aria-live="polite">120:00</span>
       <div id="authContainer" class="auth-container">
         <button id="btnSignIn" class="secondary">🔑 Sign In</button>
@@ -45,12 +50,47 @@
   <main class="container">
     <!-- HOME PAGE -->
     <section id="home" class="page active">
+      <!-- Premium Hero Dashboard Stats -->
+      <article class="card hero-dashboard" style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 1.5px; background: linear-gradient(to right, #00f2fe, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px;">NOC NETWORK OPERATIONS COMMAND</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 0;">Master the Cisco CCNA 200-301. Spaced repetition, Packet Tracer simulation, and realistic Pearson VUE drills.</p>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button id="btnLaunchStudy" class="primary" style="padding: 8px 16px; font-size: 13px;">⚡ Start Studying</button>
+            <button id="btnLaunchExam" class="secondary" style="padding: 8px 16px; font-size: 13px;">🏆 Take Exam</button>
+            <button id="btnLaunchLabs" class="secondary" style="padding: 8px 16px; font-size: 13px;">🧪 Virtual Labs</button>
+          </div>
+        </div>
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;" />
+        <div class="grid stats" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+          <div class="stat" style="position: relative; overflow: hidden;">
+            <div class="k">Readiness Score</div>
+            <div class="v" id="heroReadiness">0%</div>
+            <div class="progress" style="height: 4px; margin-top: 8px;"><div id="heroReadinessBar" style="width: 0%;"></div></div>
+          </div>
+          <div class="stat">
+            <div class="k">Questions Solved</div>
+            <div class="v" id="heroQuestions">0</div>
+          </div>
+          <div class="stat">
+            <div class="k">Active Streak</div>
+            <div class="v" id="heroStreak">0 Days</div>
+          </div>
+          <div class="stat">
+            <div class="k">Labs Completed</div>
+            <div class="v" id="heroLabs">0 / 10</div>
+          </div>
+        </div>
+      </article>
+
       <!-- NOC Packet Traversal Simulator -->
       <section class="card">
         <h3>🕸️ NOC Packet Traversal Simulator</h3>
         <p>Choose a packet type, click "Run Simulation", and watch how data traverses network nodes and gets encapsulated/decapsulated at each hop.</p>
         
-        <div class="row row-compact" style="margin-bottom: 16px; display: flex; gap: 16px; flex-wrap: wrap;">
+        <div class="row row-compact" style="margin-bottom: 16px; display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 200px;">
             <label for="simPacketType" style="margin-bottom: 4px; display: block; font-size: 12px; font-weight: 600;">Select Packet Type</label>
             <select id="simPacketType" style="width: 100%;">
@@ -63,7 +103,7 @@
               <option value="acl">Firewall ACL Block (Telnet Access Denied)</option>
             </select>
           </div>
-          <div style="width: 150px;">
+          <div style="width: 130px;">
             <label for="simSpeed" style="margin-bottom: 4px; display: block; font-size: 12px; font-weight: 600;">Simulation Speed</label>
             <select id="simSpeed" style="width: 100%;">
               <option value="2200">Normal (2.2s)</option>
@@ -71,9 +111,14 @@
               <option value="3500">Slow (3.5s)</option>
             </select>
           </div>
-          <div style="display: flex; align-items: flex-end; gap: 8px; margin-top: auto; height: 38px;">
-            <button id="btnStartSim" class="primary">▶ Run Simulation</button>
-            <button id="btnResetSim" class="secondary">🛑 Reset</button>
+          <div style="display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 10px; background: rgba(245, 158, 11, 0.04); height: 42px;">
+            <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 0; cursor: pointer; font-size: 11.5px; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.5px;">
+              <input type="checkbox" id="chkTroubleshooting" style="margin: 0; width: 15px; height: 15px; accent-color: #f59e0b;" /> Inject Configuration Bug
+            </label>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button id="btnStartSim" class="primary" style="height: 42px;">▶ Run Simulation</button>
+            <button id="btnResetSim" class="secondary" style="height: 42px;">🛑 Reset</button>
           </div>
         </div>
 
@@ -462,34 +507,119 @@
       </section>
     </section>
 
-    <!-- SUBNETTING DRILLS PAGE -->
+    <!-- SUBNETTING ARCADE ACADEMY -->
     <section id="subnet" class="page">
       <article class="hero">
-        <h2>Subnetting Trainer</h2>
-        <p>CIDR, VLSM, wildcard masks, host counts, and timed challenge practice.</p>
+        <h2>Subnetting Arcade Academy</h2>
+        <p>CIDR, VLSM, wildcard masks, host counts, and timed challenge practice with streak multipliers and dynamic score rewards.</p>
       </article>
-      <article class="card">
-        <h3>Subnetting Practice</h3>
-        <div class="row">
-          <label>Mode
-            <select id="subnetMode">
-              <option>Easy</option>
-              <option>Medium</option>
-              <option>Hard</option>
-              <option>Timed Challenge</option>
-            </select>
-          </label>
-          <label>Your Answer
-            <input id="subnetAnswer" type="text" placeholder="Enter answer" />
-          </label>
+
+      <div class="grid labs" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+        <article class="card" style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 4px;">
+            <h3 style="margin-bottom: 0;">Subnetting Trainer</h3>
+            <div id="subnetXPDisplay" style="font-family: var(--font-mono); font-size: 13px; color: #00f2fe; font-weight: 600;">XP: 0</div>
+          </div>
+          
+          <div class="subnet-mode-tabs" style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button id="btnSubnetEasy" class="primary" style="padding: 6px 12px; font-size: 11px;">Easy (/24 - /26)</button>
+            <button id="btnSubnetMedium" class="secondary" style="padding: 6px 12px; font-size: 11px;">Medium (/20 - /28)</button>
+            <button id="btnSubnetHard" class="secondary" style="padding: 6px 12px; font-size: 11px;">Hard (/16 - /30)</button>
+            <button id="btnSubnetTimed" class="secondary" style="padding: 6px 12px; font-size: 11px;">⏱️ Timed</button>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+            <div id="subnetStreakDisplay" style="font-family: var(--font-mono); font-size: 12px; color: #f59e0b; font-weight: bold;">Multiplier: x1</div>
+            <div id="subnetTimerDisplay" style="font-family: var(--font-mono); font-size: 12px; color: #ff5e3a; font-weight: bold; display: none;">Time Left: 30s</div>
+          </div>
+
+          <div class="row" style="margin: 6px 0;">
+            <label style="width: 100%;">Your Answer
+              <input id="subnetAnswer" type="text" placeholder="Enter answer..." style="margin-top: 6px; width: 100%;" />
+            </label>
+          </div>
+
+          <div id="subnetPrompt" class="output terminal-box" style="min-height: 50px; padding: 10px 14px;"></div>
+          
+          <div class="inline" style="margin-top: 4px;">
+            <button id="subnetSubmit" class="primary">Submit Answer</button>
+            <button id="subnetSkip" class="ghost">Skip</button>
+          </div>
+
+          <div id="subnetOut" class="output terminal-box" style="min-height: 70px; padding: 10px 14px;"></div>
+        </article>
+
+        <!-- Subnet Visual Range and Local Leaderboard -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          <article class="card" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+            <h3 style="font-size: 16px;">Visual Range Diagram</h3>
+            <div id="subnetRangeDiagram" style="flex: 1; border: 1px solid var(--border-color); border-radius: 12px; background: rgba(0,0,0,0.25); padding: 12px; font-family: var(--font-mono); font-size: 11.5px; color: var(--text-muted); line-height: 1.6; min-height: 120px; display: flex; justify-content: center; align-items: center; text-align: center;">
+              <span style="font-style: italic;">Submit an answer to visualize host ranges, network ID, and broadcast boundaries.</span>
+            </div>
+          </article>
+
+          <article class="card" style="display: flex; flex-direction: column; gap: 8px;">
+            <h3 style="font-size: 16px;">Arcade Leaderboard</h3>
+            <div id="subnetLeaderboard" style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto;">
+              <span style="font-style: italic;">No high scores registered yet. Complete a Timed Challenge!</span>
+            </div>
+          </article>
         </div>
-        <div id="subnetPrompt" class="output terminal-box"></div>
-        <div class="inline">
-          <button id="subnetSubmit" class="primary">Submit Answer</button>
-          <button id="subnetSkip" class="ghost">Skip</button>
-        </div>
-        <div id="subnetOut" class="output terminal-box"></div>
+      </div>
+    </section>
+
+    <!-- CCNA LAB CENTER -->
+    <section id="labs" class="page">
+      <article class="hero">
+        <h2>Cisco Virtual Lab Center</h2>
+        <p>Gain hands-on configuration experience with VLANs, OSPF, ACLs, STP, and VPNs. Configure parameters, audit status, and solve troubleshooting challenges.</p>
       </article>
+
+      <div class="lab-shell" style="display: grid; grid-template-columns: 320px 1fr; gap: 20px; min-height: 60vh;">
+        <!-- Left Panel: Lab Selector and Objectives -->
+        <aside class="card" style="display: flex; flex-direction: column; gap: 16px; padding: 16px;">
+          <div>
+            <label for="labSelector" style="font-size: 11px; font-weight: 700; margin-bottom: 6px;">Select Lab Module</label>
+            <select id="labSelector" style="width: 100%; margin-top: 0;"></select>
+          </div>
+          
+          <div class="lab-mode-group" style="display: flex; gap: 4px; border: 1px solid var(--border-color); border-radius: 8px; padding: 2px; background: rgba(0,0,0,0.25); height: 36px; align-items: center;">
+            <button id="btnModeStep" class="primary" style="flex: 1; padding: 4px; font-size: 11px; border: none !important; border-radius: 6px !important; height: 100%;">Step-by-Step</button>
+            <button id="btnModeChallenge" class="ghost" style="flex: 1; padding: 4px; font-size: 11px; border: none !important; border-radius: 6px !important; height: 100%;">Challenge</button>
+            <button id="btnModeExam" class="ghost" style="flex: 1; padding: 4px; font-size: 11px; border: none !important; border-radius: 6px !important; height: 100%;">Exam</button>
+          </div>
+
+          <div style="border-top: 1px solid var(--border-color); padding-top: 12px; flex: 1; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;">
+            <h4 style="font-size: 13px; color: #00f2fe; text-transform: uppercase;">Objectives Checklist</h4>
+            <div id="labObjectivesList" style="font-size: 12.5px; line-height: 1.5; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+        </aside>
+
+        <!-- Right Panel: Topology and CLI Console -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="card" style="padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 12px; margin-bottom: 0;">
+            <h4 id="labTitle" style="font-size: 16px; color: #fff;">Lab Module</h4>
+            <p id="labScenario" style="font-size: 13px; color: var(--text-muted); margin-bottom: 0;"></p>
+            
+            <!-- Simulated Lab Topology -->
+            <div id="labTopologyContainer" style="border: 1px solid var(--border-color); border-radius: 12px; background: rgba(6,9,19,0.5); padding: 12px; height: 200px; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;"></div>
+          </div>
+
+          <!-- CLI Console / Challenge Interface -->
+          <div class="card terminal-box" style="padding: 16px; min-height: 260px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 0;">
+            <h4 id="labConsoleHeader" style="font-size: 13px; color: #10b981; border-bottom: 1px solid rgba(16,185,129,0.15); padding-bottom: 6px; text-transform: uppercase; margin-bottom: 4px;">💻 Cisco IOS Command Console</h4>
+            <div id="labCliOutput" style="font-family: var(--font-mono); font-size: 12.5px; color: #34d399; line-height: 1.45; overflow-y: auto; flex: 1; max-height: 160px; white-space: pre-wrap;"></div>
+            
+            <!-- Interactive inputs based on mode -->
+            <div id="labConsoleInputArea" style="display: flex; align-items: center; gap: 8px; border-top: 1px solid rgba(16,185,129,0.15); padding-top: 10px;">
+              <span id="labCliPrompt" style="font-family: var(--font-mono); font-size: 13px; color: #10b981;">Switch(config)#</span>
+              <div id="labInteractiveInputs" style="flex: 1; display: flex; gap: 8px; flex-wrap: wrap;"></div>
+            </div>
+            
+            <div id="labFeedbackBox" style="font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 6px; display: none;"></div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- READINESS DASHBOARD PAGE -->
@@ -561,48 +691,48 @@
 
     <!-- EXAM ENGINE PAGE -->
     <section id="engine" class="page">
-      <div class="exam-shell">
-        <div id="sidebarBackdrop" class="drawer-backdrop"></div>
-        <aside class="left">
-          <div class="drawer-header">
-            <h3>Exam Control</h3>
-            <button id="closeSidebar" class="ghost">✕</button>
+      <div class="exam-shell" style="grid-template-columns: 1fr; border-top: 5px solid #0284c7;">
+        <header class="exam-header" style="background: #1e293b; padding: 12px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; border-radius: 0;">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <button id="btnToggleSidebar" class="ghost" aria-label="Toggle Navigator" style="padding: 8px; border: 1px solid var(--border-color);">☰ <span>Navigator</span></button>
+            <h3 id="modeTitle" style="font-family: var(--font-mono); font-size: 14px; margin-bottom: 0; color: #38bdf8;">Pearson VUE Exam Simulator</h3>
           </div>
-          <article class="card card-sidebar">
-            <h4 id="modeTitle"></h4>
-            <p id="modeDesc"></p>
-            <div class="inline mt-12">
-              <button id="openReview" class="ghost">📋 Review</button>
-              <button id="toggleMark" class="ghost">🚩 Mark</button>
-              <button id="exitSession" class="ghost">🚪 Exit</button>
-            </div>
-          </article>
-          <article class="card card-navigator">
-            <h4>Navigator</h4>
-            <p id="navMeta"></p>
-            <div id="qNav" class="qnav"></div>
-          </article>
-        </aside>
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <span id="timer" class="timer" style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: #10b981;">120:00</span>
+            <button id="btnToggleFullScreen" class="ghost" aria-label="Toggle Full Screen" style="padding: 6px 12px; border: 1px solid var(--border-color); font-size: 11px;">Fullscreen</button>
+          </div>
+        </header>
 
-        <section class="right">
-          <header class="exam-header">
-            <button id="toggleSidebar" class="ghost">☰ <span>Navigator</span></button>
-            <strong id="qCounter"></strong>
-            <div class="progress"><div id="progressFill"></div></div>
-            <span id="progressPct"></span>
-          </header>
-          <article id="questionArea" class="scroll"></article>
-          <article id="reviewArea" class="scroll hidden"></article>
-          <article id="resultArea" class="scroll hidden"></article>
-          <footer class="exam-footer">
-            <button id="prevQ" class="ghost">⬅️ <span>Previous</span></button>
-            <div class="inline mt-0">
-              <button id="saveNext" class="secondary"><span>Save & Next</span> ➡️</button>
-              <button id="submitSession" class="primary">Submit <span>Exam</span></button>
+        <div style="display: flex; min-height: 70vh; position: relative;">
+          <!-- Left Navigator Drawer Panel -->
+          <aside id="examNavigator" class="left" style="position: absolute; left: -320px; top: 0; bottom: 0; width: 300px; z-index: 50; transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); background: #0f172a; box-shadow: 10px 0 20px rgba(0,0,0,0.5); border-radius: 0;">
+            <div class="drawer-header" style="padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+              <h4 style="font-size: 13px; text-transform: uppercase; margin-bottom: 0; color: #94a3b8;">Question Navigator</h4>
+              <button id="btnCloseSidebar" class="ghost" style="padding: 4px 8px;">✕</button>
             </div>
-            <button id="nextQ" class="ghost"><span>Next</span> ➡️</button>
-          </footer>
-        </section>
+            <div style="padding: 16px; overflow-y: auto; flex: 1;">
+              <div id="qNav" class="qnav" style="grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px;"></div>
+              <div id="navMeta" style="font-size: 11.5px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 12px;"></div>
+            </div>
+          </aside>
+
+          <!-- Main Content Area -->
+          <div style="flex: 1; display: flex; flex-direction: column; background: #0b0f19;">
+            <div id="questionArea" class="scroll" style="flex: 1; padding: 24px; min-height: 480px;"></div>
+            <div id="reviewArea" class="scroll hidden" style="flex: 1; padding: 24px; min-height: 480px;"></div>
+            <div id="resultArea" class="scroll hidden" style="flex: 1; padding: 24px; min-height: 480px;"></div>
+
+            <footer class="exam-footer" style="padding: 12px 24px; background: #1e293b; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; border-radius: 0;">
+              <button id="prevQ" class="ghost" style="border: 1px solid var(--border-color);">⬅️ Previous</button>
+              <div style="display: flex; gap: 8px;">
+                <button id="toggleMark" class="ghost" style="border: 1px solid var(--border-color);">🚩 Mark For Review</button>
+                <button id="openReview" class="secondary" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);">📋 Review Screen</button>
+                <button id="saveNext" class="primary">Next ➡️</button>
+                <button id="submitSession" class="primary" style="background: var(--accent-orange); color: #060913; border: none; display: none;">Submit Exam</button>
+              </div>
+            </footer>
+          </div>
+        </div>
       </div>
     </section>
   </main>
