@@ -1,8 +1,8 @@
 :root {
   --bg-dark: #060913;
-  --bg-panel: #0d1324;
+  --bg-panel: rgba(13, 19, 36, 0.78);
   --bg-panel-solid: #0d1324;
-  --bg-card: #111827;
+  --bg-card: rgba(17, 24, 39, 0.68);
   --border-color: rgba(255, 255, 255, 0.08);
   --border-glow: rgba(0, 242, 254, 0.2);
   --text-main: #f8fafc;
@@ -436,7 +436,8 @@ textarea {
 }
 
 .left {
-  background: rgba(6, 9, 19, 0.7);
+  background: rgba(13, 19, 36, 0.75);
+  backdrop-filter: blur(16px);
   border-right: 1px solid var(--border-color);
   padding: 20px;
   display: flex;
@@ -852,7 +853,8 @@ textarea {
     width: 300px;
     height: 100vh;
     z-index: 1000;
-    background: var(--bg-panel-solid);
+    background: rgba(13, 19, 36, 0.82);
+    backdrop-filter: blur(16px);
     box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5);
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-right: 1px solid var(--border-color);

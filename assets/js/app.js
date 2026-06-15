@@ -1751,7 +1751,7 @@ function wireEvents() {
   if (chkTrouble) {
     chkTrouble.addEventListener("change", () => {
       playNetSound("click");
-      state.solvedBugs = {}; // reset solved states to allow fresh testing
+      state.simBugsFixed = {}; // reset solved states to allow fresh testing
       if (state.inspectedNode) {
         renderCLI(state.inspectedNode);
       }
