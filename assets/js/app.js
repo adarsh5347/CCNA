@@ -382,8 +382,10 @@ function startSession(mode) {
     submitted: false
   };
 
-  byId("modeTitle").textContent = conf.title;
-  byId("modeDesc").textContent = conf.desc;
+  const modeTitleEl = byId("modeTitle");
+  if (modeTitleEl) modeTitleEl.textContent = conf.title;
+  const modeDescEl = byId("modeDesc");
+  if (modeDescEl) modeDescEl.textContent = conf.desc;
 
   const timer = byId("timer");
   timer.classList.remove("hidden", "warn", "danger");
@@ -437,12 +439,16 @@ function renderNavigator() {
     return `<button class="${cls}" data-qnav="${i}">${i + 1}</button>`;
   }).join("");
 
-  byId("qCounter").textContent = `Q ${s.idx + 1} / ${s.questions.length}`;
+  const qCounterEl = byId("qCounter");
+  if (qCounterEl) qCounterEl.textContent = `Q ${s.idx + 1} / ${s.questions.length}`;
   const answeredCount = Object.keys(s.answers).length;
   const pct = Math.round((answeredCount / s.questions.length) * 100);
-  byId("progressFill").style.width = `${pct}%`;
-  byId("progressPct").textContent = `${pct}%`;
-  byId("navMeta").textContent = `Answered: ${answeredCount} | Flagged: ${Object.values(s.flagged).filter(Boolean).length}`;
+  const fillEl = byId("progressFill");
+  if (fillEl) fillEl.style.width = `${pct}%`;
+  const pctEl = byId("progressPct");
+  if (pctEl) pctEl.textContent = `${pct}%`;
+  const navMetaEl = byId("navMeta");
+  if (navMetaEl) navMetaEl.textContent = `Answered: ${answeredCount} | Flagged: ${Object.values(s.flagged).filter(Boolean).length}`;
 
   byId("qNav").querySelectorAll("[data-qnav]").forEach((b) => {
     b.addEventListener("click", () => navToQuestion(Number(b.dataset.qnav)));
@@ -1794,17 +1800,48 @@ function wireEvents() {
     });
   }
 
-  byId("openReview").addEventListener("click", openReview);
-  byId("toggleMark").addEventListener("click", markCurrent);
-  byId("exitSession").addEventListener("click", () => {
-    if (state.session?.timer) clearInterval(state.session.timer);
-    byId("timer").classList.add("hidden");
-    setPage("home");
-  });
-  byId("prevQ").addEventListener("click", prevQuestion);
-  byId("nextQ").addEventListener("click", nextQuestion);
-  byId("saveNext").addEventListener("click", saveAndNext);
-  byId("submitSession").addEventListener("click", () => submitSession(false));
+  const openReviewBtn = byId("openReview");
+  if (openReviewBtn) openReviewBtn.addEventListener("click", openReview);
+
+  const toggleMarkBtn = byId("toggleMark");
+  if (toggleMarkBtn) toggleMarkBtn.addEventListener("click", markCurrent);
+
+  const exitBtn = byId("exitSession");
+  if (exitBtn) {
+    exitBtn.addEventListener("click", () => {
+      if (state.session?.timer) clearInterval(state.session.timer);
+      const timerEl = byId("timer");
+      if (timerEl) timerEl.classList.add("hidden");
+      setPage("home");
+    });
+  }
+
+  const prevQBtn = byId("prevQ");
+  if (prevQBtn) prevQBtn.addEventListener("click", prevQuestion);
+
+  const nextQBtn = byId("nextQ");
+  if (nextQBtn) nextQBtn.addEventListener("click", nextQuestion);
+
+  const saveNextBtn = byId("saveNext");
+  if (saveNextBtn) saveNextBtn.addEventListener("click", saveAndNext);
+
+  const submitSessionBtn = byId("submitSession");
+  if (submitSessionBtn) submitSessionBtn.addEventListener("click", () => submitSession(false));
+
+  const btnFullScreen = byId("btnToggleFullScreen");
+  if (btnFullScreen) {
+    btnFullScreen.addEventListener("click", () => {
+      playNetSound("click");
+      const shell = document.querySelector(".exam-shell");
+      if (!document.fullscreenElement) {
+        shell?.requestFullscreen().catch((err) => {
+          console.error(`Error attempting to enable full-screen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    });
+  }
 
   const btnMissed = byId("startMissedQuiz");
   if (btnMissed) {
