@@ -3444,6 +3444,150 @@ function updateContrastButton() {
   }
 }
 
+function ipToNum(ip) {
+  const parts = ip.split('.').map(Number);
+  if (parts.length !== 4 || parts.some(isNaN) || parts.some(p => p < 0 || p > 255)) return null;
+  return ((parts[0] << 24) >>> 0) | (parts[1] << 16) | (parts[2] << 8) | parts[3];
+}
+
+function numToIp(num) {
+  return [
+    (num >>> 24) & 255,
+    (num >>> 16) & 255,
+    (num >>> 8) & 255,
+    num & 255
+  ].join('.');
+}
+
+function updateSubnetCalculator() {
+  const ipInput = byId("calcIp");
+  const cidrInput = byId("calcCidr");
+  if (!ipInput || !cidrInput) return;
+
+  const ipStr = ipInput.value.trim();
+  const cidr = Number(cidrInput.value);
+
+  // Update CIDR value text
+  const calcCidrVal = byId("calcCidrVal");
+  if (calcCidrVal) calcCidrVal.textContent = `/${cidr}`;
+
+  // Validate IP
+  const parts = ipStr.split('.').map(p => p.trim());
+  let isValid = true;
+  if (parts.length !== 4) {
+    isValid = false;
+  } else {
+    for (const p of parts) {
+      const n = Number(p);
+      if (p === "" || isNaN(n) || n < 0 || n > 255 || n.toString() !== p) {
+        isValid = false;
+        break;
+      }
+    }
+  }
+
+  if (!isValid) {
+    ipInput.style.borderColor = "#ff5e3a";
+    ipInput.style.boxShadow = "0 0 10px rgba(255, 94, 58, 0.25)";
+    return;
+  }
+
+  ipInput.style.borderColor = "";
+  ipInput.style.boxShadow = "";
+
+  const ipNum = ipToNum(ipStr);
+  if (ipNum === null) return;
+  
+  const maskNum = cidr === 32 ? 0xFFFFFFFF : (~(0xFFFFFFFF >>> cidr)) >>> 0;
+  const wildcardNum = (~maskNum) >>> 0;
+  const netNum = (ipNum & maskNum) >>> 0;
+  const broadNum = (netNum | wildcardNum) >>> 0;
+
+  // Mask
+  byId("calcMask").textContent = numToIp(maskNum);
+  // Wildcard
+  byId("calcWildcard").textContent = numToIp(wildcardNum);
+  // Network Address
+  byId("calcNetwork").textContent = numToIp(netNum);
+  // Broadcast Address
+  byId("calcBroadcast").textContent = numToIp(broadNum);
+
+  // Usable range & host count
+  let hosts = 0;
+  let rangeStr = "N/A";
+  if (cidr <= 30) {
+    hosts = Math.pow(2, 32 - cidr) - 2;
+    rangeStr = `${numToIp(netNum + 1)} - ${numToIp(broadNum - 1)}`;
+  } else if (cidr === 31) {
+    hosts = 2;
+    rangeStr = `${numToIp(netNum)} - ${numToIp(broadNum)}`;
+  } else {
+    hosts = 1;
+    rangeStr = numToIp(netNum);
+  }
+
+  byId("calcHosts").textContent = hosts.toLocaleString();
+  byId("calcRange").textContent = rangeStr;
+
+  // Address Class
+  const firstOctet = (ipNum >>> 24) & 255;
+  let ipClass = "Class A";
+  if (firstOctet >= 128 && firstOctet <= 191) ipClass = "Class B";
+  else if (firstOctet >= 192 && firstOctet <= 223) ipClass = "Class C";
+  else if (firstOctet >= 224 && firstOctet <= 239) ipClass = "Class D (Multicast)";
+  else if (firstOctet >= 240) ipClass = "Class E (Experimental)";
+  byId("calcClass").textContent = ipClass;
+
+  // Scope check
+  let scope = "Public";
+  if (firstOctet === 10) scope = "Private (RFC 1918)";
+  else if (firstOctet === 172 && ((ipNum >>> 16) & 255) >= 16 && ((ipNum >>> 16) & 255) <= 31) scope = "Private (RFC 1918)";
+  else if (firstOctet === 192 && ((ipNum >>> 16) & 255) === 168) scope = "Private (RFC 1918)";
+  else if (firstOctet === 127) scope = "Loopback (Localhost)";
+  else if (firstOctet === 169 && ((ipNum >>> 16) & 255) === 254) scope = "Link-Local (APIPA)";
+  byId("calcScope").textContent = scope;
+
+  // Render Bit Grid
+  const bitGrid = byId("calcBitGrid");
+  if (bitGrid) {
+    let gridHtml = "";
+    const ipBin = ipNum.toString(2).padStart(32, '0');
+    for (let i = 0; i < 32; i++) {
+      const bitNum = i + 1;
+      const isNet = bitNum <= cidr;
+      const bitVal = ipBin[i];
+      
+      const bg = isNet ? "background: rgba(0, 242, 254, 0.12); border: 1px solid rgba(0, 242, 254, 0.35); color: #00f2fe; box-shadow: 0 0 5px rgba(0,242,254,0.15);" : "background: rgba(255, 94, 58, 0.08); border: 1px solid rgba(255, 94, 58, 0.25); color: #ff9233; box-shadow: 0 0 5px rgba(255,94,58,0.1);";
+      
+      gridHtml += `<div style="width: 18px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 11.5px; border-radius: 4px; ${bg} transition: var(--transition-smooth);">${bitVal}</div>`;
+      
+      if (bitNum % 8 === 0 && bitNum < 32) {
+        gridHtml += `<span style="font-size: 16px; color: var(--text-muted); font-weight: bold; margin: 0 2px;">.</span>`;
+      }
+    }
+    bitGrid.innerHTML = gridHtml;
+  }
+}
+
+function setupSubnetCalculator() {
+  const ipInput = byId("calcIp");
+  const cidrInput = byId("calcCidr");
+  if (!ipInput || !cidrInput) return;
+
+  ipInput.addEventListener("input", updateSubnetCalculator);
+  cidrInput.addEventListener("input", updateSubnetCalculator);
+
+  document.querySelectorAll(".calc-preset-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      playNetSound("click");
+      cidrInput.value = btn.dataset.mask;
+      updateSubnetCalculator();
+    });
+  });
+
+  updateSubnetCalculator();
+}
+
 function init() {
   state.bank = generateBank(rand);
   navSetup();
@@ -3461,6 +3605,7 @@ function init() {
   updateContrastButton();
   renderSubnetLeaderboard();
   ensureSubnetQuestion(true);
+  setupSubnetCalculator();
   
   if (typeof loadLab === "function") {
     loadLab(1);

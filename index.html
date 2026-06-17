@@ -566,6 +566,100 @@
           </article>
         </div>
       </div>
+
+      <!-- Interactive Subnet Calculator & Cheat Sheet -->
+      <article class="card" style="margin-top: 24px; display: flex; flex-direction: column; gap: 16px;">
+        <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <h3 style="margin-bottom: 0; display: flex; align-items: center; gap: 8px;">🧮 Interactive VLSM Subnet Calculator</h3>
+          <span style="font-size: 11px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; padding: 3px 8px; border-radius: 6px; font-weight: 600;">CCNA Exam Reference Tool</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+          <div>
+            <label for="calcIp" style="margin-bottom: 6px;">IP Address</label>
+            <input id="calcIp" type="text" value="192.168.1.50" placeholder="e.g. 192.168.1.1" style="margin-top: 0; font-family: var(--font-mono);" />
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label style="margin-bottom: 0;">Subnet Mask (CIDR)</label>
+              <span id="calcCidrVal" style="font-family: var(--font-mono); font-size: 13px; color: #00f2fe; font-weight: bold;">/24</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; height: 44px;">
+              <input id="calcCidr" type="range" min="1" max="32" value="24" style="flex: 1; cursor: pointer; accent-color: #00f2fe;" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Mask presets -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: -8px;">
+          <span style="font-size: 10px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Presets:</span>
+          <button class="calc-preset-btn ghost" data-mask="30" style="padding: 4px 8px; font-size: 10.5px; border-radius: 6px; border: 1px solid var(--border-color);">/30 WAN Link</button>
+          <button class="calc-preset-btn ghost" data-mask="28" style="padding: 4px 8px; font-size: 10.5px; border-radius: 6px; border: 1px solid var(--border-color);">/28 Small LAN</button>
+          <button class="calc-preset-btn ghost" data-mask="24" style="padding: 4px 8px; font-size: 10.5px; border-radius: 6px; border: 1px solid var(--border-color);">/24 Standard LAN</button>
+          <button class="calc-preset-btn ghost" data-mask="22" style="padding: 4px 8px; font-size: 10.5px; border-radius: 6px; border: 1px solid var(--border-color);">/22 Large LAN</button>
+        </div>
+
+        <!-- Interactive Bit Grid -->
+        <div style="border: 1px solid var(--border-color); border-radius: 12px; background: rgba(0,0,0,0.18); padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+          <h4 style="font-size: 12px; text-transform: uppercase; color: #94a3b8; margin: 0; letter-spacing: 0.5px;">Binary Representation (32-Bit IPv4 Space)</h4>
+          
+          <div id="calcBitGrid" style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 13px; font-weight: 700; padding: 10px 0;"></div>
+          
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: rgba(0, 242, 254, 0.2); border: 1px solid #00f2fe;"></span>
+              <span>Network Bits</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: rgba(255, 94, 58, 0.15); border: 1px solid #ff5e3a;"></span>
+              <span>Host Bits</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculated Values Details -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+          <!-- Left Details: Addresses -->
+          <div class="review-table" style="background: rgba(0,0,0,0.1); margin: 0; padding: 4px;">
+            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;">
+              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Subnet Mask</strong>
+              <span id="calcMask" style="font-family: var(--font-mono); font-weight: 600; text-align: right;">255.255.255.0</span>
+            </div>
+            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;">
+              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Wildcard Mask</strong>
+              <span id="calcWildcard" style="font-family: var(--font-mono); font-weight: 600; color: #ff9233; text-align: right;">0.0.0.255</span>
+            </div>
+            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;">
+              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Network Address</strong>
+              <span id="calcNetwork" style="font-family: var(--font-mono); font-weight: 600; color: #00f2fe; text-align: right;">192.168.1.0</span>
+            </div>
+            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: none; padding: 8px 12px;">
+              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Broadcast Address</strong>
+              <span id="calcBroadcast" style="font-family: var(--font-mono); font-weight: 600; text-align: right;">192.168.1.255</span>
+            </div>
+          </div>
+
+          <!-- Right Details: Hosts and Info -->
+          <div class="review-table" style="background: rgba(0,0,0,0.1); margin: 0; padding: 4px;">
+            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;">
+              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Usable IP Range</strong>
+              <span id="calcRange" style="font-family: var(--font-mono); font-weight: 600; font-size: 12.5px; text-align: right;">192.168.1.1 - 192.168.1.254</span>
+            </div>
+            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;">
+              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Usable Hosts</strong>
+              <span id="calcHosts" style="font-family: var(--font-mono); font-weight: 600; text-align: right; color: #10b981;">254</span>
+            </div>
+            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;">
+              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Address Class</strong>
+              <span id="calcClass" style="font-family: var(--font-mono); font-weight: 600; text-align: right;">Class C</span>
+            </div>
+            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: none; padding: 8px 12px;">
+              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Address Scope</strong>
+              <span id="calcScope" style="font-family: var(--font-mono); font-weight: 600; text-align: right;">Private (RFC 1918)</span>
+            </div>
+          </div>
+        </div>
+      </article>
     </section>
 
     <!-- CCNA LAB CENTER -->
