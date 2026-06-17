@@ -102,6 +102,22 @@ export function mergeProgress(local, cloud) {
   merged.xp = Math.max(local.xp || 0, cloud.xp || 0);
   merged.studyMin = Math.max(local.studyMin || 0, cloud.studyMin || 0);
   merged.totalTime = Math.max(local.totalTime || 0, cloud.totalTime || 0);
+  merged.labsCompleted = Math.max(local.labsCompleted || 0, cloud.labsCompleted || 0);
+  merged.subnetMaxStreak = Math.max(local.subnetMaxStreak || 0, cloud.subnetMaxStreak || 0);
+  merged.streak = Math.max(local.streak || 0, cloud.streak || 0);
+
+  // Merge simPathsRun
+  const localPaths = local.simPathsRun || { ospf: false, roas: false };
+  const cloudPaths = cloud.simPathsRun || { ospf: false, roas: false };
+  merged.simPathsRun = {
+    ospf: localPaths.ospf || cloudPaths.ospf || false,
+    roas: localPaths.roas || cloudPaths.roas || false
+  };
+
+  // Merge missedIds
+  const localMissed = local.missedIds || [];
+  const cloudMissed = cloud.missedIds || [];
+  merged.missedIds = Array.from(new Set([...localMissed, ...cloudMissed]));
 
   // Merge achievements (keep any that are unlocked in either)
   merged.ach = { ...(local.ach || {}), ...(cloud.ach || {}) };

@@ -15,8 +15,7 @@ const state = {
   user: null,
   muted: localStorage.getItem("ccna_muted") === "true",
   highContrast: localStorage.getItem("ccna_high_contrast") === "true",
-  simBugsFixed: {},
-  simPathsRun: { ospf: false, roas: false }
+  simBugsFixed: {}
 };
 
 function rand() {
@@ -50,10 +49,11 @@ function loadAnalytics() {
     streak: 0,
     labsCompleted: 0,
     subnetMaxStreak: 0,
-    ach: {}
+    ach: {},
+    simPathsRun: { ospf: false, roas: false }
   };
   try {
-    const key = (state && state.user) ? `${STORE}_${state.user.uid}` : STORE;
+    const key = (typeof state !== 'undefined' && state && state.user) ? `${STORE}_${state.user.uid}` : STORE;
     const raw = localStorage.getItem(key);
     if (!raw) return base;
     return { ...base, ...JSON.parse(raw) };
@@ -1258,7 +1258,7 @@ function renderAchievements() {
       id: "routing_champion",
       title: "Routing Champion",
       desc: "Successfully run OSPF and ROAS packet traversal paths.",
-      unlocked: state.simPathsRun && state.simPathsRun.ospf && state.simPathsRun.roas,
+      unlocked: a.simPathsRun && a.simPathsRun.ospf && a.simPathsRun.roas,
       icon: "🏆"
     },
     {
@@ -1924,13 +1924,36 @@ function setupAuth() {
       const userKey = `${STORE}_${user.uid}`;
       const localCached = localStorage.getItem(userKey);
 
-      if (cloud) {
-        state.analytics = cloud;
-      } else if (localCached) {
-        state.analytics = JSON.parse(localCached);
-      } else {
-        // Zero progress for new user
-        state.analytics = {
+      let merged = cloud || null;
+
+      // Merge with local cached user progress if present
+      if (localCached) {
+        try {
+          const parsedLocal = JSON.parse(localCached);
+          merged = mergeProgress(parsedLocal, merged);
+        } catch (e) {
+          console.error("Error parsing local cached user progress:", e);
+        }
+      }
+
+      // Merge with guest data if present
+      const guestRaw = localStorage.getItem(STORE);
+      let didMergeGuest = false;
+      if (guestRaw) {
+        try {
+          const parsedGuest = JSON.parse(guestRaw);
+          if (parsedGuest && (parsedGuest.xp > 0 || parsedGuest.totalQ > 0 || (parsedGuest.attempts && parsedGuest.attempts.length > 0))) {
+            console.log("Merging guest progress into user profile...", parsedGuest);
+            merged = mergeProgress(parsedGuest, merged);
+            didMergeGuest = true;
+          }
+        } catch (e) {
+          console.error("Error parsing guest progress:", e);
+        }
+      }
+
+      if (!merged) {
+        merged = {
           attempts: [],
           domain: {},
           topic: {},
@@ -1940,14 +1963,33 @@ function setupAuth() {
           studyMin: 0,
           xp: 0,
           ach: {},
-          missedIds: []
+          missedIds: [],
+          simPathsRun: { ospf: false, roas: false }
         };
+      } else {
+        merged.attempts = merged.attempts || [];
+        merged.domain = merged.domain || {};
+        merged.topic = merged.topic || {};
+        merged.totalQ = merged.totalQ || 0;
+        merged.correct = merged.correct || 0;
+        merged.totalTime = merged.totalTime || 0;
+        merged.studyMin = merged.studyMin || 0;
+        merged.xp = merged.xp || 0;
+        merged.ach = merged.ach || {};
+        merged.missedIds = merged.missedIds || [];
+        merged.simPathsRun = merged.simPathsRun || { ospf: false, roas: false };
       }
-      state.analytics.missedIds = state.analytics.missedIds || [];
-      
+
+      state.analytics = merged;
+
+      // Clear guest progress so it isn't merged again on next login
+      if (didMergeGuest) {
+        localStorage.removeItem(STORE);
+      }
+
       localStorage.setItem(userKey, JSON.stringify(state.analytics));
       saveUserProgress(user.uid, state.analytics);
-      
+
       renderHome();
       renderAnalytics();
     } else {
@@ -1968,9 +2010,11 @@ function setupAuth() {
         studyMin: 0,
         xp: 0,
         ach: {},
-        missedIds: []
+        missedIds: [],
+        simPathsRun: { ospf: false, roas: false }
       };
       state.analytics.missedIds = state.analytics.missedIds || [];
+      state.analytics.simPathsRun = state.analytics.simPathsRun || { ospf: false, roas: false };
 
       renderHome();
       renderAnalytics();
@@ -3156,6 +3200,13 @@ function setupTraversalSimulator() {
       finishDiv.style.fontWeight = "bold";
       finishDiv.innerHTML = `✔ Traversal Completed Successfully.`;
       logContent.appendChild(finishDiv);
+
+      if (type === "ospf" || type === "roas") {
+        state.analytics.simPathsRun = state.analytics.simPathsRun || { ospf: false, roas: false };
+        state.analytics.simPathsRun[type] = true;
+        saveAnalytics();
+        renderAchievements();
+      }
     }
 
     await sleep(1000);
