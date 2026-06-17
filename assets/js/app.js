@@ -3444,20 +3444,7 @@ function updateContrastButton() {
   }
 }
 
-function ipToNum(ip) {
-  const parts = ip.split('.').map(Number);
-  if (parts.length !== 4 || parts.some(isNaN) || parts.some(p => p < 0 || p > 255)) return null;
-  return ((parts[0] << 24) >>> 0) | (parts[1] << 16) | (parts[2] << 8) | parts[3];
-}
 
-function numToIp(num) {
-  return [
-    (num >>> 24) & 255,
-    (num >>> 16) & 255,
-    (num >>> 8) & 255,
-    num & 255
-  ].join('.');
-}
 
 function updateSubnetCalculator() {
   const ipInput = byId("calcIp");
