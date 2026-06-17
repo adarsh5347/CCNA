@@ -1812,19 +1812,17 @@ function wireEvents() {
   }
 
   // Sidebar drawer handlers
-  const sidebar = document.querySelector(".left");
-  const backdrop = byId("sidebarBackdrop");
-  const closeSidebar = () => {
-    sidebar.classList.remove("active");
-    backdrop.classList.remove("active");
-  };
-  const openSidebar = () => {
-    sidebar.classList.add("active");
-    backdrop.classList.add("active");
-  };
-  byId("toggleSidebar").addEventListener("click", openSidebar);
-  byId("closeSidebar").addEventListener("click", closeSidebar);
-  backdrop.addEventListener("click", closeSidebar);
+  const sidebarNav = byId("examNavigator");
+  const btnToggleNav = byId("btnToggleSidebar");
+  const btnCloseNav = byId("btnCloseSidebar");
+  if (sidebarNav && btnToggleNav && btnCloseNav) {
+    btnToggleNav.addEventListener("click", () => {
+      sidebarNav.classList.add("active");
+    });
+    btnCloseNav.addEventListener("click", () => {
+      sidebarNav.classList.remove("active");
+    });
+  }
 
   // Reset progress handler
   const btnReset = byId("btnResetProgress");
