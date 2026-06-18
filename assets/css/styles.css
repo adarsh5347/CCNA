@@ -647,9 +647,13 @@ textarea {
   cursor: pointer;
   transition: var(--transition-smooth);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   font-size: 14.5px;
+  width: 100%;
+  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .opt:hover {
@@ -658,10 +662,11 @@ textarea {
 }
 
 .opt input[type="radio"], .opt input[type="checkbox"] {
-  margin: 0;
+  margin: 3px 0 0 0;
   accent-color: #00f2fe;
   width: 18px;
   height: 18px;
+  flex-shrink: 0;
 }
 
 .opt.correct {
@@ -1580,6 +1585,27 @@ button:focus, select:focus, input:focus, textarea:focus {
 @media (max-width: 600px) {
   .row-compact {
     grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .exam-shell {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  .exam-shell > div {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  .exam-shell > div > div {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  .scroll {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    padding: 16px !important;
   }
 }
 
