@@ -19,7 +19,32 @@
   <canvas id="netCanvas"></canvas>
   <header class="topbar">
     <div class="brand">
-      <div class="logo">C</div>
+      <div class="logo-container" aria-label="CCNA Platform Logo">
+        <svg class="cool-logo-svg" viewBox="0 0 100 100">
+          <defs>
+            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00f2fe" />
+              <stop offset="100%" stop-color="#4facfe" />
+            </linearGradient>
+            <linearGradient id="logoOrangeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ff9233" />
+              <stop offset="100%" stop-color="#ff5e3a" />
+            </linearGradient>
+            <filter id="logoGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+          <polygon points="50,5 89,27 89,73 50,95 11,73 11,27" fill="none" stroke="url(#logoOrangeGrad)" stroke-width="3" stroke-dasharray="20, 10" class="logo-hex-outer" />
+          <circle cx="50" cy="50" r="32" fill="none" stroke="url(#logoGrad)" stroke-width="2.5" stroke-dasharray="10, 15" class="logo-circle-inner" />
+          <g class="logo-center-group">
+            <circle cx="50" cy="50" r="16" fill="none" stroke="rgba(0, 242, 254, 0.4)" stroke-width="1.5" />
+            <circle cx="50" cy="50" r="6" fill="#00f2fe" filter="url(#logoGlow)" class="logo-node-center" />
+            <path d="M 40,38 A 14,14 0 0,0 40,62" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" filter="url(#logoGlow)" />
+            <path d="M 60,38 A 14,14 0 0,1 60,62" fill="none" stroke="url(#logoGrad)" stroke-width="3.5" stroke-linecap="round" />
+          </g>
+        </svg>
+      </div>
       <div>
         <h1>CCNA 200-301 Platform</h1>
         <p>NetAcad flow + Boson rigor + Pearson realism</p>
