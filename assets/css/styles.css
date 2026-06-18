@@ -1186,14 +1186,21 @@ textarea {
   grid-template-columns: 1fr 340px;
   gap: 16px;
   margin-bottom: 20px;
+  min-width: 0;
+  max-width: 100%;
 }
 @media (max-width: 900px) {
   .topology-wrapper {
     grid-template-columns: 1fr;
   }
 }
+.topology-left, .topology-right {
+  min-width: 0;
+  max-width: 100%;
+}
 .topology-main {
   width: 100%;
+  max-width: 100%;
   aspect-ratio: 700 / 280;
   display: flex;
   align-items: center;
@@ -1202,7 +1209,15 @@ textarea {
 }
 #topoSvg, #topoSvg2 {
   width: 100%;
+  max-width: 100%;
   height: 100%;
+}
+.lab-shell > div, .lab-shell > aside {
+  min-width: 0;
+  max-width: 100%;
+}
+#labTopologyContainer {
+  max-width: 100%;
 }
 .topo-node {
   cursor: pointer;

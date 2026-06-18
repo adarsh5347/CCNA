@@ -6,7 +6,7 @@ import { bugsData, cliOutputs } from "./cli.js";
 const STORE = "ccna_full_site_v1";
 
 const state = {
-  seed: 301,
+  seed: Math.floor(Math.random() * 1000000) + 1,
   bank: [],
   analytics: loadAnalytics(),
   session: null,
