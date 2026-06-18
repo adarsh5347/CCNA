@@ -1586,6 +1586,21 @@ button:focus, select:focus, input:focus, textarea:focus {
   .row-compact {
     grid-template-columns: 1fr !important;
   }
+  .topbar {
+    flex-wrap: wrap !important;
+    padding: 10px 12px !important;
+    gap: 8px !important;
+  }
+  .brand {
+    width: 100% !important;
+    justify-content: space-between !important;
+    margin-bottom: 4px !important;
+  }
+  nav {
+    width: 100% !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+  }
 }
 
 @media (max-width: 760px) {
@@ -1606,6 +1621,40 @@ button:focus, select:focus, input:focus, textarea:focus {
     max-width: 100% !important;
     overflow-x: hidden !important;
     padding: 16px !important;
+  }
+  .exam-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 12px !important;
+  }
+  .exam-header > div {
+    width: 100% !important;
+    justify-content: space-between !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
+  .exam-footer {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    padding: 12px !important;
+    gap: 10px !important;
+  }
+  .exam-footer #prevQ, .exam-footer #nextQ {
+    flex: 1 !important;
+    min-width: 80px !important;
+  }
+  .exam-footer .inline {
+    width: 100% !important;
+    display: flex !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    justify-content: center !important;
+  }
+  .exam-footer .inline button {
+    flex: 1 !important;
   }
 }
 
