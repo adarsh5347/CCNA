@@ -3590,17 +3590,21 @@ function updateSubnetCalculator() {
   if (bitGrid) {
     let gridHtml = "";
     const ipBin = ipNum.toString(2).padStart(32, '0');
-    for (let i = 0; i < 32; i++) {
-      const bitNum = i + 1;
-      const isNet = bitNum <= cidr;
-      const bitVal = ipBin[i];
-      
-      const bg = isNet ? "background: rgba(0, 242, 254, 0.12); border: 1px solid rgba(0, 242, 254, 0.35); color: #00f2fe; box-shadow: 0 0 5px rgba(0,242,254,0.15);" : "background: rgba(255, 94, 58, 0.08); border: 1px solid rgba(255, 94, 58, 0.25); color: #ff9233; box-shadow: 0 0 5px rgba(255,94,58,0.1);";
-      
-      gridHtml += `<div style="width: 18px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 11.5px; border-radius: 4px; ${bg} transition: var(--transition-smooth);">${bitVal}</div>`;
-      
-      if (bitNum % 8 === 0 && bitNum < 32) {
-        gridHtml += `<span style="font-size: 16px; color: var(--text-muted); font-weight: bold; margin: 0 2px;">.</span>`;
+    for (let octet = 0; octet < 4; octet++) {
+      gridHtml += `<span style="display: inline-flex; gap: 3px; align-items: center; white-space: nowrap; margin: 2px 4px;">`;
+      for (let bit = 0; bit < 8; bit++) {
+        const i = octet * 8 + bit;
+        const bitNum = i + 1;
+        const isNet = bitNum <= cidr;
+        const bitVal = ipBin[i];
+        
+        const bg = isNet ? "background: rgba(0, 242, 254, 0.12); border: 1px solid rgba(0, 242, 254, 0.35); color: #00f2fe; box-shadow: 0 0 5px rgba(0,242,254,0.15);" : "background: rgba(255, 94, 58, 0.08); border: 1px solid rgba(255, 94, 58, 0.25); color: #ff9233; box-shadow: 0 0 5px rgba(255,94,58,0.1);";
+        
+        gridHtml += `<div style="width: 18px; height: 26px; display: inline-flex; align-items: center; justify-content: center; font-size: 11.5px; border-radius: 4px; ${bg} transition: var(--transition-smooth);">${bitVal}</div>`;
+      }
+      gridHtml += `</span>`;
+      if (octet < 3) {
+        gridHtml += `<span style="font-size: 16px; color: var(--text-muted); font-weight: bold; align-self: center; margin: 0 1px;">.</span>`;
       }
     }
     bitGrid.innerHTML = gridHtml;

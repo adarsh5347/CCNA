@@ -1533,6 +1533,41 @@ button:focus, select:focus, input:focus, textarea:focus {
   }
 }
 
+/* Mobile Responsive Optimization Overrides */
+@media (max-width: 800px) {
+  .lab-shell {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .topology-main {
+    aspect-ratio: auto !important;
+    height: 290px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    display: block !important;
+  }
+  #topoSvg, #topoSvg2 {
+    min-width: 700px !important;
+    height: 280px !important;
+  }
+  #labTopologyContainer {
+    overflow-x: auto !important;
+    display: block !important;
+  }
+  #labTopologyContainer svg {
+    min-width: 500px !important;
+    height: 176px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .row-compact {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 
 
 
