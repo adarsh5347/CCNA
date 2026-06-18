@@ -150,10 +150,151 @@ function getLevelInfo(xp) {
 }
 
 function gainXP(amount) {
-  state.analytics.xp = (state.analytics.xp || 0) + amount;
+  const oldXp = state.analytics.xp || 0;
+  const oldInfo = getLevelInfo(oldXp);
+
+  state.analytics.xp = oldXp + amount;
   saveAnalytics();
   updateHeaderProfile();
   renderAchievements();
+
+  const newInfo = getLevelInfo(state.analytics.xp);
+  if (newInfo.level > oldInfo.level) {
+    triggerLevelUpModal(newInfo.level, newInfo.label);
+  }
+}
+
+function triggerLevelUpModal(level, label) {
+  const overlay = document.createElement("div");
+  overlay.id = "levelUpOverlay";
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(2, 4, 10, 0.95);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(15px);
+    transition: all 0.5s ease;
+    opacity: 0;
+  `;
+  
+  overlay.innerHTML = `
+    <div class="level-up-card" style="
+      background: linear-gradient(135deg, rgba(6, 9, 19, 0.9), rgba(13, 25, 43, 0.9));
+      border: 2px solid #00f2fe;
+      box-shadow: 0 0 50px rgba(0, 242, 254, 0.4), inset 0 0 20px rgba(0, 242, 254, 0.2);
+      border-radius: 24px;
+      padding: 40px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transform: scale(0.7);
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-width: 480px;
+      width: 90%;
+    ">
+      <div style="
+        position: absolute;
+        top: -100px;
+        left: -100px;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(0,242,254,0.15) 0%, transparent 70%);
+        pointer-events: none;
+      "></div>
+      
+      <div class="level-badge" style="
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(6,9,19,0.9);
+        border: 4px solid #ff5e3a;
+        box-shadow: 0 0 30px rgba(255, 94, 58, 0.4);
+        margin: 0 auto 20px auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        animation: pulseLevel 2s infinite ease-in-out;
+      ">
+        <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: #ff9233; letter-spacing: 1.5px;">Level</span>
+        <span style="font-family: 'Bebas Neue', sans-serif; font-size: 52px; line-height: 1; color: #fff; text-shadow: 0 0 10px rgba(255,94,58,0.5);">${level}</span>
+      </div>
+      
+      <h2 style="
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 44px;
+        letter-spacing: 2px;
+        background: linear-gradient(to right, #00f2fe, #10b981);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0 0 8px 0;
+        text-transform: uppercase;
+      ">Promoted!</h2>
+      
+      <p style="
+        font-size: 18px;
+        font-weight: 600;
+        color: #fff;
+        margin: 0 0 4px 0;
+      ">${label}</p>
+      
+      <p style="
+        color: var(--text-muted);
+        font-size: 13px;
+        line-height: 1.4;
+        margin: 0 0 24px 0;
+      ">Your network command privileges have been elevated. Keep solving questions and configuring switches to reach the top!</p>
+      
+      <button id="levelUpCloseBtn" class="primary" style="
+        padding: 12px 36px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-radius: 10px;
+      ">Acknowledge</button>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+  playNetSound("success");
+  
+  if (window.triggerSuccessExplosion) {
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        const x = window.innerWidth * (0.2 + Math.random() * 0.6);
+        const y = window.innerHeight * (0.3 + Math.random() * 0.4);
+        window.triggerSuccessExplosion(x, y, i % 2 === 0 ? "#00f2fe" : "#ff5e3a");
+      }, i * 300);
+    }
+  }
+  
+  setTimeout(() => {
+    overlay.style.opacity = "1";
+    overlay.querySelector(".level-up-card").style.transform = "scale(1)";
+  }, 50);
+  
+  const closeBtn = overlay.querySelector("#levelUpCloseBtn");
+  const close = () => {
+    playNetSound("click");
+    overlay.style.opacity = "0";
+    overlay.querySelector(".level-up-card").style.transform = "scale(0.8)";
+    setTimeout(() => {
+      overlay.remove();
+    }, 500);
+  };
+  
+  closeBtn.addEventListener("click", close);
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) close();
+  });
 }
 
 function updateHeaderProfile() {
@@ -3275,6 +3416,45 @@ function setupCanvasConstellation() {
   const ctx = canvas.getContext("2d");
   
   let particles = [];
+  let activeExplosionParticles = [];
+
+  class ExplosionParticle {
+    constructor(x, y, color) {
+      this.x = x;
+      this.y = y;
+      this.vx = (Math.random() - 0.5) * 6;
+      this.vy = (Math.random() - 0.5) * 6 - Math.random() * 2; // upwards bias
+      this.radius = Math.random() * 3 + 1.5;
+      this.alpha = 1;
+      this.decay = Math.random() * 0.015 + 0.01;
+      this.color = color || "#00f2fe";
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.vy += 0.05; // slight gravity
+      this.alpha -= this.decay;
+    }
+    draw() {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = Math.max(0, this.alpha);
+      ctx.shadowColor = this.color;
+      ctx.shadowBlur = 6;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  window.triggerSuccessExplosion = (x, y, color) => {
+    const explosionColor = color || (Math.random() < 0.5 ? "#00f2fe" : "#10b981");
+    for (let i = 0; i < 40; i++) {
+      activeExplosionParticles.push(new ExplosionParticle(x, y, explosionColor));
+    }
+  };
+
   const count = 45;
   let mouse = { x: null, y: null, radius: 120 };
 
@@ -3288,6 +3468,16 @@ function setupCanvasConstellation() {
   window.addEventListener("mousemove", (e) => {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
+
+    // Spawn a gentle trail of glowing micro-particles
+    if (Math.random() < 0.25 && activeExplosionParticles.length < 100) {
+      const p = new ExplosionParticle(e.clientX, e.clientY, Math.random() < 0.5 ? "#00f2fe" : "#10b981");
+      p.vx = (Math.random() - 0.5) * 1.5;
+      p.vy = (Math.random() - 0.5) * 1.5;
+      p.radius = Math.random() * 1.5 + 1;
+      p.decay = 0.025; // fade out quickly
+      activeExplosionParticles.push(p);
+    }
   });
 
   window.addEventListener("mouseout", () => {
@@ -3418,44 +3608,7 @@ function setupCanvasConstellation() {
     binaryColumns.push(new BinaryColumn());
   }
 
-  class ExplosionParticle {
-    constructor(x, y, color) {
-      this.x = x;
-      this.y = y;
-      this.vx = (Math.random() - 0.5) * 6;
-      this.vy = (Math.random() - 0.5) * 6 - Math.random() * 2; // upwards bias
-      this.radius = Math.random() * 3 + 1.5;
-      this.alpha = 1;
-      this.decay = Math.random() * 0.015 + 0.01;
-      this.color = color || "#00f2fe";
-    }
-    update() {
-      this.x += this.vx;
-      this.y += this.vy;
-      this.vy += 0.05; // slight gravity
-      this.alpha -= this.decay;
-    }
-    draw() {
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.fillStyle = this.color;
-      ctx.globalAlpha = Math.max(0, this.alpha);
-      ctx.shadowColor = this.color;
-      ctx.shadowBlur = 6;
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  let activeExplosionParticles = [];
-
-  window.triggerSuccessExplosion = (x, y, color) => {
-    const explosionColor = color || (Math.random() < 0.5 ? "#00f2fe" : "#10b981");
-    for (let i = 0; i < 40; i++) {
-      activeExplosionParticles.push(new ExplosionParticle(x, y, explosionColor));
-    }
-  };
+  // ExplosionParticle class and activeExplosionParticles defined at top of function scope
 
   const animate = () => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -3502,6 +3655,21 @@ function setupCanvasConstellation() {
           ctx.stroke();
         }
       }
+    }
+
+    // Connect mouse to nearby particles
+    if (mouse.x !== null && mouse.y !== null) {
+      particles.forEach(p => {
+        const dist = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+        if (dist < mouse.radius) {
+          ctx.beginPath();
+          ctx.moveTo(mouse.x, mouse.y);
+          ctx.lineTo(p.x, p.y);
+          ctx.strokeStyle = `rgba(0, 242, 254, ${0.32 * (1 - dist / mouse.radius)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      });
     }
 
     floatPackets.forEach(pkt => {
@@ -3930,6 +4098,10 @@ function init() {
   ensureSubnetQuestion(true);
   setupSubnetCalculator();
   setupFlashcards();
+  
+  // Initialize virtual labs selector dropdown and execution modes
+  initLabSelector();
+  initLabModes();
   
   if (typeof loadLab === "function") {
     loadLab(1);
