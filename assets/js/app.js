@@ -571,59 +571,59 @@ function wireQuestionInputs() {
   const q = s.questions[s.idx];
 
   byId("questionArea").querySelectorAll("input[type='radio'][name='single']").forEach((el) => {
-    el.addEventListener("change", () => {
+    el.addEventListener("change", (e) => {
       s.answers[s.idx] = Number(el.value);
-      instantStudyFeedback();
+      instantStudyFeedback(e);
       renderNavigator();
     });
   });
 
   byId("questionArea").querySelectorAll("input[type='checkbox']").forEach((el) => {
-    el.addEventListener("change", () => {
+    el.addEventListener("change", (e) => {
       s.answers[s.idx] = [...byId("questionArea").querySelectorAll("input[type='checkbox']:checked")].map((x) => Number(x.value));
-      instantStudyFeedback();
+      instantStudyFeedback(e);
       renderNavigator();
     });
   });
 
   byId("questionArea").querySelectorAll("[data-match]").forEach((el) => {
-    el.addEventListener("change", () => {
+    el.addEventListener("change", (e) => {
       const cur = s.answers[s.idx] || {};
       cur[Number(el.dataset.match)] = el.value;
       s.answers[s.idx] = cur;
-      instantStudyFeedback();
+      instantStudyFeedback(e);
       renderNavigator();
     });
   });
 
   byId("questionArea").querySelectorAll("[data-up]").forEach((el) => {
-    el.addEventListener("click", () => {
+    el.addEventListener("click", (e) => {
       const i = Number(el.dataset.up);
       const list = s.answers[s.idx] || [...q.order];
       if (i <= 0) return;
       [list[i], list[i - 1]] = [list[i - 1], list[i]];
       s.answers[s.idx] = list;
-      instantStudyFeedback();
+      instantStudyFeedback(e);
       renderQuestion();
       renderNavigator();
     });
   });
 
   byId("questionArea").querySelectorAll("[data-down]").forEach((el) => {
-    el.addEventListener("click", () => {
+    el.addEventListener("click", (e) => {
       const i = Number(el.dataset.down);
       const list = s.answers[s.idx] || [...q.order];
       if (i >= list.length - 1) return;
       [list[i], list[i + 1]] = [list[i + 1], list[i]];
       s.answers[s.idx] = list;
-      instantStudyFeedback();
+      instantStudyFeedback(e);
       renderQuestion();
       renderNavigator();
     });
   });
 }
 
-function instantStudyFeedback() {
+function instantStudyFeedback(e) {
   const s = state.session;
   if (s.mode !== "study") return;
   const q = s.questions[s.idx];
@@ -637,6 +637,21 @@ function instantStudyFeedback() {
   if (ok) {
     state.analytics.missedIds = state.analytics.missedIds.filter(id => id !== q.id);
     gainXP(10);
+
+    // Trigger success particle explosion
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
+    if (e && e.clientX && e.clientY) {
+      x = e.clientX;
+      y = e.clientY;
+    } else if (e && e.target) {
+      const rect = e.target.getBoundingClientRect();
+      x = rect.left + rect.width / 2;
+      y = rect.top + rect.height / 2;
+    }
+    if (window.triggerSuccessExplosion) {
+      window.triggerSuccessExplosion(x, y, "#10b981");
+    }
   } else {
     if (!state.analytics.missedIds.includes(q.id)) {
       state.analytics.missedIds.push(q.id);
@@ -1623,6 +1638,19 @@ function submitSubnet() {
     const gainedXP = baseXP * mult;
     
     gainXP(gainedXP);
+
+    // Trigger success particle explosion at the submit button
+    const submitBtn = byId("subnetSubmit");
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
+    if (submitBtn) {
+      const rect = submitBtn.getBoundingClientRect();
+      x = rect.left + rect.width / 2;
+      y = rect.top + rect.height / 2;
+    }
+    if (window.triggerSuccessExplosion) {
+      window.triggerSuccessExplosion(x, y, "#00f2fe");
+    }
     
     if (state.subnet.mode === "Timed") {
       state.subnet.timeLeft = Math.min(30, state.subnet.timeLeft + 5);
@@ -3390,6 +3418,45 @@ function setupCanvasConstellation() {
     binaryColumns.push(new BinaryColumn());
   }
 
+  class ExplosionParticle {
+    constructor(x, y, color) {
+      this.x = x;
+      this.y = y;
+      this.vx = (Math.random() - 0.5) * 6;
+      this.vy = (Math.random() - 0.5) * 6 - Math.random() * 2; // upwards bias
+      this.radius = Math.random() * 3 + 1.5;
+      this.alpha = 1;
+      this.decay = Math.random() * 0.015 + 0.01;
+      this.color = color || "#00f2fe";
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.vy += 0.05; // slight gravity
+      this.alpha -= this.decay;
+    }
+    draw() {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = Math.max(0, this.alpha);
+      ctx.shadowColor = this.color;
+      ctx.shadowBlur = 6;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  let activeExplosionParticles = [];
+
+  window.triggerSuccessExplosion = (x, y, color) => {
+    const explosionColor = color || (Math.random() < 0.5 ? "#00f2fe" : "#10b981");
+    for (let i = 0; i < 40; i++) {
+      activeExplosionParticles.push(new ExplosionParticle(x, y, explosionColor));
+    }
+  };
+
   const animate = () => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -3440,6 +3507,14 @@ function setupCanvasConstellation() {
     floatPackets.forEach(pkt => {
       pkt.update();
       pkt.draw();
+    });
+
+    activeExplosionParticles.forEach((p, idx) => {
+      p.update();
+      p.draw();
+      if (p.alpha <= 0) {
+        activeExplosionParticles.splice(idx, 1);
+      }
     });
 
     requestAnimationFrame(animate);
@@ -3609,7 +3684,33 @@ function updateSubnetCalculator() {
     }
     bitGrid.innerHTML = gridHtml;
   }
+
+  // Dynamic highlighting of cheat sheet row
+  const rows = document.querySelectorAll(".cheat-sheet-row");
+  rows.forEach(row => {
+    const rowCidr = Number(row.dataset.cidr);
+    if (rowCidr === cidr) {
+      row.classList.add("highlighted-row");
+      row.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } else {
+      row.classList.remove("highlighted-row");
+    }
+  });
 }
+
+const cheatSheetMasks = [
+  { cidr: 32, mask: "255.255.255.255", wildcard: "0.0.0.0", hosts: "1", size: "1" },
+  { cidr: 31, mask: "255.255.255.254", wildcard: "0.0.0.1", hosts: "2", size: "2" },
+  { cidr: 30, mask: "255.255.255.252", wildcard: "0.0.0.3", hosts: "2 (Usable)", size: "4" },
+  { cidr: 29, mask: "255.255.255.248", wildcard: "0.0.0.7", hosts: "6 (Usable)", size: "8" },
+  { cidr: 28, mask: "255.255.255.240", wildcard: "0.0.0.15", hosts: "14 (Usable)", size: "16" },
+  { cidr: 27, mask: "255.255.255.224", wildcard: "0.0.0.31", hosts: "30 (Usable)", size: "32" },
+  { cidr: 26, mask: "255.255.255.192", wildcard: "0.0.0.63", hosts: "62 (Usable)", size: "64" },
+  { cidr: 25, mask: "255.255.255.128", wildcard: "0.0.0.127", hosts: "126 (Usable)", size: "128" },
+  { cidr: 24, mask: "255.255.255.0", wildcard: "0.0.0.255", hosts: "254 (Usable)", size: "256" },
+  { cidr: 23, mask: "255.255.254.0", wildcard: "0.0.1.255", hosts: "510 (Usable)", size: "512" },
+  { cidr: 22, mask: "255.255.252.0", wildcard: "0.0.3.255", hosts: "1,022 (Usable)", size: "1,024" }
+];
 
 function setupSubnetCalculator() {
   const ipInput = byId("calcIp");
@@ -3627,7 +3728,187 @@ function setupSubnetCalculator() {
     });
   });
 
+  const sheetBody = byId("cheatSheetBody");
+  if (sheetBody) {
+    sheetBody.innerHTML = cheatSheetMasks.map(m => `
+      <tr class="cheat-sheet-row" data-cidr="${m.cidr}">
+        <td style="padding: 6px;">/${m.cidr}</td>
+        <td style="padding: 6px;">${m.mask}</td>
+        <td style="padding: 6px;">${m.wildcard}</td>
+        <td style="padding: 6px; color: #10b981;">${m.hosts}</td>
+        <td style="padding: 6px; color: #00f2fe;">${m.size}</td>
+      </tr>
+    `).join("");
+  }
+
   updateSubnetCalculator();
+}
+
+/* --- CCNA Rapid Recall Flashcards Deck --- */
+let currentFlashcardIdx = 0;
+let flashcardFlipped = false;
+
+const ccnaFlashcards = [
+  {
+    topic: "Routing Protocols",
+    q: "What is the default Administrative Distance (AD) of OSPF?",
+    a: "110",
+    note: "OSPF relies on path cost (bandwidth) to determine the best path, with an AD of 110."
+  },
+  {
+    topic: "Routing Protocols",
+    q: "What is the default Administrative Distance (AD) of EIGRP?",
+    a: "90",
+    note: "EIGRP uses a composite metric (bandwidth and delay by default) and has an AD of 90."
+  },
+  {
+    topic: "Routing Protocols",
+    q: "What is the default Administrative Distance (AD) of RIP?",
+    a: "120",
+    note: "RIP uses hop count as its metric (maximum 15 hops) and has an AD of 120."
+  },
+  {
+    topic: "IP Services",
+    q: "Which port does SSH use, and what layer does it operate on?",
+    a: "TCP Port 22 (Layer 4)",
+    note: "SSH provides secure command-line access. Telnet uses unencrypted TCP Port 23."
+  },
+  {
+    topic: "IP Services",
+    q: "Which port does DHCP Server listen on, and which port does DHCP Client use?",
+    a: "Server: UDP Port 67, Client: UDP Port 68",
+    note: "DHCP processes use UDP packets to dynamically allocate network parameters to hosts."
+  },
+  {
+    topic: "Security Fundamentals",
+    q: "What range of numbers represents Standard IP Access Control Lists (ACLs)?",
+    a: "1 - 99 and 1300 - 1999",
+    note: "Standard ACLs filter traffic based *only* on source IP address and should be applied close to destination."
+  },
+  {
+    topic: "Security Fundamentals",
+    q: "What range of numbers represents Extended IP Access Control Lists (ACLs)?",
+    a: "100 - 199 and 2000 - 2699",
+    note: "Extended ACLs filter by source, destination, protocol type (TCP/UDP), and port number."
+  },
+  {
+    topic: "Network Access",
+    q: "What is the default bridge priority value for Spanning Tree Protocol (STP)?",
+    a: "32768",
+    note: "Bridge ID consists of Priority (default 32768) + System ID Extension (VLAN ID) + MAC Address."
+  },
+  {
+    topic: "Network Access",
+    q: "What is the destination MAC address for an ARP Request frame?",
+    a: "FF:FF:FF:FF:FF:FF",
+    note: "ARP Requests are broadcast frames sent to all devices on the local segment to resolve an IP to MAC."
+  },
+  {
+    topic: "IP Connectivity",
+    q: "What is the OSPFv2 link-state multicast destination IP address for all SPF routers?",
+    a: "224.0.0.5",
+    note: "All OSPF routers listen on 224.0.0.5. DR/BDR routers also listen on 224.0.0.6."
+  },
+  {
+    topic: "IP Connectivity",
+    q: "What is the default Administrative Distance (AD) of a Static Route?",
+    a: "1",
+    note: "Static routes are highly trusted and have a default AD of 1. Directly connected networks have AD of 0."
+  },
+  {
+    topic: "IP Services",
+    q: "Which port does NTP (Network Time Protocol) use?",
+    a: "UDP Port 123",
+    note: "NTP synchronizes clocks across networking devices for accurate log timestamps."
+  },
+  {
+    topic: "IP Connectivity",
+    q: "What IPv6 address prefix represents Link-Local addresses?",
+    a: "FE80::/10",
+    note: "Link-local addresses are auto-configured on every IPv6-enabled interface and are only routable locally."
+  },
+  {
+    topic: "IP Connectivity",
+    q: "What IPv6 multicast address represents the All-Nodes multicast group?",
+    a: "FF02::1",
+    note: "FF02::1 acts as the local broadcast equivalent for all IPv6 hosts on the link segment."
+  },
+  {
+    topic: "Network Access",
+    q: "What is the default priority value for HSRP (Hot Standby Router Protocol)?",
+    a: "100",
+    note: "HSRP priority default is 100. The router with the highest HSRP priority is elected as the Active router."
+  }
+];
+
+function updateFlashcardUI() {
+  const card = ccnaFlashcards[currentFlashcardIdx];
+  const countSpan = byId("flashcardCount");
+  const topicSpan = byId("flashcardTopic");
+  const questionSpan = byId("flashcardQuestion");
+  const answerSpan = byId("flashcardAnswer");
+  const noteSpan = byId("flashcardNote");
+  const innerCard = byId("flashcardInner");
+  
+  if (innerCard) {
+    if (flashcardFlipped) {
+      innerCard.classList.add("flipped");
+    } else {
+      innerCard.classList.remove("flipped");
+    }
+  }
+  
+  if (countSpan) countSpan.textContent = `Card ${currentFlashcardIdx + 1} / ${ccnaFlashcards.length}`;
+  if (topicSpan) topicSpan.textContent = card.topic;
+  if (questionSpan) questionSpan.textContent = card.q;
+  if (answerSpan) answerSpan.textContent = card.a;
+  if (noteSpan) noteSpan.textContent = card.note;
+}
+
+function setupFlashcards() {
+  const innerCard = byId("flashcardInner");
+  const btnPrev = byId("btnPrevFlashcard");
+  const btnNext = byId("btnNextFlashcard");
+  const btnFlip = byId("btnFlipFlashcard");
+  
+  if (innerCard) {
+    innerCard.addEventListener("click", () => {
+      playNetSound("click");
+      flashcardFlipped = !flashcardFlipped;
+      updateFlashcardUI();
+    });
+  }
+  
+  if (btnFlip) {
+    btnFlip.addEventListener("click", (e) => {
+      e.stopPropagation();
+      playNetSound("click");
+      flashcardFlipped = !flashcardFlipped;
+      updateFlashcardUI();
+    });
+  }
+  
+  if (btnPrev) {
+    btnPrev.addEventListener("click", (e) => {
+      e.stopPropagation();
+      playNetSound("click");
+      flashcardFlipped = false;
+      currentFlashcardIdx = (currentFlashcardIdx - 1 + ccnaFlashcards.length) % ccnaFlashcards.length;
+      updateFlashcardUI();
+    });
+  }
+  
+  if (btnNext) {
+    btnNext.addEventListener("click", (e) => {
+      e.stopPropagation();
+      playNetSound("click");
+      flashcardFlipped = false;
+      currentFlashcardIdx = (currentFlashcardIdx + 1) % ccnaFlashcards.length;
+      updateFlashcardUI();
+    });
+  }
+  
+  updateFlashcardUI();
 }
 
 function init() {
@@ -3648,6 +3929,7 @@ function init() {
   renderSubnetLeaderboard();
   ensureSubnetQuestion(true);
   setupSubnetCalculator();
+  setupFlashcards();
   
   if (typeof loadLab === "function") {
     loadLab(1);

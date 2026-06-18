@@ -1658,6 +1658,99 @@ button:focus, select:focus, input:focus, textarea:focus {
   }
 }
 
+/* Hero Radar Animation CSS */
+@keyframes radarSweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes pulseCenter {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px #ff5e3a); }
+  50% { transform: scale(1.25); filter: drop-shadow(0 0 8px #ff5e3a); }
+}
+@keyframes bounceNodes {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@media (max-width: 480px) {
+  .hero-graphics {
+    display: none !important;
+  }
+}
+
+/* 3D Flashcard Styles */
+.flashcard-container {
+  perspective: 1000px;
+}
+.flashcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  min-height: 130px;
+  cursor: pointer;
+}
+.flashcard-inner.flipped {
+  transform: rotateY(180deg);
+}
+.flashcard-front, .flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+.flashcard-front {
+  background: rgba(6, 9, 19, 0.75);
+  border: 1px solid rgba(0, 242, 254, 0.2);
+}
+.flashcard-back {
+  background: rgba(6, 9, 19, 0.75);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  transform: rotateY(180deg);
+}
+
+/* Cheat Sheet Table Styles */
+.cheat-sheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 10px;
+}
+.cheat-sheet-table th {
+  padding: 8px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.cheat-sheet-table td {
+  padding: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-family: var(--font-mono);
+}
+.cheat-sheet-row {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.cheat-sheet-row.highlighted-row {
+  background: rgba(0, 242, 254, 0.12) !important;
+  color: #00f2fe;
+  font-weight: bold;
+}
+.cheat-sheet-row.highlighted-row td {
+  border-top: 1px solid rgba(0, 242, 254, 0.4);
+  border-bottom: 1px solid rgba(0, 242, 254, 0.4);
+}
+
 
 
 
