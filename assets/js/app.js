@@ -19,8 +19,7 @@ const state = {
 };
 
 function rand() {
-  state.seed = (state.seed * 1664525 + 1013904223) % 4294967296;
-  return state.seed / 4294967296;
+  return Math.random();
 }
 
 function pick(arr) {
@@ -113,7 +112,15 @@ function readinessScore() {
   const acc = (a.correct / a.totalQ) * 100;
   const avgSec = a.totalTime / a.totalQ;
   const speed = Math.max(0, Math.min(100, 100 - ((avgSec - 45) * 0.9)));
-  return Math.round(acc * 0.75 + speed * 0.25);
+  const baseScore = acc * 0.75 + speed * 0.25;
+
+  const solvedCount = a.totalQ || 0;
+  const quizzesCompleted = a.attempts ? a.attempts.length : 0;
+  const qFactor = Math.min(1, solvedCount / 150);
+  const quizFactor = Math.min(1, quizzesCompleted / 5);
+  const volumeMultiplier = 0.5 * qFactor + 0.5 * quizFactor;
+
+  return Math.round(baseScore * volumeMultiplier);
 }
 
 function passProbability() {
@@ -329,12 +336,14 @@ function renderHome() {
   const heroReadiness = byId("heroReadiness");
   const heroReadinessBar = byId("heroReadinessBar");
   const heroQuestions = byId("heroQuestions");
+  const heroQuizzes = byId("heroQuizzes");
   const heroStreak = byId("heroStreak");
   const heroLabs = byId("heroLabs");
   
   if (heroReadiness) heroReadiness.textContent = `${rs}%`;
   if (heroReadinessBar) heroReadinessBar.style.width = `${rs}%`;
   if (heroQuestions) heroQuestions.textContent = state.analytics.totalQ || 0;
+  if (heroQuizzes) heroQuizzes.textContent = state.analytics.attempts ? state.analytics.attempts.length : 0;
   if (heroStreak) heroStreak.textContent = `${state.analytics.streak || 0} Days`;
   if (heroLabs) heroLabs.textContent = `${state.analytics.labsCompleted || 0} / 10`;
   
@@ -452,6 +461,7 @@ function toMMSS(sec) {
 }
 
 function startSession(mode) {
+  state.bank = shuffle(state.bank);
   let conf;
   if (mode === "study") {
     conf = {
@@ -516,6 +526,7 @@ function startSession(mode) {
     answers: {},
     flagged: {},
     feedback: {},
+    statsApplied: {},
     startedAt: Date.now(),
     qStartAt: Date.now(),
     timeLeft: conf.minutes * 60,
@@ -544,6 +555,8 @@ function startSession(mode) {
   byId("reviewArea").classList.add("hidden");
   byId("resultArea").classList.add("hidden");
   byId("questionArea").classList.remove("hidden");
+  const examFooter = byId("examFooter") || document.querySelector(".exam-footer");
+  if (examFooter) examFooter.style.display = "flex";
   renderNavigator();
   renderQuestion();
 }
@@ -704,6 +717,32 @@ function renderQuestion() {
   if (ok != null) html += explanationBlock(q, ok);
 
   byId("questionArea").innerHTML = html;
+  
+  // Toggle footer navigation buttons based on current question index
+  const prevBtn = byId("prevQ");
+  const markBtn = byId("toggleMark");
+  const openReviewBtn = byId("openReview");
+  const saveNextBtn = byId("saveNext");
+  const submitSessionBtn = byId("submitSession");
+
+  if (prevBtn) {
+    prevBtn.style.display = "";
+    prevBtn.disabled = (s.idx === 0);
+  }
+  if (markBtn) markBtn.style.display = "";
+  if (openReviewBtn) openReviewBtn.style.display = "";
+
+  if (s.idx === s.questions.length - 1) {
+    if (saveNextBtn) saveNextBtn.style.display = "none";
+    if (submitSessionBtn) {
+      submitSessionBtn.style.display = "";
+      submitSessionBtn.textContent = s.mode === "exam" ? "Submit Exam" : "Submit Quiz";
+    }
+  } else {
+    if (saveNextBtn) saveNextBtn.style.display = "";
+    if (submitSessionBtn) submitSessionBtn.style.display = "none";
+  }
+
   wireQuestionInputs();
 }
 
@@ -771,7 +810,12 @@ function instantStudyFeedback(e) {
   const ans = s.answers[s.idx];
   const ok = answerEquals(q, ans);
   s.feedback[s.idx] = ok;
-  applyStats(q, ok, 35);
+
+  if (!s.statsApplied) s.statsApplied = {};
+  if (!s.statsApplied[s.idx]) {
+    s.statsApplied[s.idx] = true;
+    applyStats(q, ok, 35);
+  }
 
   // Update missedIds list
   if (!state.analytics.missedIds) state.analytics.missedIds = [];
@@ -853,6 +897,22 @@ function openReview() {
 
   const f = byId("finalizeFromReview");
   if (f) f.addEventListener("click", () => submitSession());
+
+  // Hide normal navigation buttons and show only Submit Session in footer
+  const prevBtn = byId("prevQ");
+  const markBtn = byId("toggleMark");
+  const openReviewBtn = byId("openReview");
+  const saveNextBtn = byId("saveNext");
+  const submitSessionBtn = byId("submitSession");
+
+  if (prevBtn) prevBtn.style.display = "none";
+  if (markBtn) markBtn.style.display = "none";
+  if (openReviewBtn) openReviewBtn.style.display = "none";
+  if (saveNextBtn) saveNextBtn.style.display = "none";
+  if (submitSessionBtn) {
+    submitSessionBtn.style.display = "";
+    submitSessionBtn.textContent = s.mode === "exam" ? "Submit Exam" : "Submit Quiz";
+  }
 }
 
 function submitSession(force) {
@@ -889,7 +949,11 @@ function submitSession(force) {
     if (!domain[q.domain]) domain[q.domain] = { total: 0, correct: 0 };
     domain[q.domain].total += 1;
     if (ok) domain[q.domain].correct += 1;
-    applyStats(q, ok, 55);
+    if (!s.statsApplied) s.statsApplied = {};
+    if (!s.statsApplied[i]) {
+      s.statsApplied[i] = true;
+      applyStats(q, ok, 55);
+    }
     if (!ok) wrong.push({ i, q });
   });
 
@@ -949,6 +1013,8 @@ function submitSession(force) {
   byId("resultArea").classList.remove("hidden");
   byId("reviewArea").classList.add("hidden");
   byId("questionArea").classList.add("hidden");
+  const examFooter = byId("examFooter") || document.querySelector(".exam-footer");
+  if (examFooter) examFooter.style.display = "none";
 
   const rsa = byId("resultArea");
   if (rsa) rsa.scrollTop = 0;
@@ -987,6 +1053,7 @@ function renderAnalytics() {
   renderStatsCards("analyticsStats", [
     { k: "Overall Readiness Score", v: `${readinessScore()}%` },
     { k: "CCNA Pass Probability", v: `${pp}%` },
+    { k: "Quizzes Completed", v: state.analytics.attempts ? state.analytics.attempts.length : 0 },
     { k: "Study Hours", v: (state.analytics.studyMin / 60).toFixed(1) },
     { k: "Average Time Per Question", v: `${avg}s` },
     { k: "Weakest Domain", v: weak ? `${weak[0]} (${weak[1]}%)` : "N/A" },
