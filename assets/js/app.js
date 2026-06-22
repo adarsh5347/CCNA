@@ -69,6 +69,56 @@ function saveAnalytics() {
   }
 }
 
+function persistSession() {
+  if (!state.session) {
+    sessionStorage.removeItem("ccna_session");
+    return;
+  }
+  const copy = { ...state.session };
+  delete copy.timer;
+  sessionStorage.setItem("ccna_session", JSON.stringify(copy));
+}
+
+function restoreSession() {
+  const raw = sessionStorage.getItem("ccna_session");
+  if (!raw) return false;
+  try {
+    const saved = JSON.parse(raw);
+    if (saved && !saved.submitted) {
+      state.session = saved;
+      const timer = byId("timer");
+      if (timer) {
+        timer.classList.remove("hidden", "warn", "danger");
+        timer.textContent = toMMSS(state.session.timeLeft);
+      }
+      state.session.timer = setInterval(() => {
+        state.session.timeLeft -= 1;
+        const tEl = byId("timer");
+        if (tEl) {
+          tEl.textContent = toMMSS(state.session.timeLeft);
+          tEl.classList.toggle("warn", state.session.timeLeft <= 600 && state.session.timeLeft > 180);
+          tEl.classList.toggle("danger", state.session.timeLeft <= 180);
+        }
+        persistSession();
+        if (state.session.timeLeft <= 0) submitSession(true);
+      }, 1000);
+      
+      setPage("engine");
+      byId("reviewArea").classList.add("hidden");
+      byId("resultArea").classList.add("hidden");
+      byId("questionArea").classList.remove("hidden");
+      const examFooter = byId("examFooter") || document.querySelector(".exam-footer");
+      if (examFooter) examFooter.style.display = "flex";
+      renderNavigator();
+      renderQuestion();
+      return true;
+    }
+  } catch (e) {
+    console.error("Failed to restore session:", e);
+  }
+  return false;
+}
+
 function byId(id) {
   return document.getElementById(id);
 }
@@ -81,10 +131,12 @@ function setPage(page) {
     const headerTimerEl = byId("headerTimer");
     if (headerTimerEl) headerTimerEl.classList.add("hidden");
     state.session = null;
+    persistSession();
   }
 
   // Clear active subnetting challenge timer if leaving subnetting page
   if (page !== "subnet" && state.subnet && state.subnet.timer) {
+    if (!confirm("You have an active subnetting challenge running. Are you sure you want to leave? Your streak will be reset.")) return;
     clearInterval(state.subnet.timer);
     state.subnet.timer = null;
   }
@@ -476,8 +528,16 @@ function startSession(mode) {
       questions: weightedSelection(40, [])
     };
   } else if (mode === "quiz") {
-    const minutes = Number(byId("quizDuration").value);
-    const count = Number(byId("quizCount").value);
+    let minutes = Number(byId("quizDuration").value);
+    let count = Number(byId("quizCount").value);
+    if (isNaN(minutes) || minutes <= 0 || minutes > 300) {
+      minutes = 30;
+      if (byId("quizDuration")) byId("quizDuration").value = 30;
+    }
+    if (isNaN(count) || count <= 0 || count > 100) {
+      count = 20;
+      if (byId("quizCount")) byId("quizCount").value = 20;
+    }
     const domains = [...document.querySelectorAll(".qdomain:checked")].map((x) => x.value);
     conf = {
       title: "Section Quiz Mode",
@@ -488,7 +548,11 @@ function startSession(mode) {
       questions: weightedSelection(count, domains)
     };
   } else if (mode === "smart") {
-    const count = Number(byId("smartQuizCount").value);
+    let count = Number(byId("smartQuizCount").value);
+    if (isNaN(count) || count <= 0 || count > 100) {
+      count = 15;
+      if (byId("smartQuizCount")) byId("smartQuizCount").value = 15;
+    }
     const weakDomains = state.weakDomains || [];
     conf = {
       title: "Smart Adaptive Quiz",
@@ -499,7 +563,11 @@ function startSession(mode) {
       questions: weightedSelection(count, weakDomains)
     };
   } else if (mode === "missed") {
-    const count = Number(byId("missedQuizCount").value);
+    let count = Number(byId("missedQuizCount").value);
+    if (isNaN(count) || count <= 0 || count > 100) {
+      count = 10;
+      if (byId("missedQuizCount")) byId("missedQuizCount").value = 10;
+    }
     const missedList = state.bank.filter((q) => (state.analytics.missedIds || []).includes(q.id));
     conf = {
       title: "Spaced Repetition Quiz",
@@ -541,6 +609,7 @@ function startSession(mode) {
     timer: null,
     submitted: false
   };
+  persistSession();
 
   const modeTitleEl = byId("modeTitle");
   if (modeTitleEl) modeTitleEl.textContent = conf.title;
@@ -572,6 +641,7 @@ function startSession(mode) {
 function navToQuestion(i) {
   state.session.idx = Math.max(0, Math.min(state.session.questions.length - 1, i));
   state.session.qStartAt = Date.now();
+  persistSession();
   renderNavigator();
   renderQuestion();
 
@@ -620,6 +690,7 @@ function renderNavigator() {
 function markCurrent() {
   const s = state.session;
   s.flagged[s.idx] = !s.flagged[s.idx];
+  persistSession();
   renderNavigator();
 }
 
@@ -764,6 +835,7 @@ function wireQuestionInputs() {
     el.addEventListener("change", (e) => {
       s.answers[s.idx] = Number(el.value);
       instantStudyFeedback(e);
+      persistSession();
       renderNavigator();
     });
   });
@@ -772,6 +844,7 @@ function wireQuestionInputs() {
     el.addEventListener("change", (e) => {
       s.answers[s.idx] = [...byId("questionArea").querySelectorAll("input[type='checkbox']:checked")].map((x) => Number(x.value));
       instantStudyFeedback(e);
+      persistSession();
       renderNavigator();
     });
   });
@@ -782,6 +855,7 @@ function wireQuestionInputs() {
       cur[Number(el.dataset.match)] = el.value;
       s.answers[s.idx] = cur;
       instantStudyFeedback(e);
+      persistSession();
       renderNavigator();
     });
   });
@@ -794,6 +868,7 @@ function wireQuestionInputs() {
       [list[i], list[i - 1]] = [list[i - 1], list[i]];
       s.answers[s.idx] = list;
       instantStudyFeedback(e);
+      persistSession();
       renderQuestion();
       renderNavigator();
     });
@@ -807,6 +882,7 @@ function wireQuestionInputs() {
       [list[i], list[i + 1]] = [list[i + 1], list[i]];
       s.answers[s.idx] = list;
       instantStudyFeedback(e);
+      persistSession();
       renderQuestion();
       renderNavigator();
     });
@@ -935,6 +1011,7 @@ function submitSession(force) {
 
   s.submitted = true;
   clearInterval(s.timer);
+  persistSession();
   const timer = byId("timer");
   if (timer) timer.classList.add("hidden");
 
@@ -2230,6 +2307,7 @@ function setupAuth() {
 
       // Clear guest progress so it isn't merged again on next login
       if (didMergeGuest) {
+        localStorage.setItem(`${STORE}_backup`, guestRaw);
         localStorage.removeItem(STORE);
       }
 
@@ -2245,7 +2323,10 @@ function setupAuth() {
       userName.textContent = "";
 
       console.log("User logged out. Restoring guest progress...");
-      const guestData = localStorage.getItem(STORE);
+      let guestData = localStorage.getItem(STORE);
+      if (!guestData) {
+        guestData = localStorage.getItem(`${STORE}_backup`);
+      }
       state.analytics = guestData ? JSON.parse(guestData) : {
         attempts: [],
         domain: {},
@@ -2624,6 +2705,13 @@ function renderCLI(nodeName) {
           </select>
           <button id="btnApplyTroubleFix" class="primary" style="align-self:flex-start; margin-top:4px; padding:6px 14px; font-size:11.5px; border-radius:6px;">Apply Configuration</button>
         </div>
+        
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:14px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:12px;">
+          <label style="font-size:11px; color:#94a3b8; font-weight:bold;">Or type the exact Cisco configuration command manually (supports aliases like "int gi0/0"):</label>
+          <input type="text" id="cliTroubleTypedInput" placeholder="e.g. interface GigabitEthernet0/0/0" style="width:100%; font-family:var(--font-mono); font-size:11px; background:#111827; border:1px solid #374151; color:#fff; padding:6px; border-radius:6px;" />
+          <button id="btnApplyTypedTroubleFix" class="secondary" style="align-self:flex-start; padding:6px 14px; font-size:11.5px; border-radius:6px;">Submit Command</button>
+        </div>
+        
         <div id="cliTroubleResult" style="margin-top:12px; font-family:var(--font-mono); font-size:11px; white-space:pre-wrap; display:none;"></div>
       </div>
     `;
@@ -2657,7 +2745,6 @@ ${nodeName.toUpperCase()}# write memory
           
           gainXP(30);
           
-          // Re-render standard CLI after 2.5 seconds
           setTimeout(() => {
             renderCLI(nodeName);
           }, 2500);
@@ -2671,6 +2758,70 @@ ${nodeName.toUpperCase()}# configure terminal
 ${nodeName.toUpperCase()}(config)# ${option.cmd.trim().replace(/\n/g, '\n' + nodeName.toUpperCase() + '(config)# ')}
 % Invalid command configuration. Rejected by Cisco IOS CLI syntax analyzer.
             `;
+          }
+        }
+      });
+    }
+
+    const btnApplyTyped = byId("btnApplyTypedTroubleFix");
+    if (btnApplyTyped) {
+      btnApplyTyped.addEventListener("click", () => {
+        const typedInput = byId("cliTroubleTypedInput");
+        const val = typedInput.value.trim().toLowerCase();
+        const resultDiv = byId("cliTroubleResult");
+        if (!val) return;
+        
+        const correctOption = bug.options.find(o => o.correct);
+        if (!correctOption) return;
+        
+        const cleanTyped = val.replace(/\s+/g, " ")
+                            .replace(/^interface\s/, "int ")
+                            .replace(/^gigabitethernet/, "gi")
+                            .replace(/^fastethernet/, "fa")
+                            .replace(/^ethernet/, "eth")
+                            .replace(/^shutdown/, "shut")
+                            .replace(/^no shutdown/, "no shut");
+                            
+        const cleanCorrect = correctOption.cmd.toLowerCase().replace(/\s+/g, " ")
+                            .replace(/^interface\s/, "int ")
+                            .replace(/^gigabitethernet/, "gi")
+                            .replace(/^fastethernet/, "fa")
+                            .replace(/^ethernet/, "eth")
+                            .replace(/^shutdown/, "shut")
+                            .replace(/^no shutdown/, "no shut");
+                            
+        const typedLines = cleanTyped.split(/\s*\\n\s*|\s*\n\s*/);
+        const correctLines = cleanCorrect.split(/\s*\\n\s*|\s*\n\s*/);
+        
+        let allMatch = typedLines.length === correctLines.length && typedLines.every((line, idx) => {
+          return line.trim() === correctLines[idx].trim();
+        });
+        
+        if (allMatch) {
+          playNetSound("success");
+          state.simBugsFixed[currentPacketType] = true;
+          if (resultDiv) {
+            resultDiv.style.display = "block";
+            resultDiv.style.color = "#10b981";
+            resultDiv.innerHTML = `
+${nodeName.toUpperCase()}# configure terminal
+Enter configuration commands, one per line. End with CNTL/Z.
+${nodeName.toUpperCase()}(config)# ${correctOption.cmd.trim().replace(/\n/g, '\n' + nodeName.toUpperCase() + '(config)# ')}
+${nodeName.toUpperCase()}(config)# end
+${nodeName.toUpperCase()}# write memory
+% Building configuration...
+% [OK] Configuration applied successfully. Status: synchronized.
+✔ Bug resolved! +30 XP rewarded.
+            `;
+          }
+          gainXP(30);
+          setTimeout(() => { renderCLI(nodeName); }, 2500);
+        } else {
+          playNetSound("block");
+          if (resultDiv) {
+            resultDiv.style.display = "block";
+            resultDiv.style.color = "#ff5e3a";
+            resultDiv.innerHTML = `% Invalid command: "${typedInput.value}"\nRejected by Cisco IOS CLI parser. (Hint: check correct command syntax/options)`;
           }
         }
       });
@@ -3540,10 +3691,22 @@ function setupCanvasConstellation() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
   };
+  // Cleanup any old listeners to prevent memory leak
+  if (window._canvasResizeListener) {
+    window.removeEventListener("resize", window._canvasResizeListener);
+  }
+  if (window._canvasMouseMoveListener) {
+    window.removeEventListener("mousemove", window._canvasMouseMoveListener);
+  }
+  if (window._canvasMouseOutListener) {
+    window.removeEventListener("mouseout", window._canvasMouseOutListener);
+  }
+
+  window._canvasResizeListener = resize;
   window.addEventListener("resize", resize);
   resize();
 
-  window.addEventListener("mousemove", (e) => {
+  const handleMouseMove = (e) => {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
 
@@ -3556,12 +3719,16 @@ function setupCanvasConstellation() {
       p.decay = 0.025; // fade out quickly
       activeExplosionParticles.push(p);
     }
-  });
+  };
+  window._canvasMouseMoveListener = handleMouseMove;
+  window.addEventListener("mousemove", handleMouseMove);
 
-  window.addEventListener("mouseout", () => {
+  const handleMouseOut = () => {
     mouse.x = null;
     mouse.y = null;
-  });
+  };
+  window._canvasMouseOutListener = handleMouseOut;
+  window.addEventListener("mouseout", handleMouseOut);
 
   class Particle {
     constructor() {
@@ -4193,7 +4360,22 @@ function init() {
     loadLab(1);
   }
   
-  setPage("home");
+  window.addEventListener("beforeunload", (e) => {
+    if (state.session && !state.session.submitted) {
+      e.preventDefault();
+      e.returnValue = "You have an active CCNA quiz session. Are you sure you want to leave?";
+      return e.returnValue;
+    }
+    if (state.subnet && state.subnet.timer) {
+      e.preventDefault();
+      e.returnValue = "You have an active subnetting challenge running. Are you sure you want to leave?";
+      return e.returnValue;
+    }
+  });
+  
+  if (!restoreSession()) {
+    setPage("home");
+  }
 }
 
 init();
