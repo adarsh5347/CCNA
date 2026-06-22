@@ -6,7 +6,7 @@
   --border-color: rgba(255, 255, 255, 0.08);
   --border-glow: rgba(0, 242, 254, 0.2);
   --text-main: #f8fafc;
-  --text-muted: #94a3b8;
+  --text-muted: #a1b2c8;
   --accent-orange: linear-gradient(135deg, #ff5e3a, #ff9233);
   --accent-cyan: linear-gradient(135deg, #00f2fe, #4facfe);
   --color-ok: #10b981;
@@ -1145,6 +1145,9 @@ textarea {
     flex: 1;
     width: 100%;
   }
+  #supportForm .row-compact {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 @media (max-width: 500px) {
@@ -1880,7 +1883,23 @@ button:focus, select:focus, input:focus, textarea:focus {
   }
 }
 
+/* BUG-009: Accessible focus indicators */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #00f2fe;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 242, 254, 0.15);
+}
 
+.opt:focus-within {
+  outline: 2px solid rgba(0, 242, 254, 0.4);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
 
 
 

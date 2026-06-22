@@ -10,7 +10,7 @@ const state = {
   bank: [],
   analytics: loadAnalytics(),
   session: null,
-  subnet: { mode: "Easy", q: null, score: 0, attempts: 0, streak: 0, timerVal: 30, timerInterval: null, leaderboard: JSON.parse(localStorage.getItem("subnet_leaderboard")) || [] },
+  subnet: { mode: "Easy", q: null, score: 0, attempts: 0, streak: 0, timerVal: 30, timerInterval: null, leaderboard: (() => { try { return JSON.parse(localStorage.getItem("subnet_leaderboard")) || []; } catch { return []; } })() },
   lab: { currentLabId: 1, mode: "step", completedSteps: {}, userCommands: [], currentPrompt: "Switch(config)#" },
   user: null,
   muted: localStorage.getItem("ccna_muted") === "true",
@@ -76,8 +76,10 @@ function byId(id) {
 function setPage(page) {
   // Clear active study/exam session if navigating away from engine page
   if (page !== "engine" && state.session && !state.session.submitted) {
+    if (!confirm("You have an active quiz session. Are you sure you want to leave? Your progress will be lost.")) return;
     if (state.session.timer) clearInterval(state.session.timer);
-    byId("timer").classList.add("hidden");
+    const headerTimerEl = byId("headerTimer");
+    if (headerTimerEl) headerTimerEl.classList.add("hidden");
     state.session = null;
   }
 
@@ -462,6 +464,7 @@ function toMMSS(sec) {
 
 function startSession(mode) {
   state.bank = shuffle(state.bank);
+  // Validate that session will have questions
   let conf;
   if (mode === "study") {
     conf = {
@@ -515,6 +518,11 @@ function startSession(mode) {
       minutes: 120,
       questions: examSelection()
     };
+  }
+
+  if (!conf.questions || conf.questions.length === 0) {
+    alert("No questions available for the selected configuration. Please select at least one domain or adjust your filters.");
+    return;
   }
 
   if (state.session && state.session.timer) clearInterval(state.session.timer);
@@ -703,7 +711,9 @@ function renderQuestion() {
   } else if (q.type === "matching") {
     const cur = s.answers[s.idx] || {};
     q.pairs.forEach((pair, i) => {
-      const opts = shuffle(q.pairs.map((x) => x[1]));
+      if (!s._matchOpts) s._matchOpts = {};
+      if (!s._matchOpts[s.idx]) s._matchOpts[s.idx] = shuffle(q.pairs.map((x) => x[1]));
+      const opts = s._matchOpts[s.idx];
       html += `<div class="opt"><strong>${pair[0]}</strong><br /><select data-match="${i}"><option value="">Select</option>${opts.map((x) => `<option ${cur[i] === x ? "selected" : ""} value="${x}">${x}</option>`).join("")}</select></div>`;
     });
   } else {
@@ -3484,6 +3494,7 @@ function setupCanvasConstellation() {
   
   let particles = [];
   let activeExplosionParticles = [];
+  let animFrameId;
 
   class ExplosionParticle {
     constructor(x, y, color) {
@@ -3694,7 +3705,7 @@ function setupCanvasConstellation() {
           }
         }
       }
-      setTimeout(() => requestAnimationFrame(animate), 500);
+      setTimeout(() => { animFrameId = requestAnimationFrame(animate); }, 500);
       return;
     }
 
@@ -3752,9 +3763,17 @@ function setupCanvasConstellation() {
       }
     });
 
-    requestAnimationFrame(animate);
+    animFrameId = requestAnimationFrame(animate);
   };
-  animate();
+  animFrameId = requestAnimationFrame(animate);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      cancelAnimationFrame(animFrameId);
+    } else {
+      animFrameId = requestAnimationFrame(animate);
+    }
+  });
 }
 
 function setupSupportDesk() {

@@ -10,12 +10,21 @@
   <meta property="og:description" content="Prepare for your Cisco certification with realistic simulated exams, spaced-repetition quizzes, and in-depth command explanations." />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23060913'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='%2300f2fe' font-family='sans-serif' font-weight='bold'>C</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
+<noscript>
+  <div style="background: #060913; color: #f8fafc; font-family: sans-serif; padding: 40px; text-align: center; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <div>
+      <h1 style="font-size: 28px; margin-bottom: 16px;">CCNA 200-301 Prep Platform</h1>
+      <p style="font-size: 16px; color: #94a3b8;">This application requires JavaScript to run. Please enable JavaScript in your browser settings and reload the page.</p>
+    </div>
+  </div>
+</noscript>
   <canvas id="netCanvas"></canvas>
   <header class="topbar">
     <div class="brand">
@@ -59,7 +68,7 @@
       <button id="btnMuteToggle" class="ghost" aria-label="Toggle Sound" style="padding: 8px;">🔊</button>
       <button id="btnToggleContrast" class="ghost" aria-label="Toggle High Contrast" style="padding: 8px;">🌓</button>
       <span id="headerXPBadge" class="timer" style="background: rgba(0, 242, 254, 0.08); border-color: rgba(0, 242, 254, 0.3); color: #00f2fe; font-size: 12px; padding: 4px 10px;">Lvl 1 (0 XP)</span>
-      <span id="timer" class="timer hidden" aria-live="polite">120:00</span>
+      <span id="headerTimer" class="timer hidden" aria-live="polite">120:00</span>
       <div id="authContainer" class="auth-container">
         <button id="btnSignIn" class="secondary">🔑 Sign In</button>
         <div id="userProfile" class="user-profile hidden">
