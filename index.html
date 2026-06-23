@@ -845,6 +845,28 @@
         <h3>Improvement Trend</h3>
         <div id="trend"></div>
       </section>
+      
+      <section class="card">
+        <h3>📅 NOC Dynamic Exam Study Planner</h3>
+        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">Set your target exam date to generate a personalized daily training regimen based on your weak domains and readiness level.</p>
+        <div style="display: flex; gap: 12px; align-items: center; margin-top: 14px; flex-wrap: wrap;">
+          <div>
+            <label for="studyExamDate" style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px; color: var(--text-muted);">Target Exam Date</label>
+            <input type="date" id="studyExamDate" style="background: #111827; border: 1px solid #374151; color: #fff; padding: 8px; border-radius: 8px; font-size: 12.5px;" />
+          </div>
+          <div>
+            <label for="studyDailyHours" style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px; color: var(--text-muted);">Daily Study Target</label>
+            <select id="studyDailyHours" style="background: #111827; border: 1px solid #374151; color: #fff; padding: 8px; border-radius: 8px; min-width: 120px; font-size: 12.5px;">
+              <option value="1">1 Hour</option>
+              <option value="2" selected>2 Hours</option>
+              <option value="3">3 Hours</option>
+              <option value="4">4+ Hours</option>
+            </select>
+          </div>
+          <button id="btnGeneratePlan" class="primary" style="margin-top: 18px; padding: 8px 16px; font-size: 12.5px;">Generate Plan</button>
+        </div>
+        <div id="studyPlanOutput" style="margin-top: 18px; padding: 16px; background: rgba(0, 242, 254, 0.03); border: 1px dashed rgba(0, 242, 254, 0.3); border-radius: 10px; display: none; font-size: 13px; line-height: 1.6;"></div>
+      </section>
     </section>
 
     <!-- HELP & SUPPORT PAGE -->
@@ -955,6 +977,42 @@
       </div>
     </section>
   </main>
+
+  <!-- Welcome Onboarding Modal -->
+  <div id="onboardingModal" class="modal-overlay hidden" style="position: fixed; inset: 0; background: rgba(3, 5, 12, 0.88); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 16px;">
+    <div class="card" style="max-width: 500px; width: 100%; background: #0d1324; border: 1.5px solid #00f2fe; border-radius: 16px; padding: 28px; box-shadow: 0 0 25px rgba(0,242,254,0.2); animation: zoomIn 0.3s ease;">
+      <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: #00f2fe; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">🚀 WELCOME TO NOC COMMAND</h2>
+      <p style="color: var(--text-muted); font-size: 14px; line-height: 1.6;">You are now in command of the CCNA 200-301 Network Operations Command. Let's brief your station parameters:</p>
+      
+      <div style="margin: 20px 0; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+          <span style="font-size: 20px;">⚡</span>
+          <div>
+            <strong style="color: #fff; font-size: 14px;">Adaptive Quiz Engine</strong>
+            <p style="margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted);">Configure custom drills or take full 120-question timed exam simulations.</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+          <span style="font-size: 20px;">🕸️</span>
+          <div>
+            <strong style="color: #fff; font-size: 14px;">Packet Traversal Simulator</strong>
+            <p style="margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted);">Visualize frame encapsulation, Layer 2 header updates, and routing hops live.</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+          <span style="font-size: 20px;">🧪</span>
+          <div>
+            <strong style="color: #fff; font-size: 14px;">10 Virtual IOS Labs</strong>
+            <p style="margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted);">Step-by-step, Challenge, and Exam configuration CLI environments.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+        <button id="btnOnboardingDismiss" class="primary" style="padding: 10px 20px; font-size: 13px; border-radius: 8px;">Acknowledge & Begin</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="assets/js/app.js"></script>
 </body>

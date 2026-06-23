@@ -18,6 +18,24 @@ const state = {
   simBugsFixed: {}
 };
 
+function safeHTML(str) {
+  if (typeof str !== "string") return str;
+  let escaped = str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+  escaped = escaped
+    .replace(/&lt;b&gt;/g, "<b>").replace(/&lt;\/b&gt;/g, "</b>")
+    .replace(/&lt;i&gt;/g, "<i>").replace(/&lt;\/i&gt;/g, "</i>")
+    .replace(/&lt;br\s*\/*&gt;/g, "<br />")
+    .replace(/&lt;code&gt;/g, "<code>").replace(/&lt;\/code&gt;/g, "</code>")
+    .replace(/&lt;strong&gt;/g, "<strong>").replace(/&lt;\/strong&gt;/g, "</strong>")
+    .replace(/&lt;pre&gt;/g, "<pre>").replace(/&lt;\/pre&gt;/g, "</pre>");
+  return escaped;
+}
+
 function rand() {
   return Math.random();
 }
@@ -737,18 +755,18 @@ function explanationBlock(q, ok) {
   return `
     <section class="block ${ok ? "correct" : "wrong"}">
       <h4>Detailed Explanation</h4>
-      <p><strong>Correct answer:</strong> ${e.correct}</p>
-      <p><strong>Why correct:</strong> ${e.why}</p>
+      <p><strong>Correct answer:</strong> ${safeHTML(e.correct)}</p>
+      <p><strong>Why correct:</strong> ${safeHTML(e.why)}</p>
       <p><strong>Why others are wrong:</strong></p>
       <ul>
-        <li>${e.wrong[0]}</li>
-        <li>${e.wrong[1]}</li>
-        <li>${e.wrong[2]}</li>
+        <li>${safeHTML(e.wrong[0])}</li>
+        <li>${safeHTML(e.wrong[1])}</li>
+        <li>${safeHTML(e.wrong[2])}</li>
       </ul>
-      <p><strong>Cisco exam tip:</strong> ${e.tip}</p>
-      <p><strong>Memory trick:</strong> ${e.memory}</p>
-      <p><strong>Real world example:</strong> ${e.real}</p>
-      <p><strong>Related commands:</strong> ${e.commands.join(" | ")}</p>
+      <p><strong>Cisco exam tip:</strong> ${safeHTML(e.tip)}</p>
+      <p><strong>Memory trick:</strong> ${safeHTML(e.memory)}</p>
+      <p><strong>Real world example:</strong> ${safeHTML(e.real)}</p>
+      <p><strong>Related commands:</strong> ${e.commands.map(x => safeHTML(x)).join(" | ")}</p>
     </section>
   `;
 }
@@ -759,38 +777,38 @@ function renderQuestion() {
   if (!q) return;
 
   let html = `
-    <span class="badge">${q.domain}</span><span class="badge">${q.topic}</span>
-    ${q.scenario ? `<div class="block"><strong>Scenario:</strong> ${q.scenario}</div>` : ""}
-    <h3>${q.text}</h3>
+    <span class="badge">${safeHTML(q.domain)}</span><span class="badge">${safeHTML(q.topic)}</span>
+    ${q.scenario ? `<div class="block"><strong>Scenario:</strong> ${safeHTML(q.scenario)}</div>` : ""}
+    <h3>${safeHTML(q.text)}</h3>
     <div class="meta">
-      <div><strong>Difficulty</strong><br />${q.difficulty}</div>
-      <div><strong>Exam Weight</strong><br />${q.examWeight}</div>
-      <div><strong>Topic Domain</strong><br />${q.domain}</div>
-      <div><strong>Expected Frequency</strong><br />${q.frequency}</div>
+      <div><strong>Difficulty</strong><br />${safeHTML(q.difficulty)}</div>
+      <div><strong>Exam Weight</strong><br />${safeHTML(q.examWeight)}</div>
+      <div><strong>Topic Domain</strong><br />${safeHTML(q.domain)}</div>
+      <div><strong>Expected Frequency</strong><br />${safeHTML(q.frequency)}</div>
     </div>
-    ${q.topology ? `<div class="block">${q.topology.replace(/\n/g, "<br />")}</div>` : ""}
-    ${q.cli ? `<div class="block cli">${q.cli.replace(/\n/g, "<br />")}</div>` : ""}
-    ${q.packet ? `<div class="block packet">Packet: ${q.packet}</div>` : ""}
+    ${q.topology ? `<div class="block">${safeHTML(q.topology).replace(/\n/g, "<br />")}</div>` : ""}
+    ${q.cli ? `<div class="block cli">${safeHTML(q.cli).replace(/\n/g, "<br />")}</div>` : ""}
+    ${q.packet ? `<div class="block packet">Packet: ${safeHTML(q.packet)}</div>` : ""}
   `;
 
   if (q.type === "single" || q.type === "scenario") {
     const v = s.answers[s.idx];
-    html += q.options.map((o, i) => `<label class="opt"><input type="radio" name="single" value="${i}" ${v === i ? "checked" : ""}/> ${String.fromCharCode(65 + i)}. ${o}</label>`).join("");
+    html += q.options.map((o, i) => `<label class="opt"><input type="radio" name="single" value="${i}" ${v === i ? "checked" : ""}/> ${String.fromCharCode(65 + i)}. ${safeHTML(o)}</label>`).join("");
   } else if (q.type === "multi") {
     const selected = Array.isArray(s.answers[s.idx]) ? s.answers[s.idx] : [];
-    html += q.options.map((o, i) => `<label class="opt"><input type="checkbox" value="${i}" ${selected.includes(i) ? "checked" : ""}/> ${String.fromCharCode(65 + i)}. ${o}</label>`).join("");
+    html += q.options.map((o, i) => `<label class="opt"><input type="checkbox" value="${i}" ${selected.includes(i) ? "checked" : ""}/> ${String.fromCharCode(65 + i)}. ${safeHTML(o)}</label>`).join("");
   } else if (q.type === "matching") {
     const cur = s.answers[s.idx] || {};
     q.pairs.forEach((pair, i) => {
       if (!s._matchOpts) s._matchOpts = {};
       if (!s._matchOpts[s.idx]) s._matchOpts[s.idx] = shuffle(q.pairs.map((x) => x[1]));
       const opts = s._matchOpts[s.idx];
-      html += `<div class="opt"><strong>${pair[0]}</strong><br /><select data-match="${i}"><option value="">Select</option>${opts.map((x) => `<option ${cur[i] === x ? "selected" : ""} value="${x}">${x}</option>`).join("")}</select></div>`;
+      html += `<div class="opt"><strong>${safeHTML(pair[0])}</strong><br /><select data-match="${i}"><option value="">Select</option>${opts.map((x) => `<option ${cur[i] === x ? "selected" : ""} value="${x}">${safeHTML(x)}</option>`).join("")}</select></div>`;
     });
   } else {
     const order = s.answers[s.idx] || [...q.order];
     order.forEach((step, i) => {
-      html += `<div class="opt"><strong>${i + 1}.</strong> ${step}<div class="inline"><button class="ghost" data-up="${i}">Up</button><button class="ghost" data-down="${i}">Down</button></div></div>`;
+      html += `<div class="opt"><strong>${i + 1}.</strong> ${safeHTML(step)}<div class="inline"><button class="ghost" data-up="${i}">Up</button><button class="ghost" data-down="${i}">Down</button></div></div>`;
     });
   }
 
@@ -2207,6 +2225,97 @@ function wireEvents() {
         renderAnalytics();
         alert("Progress reset successfully.");
       }
+    });
+  }
+
+  // Onboarding modal wire-up
+  const onboarding = byId("onboardingModal");
+  const dismissBtn = byId("btnOnboardingDismiss");
+  if (onboarding && dismissBtn) {
+    if (!localStorage.getItem("ccna_onboarded")) {
+      onboarding.classList.remove("hidden");
+    }
+    dismissBtn.addEventListener("click", () => {
+      playNetSound("success");
+      onboarding.classList.add("hidden");
+      localStorage.setItem("ccna_onboarded", "true");
+    });
+  }
+
+  // Study planner generation hook
+  const btnGeneratePlan = byId("btnGeneratePlan");
+  if (btnGeneratePlan) {
+    btnGeneratePlan.addEventListener("click", () => {
+      playNetSound("click");
+      const targetDateStr = byId("studyExamDate").value;
+      const dailyHours = Number(byId("studyDailyHours").value);
+      const outBox = byId("studyPlanOutput");
+      if (!outBox) return;
+
+      if (!targetDateStr) {
+        alert("Please select a target exam date.");
+        return;
+      }
+
+      const targetDate = new Date(targetDateStr);
+      const today = new Date();
+      const diffTime = targetDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays <= 0) {
+        alert("Target exam date must be in the future!");
+        return;
+      }
+
+      const totalStudyVolume = 120;
+      const currentXP = state.analytics.xp || 0;
+      const progressXPFactor = Math.min(0.9, currentXP / 5000);
+      const remainingHours = Math.max(10, Math.round(totalStudyVolume * (1 - progressXPFactor)));
+      const requiredHoursPerDay = remainingHours / diffDays;
+
+      outBox.style.display = "block";
+
+      let planHtml = `
+        <h4 style="color:#00f2fe; margin-top:0; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">📋 Generated Study Route</h4>
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-weight:bold; font-size:12.5px;">
+          <span>Days Remaining: ${diffDays}</span>
+          <span>Estimated Hours Needed: ${remainingHours}h</span>
+        </div>
+      `;
+
+      if (dailyHours < requiredHoursPerDay) {
+        planHtml += `
+          <div style="background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.25); color:#f87171; padding:8px 12px; border-radius:6px; margin-bottom:12px; font-size:11.5px;">
+            <strong>⚠ Schedule Alert:</strong> Your target of ${dailyHours} hours/day is insufficient to cover the remaining ${remainingHours} hours. Increase daily target to <strong>${requiredHoursPerDay.toFixed(1)}</strong> hours or push back exam date.
+          </div>
+        `;
+      } else {
+        planHtml += `
+          <div style="background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.25); color:#34d399; padding:8px 12px; border-radius:6px; margin-bottom:12px; font-size:11.5px;">
+            <strong>✔ Target Achievable:</strong> You are fully on track! A study pace of ${dailyHours} hours/day exceeds the required ${requiredHoursPerDay.toFixed(1)} hours/day.
+          </div>
+        `;
+      }
+
+      const weakDomains = state.weakDomains || [];
+      planHtml += `
+        <div style="margin-bottom:10px;">
+          <strong>Target Practice Metrics:</strong><br />
+          • Solve at least <strong>${Math.max(5, Math.round(15 / dailyHours))}</strong> questions per day.<br />
+          • Practice 1 CLI lab configurations twice a week.
+        </div>
+      `;
+
+      if (weakDomains.length > 0) {
+        planHtml += `
+          <div style="margin-top:10px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
+            <strong>Domain Focus Recommendations:</strong> Use Spaced Repetition or Smart Adaptive practice filters focusing on your weakest domains: 
+            <span style="color:#f59e0b; font-weight:bold;">${weakDomains.join(", ")}</span>.
+          </div>
+        `;
+      }
+
+      outBox.innerHTML = planHtml;
     });
   }
 }
