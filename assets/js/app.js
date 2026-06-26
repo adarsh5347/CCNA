@@ -8,6 +8,15 @@ const authReady = new Promise((resolve) => {
   authResolve = resolve;
 });
 
+function safeSetStorage(storage, key, value) {
+  try {
+    storage.setItem(key, value);
+  } catch (e) {
+    console.error("Storage Quota Exceeded or Storage Error:", e);
+    alert("Storage limit reached! Some progress may not be saved locally.");
+  }
+}
+
 const STORE = "ccna_full_site_v1";
 
 const state = {
