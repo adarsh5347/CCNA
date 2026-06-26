@@ -99,10 +99,29 @@ function loadAnalytics() {
   }
 }
 
+function validateAnalyticsSchema(data) {
+  if (!data || typeof data !== 'object') return false;
+  const requiredNums = ['totalQ', 'correct', 'xp', 'studyMin', 'totalTime', 'labsCompleted', 'subnetMaxStreak', 'streak'];
+  for (const key of requiredNums) {
+    if (typeof data[key] !== 'number' || isNaN(data[key])) return false;
+  }
+  if (!data.simPathsRun || typeof data.simPathsRun !== 'object') return false;
+  if (!Array.isArray(data.missedIds)) return false;
+  if (!data.ach || typeof data.ach !== 'object') return false;
+  if (!data.domain || typeof data.domain !== 'object') return false;
+  if (!data.topic || typeof data.topic !== 'object') return false;
+  if (!Array.isArray(data.attempts)) return false;
+  return true;
+}
+
 function saveAnalytics() {
   authReady.then(() => {
+    if (!validateAnalyticsSchema(state.analytics)) {
+      console.error("Analytics schema validation failed! Aborting save.");
+      return;
+    }
     const key = state.user ? `${STORE}_${state.user.uid}` : STORE;
-    localStorage.setItem(key, JSON.stringify(state.analytics));
+    safeSetStorage(localStorage, key, JSON.stringify(state.analytics));
     if (state.user) {
       saveUserProgress(state.user.uid, state.analytics);
     }
@@ -116,7 +135,7 @@ function persistSession() {
   }
   const copy = { ...state.session };
   delete copy.timer;
-  sessionStorage.setItem("ccna_session", JSON.stringify(copy));
+  safeSetStorage(sessionStorage, "ccna_session", JSON.stringify(copy));
 }
 
 function restoreSession() {
@@ -132,7 +151,7 @@ function restoreSession() {
         timer.textContent = toMMSS(state.session.timeLeft);
       }
       state.session.timer = setInterval(() => {
-        state.session.timeLeft -= 1;
+        state.session.timeLeft = Math.max(0, state.session.timeLeft - 1);
         const tEl = byId("timer");
         if (tEl) {
           tEl.textContent = toMMSS(state.session.timeLeft);
@@ -163,7 +182,10 @@ function byId(id) {
   return document.getElementById(id);
 }
 
-function setPage(page) {
+function setPage(page, push = true) {
+  if (push) {
+    history.pushState({ page }, "", "?page=" + page);
+  }
   // Clear active subnetting challenge timer unconditionally
   if (state.subnet) {
     clearInterval(state.subnet.timerRef);
@@ -678,7 +700,7 @@ function startSession(mode) {
   timer.textContent = toMMSS(state.session.timeLeft);
 
   state.session.timer = setInterval(() => {
-    state.session.timeLeft -= 1;
+    state.session.timeLeft = Math.max(0, state.session.timeLeft - 1);
     timer.textContent = toMMSS(state.session.timeLeft);
     timer.classList.toggle("warn", state.session.timeLeft <= 600 && state.session.timeLeft > 180);
     timer.classList.toggle("danger", state.session.timeLeft <= 180);
@@ -756,7 +778,7 @@ function answerEquals(q, ans) {
   if (q.type === "single" || q.type === "scenario") return ans === q.correct[0];
   if (q.type === "multi") {
     if (!Array.isArray(ans)) return false;
-    return [...ans].sort().join(",") === [...q.correct].sort().join(",");
+    return [...ans].sort((a, b) => a - b).join(",") === [...q.correct].sort((a, b) => a - b).join(",");
   }
   if (q.type === "matching") {
     if (!ans) return false;
@@ -1037,7 +1059,7 @@ function openReview() {
   });
 
   const f = byId("finalizeFromReview");
-  if (f) f.addEventListener("click", () => submitSession());
+  if (f) f.addEventListener("click", () => submitSession(true));
 
   // Hide normal navigation buttons and show only Submit Session in footer
   const prevBtn = byId("prevQ");
@@ -1059,6 +1081,14 @@ function openReview() {
 function submitSession(force) {
   const s = state.session;
   if (!s || s.submitted) return;
+
+  const answeredCount = s.answers.filter((a) => a != null).length;
+  if (answeredCount === 0 && !force) {
+    if (!confirm("You haven't answered any questions. Are you sure you want to submit?")) {
+      return;
+    }
+  }
+
   if (s.mode === "exam" && !force) {
     openReview();
     return;
@@ -1953,7 +1983,7 @@ function updateSubnetLeaderboard(score) {
   list.push({ date: dateStr, score: score, mode: "Timed" });
   list.sort((a, b) => b.score - a.score);
   list = list.slice(0, 5); // top 5
-  localStorage.setItem("ccna_subnet_leaderboard", JSON.stringify(list));
+  safeSetStorage(localStorage, "ccna_subnet_leaderboard", JSON.stringify(list));
   renderSubnetLeaderboard();
 }
 
@@ -2031,7 +2061,7 @@ function ensureSubnetQuestion(force) {
       state.subnet.timerRef = setInterval(() => {
         const isSubnetPage = byId("subnet") && byId("subnet").classList.contains("active");
         if (isSubnetPage && state.subnet.mode === "Timed") {
-          state.subnet.timeLeft -= 1;
+          state.subnet.timeLeft = Math.max(0, state.subnet.timeLeft - 1);
           if (state.subnet.timeLeft <= 0) {
             state.subnet.timeLeft = 0;
             clearInterval(state.subnet.timerRef);
@@ -2246,7 +2276,7 @@ function wireEvents() {
   if (btnMute) {
     btnMute.addEventListener("click", () => {
       state.muted = !state.muted;
-      localStorage.setItem("ccna_muted", state.muted);
+      safeSetStorage(localStorage, "ccna_muted", state.muted);
       updateMuteButton();
       playNetSound("click");
     });
@@ -2256,7 +2286,7 @@ function wireEvents() {
   if (btnContrast) {
     btnContrast.addEventListener("click", () => {
       state.highContrast = !state.highContrast;
-      localStorage.setItem("ccna_high_contrast", state.highContrast);
+      safeSetStorage(localStorage, "ccna_high_contrast", state.highContrast);
       updateContrastButton();
       playNetSound("click");
     });
@@ -2407,7 +2437,7 @@ function wireEvents() {
     dismissBtn.addEventListener("click", () => {
       playNetSound("success");
       onboarding.classList.add("hidden");
-      localStorage.setItem("ccna_onboarded", "true");
+      safeSetStorage(localStorage, "ccna_onboarded", "true");
     });
   }
 
@@ -2585,11 +2615,11 @@ function setupAuth() {
 
       // Clear guest progress so it isn't merged again on next login
       if (didMergeGuest) {
-        localStorage.setItem(`${STORE}_backup`, guestRaw);
+        safeSetStorage(localStorage, `${STORE}_backup`, guestRaw);
         localStorage.removeItem(STORE);
       }
 
-      localStorage.setItem(userKey, JSON.stringify(state.analytics));
+      safeSetStorage(localStorage, userKey, JSON.stringify(state.analytics));
       saveUserProgress(user.uid, state.analytics);
 
       renderHome();
@@ -4650,6 +4680,23 @@ function init() {
       e.returnValue = "You have an active subnetting challenge running. Are you sure you want to leave?";
       return e.returnValue;
     }
+  });
+
+  window.addEventListener("popstate", (e) => {
+    if (state.session && !state.session.submitted) {
+      if (!confirm("You have an active CCNA quiz session. Are you sure you want to leave? Your progress will be lost.")) {
+        history.pushState({ page: "engine" }, "", "?page=engine");
+        return;
+      } else {
+        if (state.session.timer) clearInterval(state.session.timer);
+        const headerTimerEl = byId("headerTimer");
+        if (headerTimerEl) headerTimerEl.classList.add("hidden");
+        state.session = null;
+        persistSession();
+      }
+    }
+    const page = e.state?.page || "home";
+    setPage(page, false);
   });
   
   if (!restoreSession()) {
