@@ -759,9 +759,7 @@ function explanationBlock(q, ok) {
       <p><strong>Why correct:</strong> ${safeHTML(e.why)}</p>
       <p><strong>Why others are wrong:</strong></p>
       <ul>
-        <li>${safeHTML(e.wrong[0])}</li>
-        <li>${safeHTML(e.wrong[1])}</li>
-        <li>${safeHTML(e.wrong[2])}</li>
+        ${e.wrong.map(w => `<li>${safeHTML(w)}</li>`).join("")}
       </ul>
       <p><strong>Cisco exam tip:</strong> ${safeHTML(e.tip)}</p>
       <p><strong>Memory trick:</strong> ${safeHTML(e.memory)}</p>
@@ -1107,9 +1105,141 @@ function submitSession(force) {
   html += `<div class="grid stats"><div class="stat"><div class="k">Weak Areas</div><div class="v" style="font-size:16px">${weak.map((x) => `${x.k} (${x.p}%)`).join("<br />")}</div></div><div class="stat"><div class="k">Strong Areas</div><div class="v" style="font-size:16px">${strong.map((x) => `${x.k} (${x.p}%)`).join("<br />")}</div></div><div class="stat"><div class="k">Recommended Next Quiz</div><div class="v" style="font-size:15px">15 questions / 15 mins on ${weak.map((x) => x.k).join(" + ")}</div></div></div>`;
 
   if (s.mode !== "exam") {
-    html += `<div class="card"><h3>Review (first 20 misses)</h3>${wrong.slice(0, 20).map((x) => `<div class="output"><strong>Q${x.i + 1}</strong> ${x.q.topic} | Correct: ${x.q.expl.correct}<br />Tip: ${x.q.expl.tip}</div>`).join("") || "No incorrect answers."}</div>`;
+    html += `<div class="card"><h3>Review (first 20 misses)</h3>${wrong.slice(0, 20).map((x) => `<div class="output"><strong>Q${x.i + 1}</strong> ${x.q.topic} | Correct: ${x.q.expl.correct}<br /><span style="display:block; margin-top:6px; color:#a1b2c8"><strong>Explanation:</strong> ${safeHTML(x.q.expl.why)}</span><span style="display:block; margin-top:4px; color:#a1b2c8"><strong>Tip:</strong> ${safeHTML(x.q.expl.tip)}</span></div>`).join("") || "No incorrect answers."}</div>`;
   } else {
-    html += `<div class="output">Real Exam mode policy respected: no answers or score were shown until final submission.</div>`;
+    let statusText = "";
+    let statusColor = "";
+    let readinessDesc = "";
+    
+    if (pct >= 85) {
+      statusText = "CCNA READY (Highly Prepared)";
+      statusColor = "#10b981";
+      readinessDesc = "Outstanding performance! Your score is above the safety margin for the Cisco 200-301. You demonstrate a solid grasp of core networking protocols, CLI commands, and automation architecture. We recommend scheduling your real exam immediately.";
+    } else if (pct >= 75) {
+      statusText = "PREPARED WITH MINOR GAPS";
+      statusColor = "#f59e0b";
+      readinessDesc = "Good attempt! You have a solid foundation but are operating right near the boundary passing score. We recommend targeting your weak domains (specifically reviewing CLI command syntax and subnet boundary calculations) for another 1-2 weeks before booking the official exam.";
+    } else {
+      statusText = "NOT READY (Major Gaps Found)";
+      statusColor = "#ff5e3a";
+      readinessDesc = "Study recommended. Your score is below the typical Cisco passing threshold. We suggest systematically reviewing the official Cisco Press certification guides for the highlighted weak domains, building practical lab configurations, and re-attempting practice exams.";
+    }
+
+    const weakDomains = Object.entries(domain)
+      .map(([k, v]) => ({ name: k, pct: Math.round((v.correct / v.total) * 100) }))
+      .filter(d => d.pct < 80)
+      .sort((a, b) => a.pct - b.pct);
+
+    let recommendedReadings = "";
+    if (weakDomains.length > 0) {
+      recommendedReadings = weakDomains.map(d => {
+        let refs = "";
+        if (d.name === "Network Fundamentals") refs = "Volume 1, Part I & Part IV (Subnetting)";
+        else if (d.name === "Network Access") refs = "Volume 1, Part II & Part III (VLANs, STP, EtherChannel)";
+        else if (d.name === "IP Connectivity") refs = "Volume 1, Part V (Routing) & Part VI (OSPF)";
+        else if (d.name === "IP Services") refs = "Volume 2, Part III (DHCP, NAT, NTP, QoS)";
+        else if (d.name === "Security Fundamentals") refs = "Volume 2, Part I & Part II (ACLs, Port Security, Snooping)";
+        else if (d.name === "Automation and Programmability") refs = "Volume 2, Part V (APIs, JSON, Ansible/Puppet/Chef)";
+        return `<li><strong>${d.name} (${d.pct}%):</strong> Study <u>${refs}</u></li>`;
+      }).join("");
+    } else {
+      recommendedReadings = "<li>All domains scoring above 80%! Maintain your edge by reviewing OSPF configurations and Automation APIs.</li>";
+    }
+
+    html += `
+      <div class="card" style="border: 2px solid ${statusColor}; border-radius: 8px; padding: 20px; background: rgba(255,255,255,0.02); margin-top: 20px;">
+        <h3 style="color: ${statusColor}; margin-top: 0;">CCNA 200-301 Official Readiness Analysis</h3>
+        
+        <div style="margin-bottom: 15px;">
+          <strong>Readiness Assessment Status:</strong>
+          <span style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: bold; background: ${statusColor}; color: #ffffff; margin-left: 8px;">
+            ${statusText}
+          </span>
+        </div>
+        
+        <p style="color: #a1b2c8; line-height: 1.6; margin-bottom: 20px;">
+          ${readinessDesc}
+        </p>
+        
+        <hr style="border: 0; border-top: 1px solid #1e293b; margin: 20px 0;" />
+        
+        <h4>Recommended Cisco Press Review Chapters:</h4>
+        <ul style="color: #a1b2c8; padding-left: 20px; line-height: 1.8;">
+          ${recommendedReadings}
+        </ul>
+        
+        <hr style="border: 0; border-top: 1px solid #1e293b; margin: 20px 0;" />
+        
+        <h4>Verification of Key Competencies:</h4>
+        <table style="width: 100%; border-collapse: collapse; text-align: left; color: #a1b2c8; font-size: 14px;">
+          <thead>
+            <tr style="border-bottom: 1px solid #334155; color: #ffffff;">
+              <th style="padding: 8px 0;">CCNA Blueprint Domain</th>
+              <th style="padding: 8px 0; text-align: right;">Your Score</th>
+              <th style="padding: 8px 0; text-align: right;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${Object.entries(domain).map(([name, val]) => {
+              const score = Math.round((val.correct / val.total) * 100);
+              const status = score >= 80 ? "Pass" : score >= 60 ? "Borderline" : "Needs Review";
+              const col = score >= 80 ? "#10b981" : score >= 60 ? "#f59e0b" : "#ff5e3a";
+              return `
+                <tr style="border-bottom: 1px solid #1e293b;">
+                  <td style="padding: 10px 0;">${name}</td>
+                  <td style="padding: 10px 0; text-align: right; font-weight: bold; color: ${col};">${score}%</td>
+                  <td style="padding: 10px 0; text-align: right; color: ${col}; font-weight: 500;">${status}</td>
+                </tr>
+              `;
+            }).join("")}
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="card" style="margin-top: 20px;">
+        <h3>Detailed Question Review</h3>
+        <p style="font-size:0.9em; color:#a1b2c8; margin-bottom:15px;">Below is the review list of your questions, detailing your answers versus correct answers and standard explanations.</p>
+        ${s.questions.map((q, idx) => {
+          const userAns = s.answers[idx];
+          const ok = answerEquals(q, userAns);
+          
+          let userAnsText = "";
+          let correctAnsText = "";
+          
+          if (q.type === "single" || q.type === "scenario") {
+            userAnsText = userAns !== undefined ? `${String.fromCharCode(65 + userAns)}. ${q.options[userAns]}` : "No Answer";
+            correctAnsText = `${String.fromCharCode(65 + q.correct[0])}. ${q.options[q.correct[0]]}`;
+          } else if (q.type === "multi") {
+            const list = Array.isArray(userAns) ? userAns : [];
+            userAnsText = list.length > 0 ? list.map(v => String.fromCharCode(65 + v)).join(", ") : "No Answer";
+            correctAnsText = q.correct.map(v => String.fromCharCode(65 + v)).join(", ");
+          } else if (q.type === "matching") {
+            userAnsText = userAns ? JSON.stringify(userAns) : "No Answer";
+            correctAnsText = "Matching format resolved correctly";
+          } else {
+            userAnsText = userAns ? userAns.join(" -> ") : "No Answer";
+            correctAnsText = q.order.join(" -> ");
+          }
+          
+          return `
+            <div class="output" style="border-left: 4px solid ${ok ? '#10b981' : '#ff5e3a'}; margin-bottom: 15px; padding: 12px; background: rgba(255,255,255,0.01);">
+              <strong>Q${idx + 1} (${q.topic})</strong> — 
+              <span style="font-weight: bold; color: ${ok ? '#10b981' : '#ff5e3a'};">${ok ? 'CORRECT' : 'INCORRECT'}</span>
+              <br />
+              <div style="margin-top: 6px; font-size: 0.95em;"><strong>Question:</strong> ${safeHTML(q.text)}</div>
+              <div style="margin-top: 4px; font-size: 0.95em; color: ${ok ? '#10b981' : '#ff5e3a'};"><strong>Your Answer:</strong> ${safeHTML(userAnsText)}</div>
+              ${!ok ? `<div style="margin-top: 4px; font-size: 0.95em; color: #10b981;"><strong>Correct Answer:</strong> ${safeHTML(correctAnsText)}</div>` : ""}
+              <div style="margin-top: 8px; font-size: 0.95em; color: #a1b2c8; border-top: 1px dotted #334155; padding-top: 6px;">
+                <strong>Explanation:</strong> ${safeHTML(q.expl.why)}
+              </div>
+              <div style="margin-top: 4px; font-size: 0.95em; color: #a1b2c8;">
+                <strong>Tip:</strong> ${safeHTML(q.expl.tip)}
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
   }
 
   html += `<div class="inline"><button id="backHome" class="primary">Back Home</button><button id="goAnalytics" class="secondary">Open Analytics</button></div>`;
