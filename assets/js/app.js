@@ -3,14 +3,34 @@ import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgre
 import { labs } from "./labs.js";
 import { bugsData, cliOutputs } from "./cli.js";
 
+let authResolve;
+const authReady = new Promise((resolve) => {
+  authResolve = resolve;
+});
+
 const STORE = "ccna_full_site_v1";
 
 const state = {
   seed: Math.floor(Math.random() * 1000000) + 1,
   bank: [],
-  analytics: loadAnalytics(),
+  analytics: {
+    attempts: [],
+    domain: {},
+    topic: {},
+    totalQ: 0,
+    correct: 0,
+    totalTime: 0,
+    studyMin: 0,
+    xp: 0,
+    streak: 0,
+    labsCompleted: 0,
+    subnetMaxStreak: 0,
+    ach: {},
+    simPathsRun: { ospf: false, roas: false },
+    missedIds: []
+  },
   session: null,
-  subnet: { mode: "Easy", q: null, score: 0, attempts: 0, streak: 0, timerVal: 30, timerInterval: null, leaderboard: (() => { try { return JSON.parse(localStorage.getItem("subnet_leaderboard")) || []; } catch { return []; } })() },
+  subnet: { mode: "Easy", q: null, score: 0, attempts: 0, streak: 0, timerVal: 30, timerRef: null, leaderboard: (() => { try { return JSON.parse(localStorage.getItem("subnet_leaderboard")) || []; } catch { return []; } })() },
   lab: { currentLabId: 1, mode: "step", completedSteps: {}, userCommands: [], currentPrompt: "Switch(config)#" },
   user: null,
   muted: localStorage.getItem("ccna_muted") === "true",
@@ -80,11 +100,13 @@ function loadAnalytics() {
 }
 
 function saveAnalytics() {
-  const key = state.user ? `${STORE}_${state.user.uid}` : STORE;
-  localStorage.setItem(key, JSON.stringify(state.analytics));
-  if (state.user) {
-    saveUserProgress(state.user.uid, state.analytics);
-  }
+  authReady.then(() => {
+    const key = state.user ? `${STORE}_${state.user.uid}` : STORE;
+    localStorage.setItem(key, JSON.stringify(state.analytics));
+    if (state.user) {
+      saveUserProgress(state.user.uid, state.analytics);
+    }
+  });
 }
 
 function persistSession() {
@@ -142,6 +164,12 @@ function byId(id) {
 }
 
 function setPage(page) {
+  // Clear active subnetting challenge timer unconditionally
+  if (state.subnet) {
+    clearInterval(state.subnet.timerRef);
+    state.subnet.timerRef = null;
+  }
+
   // Clear active study/exam session if navigating away from engine page
   if (page !== "engine" && state.session && !state.session.submitted) {
     if (!confirm("You have an active quiz session. Are you sure you want to leave? Your progress will be lost.")) return;
@@ -150,13 +178,6 @@ function setPage(page) {
     if (headerTimerEl) headerTimerEl.classList.add("hidden");
     state.session = null;
     persistSession();
-  }
-
-  // Clear active subnetting challenge timer if leaving subnetting page
-  if (page !== "subnet" && state.subnet && state.subnet.timer) {
-    if (!confirm("You have an active subnetting challenge running. Are you sure you want to leave? Your streak will be reset.")) return;
-    clearInterval(state.subnet.timer);
-    state.subnet.timer = null;
   }
 
   document.querySelectorAll(".page").forEach((p) => p.classList.remove("active"));
@@ -440,19 +461,32 @@ function renderHome() {
     return { name: d.name, acc, total: s.total };
   });
 
-  domainAccuracies.sort((a, b) => {
-    if (a.acc !== b.acc) return a.acc - b.acc;
-    return a.total - b.total; // Prefer fewer attempts for discovery
-  });
+  // Filter out any domain where attempted < 5
+  const qualifying = domainAccuracies.filter(item => item.total >= 5);
 
-  const weakest = domainAccuracies.slice(0, 2);
-  state.weakDomains = weakest.map((w) => w.name);
+  if (qualifying.length < 2) {
+    state.weakDomains = [];
+    state.useSmartFallback = true;
+    const smartQuizInfo = byId("smartQuizInfo");
+    if (smartQuizInfo) {
+      smartQuizInfo.innerHTML = `<strong>Current Focus Areas:</strong><br />
+        Cross-domain random fallback (fewer than 2 domains with &ge; 5 attempts)`;
+    }
+  } else {
+    state.useSmartFallback = false;
+    qualifying.sort((a, b) => {
+      if (a.acc !== b.acc) return a.acc - b.acc;
+      return a.total - b.total; // Prefer fewer attempts for discovery
+    });
+    const weakest = qualifying.slice(0, 2);
+    state.weakDomains = weakest.map((w) => w.name);
 
-  const smartQuizInfo = byId("smartQuizInfo");
-  if (smartQuizInfo) {
-    smartQuizInfo.innerHTML = `<strong>Current Focus Areas:</strong><br />
-      1. ${weakest[0].name} (${weakest[0].total ? weakest[0].acc + '%' : 'No attempts'})<br />
-      2. ${weakest[1].name} (${weakest[1].total ? weakest[1].acc + '%' : 'No attempts'})`;
+    const smartQuizInfo = byId("smartQuizInfo");
+    if (smartQuizInfo) {
+      smartQuizInfo.innerHTML = `<strong>Current Focus Areas:</strong><br />
+        1. ${weakest[0].name} (${weakest[0].acc}%)<br />
+        2. ${weakest[1].name} (${weakest[1].acc}%)`;
+    }
   }
 
   // Render Spaced Repetition information
@@ -566,19 +600,24 @@ function startSession(mode) {
       questions: weightedSelection(count, domains)
     };
   } else if (mode === "smart") {
-    let count = Number(byId("smartQuizCount").value);
-    if (isNaN(count) || count <= 0 || count > 100) {
-      count = 15;
-      if (byId("smartQuizCount")) byId("smartQuizCount").value = 15;
-    }
     const weakDomains = state.weakDomains || [];
+    const isFallback = state.useSmartFallback || weakDomains.length < 2;
+    let count = 15;
+    if (!isFallback) {
+      count = Number(byId("smartQuizCount").value);
+      if (isNaN(count) || count <= 0 || count > 100) {
+        count = 15;
+      }
+    }
     conf = {
-      title: "Smart Adaptive Quiz",
-      desc: `Focused study on your weakest areas: ${weakDomains.join(" & ")}.`,
+      title: isFallback ? "Smart Adaptive Quiz (Fallback)" : "Smart Adaptive Quiz",
+      desc: isFallback 
+        ? "Random cross-domain 15-question set (need at least 5 attempts on 2+ domains to personalize)." 
+        : `Focused study on your weakest areas: ${weakDomains.join(" & ")}.`,
       showFeedback: true,
       hideScoreUntilEnd: false,
       minutes: count * 2,
-      questions: weightedSelection(count, weakDomains)
+      questions: weightedSelection(count, isFallback ? [] : weakDomains)
     };
   } else if (mode === "missed") {
     let count = Number(byId("missedQuizCount").value);
@@ -1988,15 +2027,15 @@ function ensureSubnetQuestion(force) {
       if (subnetAnswer) subnetAnswer.disabled = false;
       if (timerDisplay) timerDisplay.textContent = `Time Left: 30s`;
       
-      if (state.subnet.timer) clearInterval(state.subnet.timer);
-      state.subnet.timer = setInterval(() => {
+      if (state.subnet.timerRef) clearInterval(state.subnet.timerRef);
+      state.subnet.timerRef = setInterval(() => {
         const isSubnetPage = byId("subnet") && byId("subnet").classList.contains("active");
         if (isSubnetPage && state.subnet.mode === "Timed") {
           state.subnet.timeLeft -= 1;
           if (state.subnet.timeLeft <= 0) {
             state.subnet.timeLeft = 0;
-            clearInterval(state.subnet.timer);
-            state.subnet.timer = null;
+            clearInterval(state.subnet.timerRef);
+            state.subnet.timerRef = null;
             
             playNetSound("block");
             if (subnetSubmit) subnetSubmit.disabled = true;
@@ -2020,15 +2059,15 @@ function ensureSubnetQuestion(force) {
             timerDisplay.textContent = `Time Left: ${state.subnet.timeLeft}s`;
           }
         } else {
-          clearInterval(state.subnet.timer);
-          state.subnet.timer = null;
+          clearInterval(state.subnet.timerRef);
+          state.subnet.timerRef = null;
         }
       }, 1000);
     }
   } else {
-    if (state.subnet.timer) {
-      clearInterval(state.subnet.timer);
-      state.subnet.timer = null;
+    if (state.subnet.timerRef) {
+      clearInterval(state.subnet.timerRef);
+      state.subnet.timerRef = null;
     }
     if (timerDisplay) {
       timerDisplay.style.display = "none";
@@ -2585,6 +2624,7 @@ function setupAuth() {
       renderHome();
       renderAnalytics();
     }
+    authResolve();
   });
 }
 
@@ -4605,7 +4645,7 @@ function init() {
       e.returnValue = "You have an active CCNA quiz session. Are you sure you want to leave?";
       return e.returnValue;
     }
-    if (state.subnet && state.subnet.timer) {
+    if (state.subnet && state.subnet.timerRef) {
       e.preventDefault();
       e.returnValue = "You have an active subnetting challenge running. Are you sure you want to leave?";
       return e.returnValue;

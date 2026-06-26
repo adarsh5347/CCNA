@@ -1901,6 +1901,19 @@ textarea:focus-visible,
   border-radius: 8px;
 }
 
+@media (max-width: 360px) {
+  .exam-header .domain-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 160px;
+  }
+  #prevQ, #nextQ, #submitSession {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
 
 
 
