@@ -4909,8 +4909,145 @@ function init() {
     });
   };
 
-  // Wire tilt effect immediately on landing page load
-  setTimeout(initTiltEffect, 100);
+  /* ─── Awwwards 3D Particle Constellation Sphere ────────── */
+  const initHeroSphere = () => {
+    const canvas = byId("heroInteractiveSphere");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    let width = canvas.offsetWidth;
+    let height = canvas.offsetHeight;
+    canvas.width = width;
+    canvas.height = height;
+
+    const numNodes = 40;
+    const nodes = [];
+    const sphereRadius = 85;
+
+    for (let i = 0; i < numNodes; i++) {
+      const theta = Math.acos(Math.random() * 2 - 1);
+      const phi = Math.random() * Math.PI * 2;
+      nodes.push({
+        x: sphereRadius * Math.sin(theta) * Math.cos(phi),
+        y: sphereRadius * Math.sin(theta) * Math.sin(phi),
+        z: sphereRadius * Math.cos(theta)
+      });
+    }
+
+    let rotationX = 0.002;
+    let rotationY = 0.003;
+
+    const heroCard = document.querySelector(".hero-dashboard");
+    if (heroCard) {
+      heroCard.addEventListener("mousemove", (e) => {
+        const rect = heroCard.getBoundingClientRect();
+        const mx = e.clientX - rect.left - rect.width / 2;
+        const my = e.clientY - rect.top - rect.height / 2;
+        rotationX = (my / rect.height) * 0.015;
+        rotationY = (mx / rect.width) * 0.015;
+      });
+      heroCard.addEventListener("mouseleave", () => {
+        rotationX = 0.002;
+        rotationY = 0.003;
+      });
+    }
+
+    const rotateNode = (node, rx, ry) => {
+      let cosY = Math.cos(ry);
+      let sinY = Math.sin(ry);
+      let x1 = node.x * cosY - node.z * sinY;
+      let z1 = node.z * cosY + node.x * sinY;
+
+      let cosX = Math.cos(rx);
+      let sinX = Math.sin(rx);
+      let y2 = node.y * cosX - z1 * sinX;
+      let z2 = z1 * cosX + node.y * sinX;
+
+      node.x = x1;
+      node.y = y2;
+      node.z = z2;
+    };
+
+    const drawSphere = () => {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      ctx.clearRect(0, 0, width, height);
+
+      const cx = width / 2;
+      const cy = height / 2;
+      const fov = 300;
+
+      nodes.forEach(node => {
+        rotateNode(node, rotationX, rotationY);
+      });
+
+      // Draw fiber link pathways
+      ctx.strokeStyle = "rgba(0, 242, 254, 0.08)";
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i < nodes.length; i++) {
+        const n1 = nodes[i];
+        const zScale1 = fov / (fov + n1.z);
+        const x2d1 = cx + n1.x * zScale1;
+        const y2d1 = cy + n1.y * zScale1;
+
+        for (let j = i + 1; j < nodes.length; j++) {
+          const n2 = nodes[j];
+          const dist = Math.hypot(n1.x - n2.x, n1.y - n2.y, n1.z - n2.z);
+          if (dist < 72) {
+            const zScale2 = fov / (fov + n2.z);
+            const x2d2 = cx + n2.x * zScale2;
+            const y2d2 = cy + n2.y * zScale2;
+
+            ctx.beginPath();
+            ctx.moveTo(x2d1, y2d1);
+            ctx.lineTo(x2d2, y2d2);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw node junctions
+      nodes.forEach(node => {
+        const zScale = fov / (fov + node.z);
+        const x2d = cx + node.x * zScale;
+        const y2d = cy + node.y * zScale;
+        const size = Math.max(1, 2.5 * zScale);
+        const opacity = Math.max(0.1, 0.65 * zScale);
+
+        ctx.beginPath();
+        ctx.arc(x2d, y2d, size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 242, 254, ${opacity})`;
+        ctx.fill();
+      });
+
+      requestAnimationFrame(drawSphere);
+    };
+
+    drawSphere();
+  };
+
+  /* ─── Magnetic Button physics ────────────────────────── */
+  const initMagneticButtons = () => {
+    const btns = document.querySelectorAll(".magnetic-btn");
+    btns.forEach(btn => {
+      btn.addEventListener("mousemove", (e) => {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        btn.style.transform = `translate(${x * 0.28}px, ${y * 0.28}px)`;
+      });
+      btn.addEventListener("mouseleave", () => {
+        btn.style.transform = "translate(0, 0)";
+      });
+    });
+  };
+
+  // Wire all launch experiences
+  setTimeout(() => {
+    initTiltEffect();
+    initHeroSphere();
+    initMagneticButtons();
+  }, 100);
 }
 
 init();

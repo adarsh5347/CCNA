@@ -2553,3 +2553,45 @@ button.primary:hover::after {
 }
 
 
+/* ══════════════════════════════════════════════════════════
+   AWWWARDS INTERACTIVE LAUNCH STYLING
+   ══════════════════════════════════════════════════════════ */
+
+/* Perspective Cyber Grid */
+.cyber-grid {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: 
+    linear-gradient(rgba(0, 242, 254, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 242, 254, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  transform: perspective(600px) rotateX(60deg) translateY(-25%) translateZ(-80px);
+  opacity: 0.75;
+  transition: opacity var(--dur-slow) var(--ease-std);
+}
+
+.hero-dashboard:hover .cyber-grid {
+  opacity: 0.95;
+}
+
+/* Immersive Hero 3D Canvas Containment */
+.hero-dashboard {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at 80% 50%, rgba(0, 242, 254, 0.05), transparent 50%),
+              var(--bg-panel);
+}
+
+/* Neon Text Glow Accent */
+.glow-accent {
+  text-shadow: 0 0 15px rgba(0, 242, 254, 0.45);
+}
+
+/* Magnetic Button Physics Transition */
+.magnetic-btn {
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+
+
