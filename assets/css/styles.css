@@ -1554,8 +1554,6 @@ textarea {
 }
 .topo-node circle, .topo-node rect {
   transition: var(--transition-lucid);
-  transform-origin: center;
-  transform-box: fill-box;
 }
 .topo-node:hover circle, .topo-node:hover rect {
   fill: rgba(0, 242, 254, 0.15) !important;
@@ -1727,8 +1725,6 @@ nav button.active {
 
 /* Radar Orbits rotate and pulse animations */
 .topo-orbit {
-  transform-origin: center;
-  transform-box: fill-box;
 }
 circle.topo-orbit {
   animation: rotateOrbit 22s linear infinite;
@@ -1752,13 +1748,9 @@ rect.topo-orbit {
 }
 svg polygon[fill="#10b981"] {
   animation: statusPulseGreen 2.5s infinite ease-in-out;
-  transform-origin: center;
-  transform-box: fill-box;
 }
 svg polygon[fill="#ff5e3a"] {
   animation: statusPulseRed 1.8s infinite ease-in-out;
-  transform-origin: center;
-  transform-box: fill-box;
 }
 
 @keyframes statusPulseGreen {
