@@ -2433,3 +2433,123 @@ nav [data-page].active {
   line-height: 1.5;
 }
 
+
+/* ══════════════════════════════════════════════════════════
+   CREATIVE MOTION & LIGHTING EFFECTS
+   ══════════════════════════════════════════════════════════ */
+
+/* ─── Premium Text Reveal Transitions ────────────────────── */
+.reveal-text {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  animation: revealUp var(--dur-slow) var(--ease-out) both;
+}
+@keyframes revealUp {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ─── Cisco-Inspired Cable/Link Packet Flow ──────────────── */
+@keyframes linkPulseFlow {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -120; }
+}
+.cable-link {
+  stroke-dasharray: 10, 6;
+  animation: linkPulseFlow 8s linear infinite !important;
+  filter: drop-shadow(0 0 2px var(--color-info));
+}
+.cable-link.secondary-link {
+  animation: linkPulseFlow 5s linear infinite reverse !important;
+  filter: drop-shadow(0 0 2px var(--color-warn));
+}
+
+/* ─── Interactive glowing node states ───────────────────── */
+.topo-node {
+  transition: transform var(--dur-base) var(--ease-spring), filter var(--dur-base) var(--ease-std);
+}
+.topo-node:hover {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 12px var(--color-info));
+}
+.topo-node.active-packet {
+  animation: nodeActivePulse 1.8s infinite ease-in-out;
+}
+@keyframes nodeActivePulse {
+  0%, 100% { filter: drop-shadow(0 0 4px var(--color-info)); }
+  50%       { filter: drop-shadow(0 0 14px var(--color-info)); transform: scale(1.04); }
+}
+
+/* ─── Advanced Card Interactive States (Glass Tilt) ───────── */
+.card, .hero-dashboard {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform var(--dur-base) var(--ease-spring),
+    border-color var(--dur-base) var(--ease-std),
+    box-shadow var(--dur-base) var(--ease-std);
+}
+
+/* Glass glare reflection element */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+  transform: skewX(-25deg);
+  transition: left var(--dur-slow) var(--ease-std);
+  pointer-events: none;
+}
+.card:hover::before {
+  left: 150%;
+  transition-duration: 0.8s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 242, 254, 0.24);
+  box-shadow: var(--elev-glow-cyan);
+}
+
+/* ─── Grid Overlay Overlay Shading ────────────────────────── */
+.topology-main svg {
+  position: relative;
+  transition: border-color var(--dur-base) var(--ease-std), box-shadow var(--dur-base) var(--ease-std);
+}
+.topology-main svg:hover {
+  border-color: rgba(0, 242, 254, 0.35) !important;
+  box-shadow: 0 12px 30px rgba(0, 242, 254, 0.08);
+}
+
+/* ─── Interactive Floating Network Particle canvas ───────── */
+#netCanvas {
+  transition: opacity var(--dur-slow) var(--ease-std);
+}
+body:hover #netCanvas {
+  opacity: 0.44; /* Subtle increase in activity on cursor movement */
+}
+
+/* ─── Magnetic CTA Glow Effects ───────────────────────────── */
+button.primary {
+  position: relative;
+  overflow: hidden;
+}
+button.primary::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.2);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-std);
+}
+button.primary:hover::after {
+  opacity: 1;
+}
+
+

@@ -4885,6 +4885,32 @@ function init() {
   if (!restoreSession()) {
     setPage("home");
   }
+
+  /* ─── Premium 3D Perspective Tilt Interaction ───────────── */
+  const initTiltEffect = () => {
+    const card = document.querySelector(".hero-dashboard");
+    if (!card) return;
+
+    card.addEventListener("mousemove", (e) => {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+
+      // Dampened 3D rotation angles for precision premium feel
+      const rotateX = -(y / rect.height) * 4;
+      const rotateY = (x / rect.width) * 4;
+
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
+    });
+
+    card.addEventListener("mouseleave", () => {
+      card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)";
+    });
+  };
+
+  // Wire tilt effect immediately on landing page load
+  setTimeout(initTiltEffect, 100);
 }
 
 init();
