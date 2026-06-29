@@ -1559,7 +1559,6 @@ textarea {
   fill: rgba(0, 242, 254, 0.15) !important;
   stroke: #00f2fe !important;
   stroke-width: 3px !important;
-  transform: scale(1.08);
 }
 .cable-link {
   stroke-dasharray: 8, 4;
@@ -1720,7 +1719,6 @@ nav button.active {
   stroke: #00f2fe !important;
   stroke-width: 4px !important;
   filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.85));
-  transform: scale(1.08);
 }
 
 /* Radar Orbits rotate and pulse animations */
@@ -2457,10 +2455,9 @@ nav [data-page].active {
 
 /* ─── Interactive glowing node states ───────────────────── */
 .topo-node {
-  transition: transform var(--dur-base) var(--ease-spring), filter var(--dur-base) var(--ease-std);
+  transition: filter var(--dur-base) var(--ease-std);
 }
 .topo-node:hover {
-  transform: scale(1.08);
   filter: drop-shadow(0 0 12px var(--color-info));
 }
 .topo-node.active-packet {
@@ -2468,7 +2465,7 @@ nav [data-page].active {
 }
 @keyframes nodeActivePulse {
   0%, 100% { filter: drop-shadow(0 0 4px var(--color-info)); }
-  50%       { filter: drop-shadow(0 0 14px var(--color-info)); transform: scale(1.04); }
+  50%       { filter: drop-shadow(0 0 14px var(--color-info)); }
 }
 
 /* ─── Advanced Card Interactive States (Glass Tilt) ───────── */
