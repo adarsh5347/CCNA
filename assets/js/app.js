@@ -13,8 +13,27 @@ function safeSetStorage(storage, key, value) {
     storage.setItem(key, value);
   } catch (e) {
     console.error("Storage Quota Exceeded or Storage Error:", e);
-    alert("Storage limit reached! Some progress may not be saved locally.");
+    showToast("Storage limit reached. Some progress may not be saved locally.", "warn");
   }
+}
+
+/* ─── Toast Notification System ─────────────────────────── */
+function showToast(message, type = "info", duration = 3500) {
+  const container = document.getElementById("toastContainer");
+  if (!container) return;
+  const toast = document.createElement("div");
+  toast.className = `toast toast-${type}`;
+  toast.setAttribute("role", "alert");
+  toast.textContent = message;
+  toast.addEventListener("click", () => dismissToast(toast));
+  container.appendChild(toast);
+  setTimeout(() => dismissToast(toast), duration);
+}
+
+function dismissToast(toast) {
+  if (toast.classList.contains("dismissing")) return;
+  toast.classList.add("dismissing");
+  toast.addEventListener("animationend", () => toast.remove(), { once: true });
 }
 
 const STORE = "ccna_full_site_v1";
@@ -123,16 +142,26 @@ function validateAnalyticsSchema(data) {
   return true;
 }
 
-function saveAnalytics() {
+function saveAnalytics(quiet = false) {
   authReady.then(() => {
     if (!validateAnalyticsSchema(state.analytics)) {
       console.error("Analytics schema validation failed! Aborting save.");
+      showToast("Telemetry save failed: schema mismatch.", "error");
       return;
     }
     const key = state.user ? `${STORE}_${state.user.uid}` : STORE;
     safeSetStorage(localStorage, key, JSON.stringify(state.analytics));
     if (state.user) {
-      saveUserProgress(state.user.uid, state.analytics);
+      saveUserProgress(state.user.uid, state.analytics)
+        .then(() => {
+          if (!quiet) showToast("Telemetry synced to Cloud", "ok");
+        })
+        .catch(err => {
+          console.error("Cloud sync failed:", err);
+          if (!quiet) showToast("Local save complete (offline)", "warn");
+        });
+    } else {
+      if (!quiet) showToast("Telemetry saved locally", "info");
     }
   });
 }
@@ -285,7 +314,8 @@ function gainXP(amount) {
   const oldInfo = getLevelInfo(oldXp);
 
   state.analytics.xp = oldXp + amount;
-  saveAnalytics();
+  showToast(`+${amount} XP Gained`, "info", 2000);
+  saveAnalytics(true);
   updateHeaderProfile();
   renderAchievements();
 
@@ -456,6 +486,11 @@ function renderStatsCards(targetId, cards) {
 function renderHome() {
   const rs = readinessScore();
   const pp = passProbability();
+  
+  // Remove skeleton loader animations when real telemetry data is hydrated
+  document.querySelectorAll(".stat.skeleton").forEach((el) => {
+    el.classList.remove("skeleton");
+  });
   
   const heroReadiness = byId("heroReadiness");
   const heroReadinessBar = byId("heroReadinessBar");
@@ -677,9 +712,11 @@ function startSession(mode) {
   }
 
   if (!conf.questions || conf.questions.length === 0) {
-    alert("No questions available for the selected configuration. Please select at least one domain or adjust your filters.");
+    showToast("No questions available for the selected filters. Please select at least one domain.", "warn", 4000);
     return;
   }
+
+  showToast(`${conf.title} initiated. Practice engine active.`, "info", 3000);
 
   if (state.session && state.session.timer) clearInterval(state.session.timer);
 
@@ -861,10 +898,26 @@ function renderQuestion() {
 
   if (q.type === "single" || q.type === "scenario") {
     const v = s.answers[s.idx];
-    html += q.options.map((o, i) => `<label class="opt"><input type="radio" name="single" value="${i}" ${v === i ? "checked" : ""}/> ${String.fromCharCode(65 + i)}. ${safeHTML(o)}</label>`).join("");
+    html += q.options.map((o, i) => {
+      const letter = String.fromCharCode(65 + i);
+      const isSelected = v === i;
+      return `<label class="opt${isSelected ? ' selected' : ''}" data-idx="${i}">
+        <input type="radio" name="single" value="${i}" ${isSelected ? "checked" : ""}/ aria-label="Option ${letter}">
+        <span class="opt-key" aria-hidden="true">${letter}</span>
+        <span>${safeHTML(o)}</span>
+      </label>`;
+    }).join("");
   } else if (q.type === "multi") {
     const selected = Array.isArray(s.answers[s.idx]) ? s.answers[s.idx] : [];
-    html += q.options.map((o, i) => `<label class="opt"><input type="checkbox" value="${i}" ${selected.includes(i) ? "checked" : ""}/> ${String.fromCharCode(65 + i)}. ${safeHTML(o)}</label>`).join("");
+    html += q.options.map((o, i) => {
+      const letter = String.fromCharCode(65 + i);
+      const isSelected = selected.includes(i);
+      return `<label class="opt${isSelected ? ' selected' : ''}" data-idx="${i}">
+        <input type="checkbox" value="${i}" ${isSelected ? "checked" : ""} aria-label="Option ${letter}">
+        <span class="opt-key" aria-hidden="true">${letter}</span>
+        <span>${safeHTML(o)}</span>
+      </label>`;
+    }).join("");
   } else if (q.type === "matching") {
     const cur = s.answers[s.idx] || {};
     q.pairs.forEach((pair, i) => {
@@ -1154,7 +1207,8 @@ function submitSession(force) {
   });
   state.analytics.attempts = state.analytics.attempts.slice(-40);
 
-  saveAnalytics();
+  saveAnalytics(true);
+  showToast(`Session submitted! Score: ${pct}%`, "ok", 4000);
   renderHome();
 
   const weak = Object.entries(domain).map(([k, v]) => ({ k, p: Math.round((v.correct / v.total) * 100) })).sort((a, b) => a.p - b.p).slice(0, 2);
@@ -1357,40 +1411,97 @@ function updateStreakOnAttempt() {
 }
 
 function renderAnalytics() {
+  const attempts = state.analytics.attempts || [];
+  const narrativeEl = byId("analyticsNarrative");
+  
+  if (attempts.length === 0) {
+    if (narrativeEl) narrativeEl.classList.add("hidden");
+    
+    // Render Empty State UI in place of domain breakdown
+    byId("analyticsStats").innerHTML = "";
+    byId("domainBreakdown").innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📡</div>
+        <h3>No telemetry data available</h3>
+        <p>Complete at least one practice quiz or simulated exam to compile telemetry diagnostics and compute your CCNA readiness metrics across all 6 Cisco blueprint domains.</p>
+        <button class="primary" onclick="setPage('home')">Start Practice Session</button>
+      </div>
+    `;
+    
+    byId("trend").innerHTML = `
+      <div class="empty-state" style="padding: var(--sp-6) 0;">
+        <p style="color: var(--text-secondary); font-size: var(--text-sm);">No active telemetry trends detected.</p>
+      </div>
+    `;
+    
+    renderAchievements();
+    return;
+  }
+
   const da = calcDomainAccuracy();
   const weak = Object.entries(da).sort((a, b) => a[1] - b[1])[0];
   const strong = Object.entries(da).sort((a, b) => b[1] - a[1])[0];
   const avg = state.analytics.totalQ ? Math.round(state.analytics.totalTime / state.analytics.totalQ) : 0;
   const pp = passProbability();
+  const rs = readinessScore();
+
+  // Render narrative summary
+  if (narrativeEl) {
+    let narrativeText = "";
+    if (rs >= 85) {
+      narrativeText = `Excellent progress! Your readiness score is <strong>${rs}%</strong>, indicating a high likelihood of passing the CCNA exam. Continue to review your weak areas, particularly <strong>${weak[0]}</strong> (${weak[1]}%), to maintain peak performance.`;
+    } else if (rs >= 70) {
+      narrativeText = `You are in the intermediate readiness zone at <strong>${rs}%</strong>. You demonstrate solid competency in <strong>${strong[0]}</strong> (${strong[1]}%), but security and connectivity controls remain critical improvement vectors. Focus heavily on <strong>${weak[0]}</strong> (${weak[1]}%) to cross the exam readiness threshold.`;
+    } else {
+      narrativeText = `Telemetry analysis indicates an active readiness score of <strong>${rs}%</strong>. To construct a reliable pass margin, prioritize high-impact study sessions. Your weakest domain is currently <strong>${weak[0]}</strong> (${weak[1]}%), which represents the largest leverage point for boosting your overall rating.`;
+    }
+    narrativeEl.innerHTML = `<h3>Telemetry Insights</h3><p>${narrativeText}</p>`;
+    narrativeEl.classList.remove("hidden");
+  }
 
   renderStatsCards("analyticsStats", [
-    { k: "Overall Readiness Score", v: `${readinessScore()}%` },
+    { k: "Overall Readiness Score", v: `${rs}%` },
     { k: "CCNA Pass Probability", v: `${pp}%` },
-    { k: "Quizzes Completed", v: state.analytics.attempts ? state.analytics.attempts.length : 0 },
+    { k: "Quizzes Completed", v: attempts.length },
     { k: "Study Hours", v: (state.analytics.studyMin / 60).toFixed(1) },
     { k: "Average Time Per Question", v: `${avg}s` },
     { k: "Weakest Domain", v: weak ? `${weak[0]} (${weak[1]}%)` : "N/A" },
     { k: "Strongest Domain", v: strong ? `${strong[0]} (${strong[1]}%)` : "N/A" }
   ]);
 
-  byId("domainBreakdown").innerHTML = blueprint.map((d) => {
-    const p = da[d.name] || 0;
-    const color = p >= 80 ? "#10b981" : p >= 50 ? "#f59e0b" : "#ff5e3a";
-    return `
-      <div class="domain-item">
-        <div class="domain-header">
-          <strong>${d.name} <span class="weight">(${d.weight}%)</span></strong>
-          <span class="pct">${p}%</span>
-        </div>
-        <div class="progress"><div style="width:${p}%; background:${color};"></div></div>
-      </div>
-    `;
-  }).join("");
+  // Render circular accuracy metrics using SVGs
+  const dasharray = 132;
+  byId("domainBreakdown").innerHTML = `
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--sp-4);">
+      ${blueprint.map((d) => {
+        const p = da[d.name] || 0;
+        const color = p >= 80 ? "var(--color-ok)" : p >= 50 ? "var(--color-warn)" : "var(--color-danger)";
+        const dashoffset = Math.round(dasharray * (1 - p / 100));
+        return `
+          <div class="domain-ring-card">
+            <div class="domain-ring" style="position: relative; display: flex; align-items: center; justify-content: center;">
+              <svg viewBox="0 0 52 52">
+                <circle class="ring-bg" cx="26" cy="26" r="21"></circle>
+                <circle class="ring-fill" cx="26" cy="26" r="21" stroke="${color}" stroke-dasharray="${dasharray}" stroke-dashoffset="${dashoffset}"></circle>
+              </svg>
+              <span class="ring-label" style="color: ${color};">${p}%</span>
+            </div>
+            <div class="domain-ring-info">
+              <strong>${d.name}</strong>
+              <span>Exam Weight: ${d.weight}%</span>
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
 
-  const rec = state.analytics.attempts.slice(-10);
-  byId("trend").innerHTML = rec.length
-    ? rec.map((a, i) => `<div class="output">Attempt ${i + 1}: ${a.mode.toUpperCase()} | ${a.score}% (${a.correct}/${a.total}) | ${new Date(a.at).toLocaleString()}</div>`).join("")
-    : "No attempts yet.";
+  const rec = attempts.slice(-10);
+  byId("trend").innerHTML = rec.map((a, i) => `
+    <div class="output">
+      Attempt ${i + 1}: ${a.mode.toUpperCase()} | <strong>${a.score}%</strong> (${a.correct}/${a.total} correct) | <span style="color: var(--text-secondary);">${new Date(a.at).toLocaleString()}</span>
+    </div>
+  `).join("");
     
   renderAchievements();
 }
@@ -2298,8 +2409,63 @@ function wireEvents() {
       safeSetStorage(localStorage, "ccna_high_contrast", state.highContrast);
       updateContrastButton();
       playNetSound("click");
+      showToast(state.highContrast ? "High contrast mode on" : "High contrast mode off", "info", 2000);
     });
   }
+
+  /* ─── Keyboard Shortcuts (Quiz Engine) ─────────────────── */
+  document.addEventListener("keydown", (e) => {
+    // Only activate when in the quiz engine and not in a text field
+    if (!state.session || state.session.submitted) return;
+    const tag = document.activeElement ? document.activeElement.tagName : "";
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    const q = state.session.questions[state.session.idx];
+    if (!q) return;
+
+    const keyMap = { KeyA: 0, KeyB: 1, KeyC: 2, KeyD: 3 };
+
+    if (e.code in keyMap && (q.type === "single" || q.type === "scenario" || q.type === "multi")) {
+      e.preventDefault();
+      const optIdx = keyMap[e.code];
+      const opts = document.querySelectorAll(".opt input[type='radio'], .opt input[type='checkbox']");
+      if (opts[optIdx]) {
+        opts[optIdx].click();
+        // Visually highlight the selected opt-key
+        const labels = document.querySelectorAll(".opt");
+        labels.forEach((l, i) => l.classList.toggle("selected", i === optIdx));
+      }
+      return;
+    }
+
+    switch (e.code) {
+      case "ArrowRight":
+      case "KeyN": {
+        e.preventDefault();
+        const nb = byId("nextQ") || byId("saveNext");
+        if (nb && !nb.disabled) nb.click();
+        break;
+      }
+      case "ArrowLeft":
+      case "KeyP": {
+        e.preventDefault();
+        const pb = byId("prevQ");
+        if (pb && !pb.disabled) pb.click();
+        break;
+      }
+      case "KeyF": {
+        e.preventDefault();
+        const fb = byId("toggleMark");
+        if (fb) {
+          fb.click();
+          const isFlagged = state.session.flagged[state.session.idx];
+          showToast(isFlagged ? "Question flagged for review" : "Flag removed", "info", 1800);
+        }
+        break;
+      }
+    }
+  });
 
   // Troubleshooting mode updates
   const chkTrouble = byId("chkTroubleshooting");
@@ -2428,10 +2594,10 @@ function wireEvents() {
           missedIds: []
         };
         state.analytics = fresh;
-        saveAnalytics();
+        saveAnalytics(true);
         renderHome();
         renderAnalytics();
-        alert("Progress reset successfully.");
+        showToast("Progress statistics reset successfully.", "info", 4000);
       }
     });
   }
@@ -2461,7 +2627,7 @@ function wireEvents() {
       if (!outBox) return;
 
       if (!targetDateStr) {
-        alert("Please select a target exam date.");
+        showToast("Please select a target exam date.", "warn");
         return;
       }
 
@@ -2471,7 +2637,7 @@ function wireEvents() {
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
       if (diffDays <= 0) {
-        alert("Target exam date must be in the future!");
+        showToast("Target exam date must be in the future!", "warn");
         return;
       }
 
@@ -2537,17 +2703,21 @@ function setupAuth() {
 
   btnSignIn.addEventListener("click", async () => {
     try {
+      showToast("Opening Google Sign-In...", "info", 2000);
       await loginWithGoogle();
     } catch (err) {
       console.error("Login failed:", err);
+      showToast("Authentication failed.", "error");
     }
   });
 
   btnSignOut.addEventListener("click", async () => {
     try {
       await logout();
+      showToast("Signed out successfully.", "info");
     } catch (err) {
       console.error("Logout failed:", err);
+      showToast("Failed to sign out.", "error");
     }
   });
 
@@ -2559,6 +2729,8 @@ function setupAuth() {
       userPhoto.src = user.photoURL || "";
       userName.textContent = user.displayName || user.email;
 
+      showToast(`Welcome back, ${user.displayName || "Engineer"}!`, "ok");
+      
       console.log("User logged in. Loading user profile progress...");
       const cloud = await loadUserProgress(user.uid);
       const userKey = `${STORE}_${user.uid}`;
@@ -2586,6 +2758,7 @@ function setupAuth() {
             console.log("Merging guest progress into user profile...", parsedGuest);
             merged = mergeProgress(parsedGuest, merged);
             didMergeGuest = true;
+            showToast("Merged local guest progress into your cloud profile.", "info", 4500);
           }
         } catch (e) {
           console.error("Error parsing guest progress:", e);
@@ -4273,10 +4446,11 @@ function setupSupportDesk() {
     const desc = byId("supportDesc").value.trim();
 
     if (!name || !email || !desc) {
-      alert("Please fill in all required fields.");
+      showToast("Please fill in all required fields.", "warn");
       return;
     }
 
+    showToast("Incident ticket successfully logged ✓", "ok", 3000);
     out.innerHTML = `
       <strong style="color: #10b981;">Incident Logged Successfully!</strong><br />
       <strong>Ticket ID:</strong> INC-${Math.floor(100000 + Math.random() * 900000)}<br />

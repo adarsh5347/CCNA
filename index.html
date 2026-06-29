@@ -62,22 +62,41 @@
         <p>NetAcad flow + Boson rigor + Pearson realism</p>
       </div>
     </div>
-    <nav>
-      <button data-page="home" class="ghost" aria-label="Home Navigation">🏠 <span>Home</span></button>
-      <button data-page="subnet" class="ghost" aria-label="Subnetting Academy">⚡ <span>Subnetting</span></button>
-      <button data-page="labs" class="ghost" aria-label="CCNA Lab Center">🧪 <span>Lab Center</span></button>
-      <button data-page="analytics" class="ghost" aria-label="Readiness Analytics">📊 <span>Analytics</span></button>
-      <button data-page="support" class="ghost" aria-label="Support Helpdesk">🛠️ <span>Support</span></button>
-      <button id="btnMuteToggle" class="ghost" aria-label="Toggle Sound" style="padding: 8px;">🔊</button>
-      <button id="btnToggleContrast" class="ghost" aria-label="Toggle High Contrast" style="padding: 8px;">🌓</button>
-      <span id="headerXPBadge" class="timer" style="background: rgba(0, 242, 254, 0.08); border-color: rgba(0, 242, 254, 0.3); color: #00f2fe; font-size: 12px; padding: 4px 10px;">Lvl 1 (0 XP)</span>
+    <nav role="navigation" aria-label="Main navigation">
+      <button data-page="home" class="nav-btn ghost" aria-label="Dashboard">
+        <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><rect x="2" y="2" width="7" height="7" rx="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5"/></svg>
+        <span class="nav-label">Home</span>
+      </button>
+      <button data-page="subnet" class="nav-btn ghost" aria-label="Subnetting Academy">
+        <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 3v14M3 10h14" stroke-linecap="round"/></svg>
+        <span class="nav-label">Subnetting</span>
+      </button>
+      <button data-page="labs" class="nav-btn ghost" aria-label="Lab Center">
+        <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><path d="M7 3v7l-3 5h12l-3-5V3" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 3h6" stroke-linecap="round"/></svg>
+        <span class="nav-label">Lab Center</span>
+      </button>
+      <button data-page="analytics" class="nav-btn ghost" aria-label="Analytics">
+        <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><path d="M3 14l4-5 4 3 4-6 2 2" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="2" width="16" height="16" rx="2"/></svg>
+        <span class="nav-label">Analytics</span>
+      </button>
+      <button data-page="support" class="nav-btn ghost" aria-label="Support">
+        <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 11v-1c0-.6.4-1 .9-1.2.5-.2.9-.8.9-1.4C11.8 8 11 7.3 10 7.3c-.9 0-1.5.6-1.7 1.3" stroke-linecap="round"/><circle cx="10" cy="13.5" r="0.5" fill="currentColor" stroke="none"/></svg>
+        <span class="nav-label">Support</span>
+      </button>
+      <button id="btnMuteToggle" class="nav-util-btn ghost" aria-label="Toggle Sound">
+        <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><path d="M11 5l-5 4H3v4h3l5 4V5z" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8c.8.8 1.2 1.9 1.2 3s-.4 2.2-1.2 3M13 9.5c.4.4.7 1 .7 1.5s-.3 1.1-.7 1.5" stroke-linecap="round"/></svg>
+      </button>
+      <button id="btnToggleContrast" class="nav-util-btn ghost" aria-label="Toggle High Contrast">
+        <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 3v14" stroke-linecap="round"/><path d="M10 3a7 7 0 0 1 0 14V3z" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <span id="headerXPBadge" class="xp-badge" aria-label="Experience level">Lvl 1</span>
       <span id="headerTimer" class="timer hidden" aria-live="polite">120:00</span>
       <div id="authContainer" class="auth-container">
-        <button id="btnSignIn" class="secondary">🔑 Sign In</button>
+        <button id="btnSignIn" class="secondary" style="padding: 6px 12px; font-size: 12px;">Sign In</button>
         <div id="userProfile" class="user-profile hidden">
           <img id="userPhoto" class="user-photo" src="" alt="User Photo" />
           <span id="userName" class="user-name"></span>
-          <button id="btnSignOut" class="ghost">Log Out</button>
+          <button id="btnSignOut" class="ghost" style="font-size: 11px; padding: 5px 8px;">Sign Out</button>
         </div>
       </div>
     </nav>
@@ -87,7 +106,7 @@
     <!-- HOME PAGE -->
     <section id="home" class="page active">
       <!-- Premium Hero Dashboard Stats -->
-      <article class="card hero-dashboard" style="background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; margin-bottom: 20px;">
+      <article class="card hero-dashboard">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
           <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap; flex: 1; min-width: 280px;">
             <div class="hero-graphics" style="width: 100px; height: 100px; position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
@@ -124,24 +143,24 @@
         </div>
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0;" />
         <div class="grid stats" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-          <div class="stat" style="position: relative; overflow: hidden;">
+          <div class="stat skeleton" style="position: relative; overflow: hidden;">
             <div class="k">Readiness Score</div>
             <div class="v" id="heroReadiness">0%</div>
             <div class="progress" style="height: 4px; margin-top: 8px;"><div id="heroReadinessBar" style="width: 0%;"></div></div>
           </div>
-          <div class="stat">
+          <div class="stat skeleton">
             <div class="k">Questions Solved</div>
             <div class="v" id="heroQuestions">0</div>
           </div>
-          <div class="stat">
+          <div class="stat skeleton">
             <div class="k">Active Streak</div>
             <div class="v" id="heroStreak">0 Days</div>
           </div>
-          <div class="stat">
+          <div class="stat skeleton">
             <div class="k">Labs Completed</div>
             <div class="v" id="heroLabs">0 / 10</div>
           </div>
-          <div class="stat">
+          <div class="stat skeleton">
             <div class="k">Quizzes Completed</div>
             <div class="v" id="heroQuizzes">0</div>
           </div>
@@ -839,6 +858,7 @@
         <p>Track pass probability, readiness score, weak domains, and trend across attempts.</p>
         <button id="btnResetProgress" class="secondary">⚠️ Reset Progress</button>
       </article>
+      <div id="analyticsNarrative" class="analytics-narrative hidden"></div>
       <section id="analyticsStats" class="grid stats"></section>
       <section class="card">
         <h3>Domain Breakdown</h3>
@@ -1027,5 +1047,7 @@
     });
   }
 </script>
+<!-- Toast Notification Container -->
+<div id="toastContainer" role="status" aria-live="polite" aria-atomic="false"></div>
 </body>
 </html>
