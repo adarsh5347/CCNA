@@ -628,9 +628,11 @@
 
     <!-- SUBNETTING ARCADE ACADEMY -->
     <section id="subnet" class="page">
-      <article class="hero">
-        <h2>Subnetting Arcade Academy</h2>
-        <p>CIDR, VLSM, wildcard masks, host counts, and timed challenge practice with streak multipliers and dynamic score rewards.</p>
+      <article class="hero" style="position: relative; overflow: hidden;">
+        <!-- Immersive Awwwards-style perspective cyber grid -->
+        <div class="cyber-grid" aria-hidden="true"></div>
+        <h2 class="reveal-text glow-accent" style="position: relative; z-index: 1;">Subnetting Arcade Academy</h2>
+        <p style="position: relative; z-index: 1; color: var(--text-muted); margin-bottom: 0;">CIDR, VLSM, wildcard masks, host counts, and timed challenge practice with streak multipliers and dynamic score rewards.</p>
       </article>
 
       <div class="grid labs" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
@@ -641,10 +643,10 @@
           </div>
           
           <div class="subnet-mode-tabs" style="display: flex; gap: 6px; flex-wrap: wrap;">
-            <button id="btnSubnetEasy" class="primary" style="padding: 6px 12px; font-size: 11px;">Easy (/24 - /26)</button>
-            <button id="btnSubnetMedium" class="secondary" style="padding: 6px 12px; font-size: 11px;">Medium (/20 - /28)</button>
-            <button id="btnSubnetHard" class="secondary" style="padding: 6px 12px; font-size: 11px;">Hard (/16 - /30)</button>
-            <button id="btnSubnetTimed" class="secondary" style="padding: 6px 12px; font-size: 11px;">⏱️ Timed</button>
+            <button id="btnSubnetEasy" class="primary magnetic-btn" style="padding: 6px 12px; font-size: 11px;">Easy (/24 - /26)</button>
+            <button id="btnSubnetMedium" class="secondary magnetic-btn" style="padding: 6px 12px; font-size: 11px;">Medium (/20 - /28)</button>
+            <button id="btnSubnetHard" class="secondary magnetic-btn" style="padding: 6px 12px; font-size: 11px;">Hard (/16 - /30)</button>
+            <button id="btnSubnetTimed" class="secondary magnetic-btn" style="padding: 6px 12px; font-size: 11px;">⏱️ Timed</button>
           </div>
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
@@ -661,8 +663,8 @@
           <div id="subnetPrompt" class="output terminal-box" style="min-height: 50px; padding: 10px 14px;"></div>
           
           <div class="inline" style="margin-top: 4px;">
-            <button id="subnetSubmit" class="primary">Submit Answer</button>
-            <button id="subnetSkip" class="ghost">Skip</button>
+            <button id="subnetSubmit" class="primary magnetic-btn">Submit Answer</button>
+            <button id="subnetSkip" class="ghost magnetic-btn">Skip</button>
           </div>
 
           <div id="subnetOut" class="output terminal-box" style="min-height: 70px; padding: 10px 14px;"></div>
@@ -804,9 +806,11 @@
 
     <!-- CCNA LAB CENTER -->
     <section id="labs" class="page">
-      <article class="hero">
-        <h2>Cisco Virtual Lab Center</h2>
-        <p>Gain hands-on configuration experience with VLANs, OSPF, ACLs, STP, and VPNs. Configure parameters, audit status, and solve troubleshooting challenges.</p>
+      <article class="hero" style="position: relative; overflow: hidden;">
+        <!-- Immersive Awwwards-style perspective cyber grid -->
+        <div class="cyber-grid" aria-hidden="true"></div>
+        <h2 class="reveal-text glow-accent" style="position: relative; z-index: 1;">Cisco Virtual Lab Center</h2>
+        <p style="position: relative; z-index: 1; color: var(--text-muted); margin-bottom: 0;">Gain hands-on configuration experience with VLANs, OSPF, ACLs, STP, and VPNs. Configure parameters, audit status, and solve troubleshooting challenges.</p>
       </article>
 
       <div class="lab-shell" style="display: grid; grid-template-columns: 320px 1fr; gap: 20px; min-height: 60vh;">
@@ -818,9 +822,9 @@
           </div>
           
           <div class="lab-mode-group" style="display: flex; gap: 4px; border: 1px solid var(--border-color); border-radius: 8px; padding: 2px; background: rgba(0,0,0,0.25); height: 36px; align-items: center;">
-            <button id="btnModeStep" class="primary" style="flex: 1; padding: 4px; font-size: 11px; border: none !important; border-radius: 6px !important; height: 100%;">Step-by-Step</button>
-            <button id="btnModeChallenge" class="ghost" style="flex: 1; padding: 4px; font-size: 11px; border: none !important; border-radius: 6px !important; height: 100%;">Challenge</button>
-            <button id="btnModeExam" class="ghost" style="flex: 1; padding: 4px; font-size: 11px; border: none !important; border-radius: 6px !important; height: 100%;">Exam</button>
+            <button id="btnModeStep" class="primary magnetic-btn" style="flex: 1; padding: 4px; font-size: 11px; border: none !important; border-radius: 6px !important; height: 100%;">Step-by-Step</button>
+            <button id="btnModeChallenge" class="ghost magnetic-btn" style="flex: 1; padding: 4px; font-size: 11px; border: none !important; border-radius: 6px !important; height: 100%;">Challenge</button>
+            <button id="btnModeExam" class="ghost magnetic-btn" style="flex: 1; padding: 4px; font-size: 11px; border: none !important; border-radius: 6px !important; height: 100%;">Exam</button>
           </div>
 
           <div style="border-top: 1px solid var(--border-color); padding-top: 12px; flex: 1; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;">
@@ -858,10 +862,12 @@
 
     <!-- READINESS DASHBOARD PAGE -->
     <section id="analytics" class="page">
-      <article class="hero">
-        <h2>Readiness Dashboard</h2>
-        <p>Track pass probability, readiness score, weak domains, and trend across attempts.</p>
-        <button id="btnResetProgress" class="secondary">⚠️ Reset Progress</button>
+      <article class="hero" style="position: relative; overflow: hidden;">
+        <!-- Immersive Awwwards-style perspective cyber grid -->
+        <div class="cyber-grid" aria-hidden="true"></div>
+        <h2 class="reveal-text glow-accent" style="position: relative; z-index: 1;">Readiness Dashboard</h2>
+        <p style="position: relative; z-index: 1; color: var(--text-muted);">Track pass probability, readiness score, weak domains, and trend across attempts.</p>
+        <button id="btnResetProgress" class="secondary magnetic-btn" style="position: relative; z-index: 2;">⚠️ Reset Progress</button>
       </article>
       <div id="analyticsNarrative" class="analytics-narrative hidden"></div>
       <section id="analyticsStats" class="grid stats"></section>
@@ -899,9 +905,11 @@
 
     <!-- HELP & SUPPORT PAGE -->
     <section id="support" class="page">
-      <article class="hero">
-        <h2>IT Support Desk & Network Operations Center</h2>
-        <p>Submit incident tickets or reach out directly to the Network Administrator for CCNA Platform issues.</p>
+      <article class="hero" style="position: relative; overflow: hidden;">
+        <!-- Immersive Awwwards-style perspective cyber grid -->
+        <div class="cyber-grid" aria-hidden="true"></div>
+        <h2 class="reveal-text glow-accent" style="position: relative; z-index: 1;">IT Support Desk & Network Operations Center</h2>
+        <p style="position: relative; z-index: 1; color: var(--text-muted); margin-bottom: 0;">Submit incident tickets or reach out directly to the Network Administrator for CCNA Platform issues.</p>
       </article>
 
       <div class="grid labs">
