@@ -9398,6 +9398,1719 @@ const questionBank = [
       "tip": "'ntp server' = client mode, 'ntp peer' = symmetric active."
     },
     "id": 278
+,
+
+    {
+      "domain": "IP Services",
+      "topic": "QoS",
+      "type": "single",
+      "difficulty": "Hard",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "An administrator reviews the packet capture of voice signaling traffic and notices a DSCP value of CS3. Which Per-Hop Behavior (PHB) and decimal value correspond to this classification?",
+      "options": [
+        "AF31, decimal value 26",
+        "CS3, decimal value 24",
+        "AF33, decimal value 30",
+        "CS3, decimal value 28"
+      ],
+      "correct": [
+        1
+      ],
+      "expl": {
+        "correct": "B",
+        "why": "Class Selector 3 (CS3) maps to the legacy IP Precedence value 3. In the DiffServ field, CS3 is represented as binary 011000, which translates to decimal value 24. Citing Vol2 Ch11.",
+        "wrong": [
+          "AF31 (Assured Forwarding 31) uses binary 011010, which corresponds to decimal value 26, not CS3.",
+          "AF33 (Assured Forwarding 33) uses binary 011110, which corresponds to decimal value 30.",
+          "CS3 corresponds to decimal 24. Decimal 28 corresponds to AF32 (binary 011100)."
+        ],
+        "tip": "CS values are simply IP Precedence values shifted left by 3 bits (multiplied by 8). CS3 = 3 * 8 = 24.",
+        "memory": "Class Selectors are multiples of 8: CS1=8, CS2=16, CS3=24, CS4=32.",
+        "real": "Voice signaling (SIP/H.323) is standardly marked CS3 to guarantee signaling priority over data traffic during call setup.",
+        "commands": [
+          "show policy-map interface"
+        ]
+      },
+      "id": 279
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "YANG / NETCONF",
+      "type": "single",
+      "difficulty": "Easy",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "A network engineer wants to configure programmatic access to a Cisco router using NETCONF. Which transport protocol and default TCP port number does NETCONF use?",
+      "options": [
+        "HTTPS, port 443",
+        "SSH, port 22",
+        "SSH, port 830",
+        "HTTPS, port 830"
+      ],
+      "correct": [
+        2
+      ],
+      "expl": {
+        "correct": "C",
+        "why": "NETCONF is standardly defined to use SSH as its transport protocol, listening on TCP port 830 by default. Citing Vol2 Ch19.",
+        "wrong": [
+          "HTTPS on port 443 is used by RESTCONF, not NETCONF.",
+          "SSH on port 22 is used for standard CLI management access (vty lines), not the NETCONF subsystem interface.",
+          "NETCONF utilizes SSH as its transport layer, not HTTPS. HTTPS port 830 is invalid."
+        ],
+        "tip": "NETCONF = SSH 830. RESTCONF = HTTPS 443.",
+        "memory": "NETCONF needs security (SSH) and has its own workspace (830).",
+        "real": "Enabling 'netconf-yang' on a Cisco IOS-XE router spawns a listener on port 830 for automation controllers like Cisco DNA Center.",
+        "commands": [
+          "netconf-yang"
+        ]
+      },
+      "id": 280
+    },
+    {
+      "domain": "Network Fundamentals",
+      "topic": "WAN Technologies",
+      "type": "scenario",
+      "difficulty": "Medium",
+      "examWeight": "20%",
+      "frequency": "High",
+      "text": "A company is expanding its WAN to connect 10 branch offices to a central data center. The business requires high reliability between the branches and the data center, but wants to minimize cost by not connecting branches directly to one another. Which WAN topology is best suited for this requirement?",
+      "options": [
+        "Hub-and-spoke",
+        "Full mesh",
+        "Point-to-point",
+        "Partial mesh"
+      ],
+      "correct": [
+        0
+      ],
+      "expl": {
+        "correct": "A",
+        "why": "A hub-and-spoke WAN topology connects multiple remote branch routers (spokes) to a central location (hub). This minimizes WAN link costs because branches do not require direct links to one another. Citing Vol2 Ch14.",
+        "wrong": [
+          "Full mesh requires every site to connect to every other site, which dramatically increases link costs.",
+          "Point-to-point connections only connect two endpoints directly and do not scale to connect 10 branch offices without multiple interfaces.",
+          "Partial mesh connects some, but not all, remote sites together, incurring more link cost than a hub-and-spoke setup."
+        ],
+        "tip": "Hub-and-spoke = cheapest option for branch-to-HQ connectivity.",
+        "memory": "Spokes point to the hub like a bicycle wheel.",
+        "real": "DMVPN networks commonly deploy a hub-and-spoke architecture to link satellite branch offices to headquarters.",
+        "commands": [
+          "show tunnel destination"
+        ]
+      },
+      "id": 281
+    },
+    {
+      "domain": "IP Services",
+      "topic": "QoS",
+      "type": "scenario",
+      "difficulty": "Medium",
+      "examWeight": "10%",
+      "frequency": "Medium",
+      "text": "A network engineer is configuring traffic conditioning on a WAN edge router. The service provider mandates that any egress traffic exceeding the contracted Information Rate (CIR) must be immediately dropped rather than buffered. Which QoS mechanism should the engineer implement?",
+      "options": [
+        "Traffic shaping",
+        "Tail drop",
+        "Weighted Random Early Detection (WRED)",
+        "Traffic policing"
+      ],
+      "correct": [
+        3
+      ],
+      "expl": {
+        "correct": "D",
+        "why": "Traffic policing limits bandwidth by dropping or re-marking packets that exceed the configured rate threshold immediately, without buffering. Citing Vol2 Ch11.",
+        "wrong": [
+          "Traffic shaping buffers traffic exceeding the rate limit in queues to smooth out bursts, which violates the zero-buffering requirement.",
+          "Tail drop is a queue management mechanism that drops newly arrived packets at the end of a queue when it becomes full, rather than enforcing a CIR.",
+          "WRED is a congestion avoidance mechanism that drops random packets early to avoid TCP global synchronization."
+        ],
+        "tip": "Shaping = buffer and delay. Policing = drop or re-mark.",
+        "memory": "Police officers drop the hammer; shapers smooth things out.",
+        "real": "Service providers apply ingress policing at the carrier edge to enforce the bandwidth limits purchased by customers.",
+        "commands": [
+          "police 10000000 conform-action transmit exceed-action drop"
+        ]
+      },
+      "id": 282
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "YANG / NETCONF",
+      "type": "single",
+      "difficulty": "Medium",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Which statement correctly describes the difference between a 'leaf' and a 'leaf-list' in a YANG data model schema?",
+      "options": [
+        "A leaf represents a container node, whereas a leaf-list represents a single value.",
+        "A leaf contains exactly one value of a particular type, whereas a leaf-list contains an array of values of a particular type.",
+        "A leaf-list can contain nested container structures, whereas a leaf is restricted to terminal values.",
+        "A leaf represents a configuration property, whereas a leaf-list represents operational state data only."
+      ],
+      "correct": [
+        1
+      ],
+      "expl": {
+        "correct": "B",
+        "why": "In YANG, a 'leaf' represents a single data node containing a single value of a specific type (e.g., host-name). A 'leaf-list' represents a sequence of leaf nodes, each containing a value of a specific type (e.g., list of DNS servers). Citing Vol2 Ch19.",
+        "wrong": [
+          "A leaf does not represent a container. Container nodes hold other nested data nodes, whereas leaf elements hold values.",
+          "Neither leaf nor leaf-list contains nested containers; both are terminal nodes containing values.",
+          "Both leaves and leaf-lists can represent configuration properties or operational data depending on their configuration flags."
+        ],
+        "tip": "Leaf = single variable. Leaf-list = array of variables.",
+        "memory": "A single leaf is one item; a list of leaves is an array of items.",
+        "real": "A device hostname is modeled as a YANG leaf, while a list of static NTP server IP addresses is modeled as a leaf-list.",
+        "commands": [
+          "show running-config"
+        ]
+      },
+      "id": 283
+    },
+    {
+      "domain": "Network Fundamentals",
+      "topic": "WAN Technologies",
+      "type": "single",
+      "difficulty": "Easy",
+      "examWeight": "20%",
+      "frequency": "Medium",
+      "text": "Which role does a router play if it sits at the edge of the customer network and connects directly to the service provider's MPLS network edge device?",
+      "options": [
+        "Provider (P) router",
+        "Provider Edge (PE) router",
+        "Label Switch Router (LSR)",
+        "Customer Edge (CE) router"
+      ],
+      "correct": [
+        3
+      ],
+      "expl": {
+        "correct": "D",
+        "why": "Customer Edge (CE) routers belong to the customer network and interface directly with the Provider Edge (PE) routers of the service provider MPLS core. Citing Vol2 Ch14.",
+        "wrong": [
+          "Provider (P) routers sit entirely within the MPLS provider core and do not connect directly to customer devices.",
+          "Provider Edge (PE) routers reside on the boundary of the provider core and connect directly to CE devices.",
+          "Label Switch Routers (LSR) perform label swapping inside the service provider core network."
+        ],
+        "tip": "CE = Customer Edge (belongs to customer). PE = Provider Edge (belongs to provider).",
+        "memory": "C is for Customer, P is for Provider.",
+        "real": "In an enterprise network connected via MPLS WAN, the router you manage on-site is the CE router.",
+        "commands": [
+          "show ip route"
+        ]
+      },
+      "id": 284
+    },
+    {
+      "domain": "IP Services",
+      "topic": "QoS",
+      "type": "multi",
+      "difficulty": "Medium",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "A voice engineer is configuring Class-Based Weighted Fair Queuing (CBWFQ) on a serial interface. They need to ensure voice traffic is placed in a priority queue and given strict low-latency service. Which two actions must the engineer configure to enable Low-Latency Queuing (LLQ)? (Choose two.)",
+      "options": [
+        "Apply the 'priority' command inside the policy-map class block.",
+        "Apply the 'bandwidth' command to reserve class bandwidth.",
+        "Configure a maximum bandwidth limit for the priority class.",
+        "Enable fair-queue on the interface directly."
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "expl": {
+        "correct": "A, C",
+        "why": "LLQ is configured by applying the 'priority' command inside a policy-map class. To prevent the priority queue from starving other queues, the priority command must be configured with a bandwidth allocation (which acts as a policing limit during congestion). Citing Vol2 Ch11.",
+        "wrong": [
+          "The 'bandwidth' command enables standard CBWFQ, which guarantees minimum bandwidth but does not provide strict low-latency priority service.",
+          "Fair-queuing distributes interface bandwidth dynamically but does not support strict priority low-latency services."
+        ],
+        "tip": "LLQ = CBWFQ + Priority Queue.",
+        "memory": "Priority means low latency.",
+        "real": "Voice over IP (VoIP) payloads must be assigned to the strict priority queue using LLQ to avoid audio jitter.",
+        "commands": [
+          "priority 128"
+        ]
+      },
+      "id": 285
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "YANG / NETCONF",
+      "type": "single",
+      "difficulty": "Medium",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Which statement correctly describes the encoding and protocol differences between NETCONF and RESTCONF?",
+      "options": [
+        "NETCONF uses JSON/HTTPS, whereas RESTCONF uses XML/SSH.",
+        "NETCONF uses XML/SSH, whereas RESTCONF supports JSON or XML over SSH.",
+        "NETCONF uses XML/SSH, whereas RESTCONF supports JSON or XML over HTTPS.",
+        "NETCONF supports JSON/SSH, whereas RESTCONF only supports XML/HTTPS."
+      ],
+      "correct": [
+        2
+      ],
+      "expl": {
+        "correct": "C",
+        "why": "NETCONF uses XML encoding and transport over SSH (port 830). RESTCONF supports both JSON and XML encoding, transported over HTTP/HTTPS (port 443). Citing Vol2 Ch19.",
+        "wrong": [
+          "NETCONF does not support JSON or use HTTPS; RESTCONF does not use SSH.",
+          "RESTCONF operates over HTTP/HTTPS, not SSH.",
+          "NETCONF only supports XML encoding, not JSON."
+        ],
+        "tip": "NETCONF = XML + SSH. RESTCONF = JSON/XML + HTTPS.",
+        "memory": "REST = Web APIs (HTTPS, JSON). NETCONF = Secure Configuration (SSH, XML).",
+        "real": "Modern SDN controllers use RESTCONF to push JSON configurations to switches because it integrates with web developer tools.",
+        "commands": [
+          "ip http secure-server"
+        ]
+      },
+      "id": 286
+    },
+    {
+      "domain": "Network Fundamentals",
+      "topic": "WAN Technologies",
+      "type": "scenario",
+      "difficulty": "Medium",
+      "examWeight": "20%",
+      "frequency": "Medium",
+      "text": "A corporation is deploying a Metro Ethernet WAN to connect its headquarters and three regional warehouses. The network design requires the warehouses to communicate with the headquarters but prevents them from communicating directly with each other over the WAN. Which MEF Metro Ethernet service type should be implemented?",
+      "options": [
+        "E-Tree (Ethernet Private Tree)",
+        "E-Line (Ethernet Private Line)",
+        "E-LAN (Ethernet Private LAN)",
+        "Point-to-Point Virtual Private Line"
+      ],
+      "correct": [
+        0
+      ],
+      "expl": {
+        "correct": "A",
+        "why": "E-Tree (Ethernet Private Tree) is a hub-and-spoke architecture where the central hub (root) can communicate with all branches (leaves), but branches cannot communicate directly with one another. Citing Vol2 Ch14.",
+        "wrong": [
+          "E-Line provides a simple point-to-point connection between exactly two endpoints.",
+          "E-LAN provides full multipoint-to-multipoint connectivity where all connected sites can communicate directly with all other sites.",
+          "Point-to-Point Virtual Private Line is an E-Line service, not a hub-and-spoke setup."
+        ],
+        "tip": "E-Tree = Hub-and-Spoke. E-LAN = Full-Mesh. E-Line = Point-to-Point.",
+        "memory": "Tree roots connect to leaves, but leaves don't connect to other leaves.",
+        "real": "A bank branches network standardly uses E-Tree to direct all transaction traffic to the main office datacenter while isolating branches from each other.",
+        "commands": [
+          "show interface status"
+        ]
+      },
+      "id": 287
+    },
+    {
+      "domain": "IP Services",
+      "topic": "QoS",
+      "type": "single",
+      "difficulty": "Easy",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "In a modern network design, where is the most typical and optimal location to establish the QoS trust boundary for user endpoints?",
+      "options": [
+        "At the WAN router interface",
+        "At the access switch port connected to the IP Phone",
+        "At the core layer switch interfaces",
+        "On the user endpoint workstation directly"
+      ],
+      "correct": [
+        1
+      ],
+      "expl": {
+        "correct": "B",
+        "why": "The trust boundary should be set as close to the source of traffic as possible. In designs with IP phones, the access switch port is configured to trust the markings of the IP phone, establishing the trust boundary at the switch. Citing Vol2 Ch11.",
+        "wrong": [
+          "The WAN router is too far into the network; traffic should be classified before it crosses the access and distribution layers.",
+          "The core layer is too deep; queuing and classification advantages would be lost in the access layer.",
+          "Endpoints are generally not trusted because users could modify settings to prioritize their own traffic."
+        ],
+        "tip": "Place trust boundaries at the ingress access switch port.",
+        "memory": "Trust the hardware (IP Phone/Switch), not the user's PC.",
+        "real": "Configuring access ports with 'mls qos trust device cisco-phone' allows the switch to trust markings from the phone while resetting PC markings.",
+        "commands": [
+          "mls qos trust device cisco-phone"
+        ]
+      },
+      "id": 288
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "YANG / NETCONF",
+      "type": "matching",
+      "difficulty": "Hard",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Match the RESTCONF HTTP verb on the left to its corresponding NETCONF operation on the right.",
+      "pairs": [
+        [
+          "GET",
+          "get / get-config"
+        ],
+        [
+          "POST",
+          "create"
+        ],
+        [
+          "PUT",
+          "replace"
+        ],
+        [
+          "PATCH",
+          "merge"
+        ]
+      ],
+      "expl": {
+        "correct": "Matching",
+        "why": "RESTCONF maps standard HTTP methods to NETCONF operations: GET maps to retrieve data, POST creates new resources, PUT replaces configurations, and PATCH merges changes. Citing Vol2 Ch19.",
+        "wrong": [
+          "Matching PUT to 'create' is incorrect because PUT replaces/overwrites the resource rather than creating a new instance."
+        ],
+        "tip": "POST = create, PUT = replace, PATCH = merge.",
+        "memory": "PUT replaces, PATCH patches (merges).",
+        "real": "A script using RESTCONF uses a PATCH request to edit an interface IP address without deleting the rest of the interface configurations.",
+        "commands": [
+          "ip http secure-server"
+        ]
+      },
+      "id": 289
+    },
+    {
+      "domain": "Network Fundamentals",
+      "topic": "WAN Technologies",
+      "type": "single",
+      "difficulty": "Easy",
+      "examWeight": "20%",
+      "frequency": "Medium",
+      "text": "What is the standardized transmission speed of an E1 synchronous leased line?",
+      "options": [
+        "1.544 Mbps",
+        "44.736 Mbps",
+        "34.368 Mbps",
+        "2.048 Mbps"
+      ],
+      "correct": [
+        3
+      ],
+      "expl": {
+        "correct": "D",
+        "why": "An E1 leased line (common in Europe) has a standardized synchronous transmission rate of 2.048 Mbps. Citing Vol2 Ch14.",
+        "wrong": [
+          "1.544 Mbps is the speed of a T1 leased line (common in North America).",
+          "44.736 Mbps is the speed of a T3 leased line.",
+          "34.368 Mbps is the speed of an E3 leased line."
+        ],
+        "tip": "T1 = 1.544 Mbps. E1 = 2.048 Mbps.",
+        "memory": "E1 is slightly higher than T1 (E1 is ~2M, T1 is ~1.5M).",
+        "real": "Legacy voice trunk systems connect to local telcos using physical E1 spans to transmit multiple active phone calls.",
+        "commands": [
+          "controller e1 0/0/0"
+        ]
+      },
+      "id": 290
+    },
+    {
+      "domain": "IP Services",
+      "topic": "QoS",
+      "type": "scenario",
+      "difficulty": "Hard",
+      "examWeight": "10%",
+      "frequency": "Medium",
+      "text": "A technician notices that during periods of link congestion, multiple TCP connections experience dropouts and recover simultaneously. This causes cycles of high utilization followed by underutilization (global synchronization). Which QoS mechanism should be configured to prevent this behavior?",
+      "options": [
+        "Tail drop",
+        "Weighted Random Early Detection (WRED)",
+        "First-In, First-Out (FIFO) queuing",
+        "Traffic shaping"
+      ],
+      "correct": [
+        1
+      ],
+      "expl": {
+        "correct": "B",
+        "why": "WRED prevents TCP global synchronization by dropping packets randomly from different TCP streams before congestion peaks, forcing individual TCP flows to back off at different times. Citing Vol2 Ch11.",
+        "wrong": [
+          "Tail drop drops all packets arriving when a queue is full, which triggers global synchronization because all TCP flows drop packets and back off at the same time.",
+          "FIFO queuing processes packets in arrival order and drops tail packets when full, which contributes to global synchronization.",
+          "Traffic shaping buffers traffic to avoid drops but does not resolve synchronization behaviors once queues fill."
+        ],
+        "tip": "WRED resolves TCP global synchronization by dropping packets early and randomly.",
+        "memory": "RED drop = Early Drop.",
+        "real": "Deploying WRED on WAN interface policies ensures traffic flows steadily rather than oscillating between saturated and empty states.",
+        "commands": [
+          "random-detect"
+        ]
+      },
+      "id": 291
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "YANG / NETCONF",
+      "type": "multi",
+      "difficulty": "Medium",
+      "examWeight": "10%",
+      "frequency": "Medium",
+      "text": "A network operations team is replacing SNMP polling with model-driven telemetry. Which two statements correctly describe model-driven telemetry dial-out connections? (Choose two.)",
+      "options": [
+        "Collector initiates session",
+        "Device initiates outbound session",
+        "Device pushes stream at intervals",
+        "NETCONF SSH 830 push logs"
+      ],
+      "correct": [
+        1,
+        2
+      ],
+      "expl": {
+        "correct": "B, C",
+        "why": "In a dial-out configuration, the managed network device initiates the outbound connection to the telemetry collector. Once established, data is streamed continuously or at set intervals. Citing Vol2 Ch19.",
+        "wrong": [
+          "In dial-in configurations, the collector initiates the session, not in dial-out.",
+          "Dial-out telemetry typically uses gRPC/HTTP2 transports rather than NETCONF SSH port 830."
+        ],
+        "tip": "Dial-out = Device pushes data. Dial-in = Collector pulls data.",
+        "memory": "Dialing out means the device calls the collector.",
+        "real": "Engineers configure dial-out telemetry to ensure firewall changes aren't needed to allow inbound control calls to critical devices.",
+        "commands": [
+          "telemetry ietf subscription 101"
+        ]
+      },
+      "id": 292
+    },
+    {
+      "domain": "Network Fundamentals",
+      "topic": "WAN Technologies",
+      "type": "single",
+      "difficulty": "Medium",
+      "examWeight": "20%",
+      "frequency": "High",
+      "text": "Which three protocols combine to form a Dynamic Multipoint VPN (DMVPN) implementation?",
+      "options": [
+        "mGRE, NHRP, and IPsec",
+        "GRE, OSPF, and IPsec",
+        "L2TP, NHRP, and SSL",
+        "mGRE, LACP, and IPsec"
+      ],
+      "correct": [
+        0
+      ],
+      "expl": {
+        "correct": "A",
+        "why": "DMVPN uses multipoint GRE (mGRE) to manage tunnel interfaces, Next Hop Resolution Protocol (NHRP) to discover spoke public IP mapping, and IPsec to encrypt tunnel payload traffic. Citing Vol2 Ch15.",
+        "wrong": [
+          "Standard GRE does not support dynamic multipoint connections; OSPF is a routing protocol, not a DMVPN component.",
+          "L2TP and SSL are not part of the standard DMVPN design.",
+          "LACP is an EtherChannel control protocol, not a WAN encapsulation tunneling protocol."
+        ],
+        "tip": "DMVPN = mGRE + NHRP + IPsec.",
+        "memory": "My Great Network Is Secure: mGRE, NHRP, IPsec.",
+        "real": "DMVPN allows enterprise networks to build dynamic spoke-to-spoke tunnels over the public Internet for secure, direct communication.",
+        "commands": [
+          "ip nhrp network-id 1"
+        ]
+      },
+      "id": 293
+    },
+    {
+      "domain": "IP Services",
+      "topic": "QoS",
+      "type": "single",
+      "difficulty": "Medium",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Where is the 3-bit Class of Service (CoS) priority field located in an Ethernet frame?",
+      "options": [
+        "In the IPv4 Type of Service (ToS) byte",
+        "In the preamble of the Ethernet frame",
+        "In the 802.1Q VLAN tag",
+        "In the IPv4 DSCP field"
+      ],
+      "correct": [
+        2
+      ],
+      "expl": {
+        "correct": "C",
+        "why": "CoS is a Layer 2 priority field located inside the 2-byte 802.1Q tag inserted into an Ethernet header. It contains a 3-bit User Priority field (also known as 802.1p). Citing Vol2 Ch11.",
+        "wrong": [
+          "The ToS byte resides in the Layer 3 IPv4 header, not the Layer 2 Ethernet frame.",
+          "The preamble does not contain QoS information.",
+          "The DSCP field is a 6-bit field inside the Layer 3 IPv4 ToS byte."
+        ],
+        "tip": "CoS = Layer 2 (802.1Q). DSCP = Layer 3 (IPv4 ToS).",
+        "memory": "CoS = Tag (Layer 2).",
+        "real": "Access switches copy Layer 3 DSCP markings to Layer 2 CoS fields when forwarding frames across trunk links to adjacent switches.",
+        "commands": [
+          "switchport mode trunk"
+        ]
+      },
+      "id": 294
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "Configuration Management",
+      "type": "single",
+      "difficulty": "Easy",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Which configuration management tool is agentless, uses YAML-based 'playbooks', and connects to managed nodes primarily via SSH?",
+      "options": [
+        "Puppet",
+        "Ansible",
+        "Chef",
+        "SaltStack"
+      ],
+      "correct": [
+        1
+      ],
+      "expl": {
+        "correct": "B",
+        "why": "Ansible is agentless (requires no software installed on managed hosts), uses YAML files called Playbooks to define configuration states, and uses SSH to push updates. Citing Vol2 Ch19.",
+        "wrong": [
+          "Puppet is agent-based, uses manifests written in its own Ruby-like DSL, and runs on a pull model over HTTPS.",
+          "Chef is agent-based, uses recipes/cookbooks written in Ruby, and operates on a pull model.",
+          "SaltStack is typically agent-based (uses Minions) and uses a master/agent architecture."
+        ],
+        "tip": "Ansible = Agentless, YAML, Push, SSH.",
+        "memory": "Ansible has no agents (Agentless) and pushes YAML.",
+        "real": "Ansible is widely used by network engineers because it can automate legacy routers without installing additional software on them.",
+        "commands": [
+          "ansible-playbook -i hosts site.yml"
+        ]
+      },
+      "id": 295
+    },
+    {
+      "domain": "Network Fundamentals",
+      "topic": "WAN Technologies",
+      "type": "matching",
+      "difficulty": "Hard",
+      "examWeight": "20%",
+      "frequency": "High",
+      "text": "Match the Cisco SD-WAN component on the left to its corresponding plane of operation on the right.",
+      "pairs": [
+        [
+          "vManage",
+          "Management Plane"
+        ],
+        [
+          "vSmart",
+          "Control Plane"
+        ],
+        [
+          "vBond",
+          "Orchestration Plane"
+        ],
+        [
+          "vEdge / cEdge",
+          "Data Plane"
+        ]
+      ],
+      "expl": {
+        "correct": "Matching",
+        "why": "vManage provides GUI/NMS access (Management), vSmart controls policy/routing distribution (Control), vBond authenticates devices and handles NAT traversal (Orchestration), and vEdge/cEdge routers forward the data (Data). Citing Vol2 Ch15.",
+        "wrong": [
+          "Matching vSmart to the Data Plane is incorrect because vSmart distributes routing updates and policies, never forwarding data traffic."
+        ],
+        "tip": "vManage = Manage. vSmart = Control. vBond = Orchestrate. Edges = Data.",
+        "memory": "Manage = Management. Smart = Control. Bond = Orchestrate. Edge = Data.",
+        "real": "In Cisco SD-WAN, a new edge router contacts the vBond orchestrator to join the overlay fabric before getting controls from vSmart.",
+        "commands": [
+          "show sdwan control connections"
+        ]
+      },
+      "id": 296
+    },
+    {
+      "domain": "IP Services",
+      "topic": "QoS",
+      "type": "single",
+      "difficulty": "Hard",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Which command is used to apply a policy map to an interface for egress traffic control?",
+      "options": [
+        "service-policy output <policy-name>",
+        "policy-map <policy-name> out",
+        "ip qos policy <policy-name> egress",
+        "traffic-shape group <policy-name>"
+      ],
+      "correct": [
+        0
+      ],
+      "expl": {
+        "correct": "A",
+        "why": "The command 'service-policy output <policy-name>' applies a configured MQC policy map to an interface for traffic leaving the router. Citing Vol2 Ch11.",
+        "wrong": [
+          "'policy-map' is used in global configuration mode to define policies, not to apply them to interfaces.",
+          "'ip qos policy' is invalid syntax.",
+          "'traffic-shape group' is legacy syntax and does not apply an MQC policy map."
+        ],
+        "tip": "Create class-map -> policy-map -> apply with service-policy.",
+        "memory": "Service the policy on egress.",
+        "real": "An engineer applies 'service-policy output WAN-SHAPING' to a WAN serial link to limit outgoing traffic and prioritize voice packets.",
+        "commands": [
+          "service-policy output voice-policy"
+        ]
+      },
+      "id": 297
+    },
+    {
+      "domain": "IP Connectivity",
+      "topic": "FHRP",
+      "type": "scenario",
+      "difficulty": "Medium",
+      "examWeight": "25%",
+      "frequency": "High",
+      "text": "A network engineer is configuring HSRP on two routers. Router A is configured with priority 110, and Router B is configured with priority 120. Preemption is enabled on both routers. Initially, Router B is elected as the active router. If Router B's uplink interface fails, how will the HSRP routers coordinate failover if interface tracking is not configured?",
+      "options": [
+        "Router A immediately becomes active because its priority is higher than Router B's adjusted priority.",
+        "Router B remains active because it has a higher configured priority and preemption does not apply to link failures.",
+        "Router B remains active because it is still reachable via the LAN and its HSRP priority does not automatically decrement without interface tracking.",
+        "Router A and Router B both transition to active state, causing a split-brain condition."
+      ],
+      "correct": [
+        2
+      ],
+      "expl": {
+        "correct": "C",
+        "why": "HSRP monitors LAN hello exchanges to negotiate active status. If Router B's uplink fails but its LAN interface remains up, it continues sending hellos with priority 120. Without interface tracking configured, its priority does not decrement, so Router A cannot preempt it. Citing Vol2 Ch11.",
+        "wrong": [
+          "Router B's priority does not decrement automatically, so Router A will not become active.",
+          "Router B does remain active, but preemption *would* apply if its priority was lowered below Router A's.",
+          "Split-brain only occurs if HSRP hello packets are blocked between the routers on the LAN segment."
+        ],
+        "tip": "Track interfaces to dynamically decrement HSRP priority when links fail.",
+        "memory": "No tracking = no failover for uplinks.",
+        "real": "Without interface tracking, a LAN host's traffic will still go to Router B, which will then blackhole the packets because its uplink is down.",
+        "commands": [
+          "standby 1 track GigabitEthernet0/0 decrement 20"
+        ]
+      },
+      "id": 298
+    },
+    {
+      "domain": "Security Fundamentals",
+      "topic": "AAA",
+      "type": "single",
+      "difficulty": "Medium",
+      "examWeight": "15%",
+      "frequency": "High",
+      "text": "Which statement correctly describes a protocol feature of TACACS+ compared to RADIUS?",
+      "options": [
+        "TACACS+ uses UDP port 49, whereas RADIUS uses TCP port 1812.",
+        "TACACS+ encrypts only the password, whereas RADIUS encrypts the entire packet body.",
+        "TACACS+ combines authentication and authorization, whereas RADIUS separates them.",
+        "TACACS+ encrypts the entire packet payload, whereas RADIUS encrypts only the user password field."
+      ],
+      "correct": [
+        3
+      ],
+      "expl": {
+        "correct": "D",
+        "why": "TACACS+ encrypts the entire body of the packet during transmission, exposing only the header. RADIUS only encrypts the password field within the access-request packet. Citing Vol2 Ch6.",
+        "wrong": [
+          "TACACS+ uses TCP port 49, whereas RADIUS uses UDP ports 1812 and 1813.",
+          "TACACS+ encrypts the entire packet body; RADIUS encrypts only the password.",
+          "TACACS+ separates authentication and authorization, whereas RADIUS combines them."
+        ],
+        "tip": "TACACS+ = TCP (port 49), encrypts all, separates AA. RADIUS = UDP, encrypts password only, combines AA.",
+        "memory": "T in TACACS+ is for TCP; R in RADIUS is for UDP (R-U-Ready?).",
+        "real": "TACACS+ is preferred for device administration (CLI configuration commands) because it allows authorization of individual commands.",
+        "commands": [
+          "tacacs server MY_TACACS"
+        ]
+      },
+      "id": 299
+    },
+    {
+      "domain": "Security Fundamentals",
+      "topic": "Device Hardening",
+      "type": "single",
+      "difficulty": "Easy",
+      "examWeight": "15%",
+      "frequency": "Medium",
+      "text": "Which type of hash does a Cisco router use to represent a password configured with the 'username <name> secret' command?",
+      "options": [
+        "Type 7 Vigenere cipher",
+        "Type 5 MD5 (or Type 8/9 SHA-256/scrypt) secure hash",
+        "Cleartext representation",
+        "Type 0 basic translation hash"
+      ],
+      "correct": [
+        1
+      ],
+      "expl": {
+        "correct": "B",
+        "why": "The 'secret' keyword instructs the Cisco IOS to encrypt the password using a secure one-way hash (Type 5 MD5, Type 8 SHA-256, or Type 9 scrypt), which cannot be easily decrypted. Citing Vol2 Ch6.",
+        "wrong": [
+          "Type 7 ciphers (configured with 'password' command + password encryption) use a weak, reversible algorithm.",
+          "The 'secret' command never stores passwords in cleartext.",
+          "Type 0 is cleartext storage, not a secure hash."
+        ],
+        "tip": "Always use 'secret' instead of 'password' to secure device credentials.",
+        "memory": "Secrets are secure hashes (Type 5/8/9). Passwords are weak ciphers (Type 7).",
+        "real": "Using the 'username admin secret' command prevents unauthorized users from learning credentials if they copy the config file.",
+        "commands": [
+          "username admin secret Cisco12345"
+        ]
+      },
+      "id": 300
+    },
+    {
+      "domain": "IP Services",
+      "topic": "SNMPv3",
+      "type": "single",
+      "difficulty": "Medium",
+      "examWeight": "10%",
+      "frequency": "Medium",
+      "text": "Which SNMPv3 security level provides authentication using MD5 or SHA, but does not provide packet payload encryption?",
+      "options": [
+        "noAuthNoPriv",
+        "authPriv",
+        "authNoPriv",
+        "privNoAuth"
+      ],
+      "correct": [
+        2
+      ],
+      "expl": {
+        "correct": "C",
+        "why": "The 'authNoPriv' security level in SNMPv3 requires authentication via username/password (hashed with MD5 or SHA) but does not encrypt the transmitted network management packets. Citing Vol2 Ch10.",
+        "wrong": [
+          "noAuthNoPriv provides no user authentication and no packet encryption.",
+          "authPriv provides both secure MD5/SHA authentication and DES/3DES/AES packet payload encryption.",
+          "privNoAuth is an invalid SNMPv3 security level combination."
+        ],
+        "tip": "SNMPv3 levels: noAuthNoPriv (none) -> authNoPriv (auth only) -> authPriv (auth + encryption).",
+        "memory": "auth = authentication. priv = privacy (encryption). NoPriv = no encryption.",
+        "real": "SNMPv3 authNoPriv is configured when authentication is needed but devices lack the processing capacity for continuous encryption.",
+        "commands": [
+          "snmp-server group v3group v3 auth"
+        ]
+      },
+      "id": 301
+    },
+    {
+      "domain": "Network Access",
+      "topic": "Wireless Access",
+      "type": "dragdrop",
+      "difficulty": "Hard",
+      "examWeight": "20%",
+      "frequency": "Medium",
+      "text": "Order the 802.11 wireless standards from the oldest release/lowest theoretical speed to the newest release/highest theoretical speed.",
+      "order": [
+        "802.11b (2.4 GHz, 11 Mbps)",
+        "802.11g (2.4 GHz, 54 Mbps)",
+        "802.11n (2.4/5 GHz, 600 Mbps)",
+        "802.11ax (2.4/5/6 GHz, 9.6 Gbps)"
+      ],
+      "expl": {
+        "correct": "Correct Order",
+        "why": "802.11b was released in 1999 (11 Mbps), followed by 802.11g in 2003 (54 Mbps), 802.11n in 2009 (600 Mbps), and 802.11ax in 2021 (9.6 Gbps). Citing Vol1 Ch27.",
+        "wrong": [
+          "Swapping 802.11g and 802.11b breaks chronology because 802.11b is a legacy, slower standard than 802.11g."
+        ],
+        "tip": "Wireless timeline order: b -> g -> n -> ax.",
+        "memory": "Alphabetical speeds: b is slow, g is medium, n is fast, ax is super fast.",
+        "real": "Identifying client standard support helps planners decide when to deprecate legacy 2.4 GHz bands on local access points.",
+        "commands": [
+          "show wlan summary"
+        ]
+      },
+      "id": 302
+    },
+    {
+      "domain": "Network Access",
+      "topic": "Wireless Access",
+      "type": "single",
+      "difficulty": "Medium",
+      "examWeight": "20%",
+      "frequency": "Medium",
+      "text": "Which key exchange mechanism is introduced in WPA3-Personal to replace the vulnerable WPA2 Pre-Shared Key (PSK) handshake?",
+      "options": [
+        "Simultaneous Authentication of Equals (SAE)",
+        "Temporal Key Integrity Protocol (TKIP)",
+        "Counter Mode with Cipher Block Chaining Message Authentication Code Protocol (CCMP)",
+        "Extensible Authentication Protocol (EAP)"
+      ],
+      "correct": [
+        0
+      ],
+      "expl": {
+        "correct": "A",
+        "why": "WPA3 replaces the 4-way PSK handshake with Simultaneous Authentication of Equals (SAE), which protects against offline dictionary attacks even if users choose weak passwords. Citing Vol1 Ch27.",
+        "wrong": [
+          "TKIP was used with original WPA and is now deprecated due to security vulnerabilities.",
+          "CCMP is the encryption protocol used in WPA2, not the WPA3 key exchange mechanism.",
+          "EAP is used in enterprise mode authentication (802.1X), not personal pre-shared key exchanges."
+        ],
+        "tip": "WPA3 Personal = SAE key exchange.",
+        "memory": "SAE saves personal keys from attacks.",
+        "real": "Enabling WPA3-Personal (SAE) prevents attackers from capturing wireless handshakes over the air and crack passwords offline.",
+        "commands": [
+          "security wpa wpa3"
+        ]
+      },
+      "id": 303
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "RESTCONF",
+      "type": "single",
+      "difficulty": "Hard",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "An administrator is writing a Python script to retrieve interface configuration parameters from an IOS-XE router using RESTCONF. Which HTTP header must the script include to request JSON-formatted data encoded specifically according to the YANG schema?",
+      "options": [
+        "Accept: application/json",
+        "Accept: application/yang-data+json",
+        "Content-Type: application/yang+json",
+        "Content-Type: application/xml"
+      ],
+      "correct": [
+        1
+      ],
+      "expl": {
+        "correct": "B",
+        "why": "RESTCONF specifies the use of unique media types for YANG-modeled data payloads. To request JSON data structured according to the YANG model, the client must use the Accept header 'application/yang-data+json'. Citing Vol2 Ch19.",
+        "wrong": [
+          "application/json requests standard JSON data representation but does not explicitly request the YANG data schema-specific structure mandated by RESTCONF.",
+          "application/yang+json is an invalid MIME type string.",
+          "Content-Type specifies the encoding of the outbound request body, not the requested format for the incoming response, and XML is not JSON."
+        ],
+        "tip": "RESTCONF Accept media type = application/yang-data+json.",
+        "memory": "YANG + JSON = yang-data+json.",
+        "real": "RESTCONF scripts utilize yang-data+json headers to ensure API controllers parse interfaces, trunks, and ACL fields correctly.",
+        "commands": [
+          "ip http secure-server"
+        ]
+      },
+      "id": 304
+    },
+    {
+      "domain": "IP Connectivity",
+      "topic": "FHRP",
+      "type": "single",
+      "difficulty": "Easy",
+      "examWeight": "25%",
+      "frequency": "High",
+      "text": "What is the specific Virtual MAC address used by HSRP version 1 for IPv4 standby group 10?",
+      "options": [
+        "0000.5E00.010A",
+        "0000.0C07.AC10",
+        "0000.0C07.AC0A",
+        "0000.0C9F.F00A"
+      ],
+      "correct": [
+        2
+      ],
+      "expl": {
+        "correct": "C",
+        "why": "HSRPv1 uses the virtual MAC prefix 0000.0C07.ACxx, where xx is the 2-digit hexadecimal representation of the HSRP group number. Group 10 in hexadecimal is 0A. Citing Vol2 Ch11.",
+        "wrong": [
+          "0000.5E00.010A is the virtual MAC for VRRP group 10 (decimal 10 = hex 0A).",
+          "0000.0C07.AC10 uses the decimal value 10 instead of converting it to hexadecimal (0A).",
+          "0000.0C9F.F00A is the virtual MAC for HSRP version 2 group 10."
+        ],
+        "tip": "HSRPv1 MAC ends with ACxx (hex group). HSRPv2 ends with F0xx (hex group).",
+        "memory": "AC = Active Cisco (HSRPv1).",
+        "real": "Access switch MAC tables record the HSRP virtual MAC pointing to the active physical gateway trunk port.",
+        "commands": [
+          "standby 10 ip 192.168.1.1"
+        ]
+      },
+      "id": 305
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "Configuration Management",
+      "type": "scenario",
+      "difficulty": "Medium",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "A network engineer wants to automate VLAN configuration across multiple access switches. They define the inventory of switches and write a text file containing tasks, hosts, and variables. Which tool and filename extension does this automation structure utilize?",
+      "options": [
+        "Ansible playbook, with a .yml or .yaml extension",
+        "Puppet manifest, with a .pp extension",
+        "Chef recipe, with a .rb extension",
+        "Terraform configuration, with a .tf extension"
+      ],
+      "correct": [
+        0
+      ],
+      "expl": {
+        "correct": "A",
+        "why": "Ansible uses text configuration files written in YAML syntax called 'playbooks' which standardly end with a .yml or .yaml file extension. Citing Vol2 Ch19.",
+        "wrong": [
+          "Puppet manifests define config states in .pp files using its own declarative language, not YAML playbooks.",
+          "Chef uses Ruby-based (.rb) recipe configurations.",
+          "Terraform uses HashiCorp Configuration Language (.tf files) to declare infrastructure variables."
+        ],
+        "tip": "Ansible configurations = Playbooks (.yml).",
+        "memory": "Ansible hosts play YAML records.",
+        "real": "Ansible playbooks are stored in Git repositories to enable version control over network VLAN database configurations.",
+        "commands": [
+          "ansible-playbook -i inventory config-vlans.yml"
+        ]
+      },
+      "id": 306
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "RESTCONF",
+      "type": "single",
+      "difficulty": "Hard",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Which URI path represents the root resource directory for RESTCONF operations on a Cisco IOS-XE router configured for programmatic API access?",
+      "options": [
+        "/api/v1/restconf",
+        "/restconf/config",
+        "/api/restconf/data",
+        "/restconf/data"
+      ],
+      "correct": [
+        3
+      ],
+      "expl": {
+        "correct": "D",
+        "why": "The RESTCONF RFC specifies that all configuration and operational data resources are structured under the resource path root '/restconf/data'. Citing Vol2 Ch19.",
+        "wrong": [
+          "/api/v1/restconf is a non-standard API route and is not used by the RESTCONF RFC.",
+          "/restconf/config is not the correct resource root endpoint name.",
+          "/api/restconf/data adds an invalid '/api' prefix to the root URL path."
+        ],
+        "tip": "RESTCONF resource root = /restconf/data.",
+        "memory": "RESTCONF is data-focused, so resources sit under /restconf/data.",
+        "real": "To retrieve device configuration via RESTCONF, scripts send HTTP GET requests targeting https://<ip>/restconf/data.",
+        "commands": [
+          "restconf"
+        ]
+      },
+      "id": 307
+    },
+    {
+      "domain": "IP Connectivity",
+      "topic": "FHRP",
+      "type": "scenario",
+      "difficulty": "Medium",
+      "examWeight": "25%",
+      "frequency": "High",
+      "text": "A company's primary gateway router (Router A, configured with HSRP priority 120 and preemption) recovers from a power outage. The standby router (Router B) is currently active with priority 100. How does the network traffic pathway react once Router A finishes booting up and begins sending hello packets?",
+      "options": [
+        "Router B remains active because preemption is not triggered after a complete reboot cycle.",
+        "Router A immediately assumes the active role because preemption is enabled and its priority is higher than Router B's.",
+        "Router A waits for Router B's hold time to expire before taking over as the active gateway.",
+        "Both routers run in active-active forwarding mode, load-balancing traffic until the standby timer expires."
+      ],
+      "correct": [
+        1
+      ],
+      "expl": {
+        "correct": "B",
+        "why": "With preemption configured, a router that recovers and has a higher HSRP priority than the current active router immediately sends a coup message and assumes the active gateway role. Citing Vol2 Ch11.",
+        "wrong": [
+          "Router B does not remain active because Router A's preemption command allows it to actively take over.",
+          "Router A does not wait for hold timers to expire; preemption triggers takeover immediately upon hello check.",
+          "HSRP does not support active-active gateway operations; only one router forwards traffic for a group."
+        ],
+        "tip": "HSRP Preemption allows a higher priority router to actively take over.",
+        "memory": "Preempt = takeover immediately.",
+        "real": "Enabling preemption ensures your high-performance chassis router reassumes the primary gateway role once it recovers.",
+        "commands": [
+          "standby 1 preempt"
+        ]
+      },
+      "id": 308
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "Configuration Management",
+      "type": "single",
+      "difficulty": "Medium",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "A network engineer is comparing configuration management tools for an enterprise campus deployment. Which protocol and default TCP port does a Puppet agent use to pull compiled manifests from the Puppet Master?",
+      "options": [
+        "SSH, port 22",
+        "HTTPS, port 443",
+        "SSH, port 830",
+        "HTTPS, port 8140"
+      ],
+      "correct": [
+        3
+      ],
+      "expl": {
+        "correct": "D",
+        "why": "Puppet agents use HTTPS to communicate with the Puppet Master, listening on TCP port 8140 by default. Citing Vol2 Ch19.",
+        "wrong": [
+          "SSH on port 22 is used by Ansible for agentless config deployment.",
+          "HTTPS on port 443 is not the default port used by the Puppet daemon architecture.",
+          "SSH on port 830 is the transport connection port used by NETCONF."
+        ],
+        "tip": "Puppet Agent pulls over HTTPS port 8140.",
+        "memory": "Puppet Master controls the strings on 8140.",
+        "real": "Firewall administrators must permit outgoing TCP port 8140 traffic to allow branch nodes to retrieve updates from the central Puppet Master server.",
+        "commands": [
+          "show ip access-lists"
+        ]
+      },
+      "id": 309
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "RESTCONF",
+      "type": "single",
+      "difficulty": "Hard",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "A developer needs to modify a specific leaf value in a YANG data model on a router. They want to avoid replacing the entire parent container database structure. Which HTTP method should they specify in the RESTCONF request header?",
+      "options": [
+        "POST",
+        "PUT",
+        "PATCH",
+        "GET"
+      ],
+      "correct": [
+        2
+      ],
+      "expl": {
+        "correct": "C",
+        "why": "RESTCONF maps the HTTP PATCH method to the NETCONF 'merge' operation, allowing developers to change or add specific fields within a container without overwriting other unmentioned variables. Citing Vol2 Ch19.",
+        "wrong": [
+          "POST maps to the NETCONF 'create' operation and fails if the resource already exists.",
+          "PUT replaces the entire configuration at the target URI, deleting any omitted container child elements.",
+          "GET retrieves data configurations but cannot perform modifications."
+        ],
+        "tip": "PUT = Replace. PATCH = Merge (Modify).",
+        "memory": "PATCH patches a hole; PUT replaces the wall.",
+        "real": "Using PATCH allows scripts to safely modify description fields on interfaces without deleting active IP addresses.",
+        "commands": [
+          "restconf"
+        ]
+      },
+      "id": 310
+    },
+    {
+      "domain": "IP Connectivity",
+      "topic": "FHRP",
+      "type": "single",
+      "difficulty": "Easy",
+      "examWeight": "25%",
+      "frequency": "Medium",
+      "text": "Which virtual MAC address range is used by HSRP version 2 for IPv4 configurations?",
+      "options": [
+        "0000.0C9F.F000 to 0000.0C9F.FFFF",
+        "0000.0C07.AC00 to 0000.0C07.ACFF",
+        "0000.5E00.0100 to 0000.5E00.01FF",
+        "0007.B400.0000 to 0007.B400.FFFF"
+      ],
+      "correct": [
+        0
+      ],
+      "expl": {
+        "correct": "A",
+        "why": "HSRPv2 uses the virtual MAC range 0000.0C9F.F000 through 0000.0C9F.FFFF to support group numbers up to 4095. Citing Vol2 Ch11.",
+        "wrong": [
+          "0000.0C07.AC00 to 0000.0C07.ACFF is the MAC range reserved for HSRP version 1.",
+          "0000.5E00.0100 to 0000.5E00.01FF is the MAC range reserved for VRRP for IPv4.",
+          "0007.B400.0000 to 0007.B400.FFFF is the MAC range prefix utilized by GLBP."
+        ],
+        "tip": "HSRPv1 MAC prefix = 0000.0C07.ACxx. HSRPv2 MAC prefix = 0000.0C9F.Fxxx.",
+        "memory": "V2 has more groups, so it needs a larger range (F000 to FFFF).",
+        "real": "Inspecting access switch MAC address tables helps identify whether hosts are routing through an HSRPv1 or HSRPv2 gateway.",
+        "commands": [
+          "show standby"
+        ]
+      },
+      "id": 311
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "Configuration Management",
+      "type": "single",
+      "difficulty": "Easy",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Which configuration management tool uses Ruby-based 'cookbooks' and 'recipes' to define host states on client agents?",
+      "options": [
+        "Ansible",
+        "Chef",
+        "Puppet",
+        "Terraform"
+      ],
+      "correct": [
+        1
+      ],
+      "expl": {
+        "correct": "B",
+        "why": "Chef utilizes Ruby-based configuration structures organized into 'recipes' and 'cookbooks' to manage systems. Citing Vol2 Ch19.",
+        "wrong": [
+          "Ansible uses YAML-based playbooks, not Ruby cookbooks.",
+          "Puppet uses its own Ruby DSL to build configuration manifests (.pp files).",
+          "Terraform uses HashiCorp Configuration Language (HCL) to construct declarative models."
+        ],
+        "tip": "Chef = Cookbooks, Recipes, Ruby, Pull model.",
+        "memory": "Chefs cook recipes using cookbooks.",
+        "real": "Chef is commonly implemented in application delivery environments to synchronize configuration parameters across server pools.",
+        "commands": [
+          "chef-client"
+        ]
+      },
+      "id": 312
+    },
+    {
+      "domain": "IP Connectivity",
+      "topic": "FHRP",
+      "type": "single",
+      "difficulty": "Medium",
+      "examWeight": "25%",
+      "frequency": "High",
+      "text": "Which statement correctly describes a difference between the open-standard Virtual Router Redundancy Protocol (VRRP) and HSRP?",
+      "options": [
+        "VRRP load-balances traffic across multiple active forwarders by default, whereas HSRP does not.",
+        "VRRP uses the virtual MAC address prefix 0000.0C07.ACxx, whereas HSRP uses 0000.5E00.01xx.",
+        "VRRP is a Cisco-proprietary protocol, whereas HSRP is an IETF open standard.",
+        "VRRP uses the terms Master and Backup to define router roles, whereas HSRP uses Active and Standby."
+      ],
+      "correct": [
+        3
+      ],
+      "expl": {
+        "correct": "D",
+        "why": "VRRP designates the forwarding gateway as the Master router and backup gateways as Backup routers. HSRP designates them as Active and Standby. Citing Vol2 Ch11.",
+        "wrong": [
+          "VRRP does not load-balance traffic by default; only GLBP load-balances natively across up to 4 virtual forwarders.",
+          "VRRP uses 0000.5E00.01xx, while HSRP uses 0000.0C07.ACxx.",
+          "VRRP is the IETF open standard, whereas HSRP is Cisco-proprietary."
+        ],
+        "tip": "VRRP = Master/Backup (Open). HSRP = Active/Standby (Cisco).",
+        "memory": "Master Backup = Open VRRP. Active Standby = Cisco HSRP.",
+        "real": "Deploying VRRP allows you to configure redundancy in multi-vendor environments containing both Cisco and non-Cisco routers.",
+        "commands": [
+          "vrrp 1 ip 192.168.1.1"
+        ]
+      },
+      "id": 313
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "RESTCONF",
+      "type": "single",
+      "difficulty": "Hard",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "A script attempts to create a new loopback interface on a router using a RESTCONF POST request. The router rejects the request because the loopback interface resource already exists at that path. Which HTTP status code is returned by the router?",
+      "options": [
+        "200 OK",
+        "409 Conflict",
+        "404 Not Found",
+        "201 Created"
+      ],
+      "correct": [
+        1
+      ],
+      "expl": {
+        "correct": "B",
+        "why": "RESTCONF returns HTTP status code 409 Conflict if a POST request attempts to create a resource that already exists on the device. Citing Vol2 Ch19.",
+        "wrong": [
+          "200 OK indicates success but is not returned for rejected duplicate resource creation attempts.",
+          "404 Not Found indicates the resource URI path does not exist, which is not the case for a duplicate resource error.",
+          "201 Created is returned only when the resource is successfully created."
+        ],
+        "tip": "POST to existing resource = 409 Conflict.",
+        "memory": "Duplicate resource = API database conflict (409).",
+        "real": "Scripts check for HTTP 409 status returns to handle interface creation conflicts without crashing the script execution stream.",
+        "commands": [
+          "restconf"
+        ]
+      },
+      "id": 314
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "Configuration Management",
+      "type": "matching",
+      "difficulty": "Hard",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Match the configuration management tool on the left to its corresponding execution architecture properties on the right.",
+      "pairs": [
+        [
+          "Ansible",
+          "Agentless, Push model, YAML playbooks"
+        ],
+        [
+          "Puppet",
+          "Agent-based, Pull model, Ruby DSL manifests"
+        ],
+        [
+          "Chef",
+          "Agent-based, Pull model, Ruby cookbooks"
+        ],
+        [
+          "Terraform",
+          "Agentless, Push model, Declarative HCL state files"
+        ]
+      ],
+      "expl": {
+        "correct": "Matching",
+        "why": "Ansible pushes YAML playbooks over SSH (agentless). Puppet pulls Ruby manifests over HTTPS (agent-based). Chef pulls Ruby cookbooks (agent-based). Terraform pushes HCL configurations to cloud APIs (agentless). Citing Vol2 Ch19.",
+        "wrong": [
+          "Matching Ansible to 'agent-based' is wrong because Ansible connects to target routers over standard SSH without installing agents."
+        ],
+        "tip": "Ansible/Terraform = Agentless, Push. Puppet/Chef = Agent-based, Pull.",
+        "memory": "Ansible and Terraform push configurations without agents.",
+        "real": "Ansible is commonly chosen for networks with older switches because it requires no on-device agent installation.",
+        "commands": [
+          "ansible --version"
+        ]
+      },
+      "id": 315
+    },
+    {
+      "domain": "IP Connectivity",
+      "topic": "FHRP",
+      "type": "single",
+      "difficulty": "Medium",
+      "examWeight": "25%",
+      "frequency": "High",
+      "text": "A network engineer wants to implement first-hop redundancy while load-balancing host traffic dynamically across three active gateway routers. Which protocol should the engineer configure?",
+      "options": [
+        "Gateway Load Balancing Protocol (GLBP)",
+        "Hot Standby Router Protocol (HSRP)",
+        "Virtual Router Redundancy Protocol (VRRP)",
+        "Open Shortest Path First (OSPF)"
+      ],
+      "correct": [
+        0
+      ],
+      "expl": {
+        "correct": "A",
+        "why": "GLBP is designed to load-balance outbound traffic across up to four active gateway routers within a single group, whereas HSRP and VRRP only use one active/master router for forwarding. Citing Vol2 Ch11.",
+        "wrong": [
+          "HSRP only forwards traffic through a single active router; other routers remain in standby mode.",
+          "VRRP only forwards traffic through a single master router; backups remain idle.",
+          "OSPF is a dynamic routing protocol used between routers, not an FHRP gateway load balancer for LAN hosts."
+        ],
+        "tip": "GLBP is the only FHRP that load-balances traffic across multiple gateways natively.",
+        "memory": "GLBP = Gateway Load Balancing (load-balances natively).",
+        "real": "Implementing GLBP allows a network to utilize the bandwidth of multiple core routers simultaneously without complex client grouping.",
+        "commands": [
+          "glbp 1 ip 192.168.1.1"
+        ]
+      },
+      "id": 316
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "RESTCONF",
+      "type": "multi",
+      "difficulty": "Medium",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Which two data encoding formats are supported in RESTCONF requests and responses? (Choose two.)",
+      "options": [
+        "XML (Extensible Markup Language)",
+        "YAML (YAML Ain't Markup Language)",
+        "JSON (JavaScript Object Notation)",
+        "Plain text configuration scripts"
+      ],
+      "correct": [
+        0,
+        2
+      ],
+      "expl": {
+        "correct": "A, C",
+        "why": "RESTCONF RFC states that APIs must support both XML and JSON data encodings for request payloads and returned responses. Citing Vol2 Ch19.",
+        "wrong": [
+          "YAML is not supported in the RESTCONF protocol standard.",
+          "Plain text script commands are not parsed by RESTCONF YANG decoders."
+        ],
+        "tip": "RESTCONF supports JSON and XML formats. NETCONF only supports XML.",
+        "memory": "REST = XML + JSON.",
+        "real": "Python scripts query RESTCONF endpoints using JSON headers to obtain configuration structures that are easy to parse.",
+        "commands": [
+          "restconf"
+        ]
+      },
+      "id": 317
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "Configuration Management",
+      "type": "scenario",
+      "difficulty": "Easy",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "An administrator wants to deploy virtual network adapters in a public cloud environment using Terraform. They write the configuration file and want to dry-run the deployment to preview which resources will be created. Which Terraform command should the administrator run?",
+      "options": [
+        "terraform init",
+        "terraform apply",
+        "terraform plan",
+        "terraform destroy"
+      ],
+      "correct": [
+        2
+      ],
+      "expl": {
+        "correct": "C",
+        "why": "The 'terraform plan' command performs a dry-run of the configuration files, comparing them to the state file and outputting a list of resource creations, modifications, and deletions. Citing Vol2 Ch19.",
+        "wrong": [
+          "terraform init initializes the working directory by downloading provider plugins.",
+          "terraform apply executes the configuration and builds the resources, altering infrastructure.",
+          "terraform destroy deletes all active infrastructure declared in the Terraform workspace state."
+        ],
+        "tip": "Terraform plan = Preview changes. Terraform apply = Commit changes.",
+        "memory": "Plan before you apply.",
+        "real": "Running 'terraform plan' prevents configuration errors by allowing engineers to review changes before committing them to production.",
+        "commands": [
+          "terraform plan"
+        ]
+      },
+      "id": 318
+    },
+    {
+      "domain": "IP Connectivity",
+      "topic": "FHRP",
+      "type": "single",
+      "difficulty": "Easy",
+      "examWeight": "25%",
+      "frequency": "Medium",
+      "text": "What are the default hello and hold timers configured for HSRP group communication?",
+      "options": [
+        "Hello: 1 second, Hold: 3 seconds",
+        "Hello: 3 seconds, Hold: 10 seconds",
+        "Hello: 10 seconds, Hold: 30 seconds",
+        "Hello: 5 seconds, Hold: 15 seconds"
+      ],
+      "correct": [
+        1
+      ],
+      "expl": {
+        "correct": "B",
+        "why": "By default, HSRP active routers broadcast hello packets every 3 seconds, and the standby router considers the active router down if hellos cease for 10 seconds (hold time). Citing Vol2 Ch11.",
+        "wrong": [
+          "1 and 3 seconds are default timers for VRRP.",
+          "10 and 30 seconds are non-standard timers.",
+          "5 and 15 seconds are timers used by GLBP by default."
+        ],
+        "tip": "HSRP default timers: Hello = 3s, Hold = 10s.",
+        "memory": "HSRP = 3 and 10.",
+        "real": "Optimizing HSRP failover speeds requires configuring subsecond hello and hold timers on core switch links.",
+        "commands": [
+          "standby 1 timers 3 10"
+        ]
+      },
+      "id": 319
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "RESTCONF",
+      "type": "dragdrop",
+      "difficulty": "Hard",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Arrange the RESTCONF HTTP methods in order of their operation type: Create a resource, Retrieve a resource, Replace a resource, and Delete a resource.",
+      "order": [
+        "POST (Create)",
+        "GET (Retrieve)",
+        "PUT (Replace)",
+        "DELETE (Remove)"
+      ],
+      "expl": {
+        "correct": "Correct Order",
+        "why": "RESTCONF maps POST to creating new configuration resources, GET to retrieving them, PUT to replacing them entirely, and DELETE to removing them. Citing Vol2 Ch19.",
+        "wrong": [
+          "Placing PUT before POST breaks the sequence because PUT replaces an existing configuration rather than creating a new one."
+        ],
+        "tip": "HTTP verbs map directly to database CRUD operations.",
+        "memory": "POST gets it there (create), GET views it (retrieve), PUT overwrites it (replace).",
+        "real": "Understanding these mappings is essential when writing scripts that modify device parameters without breaking existing configs.",
+        "commands": [
+          "restconf"
+        ]
+      },
+      "id": 320
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "Configuration Management",
+      "type": "single",
+      "difficulty": "Easy",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Why is Ansible considered an 'agentless' configuration management tool?",
+      "options": [
+        "It requires a dedicated control workstation node.",
+        "It operates exclusively using a pull model database.",
+        "It does not support execution commands on managed nodes.",
+        "It does not require a client software daemon to run on the managed routers and switches."
+      ],
+      "correct": [
+        3
+      ],
+      "expl": {
+        "correct": "D",
+        "why": "Ansible is agentless because it connects to managed devices using SSH or APIs, executing tasks directly without requiring client software (agents) to be installed on target endpoints. Citing Vol2 Ch19.",
+        "wrong": [
+          "All configuration tools require a control station; this does not make Ansible agentless.",
+          "Ansible operates on a push model, not a pull model.",
+          "Ansible supports full command execution on remote hosts."
+        ],
+        "tip": "Agentless = No client software daemon required on target nodes.",
+        "memory": "No agent = Agentless.",
+        "real": "Ansible is favored for networking equipment because manufacturers rarely allow third-party agent software to run on device OS kernels.",
+        "commands": [
+          "ansible all -m ping"
+        ]
+      },
+      "id": 321
+    },
+    {
+      "domain": "IP Connectivity",
+      "topic": "FHRP",
+      "type": "single",
+      "difficulty": "Medium",
+      "examWeight": "25%",
+      "frequency": "Medium",
+      "text": "What is the specific Virtual MAC address prefix used by the Virtual Router Redundancy Protocol (VRRP) for IPv4?",
+      "options": [
+        "0000.5E00.01xx",
+        "0000.0C07.ACxx",
+        "0000.0C9F.F0xx",
+        "0007.B400.01xx"
+      ],
+      "correct": [
+        0
+      ],
+      "expl": {
+        "correct": "A",
+        "why": "VRRP for IPv4 configurations utilizes the virtual MAC prefix 0000.5E00.01xx, where xx is the hexadecimal representation of the VRRP group ID. Citing Vol2 Ch11.",
+        "wrong": [
+          "0000.0C07.ACxx is the virtual MAC prefix used by HSRPv1.",
+          "0000.0C9F.F0xx is the virtual MAC prefix used by HSRPv2.",
+          "0007.B400.01xx is a MAC prefix utilized by GLBP."
+        ],
+        "tip": "VRRP MAC prefix = 0000.5E00.01xx.",
+        "memory": "5E = VRRP.",
+        "real": "Engineers identify VRRP master devices in a multi-vendor core by examining the ARP table for MACs starting with 0000.5e.",
+        "commands": [
+          "show vrrp"
+        ]
+      },
+      "id": 322
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "RESTCONF",
+      "type": "single",
+      "difficulty": "Easy",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Which TCP port does RESTCONF use on a Cisco IOS-XE device configured for secure remote programmatic access?",
+      "options": [
+        "Port 830",
+        "Port 22",
+        "Port 443",
+        "Port 80"
+      ],
+      "correct": [
+        2
+      ],
+      "expl": {
+        "correct": "C",
+        "why": "RESTCONF operates over HTTP/HTTPS, utilizing the standard secure web port TCP 443. Citing Vol2 Ch19.",
+        "wrong": [
+          "Port 830 is the transport connection port utilized by NETCONF over SSH.",
+          "Port 22 is used for standard CLI management access (SSH).",
+          "Port 80 is the default port for unencrypted HTTP traffic, whereas RESTCONF uses secure HTTPS."
+        ],
+        "tip": "RESTCONF = HTTPS port 443.",
+        "memory": "RESTCONF is a web API, so it runs on standard web port 443.",
+        "real": "To query configurations, automation scripts target the HTTPS port 443 of the device API gateway.",
+        "commands": [
+          "ip http secure-server"
+        ]
+      },
+      "id": 323
+    },
+    {
+      "domain": "IP Connectivity",
+      "topic": "FHRP",
+      "type": "scenario",
+      "difficulty": "Hard",
+      "examWeight": "25%",
+      "frequency": "Medium",
+      "text": "A network engineer wants to test gateway redundancy by pinging the HSRP Virtual IP address from a host workstation. If Router A is the active router and Router B is the standby router, how is the ICMP echo request frame handled on the network?",
+      "options": [
+        "The switch broadcasts the ICMP frame because the virtual MAC address is not stored in the MAC table.",
+        "Router A processes the ICMP frame because it owns the active virtual MAC address mapping, while Router B discards its copy.",
+        "Both Router A and Router B process the ICMP frame and return separate echo replies, causing host packet duplication.",
+        "Router B intercepts and forwards the ICMP frame to Router A via the standby tunnel interface."
+      ],
+      "correct": [
+        1
+      ],
+      "expl": {
+        "correct": "B",
+        "why": "The active router (Router A) responds to all traffic sent to the virtual MAC and Virtual IP address. Although both routers receive the packet at Layer 2 if connected to a hub, Router B discards the frame because it is in standby mode. Citing Vol2 Ch11.",
+        "wrong": [
+          "The switch forwards the frame directly to the active router's interface port because the virtual MAC is learned dynamically in the MAC table.",
+          "The standby router does not respond to virtual IP requests, preventing packet duplication.",
+          "The standby router does not forward user traffic to the active router."
+        ],
+        "tip": "Only the HSRP active router responds to the virtual IP and MAC.",
+        "memory": "Active router does all the work.",
+        "real": "Pinging the virtual IP verifies that the currently active router is processing client gateway requests.",
+        "commands": [
+          "show standby brief"
+        ]
+      },
+      "id": 324
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "Configuration Management",
+      "type": "single",
+      "difficulty": "Medium",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Which file does Ansible use to define the list of IP addresses, hostnames, and credentials of the network devices it will manage?",
+      "options": [
+        "site.yml",
+        "ansible.cfg",
+        "roles.yaml",
+        "hosts inventory file"
+      ],
+      "correct": [
+        3
+      ],
+      "expl": {
+        "correct": "D",
+        "why": "Ansible uses an inventory file (typically named hosts) to list and organize target managed hosts, IP addresses, and group variables. Citing Vol2 Ch19.",
+        "wrong": [
+          "site.yml is the main playbook file containing tasks and roles, not the device list.",
+          "ansible.cfg holds execution parameters like defaults, timeout limits, and path declarations.",
+          "roles.yaml is not a standard inventory configuration file."
+        ],
+        "tip": "Ansible inventory file = Hosts list.",
+        "memory": "Inventory = list of hosts.",
+        "real": "Engineers organize hosts into groups (like [routers] or [switches]) within the inventory file to target commands to specific roles.",
+        "commands": [
+          "ansible -i hosts all -m ping"
+        ]
+      },
+      "id": 325
+    },
+    {
+      "domain": "IP Connectivity",
+      "topic": "FHRP",
+      "type": "scenario",
+      "difficulty": "Hard",
+      "examWeight": "25%",
+      "frequency": "High",
+      "text": "An administrator is configuring GLBP on a core subnet. They notice that the Active Virtual Gateway (AVG) assigns virtual MAC addresses dynamically to client requests. The administrator wants to configure the load balancing algorithm so that host traffic is distributed evenly in a round-robin rotation. Which GLBP load-balancing algorithm is the default?",
+      "options": [
+        "Weighted load-balancing",
+        "Host-dependent load-balancing",
+        "Round-robin load-balancing",
+        "Least-connection load-balancing"
+      ],
+      "correct": [
+        2
+      ],
+      "expl": {
+        "correct": "C",
+        "why": "GLBP uses round-robin load-balancing by default. When hosts request the MAC address of the virtual IP gateway via ARP, the AVG rotates through the MAC addresses of all AVFs in order. Citing Vol2 Ch11.",
+        "wrong": [
+          "Weighted load-balancing determines the traffic share assigned to each AVF based on its configured weight value, which is not the default.",
+          "Host-dependent load-balancing ensures a host always receives the same AVF MAC address when it requests it, which is not the default.",
+          "Least-connection is a load-balancing algorithm used in load balancers (F5, etc.) but is not supported in GLBP."
+        ],
+        "tip": "GLBP default load-balancing = Round-robin.",
+        "memory": "Round-robin rotates through gateways in order.",
+        "real": "GLBP round-robin balancing ensures that adjacent user machines share bandwidth across different physical switches.",
+        "commands": [
+          "glbp 1 load-balancing round-robin"
+        ]
+      },
+      "id": 326
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "RESTCONF",
+      "type": "single",
+      "difficulty": "Medium",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "A Python script sends an HTTP POST request to a router's RESTCONF API to create a new class-map. If the resource is successfully created, which HTTP status code does the router return?",
+      "options": [
+        "201 Created",
+        "200 OK",
+        "204 No Content",
+        "301 Moved Permanently"
+      ],
+      "correct": [
+        0
+      ],
+      "expl": {
+        "correct": "A",
+        "why": "HTTP status code 201 Created indicates that the request was successful and a new resource was created at the target path. Citing Vol2 Ch19.",
+        "wrong": [
+          "200 OK indicates a successful request but is typically returned for GET updates or modifications, not resource creation.",
+          "204 No Content indicates success with no returned payload, commonly returned for DELETE requests.",
+          "301 Moved Permanently is a redirect response, not a success creation code."
+        ],
+        "tip": "Successful resource creation = 201 Created.",
+        "memory": "Create = 201 Created.",
+        "real": "Script assertions verify a 201 status code response to confirm that interface configurations have successfully committed.",
+        "commands": [
+          "restconf"
+        ]
+      },
+      "id": 327
+    },
+    {
+      "domain": "Automation and Programmability",
+      "topic": "Configuration Management",
+      "type": "single",
+      "difficulty": "Hard",
+      "examWeight": "10%",
+      "frequency": "High",
+      "text": "Which syntax represents a valid Puppet resource declaration inside a manifest file targeting a service configuration?",
+      "options": [
+        "service: 'ntp' ensure => running",
+        "service { 'ntp': ensure => running }",
+        "service { ntp: ensure = running }",
+        "service: ntp { ensure: running }"
+      ],
+      "correct": [
+        1
+      ],
+      "expl": {
+        "correct": "B",
+        "why": "Puppet manifests declare resources using lowercase types, followed by curly braces, the resource title, a colon, and parameter declarations using '=>'. Citing Vol2 Ch19.",
+        "wrong": [
+          "This syntax lacks curly braces around resource parameters.",
+          "This syntax fails because ntp is not quoted and uses '=' instead of '=>'.",
+          "This syntax uses invalid colon-based structures instead of standard Puppet syntax."
+        ],
+        "tip": "Puppet Resource: type { 'title': parameter => value }.",
+        "memory": "Puppet manifests declare resources in curly braces with hash rockets (=>).",
+        "real": "Engineers deploy Puppet manifests to synchronize NTP and syslog client daemon states across server fields.",
+        "commands": [
+          "puppet apply manifest.pp"
+        ]
+      },
+      "id": 328
+    }
   }
 ];
 
