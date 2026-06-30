@@ -113,10 +113,10 @@ export const bugsData = {
     errorLog: "%CRYPTO-4-IKMP_KEY_MISMATCH: ISAKMP Phase 1 failed: Pre-shared key mismatch with peer 192.0.2.1.",
     desc: "Site-to-Site VPN fails because the pre-shared key config on the branch firewall has a password mismatch with peer router.",
     options: [
-      { cmd: "crypto isakmp key NetSec301 address 198.51.100.1", correct: true, label: "Set correct pre-shared key 'NetSec301' for peer 198.51.100.1" },
+      { cmd: "crypto isakmp key NetSec301 address 192.0.2.1", correct: true, label: "Set correct pre-shared key 'NetSec301' for peer 192.0.2.1" },
       { cmd: "crypto ipsec transform-set VPN_SET esp-aes esp-sha-hmac", correct: false, label: "Re-encrypt the transform set settings" },
       { cmd: "no crypto isakmp policy 10", correct: false, label: "Delete ISAKMP Phase 1 policy parameters" },
-      { cmd: "crypto isakmp key WrongPassword address 198.51.100.1", correct: false, label: "Assign incorrect password key" }
+      { cmd: "crypto isakmp key WrongPassword address 192.0.2.1", correct: false, label: "Assign incorrect password key" }
     ]
   }
 };
