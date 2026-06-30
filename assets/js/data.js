@@ -9398,9 +9398,8 @@ const questionBank = [
       "tip": "'ntp server' = client mode, 'ntp peer' = symmetric active."
     },
     "id": 278
-,
-
-    {
+  },
+  {
       "domain": "IP Services",
       "topic": "QoS",
       "type": "single",
@@ -11111,7 +11110,6 @@ const questionBank = [
       },
       "id": 328
     }
-  }
 ];
 
 export function generateBank(seedRandom) {
