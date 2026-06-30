@@ -859,19 +859,31 @@ function applyStats(q, ok, sec) {
 function explanationBlock(q, ok) {
   if (!state.session.showFeedback) return "";
   const e = q.expl;
+  if (!e) return "";
+  
+  if (e.text && !e.why) {
+    return `
+      <section class="block ${ok ? "correct" : "wrong"}">
+        <h4>Detailed Explanation</h4>
+        <p>${safeHTML(e.text)}</p>
+        ${e.tip ? `<p><strong>Cisco exam tip:</strong> ${safeHTML(e.tip)}</p>` : ""}
+      </section>
+    `;
+  }
+
   return `
     <section class="block ${ok ? "correct" : "wrong"}">
       <h4>Detailed Explanation</h4>
-      <p><strong>Correct answer:</strong> ${safeHTML(e.correct)}</p>
-      <p><strong>Why correct:</strong> ${safeHTML(e.why)}</p>
+      <p><strong>Correct answer:</strong> ${safeHTML(e.correct || "")}</p>
+      <p><strong>Why correct:</strong> ${safeHTML(e.why || "")}</p>
       <p><strong>Why others are wrong:</strong></p>
       <ul>
-        ${e.wrong.map(w => `<li>${safeHTML(w)}</li>`).join("")}
+        ${(e.wrong || []).map(w => `<li>${safeHTML(w)}</li>`).join("")}
       </ul>
-      <p><strong>Cisco exam tip:</strong> ${safeHTML(e.tip)}</p>
-      <p><strong>Memory trick:</strong> ${safeHTML(e.memory)}</p>
-      <p><strong>Real world example:</strong> ${safeHTML(e.real)}</p>
-      <p><strong>Related commands:</strong> ${e.commands.map(x => safeHTML(x)).join(" | ")}</p>
+      ${e.tip ? `<p><strong>Cisco exam tip:</strong> ${safeHTML(e.tip)}</p>` : ""}
+      ${e.memory ? `<p><strong>Memory trick:</strong> ${safeHTML(e.memory)}</p>` : ""}
+      ${e.real ? `<p><strong>Real world example:</strong> ${safeHTML(e.real)}</p>` : ""}
+      ${e.commands && e.commands.length > 0 ? `<p><strong>Related commands:</strong> ${e.commands.map(x => safeHTML(x)).join(" | ")}</p>` : ""}
     </section>
   `;
 }
@@ -1237,7 +1249,12 @@ function submitSession(force) {
   html += `<div class="grid stats"><div class="stat"><div class="k">Weak Areas</div><div class="v" style="font-size:16px">${weak.map((x) => `${x.k} (${x.p}%)`).join("<br />")}</div></div><div class="stat"><div class="k">Strong Areas</div><div class="v" style="font-size:16px">${strong.map((x) => `${x.k} (${x.p}%)`).join("<br />")}</div></div><div class="stat"><div class="k">Recommended Next Quiz</div><div class="v" style="font-size:15px">15 questions / 15 mins on ${weak.map((x) => x.k).join(" + ")}</div></div></div>`;
 
   if (s.mode !== "exam") {
-    html += `<div class="card"><h3>Review (first 20 misses)</h3>${wrong.slice(0, 20).map((x) => `<div class="output"><strong>Q${x.i + 1}</strong> ${x.q.topic} | Correct: ${x.q.expl.correct}<br /><span style="display:block; margin-top:6px; color:#a1b2c8"><strong>Explanation:</strong> ${safeHTML(x.q.expl.why)}</span><span style="display:block; margin-top:4px; color:#a1b2c8"><strong>Tip:</strong> ${safeHTML(x.q.expl.tip)}</span></div>`).join("") || "No incorrect answers."}</div>`;
+    html += `<div class="card"><h3>Review (first 20 misses)</h3>${wrong.slice(0, 20).map((x) => {
+      const correctVal = x.q.expl.correct || x.q.correct.map(idx => String.fromCharCode(65 + idx)).join(", ");
+      const whyVal = x.q.expl.why || x.q.expl.text || "";
+      const tipVal = x.q.expl.tip || "";
+      return `<div class="output"><strong>Q${x.i + 1}</strong> ${x.q.topic} | Correct: ${correctVal}<br /><span style="display:block; margin-top:6px; color:#a1b2c8"><strong>Explanation:</strong> ${safeHTML(whyVal)}</span>${tipVal ? `<span style="display:block; margin-top:4px; color:#a1b2c8"><strong>Tip:</strong> ${safeHTML(tipVal)}</span>` : ""}</div>`;
+    }).join("") || "No incorrect answers."}</div>`;
   } else {
     let statusText = "";
     let statusColor = "";
@@ -1362,11 +1379,12 @@ function submitSession(force) {
               <div style="margin-top: 4px; font-size: 0.95em; color: ${ok ? '#10b981' : '#ff5e3a'};"><strong>Your Answer:</strong> ${safeHTML(userAnsText)}</div>
               ${!ok ? `<div style="margin-top: 4px; font-size: 0.95em; color: #10b981;"><strong>Correct Answer:</strong> ${safeHTML(correctAnsText)}</div>` : ""}
               <div style="margin-top: 8px; font-size: 0.95em; color: #a1b2c8; border-top: 1px dotted #334155; padding-top: 6px;">
-                <strong>Explanation:</strong> ${safeHTML(q.expl.why)}
+                <strong>Explanation:</strong> ${safeHTML(q.expl.why || q.expl.text || "")}
               </div>
+              ${q.expl.tip ? `
               <div style="margin-top: 4px; font-size: 0.95em; color: #a1b2c8;">
                 <strong>Tip:</strong> ${safeHTML(q.expl.tip)}
-              </div>
+              </div>` : ""}
             </div>
           `;
         }).join("")}
