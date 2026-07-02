@@ -5168,7 +5168,22 @@ function initAICoach() {
 
   // Load saved state
   if (inputKey) inputKey.value = aiConfig.getApiKey();
-  if (selectModel) selectModel.value = aiConfig.getModel();
+  const savedModel = aiConfig.getModel();
+  const inputCustom = byId("inputCustomModel");
+  
+  if (selectModel) {
+    const optionValues = Array.from(selectModel.options).map(opt => opt.value);
+    if (optionValues.includes(savedModel)) {
+      selectModel.value = savedModel;
+      if (inputCustom) inputCustom.style.display = "none";
+    } else {
+      selectModel.value = "custom";
+      if (inputCustom) {
+        inputCustom.value = savedModel;
+        inputCustom.style.display = "block";
+      }
+    }
+  }
   updateStatus();
 
   // Settings Handlers
@@ -5206,8 +5221,27 @@ function initAICoach() {
 
   if (selectModel) {
     selectModel.addEventListener("change", () => {
-      aiConfig.setModel(selectModel.value);
-      showToast(`Model switched to ${selectModel.value}`, "info", 2000);
+      const val = selectModel.value;
+      if (val === "custom") {
+        if (inputCustom) {
+          inputCustom.style.display = "block";
+          inputCustom.focus();
+          aiConfig.setModel(inputCustom.value || "gemini-2.0-flash");
+        }
+      } else {
+        if (inputCustom) inputCustom.style.display = "none";
+        aiConfig.setModel(val);
+        showToast(`Model switched to ${val}`, "info", 2000);
+      }
+    });
+  }
+
+  if (inputCustom) {
+    inputCustom.addEventListener("input", () => {
+      const val = inputCustom.value.trim();
+      if (val) {
+        aiConfig.setModel(val);
+      }
     });
   }
 

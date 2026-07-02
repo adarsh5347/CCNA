@@ -1,5 +1,5 @@
 const API_URL = "https://generativelanguage.googleapis.com/v1beta/models";
-const DEFAULT_MODEL = "gemini-1.5-flash";
+const DEFAULT_MODEL = "gemini-2.0-flash";
 
 const COACH_SYSTEM_INSTRUCTION = `You are "NOC AI Study Coach", an elite Cisco Certified Network Associate (CCNA 200-301) instructor and expert network operations engineer.
 Your goal is to guide students through concepts in Wendell Odom's CCNA Official Cert Guide.
