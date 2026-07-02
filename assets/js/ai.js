@@ -27,7 +27,16 @@ export const aiConfig = {
     return !!this.getApiKey();
   },
   getModel() {
-    return localStorage.getItem("ccna_gemini_model") || DEFAULT_MODEL;
+    let m = localStorage.getItem("ccna_gemini_model") || DEFAULT_MODEL;
+    if (m === "gemini-1.5-flash") {
+      m = "gemini-2.0-flash";
+      localStorage.setItem("ccna_gemini_model", m);
+    }
+    if (m === "gemini-1.5-pro") {
+      m = "gemini-2.0-pro";
+      localStorage.setItem("ccna_gemini_model", m);
+    }
+    return m;
   },
   setModel(model) {
     localStorage.setItem("ccna_gemini_model", model);
