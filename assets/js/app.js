@@ -182,6 +182,16 @@ function restoreSession() {
   try {
     const saved = JSON.parse(raw);
     if (saved && !saved.submitted) {
+      if (saved.answers && !Array.isArray(saved.answers)) {
+        const arr = new Array(saved.questions.length).fill(null);
+        Object.keys(saved.answers).forEach(key => {
+          const idx = Number(key);
+          if (!isNaN(idx) && idx >= 0 && idx < arr.length) {
+            arr[idx] = saved.answers[key];
+          }
+        });
+        saved.answers = arr;
+      }
       state.session = saved;
       const timer = byId("timer");
       if (timer) {
