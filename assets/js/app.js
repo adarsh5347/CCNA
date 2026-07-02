@@ -5316,6 +5316,9 @@ function initAICoach() {
 }
 
 function init() {
+  if (!localStorage.getItem("ccna_gemini_api_key")) {
+    localStorage.setItem("ccna_gemini_api_key", "AIzaSyDuAP55teeNeBrEEAhUKnAMFqGRMHoxhMY");
+  }
   state.bank = generateBank(rand);
   navSetup();
   renderDomainChecks();
