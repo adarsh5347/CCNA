@@ -724,7 +724,7 @@ function startSession(mode) {
     mode,
     ...conf,
     idx: 0,
-    answers: {},
+    answers: new Array(conf.questions.length).fill(null),
     flagged: {},
     feedback: {},
     statsApplied: {},
@@ -798,7 +798,7 @@ function renderNavigator() {
 
   const qCounterEl = byId("qCounter");
   if (qCounterEl) qCounterEl.textContent = `Q ${s.idx + 1} / ${s.questions.length}`;
-  const answeredCount = Object.keys(s.answers).length;
+  const answeredCount = s.answers.filter((a) => a != null).length;
   const pct = Math.round((answeredCount / s.questions.length) * 100);
   const fillEl = byId("progressFill");
   if (fillEl) fillEl.style.width = `${pct}%`;
