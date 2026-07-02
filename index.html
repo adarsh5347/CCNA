@@ -179,6 +179,36 @@
         </div>
       </article>
 
+
+      <!-- GENERAL LANDING PAGE AI COACH CARD -->
+      <section class="card" style="margin-bottom: 24px; padding: 20px; border: 1px solid rgba(0, 242, 254, 0.25); background: linear-gradient(135deg, rgba(6,9,19,0.9), rgba(10,25,47,0.7));">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <h3 style="margin: 0; display: flex; align-items: center; gap: 8px; color: #fff;">
+            <span>🤖 NOC Global AI Assistant</span>
+          </h3>
+          <span style="font-size: 11px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; padding: 3px 8px; border-radius: 6px; font-family: var(--font-mono); font-weight: 600;">Gemini 1.5 Powered</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 13.5px; margin-top: 0; margin-bottom: 16px; line-height: 1.5;">
+          Ask any questions about CCNA topics, get tips, or ask about the platform's question bank. This AI has full awareness of the entire website's data and Odom cert guides.
+        </p>
+        
+        <!-- Live Chat Widget -->
+        <div id="homeAiChatBox" style="display: none; flex-direction: column; height: 320px; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 16px; background: rgba(2, 4, 10, 0.8);">
+          <div id="homeAiHistory" style="flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+            <!-- Chats injected here -->
+          </div>
+          <div id="homeAiLoading" class="hidden" style="padding: 8px 14px; display: flex; align-items: center; gap: 6px; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
+            <div class="ai-dots"><span></span><span></span><span></span></div>
+            <span style="font-size: 11.5px; color: var(--text-muted);">Assistant is composing reply...</span>
+          </div>
+        </div>
+
+        <form id="homeAiChatForm" style="display: flex; gap: 10px; margin-bottom: 0;">
+          <input type="text" id="inputHomeAi" placeholder="Ask Gemini about CCNA routing metrics, ACLs, or study bank questions..." style="flex: 1; font-size: 13.5px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 14px; color: #fff;" required />
+          <button type="submit" class="primary" style="padding: 0 20px; height: 38px;">Ask Assistant</button>
+        </form>
+      </section>
+
       <!-- NOC Packet Traversal Simulator -->
       <section class="card">
         <h3>🕸️ NOC Packet Traversal Simulator</h3>

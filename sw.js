@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ccna-prep-v6';
+const CACHE_NAME = 'ccna-prep-v7';
 const ASSETS = [
   '/',
   '/index.html',

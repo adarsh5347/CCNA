@@ -65,7 +65,8 @@ const state = {
   muted: localStorage.getItem("ccna_muted") === "true",
   highContrast: localStorage.getItem("ccna_high_contrast") === "true",
   simBugsFixed: {},
-  ai: { history: [] }
+  ai: { history: [] },
+  homeAi: { history: [] }
 };
 
 function safeHTML(str) {
@@ -4858,6 +4859,139 @@ function setupFlashcards() {
   updateFlashcardUI();
 }
 
+function getQuestionsContext(queryText) {
+  if (!state.bank || state.bank.length === 0) return "";
+  
+  const keywords = queryText.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter(w => w.length > 3);
+  const matches = [];
+  
+  for (const q of state.bank) {
+    let score = 0;
+    const txt = (q.text + " " + q.domain + " " + q.topic + " " + (q.expl.why || q.expl.text || "")).toLowerCase();
+    
+    for (const kw of keywords) {
+      if (txt.includes(kw)) {
+        score++;
+      }
+    }
+    
+    const idMatch = queryText.match(/(?:question|id|num|number)\s*#?(\d+)/i);
+    if (idMatch && q.id === Number(idMatch[1])) {
+      score += 100;
+    }
+    
+    if (score > 0) {
+      matches.push({ q, score });
+    }
+  }
+  
+  matches.sort((a, b) => b.score - a.score);
+  const topMatches = matches.slice(0, 5).map(m => m.q);
+  
+  if (topMatches.length === 0) return "";
+  
+  return `\n\n[RELEVANT STUDY BANK QUESTIONS MATCHING USER QUERY]:
+${topMatches.map((q) => `---
+Question ID: ${q.id}
+Domain: ${q.domain}
+Topic: ${q.topic}
+Difficulty: ${q.difficulty}
+Question Text: ${q.text}
+Options: ${q.options.map((opt, i) => `${String.fromCharCode(65 + i)}) ${opt}`).join(", ")}
+Correct Answer: ${q.options[q.correct[0]] || q.correct.join(", ")}
+Explanation: ${q.expl.why || q.expl.text || "None"}`).join("\n\n")}`;
+}
+
+function appendHomeChatBubble(role, text) {
+  const container = byId("homeAiHistory");
+  if (!container) return;
+  
+  const row = document.createElement("div");
+  row.className = `ai-message-row ${role}`;
+  
+  const bubble = document.createElement("div");
+  bubble.className = `ai-message ${role}`;
+  bubble.innerHTML = renderMarkdown(text);
+  
+  row.appendChild(bubble);
+  container.appendChild(row);
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendHomeChatPrompt(promptText) {
+  if (!promptText.trim()) return;
+  if (!aiConfig.hasApiKey()) {
+    showToast("Gemini API Key is not configured. Please paste your key in the AI Coach settings panel.", "warn", 5000);
+    return;
+  }
+
+  const chatBox = byId("homeAiChatBox");
+  if (chatBox) chatBox.style.display = "flex";
+
+  appendHomeChatBubble("user", promptText);
+  
+  const questionCtx = getQuestionsContext(promptText);
+  const systemContext = `You are the NOC Global AI Assistant for the CCNA Prep Platform (NOC Command Center).
+The platform includes these modules:
+- Study Mode: instant explanations and drills.
+- Section Quiz: timed customizable practice.
+- Real Exam: 120-minute simulated test.
+- Smart Adaptive Quiz: targets weak spots.
+- Spaced Repetition: reviews incorrect questions.
+- Subnetting Arcade: timed Subnetting trainer.
+- Virtual Labs: interactive IOS CLI configuration.
+- Packet Traversal Simulator: hop-by-hop OSI layer decapsulation.
+
+You have direct, verbatim access to the Wendell Odom Official Cert Guides (Volume 1 & Volume 2) and all questions in the bank. Keep answers highly professional, concise, correct, and cite official standard behaviors where possible. Ensure all code/CLI blocks are properly enclosed in triple backticks.
+${questionCtx}`;
+
+  const payload = [
+    { role: "user", text: systemContext },
+    ...state.homeAi.history,
+    { role: "user", text: promptText }
+  ];
+
+  state.homeAi.history.push({ role: "user", text: promptText });
+
+  const inputEl = byId("inputHomeAi");
+  const loading = byId("homeAiLoading");
+  const historyContainer = byId("homeAiHistory");
+
+  if (inputEl) inputEl.value = "";
+  if (inputEl) inputEl.disabled = true;
+  if (loading) loading.classList.remove("hidden");
+  if (historyContainer) historyContainer.scrollTop = historyContainer.scrollHeight;
+
+  try {
+    const reply = await askGemini(payload);
+    appendHomeChatBubble("coach", reply);
+    state.homeAi.history.push({ role: "coach", text: reply });
+  } catch (err) {
+    console.error("Gemini Global API Error:", err);
+    appendHomeChatBubble("coach", `⚠️ **Error communicating with Gemini:** ${err.message}`);
+    showToast("Global Assistant request failed.", "error");
+  } finally {
+    if (inputEl) inputEl.disabled = false;
+    if (loading) loading.classList.add("hidden");
+    if (inputEl) inputEl.focus();
+  }
+}
+
+function initHomeAICoach() {
+  const form = byId("homeAiChatForm");
+  const input = byId("inputHomeAi");
+  
+  if (form && input) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const val = input.value.trim();
+      if (!val) return;
+      playNetSound("click");
+      sendHomeChatPrompt(val);
+    });
+  }
+}
+
 function renderMarkdown(str) {
   if (!str) return "";
   let html = str;
@@ -5159,6 +5293,7 @@ function init() {
   setupTraversalSimulator();
   setupSupportDesk();
   initAICoach();
+  initHomeAICoach();
   
   // Custom load sequence
   updateMuteButton();
