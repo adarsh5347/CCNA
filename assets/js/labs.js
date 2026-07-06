@@ -19,10 +19,10 @@ export const labs = [
       { cmd: "vlan 20", desc: "Enter VLAN 20 database configuration" },
       { cmd: "name Finance", desc: "Assign name 'Finance' to VLAN 20" },
       { cmd: "interface FastEthernet0/1", desc: "Enter interface configuration mode for Fa0/1" },
-      { cmd: "switchport mode access", desc: "Configure port as an access interface" },
+      { cmd: "switchport mode access", desc: "Set Fa0/1 as access port" },
       { cmd: "switchport access vlan 10", desc: "Assign interface to VLAN 10" },
       { cmd: "interface FastEthernet0/2", desc: "Enter interface configuration mode for Fa0/2" },
-      { cmd: "switchport mode access", desc: "Configure port as an access interface" },
+      { cmd: "switchport mode access", desc: "Set Fa0/2 as access port" },
       { cmd: "switchport access vlan 20", desc: "Assign interface to VLAN 20" }
     ],
     verification: [

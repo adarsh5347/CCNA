@@ -49,7 +49,7 @@ export async function askGemini(history) {
     throw new Error("API Key not found. Please save a valid Gemini API Key first.");
   }
   const model = aiConfig.getModel();
-  const url = `${API_URL}/${model}:generateContent?key=${apiKey}`;
+  const url = `${API_URL}/${model}:generateContent`;
 
   // Format chat history to meet Gemini API shape:
   // contents: Array<{ role: 'user' | 'model', parts: Array<{ text: string }> }>
@@ -73,7 +73,8 @@ export async function askGemini(history) {
   const response = await fetch(url, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "x-goog-api-key": apiKey
     },
     body: JSON.stringify(payload)
   });

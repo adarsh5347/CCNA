@@ -521,17 +521,25 @@ function renderHome() {
   
   updateHeaderProfile();
 
-  const easy = Math.round(state.bank.length * 0.4);
-  const medium = Math.round(state.bank.length * 0.4);
-  const hard = state.bank.length - easy - medium;
+  const easy = state.bank.filter(q => q.difficulty === "Easy").length;
+  const medium = state.bank.filter(q => q.difficulty === "Medium").length;
+  const hard = state.bank.filter(q => q.difficulty === "Hard").length;
+  const coveragePct = Math.round((state.bank.length / blueprint.reduce((s, d) => s + d.count, 0)) * 100);
   renderStatsCards("bankStats", [
     { k: "Total Questions", v: state.bank.length },
-    { k: "Distribution", v: "Blueprint Matched" },
+    { k: "Blueprint Coverage", v: `${coveragePct}%` },
     { k: "Easy", v: easy },
     { k: "Medium", v: medium },
     { k: "Hard", v: hard },
     { k: "Question Types", v: "Single/Multi/Matching/Drag/Scenario" }
   ]);
+
+  // Dynamically update AI model badge
+  const modelBadge = byId("aiModelBadge");
+  if (modelBadge) {
+    const currentModel = aiConfig.getModel();
+    modelBadge.textContent = `${currentModel} Powered`;
+  }
 
   // Identify two weakest domains for Smart Adaptive Quiz
   const domainAccuracies = blueprint.map((d) => {
@@ -3080,7 +3088,7 @@ Use <code>show mac address-table</code> to verify bridging learning, and <code>s
 Use <code>show ip route</code> to inspect routing decisions, and <code>show ip interface brief</code> to verify line protocol status.
   `,
   firewall: `
-<strong style="color: #00f2fe; font-size: 13px;">🔒 Device: Firewall FW-1 (Cisco ASA 5506-X)</strong>
+<strong style="color: #00f2fe; font-size: 13px;">🔒 Device: Firewall FW-1 (Cisco Secure Firewall 1010)</strong>
 <hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
 <strong>Security Zones:</strong>
   - Inside (Gi1/1): Security Level 100 (Trust) - IP: 192.168.1.254/24
@@ -4486,12 +4494,13 @@ function setupSupportDesk() {
     }
 
     showToast("Incident ticket successfully logged ✓", "ok", 3000);
+    const safePriority = priority.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     out.innerHTML = `
       <strong style="color: #10b981;">Incident Logged Successfully!</strong><br />
       <strong>Ticket ID:</strong> INC-${Math.floor(100000 + Math.random() * 900000)}<br />
-      <strong>Severity:</strong> ${priority}<br />
-      <strong>Status:</strong> Assigned to Adarsh Poojari (Admin)<br />
-      <span style="font-size: 12px; color: var(--text-muted);">A confirmation ticket detail was logged in local session cache. Administrator contact 9136398778 / adarshpoojari8630@gmail.com has been referenced.</span>
+      <strong>Severity:</strong> ${safePriority}<br />
+      <strong>Status:</strong> Assigned to Platform Admin<br />
+      <span style="font-size: 12px; color: var(--text-muted);">Your incident has been logged. The admin team will follow up via the email address you provided.</span>
     `;
     out.classList.remove("hidden");
 
@@ -4992,9 +5001,19 @@ function initHomeAICoach() {
   }
 }
 
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 function renderMarkdown(str) {
   if (!str) return "";
-  let html = str;
+  // Escape HTML entities first to prevent XSS from user input or API responses
+  let html = escapeHtml(str);
   // Code blocks: ```cmd\n...\n```
   html = html.replace(/```(?:[a-zA-Z0-9_-]+)?\n([\s\S]*?)\n```/g, '<pre><code>$1</code></pre>');
   // Inline code: `cmd`
@@ -5316,8 +5335,7 @@ function initAICoach() {
 }
 
 function init() {
-  // Always set the default API key (ensures key rotation propagates to all users)
-  localStorage.setItem("ccna_gemini_api_key", "AQ.Ab8RN6Jq6sP4cB84FdvnrGyg4ArB4x-5JGqK7CPTSmNK6D5sbg");
+  // API key is user-provided via the AI Coach settings panel (bring-your-own-key)
   state.bank = generateBank(rand);
   navSetup();
   renderDomainChecks();
