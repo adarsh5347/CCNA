@@ -1081,18 +1081,25 @@ textarea {
 /* Empty/loading state for stat cards */
 .stat.skeleton {
   pointer-events: none;
+  position: relative;
+  overflow: hidden;
 }
 .stat.skeleton .k,
-.stat.skeleton .v { opacity: 0; }
+.stat.skeleton .v,
+.stat.skeleton .progress {
+  opacity: 0.3;
+}
 .stat.skeleton::after {
   content: '';
-  display: block;
-  height: 44px;
-  border-radius: var(--radius-sm);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: linear-gradient(90deg,
-    var(--surface-2) 25%,
-    var(--surface-3) 50%,
-    var(--surface-2) 75%
+    transparent 25%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.6s infinite;
