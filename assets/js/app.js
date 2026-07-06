@@ -599,7 +599,7 @@ function renderHome() {
 function renderDomainChecks() {
   const wrap = byId("domainChecks");
   if (wrap) {
-    wrap.innerHTML = blueprint.map((d, i) => `<label><input class="qdomain" type="checkbox" value="${d.name}" ${i === 0 ? "checked" : ""} /> ${d.name} (${d.weight}%)</label>`).join("<br />");
+    wrap.innerHTML = blueprint.map((d, i) => `<label><input class="qdomain" type="checkbox" value="${d.name}" ${i === 0 ? "checked" : ""} /> ${d.name} (${d.weight}%)</label>`).join("");
   }
 }
 
@@ -4875,6 +4875,34 @@ function setupFlashcards() {
       updateFlashcardUI();
     });
   }
+
+  // Mobile Touch Swipe Gesture Support
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const container = document.querySelector(".flashcard-container");
+  if (container) {
+    container.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    
+    container.addEventListener("touchend", (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      const swipeThreshold = 50;
+      if (touchEndX < touchStartX - swipeThreshold) {
+        // Swiped Left -> Next Card
+        playNetSound("click");
+        flashcardFlipped = false;
+        currentFlashcardIdx = (currentFlashcardIdx + 1) % ccnaFlashcards.length;
+        updateFlashcardUI();
+      } else if (touchEndX > touchStartX + swipeThreshold) {
+        // Swiped Right -> Prev Card
+        playNetSound("click");
+        flashcardFlipped = false;
+        currentFlashcardIdx = (currentFlashcardIdx - 1 + ccnaFlashcards.length) % ccnaFlashcards.length;
+        updateFlashcardUI();
+      }
+    }, { passive: true });
+  }
   
   updateFlashcardUI();
 }
@@ -4895,7 +4923,6 @@ function init() {
   navSetup();
   renderDomainChecks();
   renderHome();
-  renderAnalytics();
   wireEvents();
   setupAuth();
   setupCanvasConstellation();

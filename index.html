@@ -96,6 +96,8 @@
       <button id="btnToggleContrast" class="nav-util-btn ghost" aria-label="Toggle High Contrast">
         <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 3v14" stroke-linecap="round"/><path d="M10 3a7 7 0 0 1 0 14V3z" fill="currentColor" stroke="none"/></svg>
       </button>
+    </nav>
+    <div class="topbar-utils">
       <span id="headerXPBadge" class="xp-badge" aria-label="Experience level">Lvl 1</span>
       <span id="headerTimer" class="timer hidden" aria-live="polite">120:00</span>
       <div id="authContainer" class="auth-container">
@@ -106,7 +108,7 @@
           <button id="btnSignOut" class="ghost" style="font-size: 11px; padding: 5px 8px;">Sign Out</button>
         </div>
       </div>
-    </nav>
+    </div>
   </header>
 
   <main class="container">
@@ -665,7 +667,7 @@
 
           <div class="row" style="margin: 6px 0;">
             <label style="width: 100%;">Your Answer
-              <input id="subnetAnswer" type="text" placeholder="Enter answer..." style="margin-top: 6px; width: 100%;" />
+              <input id="subnetAnswer" type="text" inputmode="numeric" placeholder="Enter answer..." style="margin-top: 6px; width: 100%;" />
             </label>
           </div>
 
@@ -792,8 +794,11 @@
 
         <!-- Dynamic Subnetting Cheat Sheet -->
         <div style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 16px;">
-          <h4 style="font-size: 13px; color: #00f2fe; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 0.5px;">Subnetting Cheat Sheet Reference</h4>
-          <div style="overflow-x: auto;">
+          <h4 style="font-size: 13px; color: #00f2fe; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <span>Subnetting Cheat Sheet Reference</span>
+            <span style="font-size: 10px; color: var(--text-muted); text-transform: none; font-weight: normal; font-style: italic;">↔ Swipe to scroll</span>
+          </h4>
+          <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px;">
             <table class="cheat-sheet-table">
               <thead>
                 <tr>
@@ -1055,12 +1060,12 @@
             <div id="resultArea" class="scroll hidden" style="flex: 1; padding: 24px; min-height: 480px;"></div>
 
             <footer id="examFooter" class="exam-footer" style="padding: 12px 24px; background: rgba(30, 41, 59, 0.45); backdrop-filter: blur(12px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; border-radius: 0;">
-              <button id="prevQ" class="ghost" style="border: 1px solid var(--border-color);">⬅️ Previous</button>
+              <button id="prevQ" class="ghost" style="border: 1px solid var(--border-color);"><span class="btn-full-text">⬅️ Previous</span><span class="btn-mobile-text">⬅️ Prev</span></button>
               <div style="display: flex; gap: 8px;">
-                <button id="toggleMark" class="ghost" style="border: 1px solid var(--border-color);">🚩 Mark For Review</button>
-                <button id="openReview" class="secondary" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);">📋 Review Screen</button>
-                <button id="saveNext" class="primary">Next ➡️</button>
-                <button id="submitSession" class="primary" style="background: var(--accent-orange); color: #060913; border: none; display: none;">Submit Exam</button>
+                <button id="toggleMark" class="ghost" style="border: 1px solid var(--border-color);"><span class="btn-full-text">🚩 Mark For Review</span><span class="btn-mobile-text">🚩 Mark</span></button>
+                <button id="openReview" class="secondary" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);"><span class="btn-full-text">📋 Review Screen</span><span class="btn-mobile-text">📋 Review</span></button>
+                <button id="saveNext" class="primary"><span class="btn-full-text">Next ➡️</span><span class="btn-mobile-text">Next ➡️</span></button>
+                <button id="submitSession" class="primary" style="background: var(--accent-orange); color: #060913; border: none; display: none;"><span class="btn-full-text">Submit Exam</span><span class="btn-mobile-text">Submit</span></button>
               </div>
             </footer>
           </div>
