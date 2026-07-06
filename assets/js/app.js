@@ -4879,59 +4879,15 @@ function setupFlashcards() {
   updateFlashcardUI();
 }
 
-function getQuestionsContext(queryText) {
-  if (!state.bank || state.bank.length === 0) return "";
-  
-  const keywords = queryText.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter(w => w.length > 3);
-  const matches = [];
-  
-  for (const q of state.bank) {
-    let score = 0;
-    const txt = (q.text + " " + q.domain + " " + q.topic + " " + (q.expl.why || q.expl.text || "")).toLowerCase();
-    
-    for (const kw of keywords) {
-      if (txt.includes(kw)) {
-        score++;
-      }
-    }
-    
-    const idMatch = queryText.match(/(?:question|id|num|number)\s*#?(\d+)/i);
-    if (idMatch && q.id === Number(idMatch[1])) {
-      score += 100;
-    }
-    
-    if (score > 0) {
-      matches.push({ q, score });
-    }
+document.addEventListener("click", (e) => {
+  const videoBtn = e.target.closest(".btn-video-watch");
+  if (videoBtn) {
+    const yid = videoBtn.dataset.youtubeId;
+    const title = videoBtn.dataset.videoTitle;
+    const vidId = Number(videoBtn.dataset.videoId);
+    playVideo(yid, title, vidId);
   }
-  
-  matches.sort((a, b) => b.score - a.score);
-  const topMatches = matches.slice(0, 5).map(m => m.q);
-  
-  if (topMatches.length === 0) return "";
-  
-  return `\n\n[RELEVANT STUDY BANK QUESTIONS MATCHING USER QUERY]:
-${topMatches.map((q) => `---
-Question ID: ${q.id}
-Domain: ${q.domain}
-Topic: ${q.topic}
-Difficulty: ${q.difficulty}
-Question Text: ${q.text}
-Options: ${q.options.map((opt, i) => `${String.fromCharCode(65 + i)}) ${opt}`).join(", ")}
-Correct Answer: ${q.options[q.correct[0]] || q.correct.join(", ")}
-Explanation: ${q.expl.why || q.expl.text || "None"}`).join("\n\n")}`;
-}
-
-  document.addEventListener("click", (e) => {
-    const videoBtn = e.target.closest(".btn-video-watch");
-    if (videoBtn) {
-      const yid = videoBtn.dataset.youtubeId;
-      const title = videoBtn.dataset.videoTitle;
-      const vidId = Number(videoBtn.dataset.videoId);
-      playVideo(yid, title, vidId);
-    }
-  });
-}
+});
 
 function init() {
   // API key is user-provided via the AI Coach settings panel (bring-your-own-key)
