@@ -3,6 +3,7 @@ import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgre
 import { labs } from "./labs.js";
 import { bugsData, cliOutputs } from "./cli.js";
 import { aiConfig, askGemini } from "./ai.js";
+import { ccnaVideos } from "./videos.js";
 
 let authResolve;
 const authReady = new Promise((resolve) => {
@@ -118,7 +119,9 @@ function loadAnalytics() {
     labsCompleted: 0,
     subnetMaxStreak: 0,
     ach: {},
-    simPathsRun: { ospf: false, roas: false }
+    simPathsRun: { ospf: false, roas: false },
+    missedIds: [],
+    watchedVideos: []
   };
   try {
     const key = (typeof state !== 'undefined' && state && state.user) ? `${STORE}_${state.user.uid}` : STORE;
@@ -142,6 +145,7 @@ function validateAnalyticsSchema(data) {
   if (!data.domain || typeof data.domain !== 'object') return false;
   if (!data.topic || typeof data.topic !== 'object') return false;
   if (!Array.isArray(data.attempts)) return false;
+  if (data.watchedVideos && !Array.isArray(data.watchedVideos)) return false;
   return true;
 }
 
@@ -263,6 +267,7 @@ function setPage(page, push = true) {
 
   if (page === "analytics") renderAnalytics();
   if (page === "subnet") ensureSubnetQuestion(true);
+  if (page === "videos") renderVideos();
   window.scrollTo(0, 0);
 }
 
@@ -882,6 +887,21 @@ function explanationBlock(q, ok) {
   const e = q.expl;
   if (!e) return "";
   
+  // Find related video using flexible topic matcher
+  let videoBtnHtml = "";
+  if (q.topic) {
+    const topicLower = q.topic.toLowerCase();
+    const matchedVideo = ccnaVideos.find(v => {
+      const vTopic = v.topic.toLowerCase();
+      return topicLower === vTopic || topicLower.includes(vTopic) || vTopic.includes(topicLower);
+    });
+    if (matchedVideo) {
+      videoBtnHtml = `
+        <button class="secondary btn-video-watch" style="margin-top: 12px; margin-left: 8px; padding: 4px 10px; font-size: 11.5px; height: auto;" data-youtube-id="${matchedVideo.youtubeId}" data-video-title="${matchedVideo.title}" data-video-id="${matchedVideo.id}">📺 Watch Related Lesson</button>
+      `;
+    }
+  }
+  
   if (e.text && !e.why) {
     return `
       <section class="block ${ok ? "correct" : "wrong"}">
@@ -889,6 +909,7 @@ function explanationBlock(q, ok) {
         <p>${safeHTML(e.text)}</p>
         ${e.tip ? `<p><strong>Cisco exam tip:</strong> ${safeHTML(e.tip)}</p>` : ""}
         <button class="secondary btn-ai-ask" style="margin-top: 12px; padding: 4px 10px; font-size: 11.5px; height: auto;" data-q-idx="${state.session.idx}">💡 Ask Gemini Coach</button>
+        ${videoBtnHtml}
       </section>
     `;
   }
@@ -907,6 +928,7 @@ function explanationBlock(q, ok) {
       ${e.real ? `<p><strong>Real world example:</strong> ${safeHTML(e.real)}</p>` : ""}
       ${e.commands && e.commands.length > 0 ? `<p><strong>Related commands:</strong> ${e.commands.map(x => safeHTML(x)).join(" | ")}</p>` : ""}
       <button class="secondary btn-ai-ask" style="margin-top: 12px; padding: 4px 10px; font-size: 11.5px; height: auto;" data-q-idx="${state.session.idx}">💡 Ask Gemini Coach</button>
+      ${videoBtnHtml}
     </section>
   `;
 }
@@ -5323,13 +5345,21 @@ function initAICoach() {
     });
   }
 
-  // Delegated click handler for quiz explanation Ask buttons
+  // Delegated click handler for quiz explanation Ask buttons & Video watch buttons
   document.addEventListener("click", (e) => {
     const btn = e.target.closest(".btn-ai-ask");
     if (btn) {
       playNetSound("click");
       const idx = Number(btn.dataset.qIdx);
       askCoachForQuestion(idx);
+    }
+    
+    const videoBtn = e.target.closest(".btn-video-watch");
+    if (videoBtn) {
+      const yid = videoBtn.dataset.youtubeId;
+      const title = videoBtn.dataset.videoTitle;
+      const vidId = Number(videoBtn.dataset.videoId);
+      playVideo(yid, title, vidId);
     }
   });
 }
@@ -5348,6 +5378,7 @@ function init() {
   setupSupportDesk();
   initAICoach();
   initHomeAICoach();
+  initVideos();
   
   // Custom load sequence
   updateMuteButton();
@@ -5561,6 +5592,152 @@ function init() {
     initHeroSphere();
     initMagneticButtons();
   }, 100);
+}
+
+/* ─── Video Library Features ────────────────────────── */
+
+function initVideos() {
+  const filtersContainer = byId("videoFiltersContainer");
+  if (filtersContainer) {
+    filtersContainer.querySelectorAll(".video-filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        filtersContainer.querySelectorAll(".video-filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        playNetSound("click");
+        renderVideos();
+      });
+    });
+  }
+
+  const btnCloseVideo = byId("btnCloseVideoModal");
+  if (btnCloseVideo) {
+    btnCloseVideo.addEventListener("click", closeVideoPlayer);
+  }
+  const videoModal = byId("videoModal");
+  if (videoModal) {
+    videoModal.addEventListener("click", (e) => {
+      if (e.target === videoModal) closeVideoPlayer();
+    });
+  }
+}
+
+function renderVideos() {
+  const container = byId("videoLessonsGrid");
+  if (!container) return;
+
+  const currentDomain = document.querySelector(".video-filter-btn.active")?.dataset.domain || "all";
+  
+  if (!state.analytics.watchedVideos) {
+    state.analytics.watchedVideos = [];
+  }
+
+  const filtered = ccnaVideos.filter(v => currentDomain === "all" || v.domain === currentDomain);
+
+  container.innerHTML = filtered.map(v => {
+    const isWatched = state.analytics.watchedVideos.includes(v.id);
+    return `
+      <article class="card video-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 16px; border: 1.5px solid ${isWatched ? "rgba(16, 185, 129, 0.3)" : "var(--border-color)"}; background: rgba(13, 19, 36, 0.4); position: relative; transition: border-color 0.2s;">
+        <div>
+          <div class="video-thumbnail-container" data-video-id="${v.id}" style="position: relative; width: 100%; padding-bottom: 56.25%; background: rgba(0,0,0,0.6); border-radius: 8px; margin-bottom: 12px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <img src="https://img.youtube.com/vi/${v.youtubeId}/mqdefault.jpg" alt="${v.title}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.75; transition: transform 0.3s;" />
+            <div class="play-icon-overlay" style="position: absolute; font-size: 32px; color: var(--accent-color); opacity: 0.85; filter: drop-shadow(0 0 10px rgba(0,242,254,0.5)); transition: transform 0.2s;">▶</div>
+            <span style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.85); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono);">${v.duration}</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+            <span style="font-size: 11px; color: var(--accent-color); font-weight: bold; background: rgba(0, 242, 254, 0.08); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0,242,254,0.15);">${v.topic}</span>
+            <label style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-muted); cursor: pointer;">
+              <input type="checkbox" class="video-watch-checkbox" data-video-id="${v.id}" ${isWatched ? "checked" : ""} style="cursor: pointer;" />
+              Watched
+            </label>
+          </div>
+          <h4 style="margin: 6px 0 8px 0; font-size: 14px; line-height: 1.4; color: #fff;">${v.title}</h4>
+          <p style="margin: 0 0 12px 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">${v.description}</p>
+        </div>
+        <button class="primary btn-watch-video" data-youtube-id="${v.youtubeId}" data-video-title="${v.title}" data-video-id="${v.id}" style="width: 100%; font-size: 12px; padding: 8px;">Watch Lesson</button>
+      </article>
+    `;
+  }).join("");
+
+  updateVideoProgress();
+
+  container.querySelectorAll(".btn-watch-video, .video-thumbnail-container").forEach(el => {
+    el.addEventListener("click", () => {
+      const yid = el.dataset.youtubeId || el.closest(".video-card").querySelector(".btn-watch-video").dataset.youtubeId;
+      const title = el.dataset.videoTitle || el.closest(".video-card").querySelector(".btn-watch-video").dataset.videoTitle;
+      const vidId = el.dataset.videoId || el.closest(".video-card").querySelector(".btn-watch-video").dataset.videoId;
+      playVideo(yid, title, Number(vidId));
+    });
+  });
+
+  container.querySelectorAll(".video-watch-checkbox").forEach(chk => {
+    chk.addEventListener("change", () => {
+      const vidId = Number(chk.dataset.videoId);
+      toggleVideoWatchedState(vidId, chk.checked);
+    });
+  });
+}
+
+function toggleVideoWatchedState(vidId, isWatched) {
+  if (!state.analytics.watchedVideos) {
+    state.analytics.watchedVideos = [];
+  }
+  
+  if (isWatched) {
+    if (!state.analytics.watchedVideos.includes(vidId)) {
+      state.analytics.watchedVideos.push(vidId);
+      playNetSound("success");
+    }
+  } else {
+    state.analytics.watchedVideos = state.analytics.watchedVideos.filter(id => id !== vidId);
+    playNetSound("click");
+  }
+
+  saveAnalytics(true);
+  renderVideos();
+}
+
+function updateVideoProgress() {
+  const progressPercentBar = byId("videoProgressPercentageBar");
+  const progressLabel = byId("videoProgressLabel");
+  const progressPercentage = byId("videoProgressPercentage");
+
+  if (!progressPercentBar) return;
+
+  const total = ccnaVideos.length;
+  const watched = state.analytics.watchedVideos ? state.analytics.watchedVideos.length : 0;
+  const pct = total > 0 ? Math.round((watched / total) * 100) : 0;
+
+  progressPercentBar.style.width = `${pct}%`;
+  if (progressLabel) progressLabel.textContent = `${watched}/${total} Watched`;
+  if (progressPercentage) progressPercentage.textContent = `${pct}%`;
+}
+
+function playVideo(youtubeId, title, vidId) {
+  const modal = byId("videoModal");
+  const iframe = byId("videoIFrame");
+  const modalTitle = byId("videoModalTitle");
+
+  if (!modal || !iframe) return;
+
+  modalTitle.textContent = title;
+  iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
+  modal.classList.remove("hidden");
+  playNetSound("success");
+
+  if (vidId && state.analytics.watchedVideos && !state.analytics.watchedVideos.includes(vidId)) {
+    toggleVideoWatchedState(vidId, true);
+  }
+}
+
+function closeVideoPlayer() {
+  const modal = byId("videoModal");
+  const iframe = byId("videoIFrame");
+  if (!modal || !iframe) return;
+
+  iframe.src = "";
+  modal.classList.add("hidden");
+  playNetSound("click");
 }
 
 init();
