@@ -79,13 +79,6 @@
         <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><path d="M3 14l4-5 4 3 4-6 2 2" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="2" width="16" height="16" rx="2"/></svg>
         <span class="nav-label">Analytics</span>
       </button>
-      <button data-page="ai-coach" class="nav-btn ghost" aria-label="AI Study Coach">
-        <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true" fill="none" stroke="currentColor">
-          <path d="M10 2a6 6 0 0 0-6 6c0 2.2 1.3 4.1 3.2 4.9.4.2.8.5.8 1.1v1.5a1.5 1.5 0 0 0 3 0V14c0-.6.4-.9.8-1.1A6 6 0 0 0 10 2z" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M8 18h4" stroke-linecap="round"/>
-        </svg>
-        <span class="nav-label">AI Coach</span>
-      </button>
       <button data-page="videos" class="nav-btn ghost" aria-label="Video Lessons">
         <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true" fill="none" stroke="currentColor">
           <rect x="2" y="4" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.6" />
@@ -187,34 +180,6 @@
       </article>
 
 
-      <!-- GENERAL LANDING PAGE AI COACH CARD -->
-      <section class="card" style="margin-bottom: 24px; padding: 20px; border: 1px solid rgba(0, 242, 254, 0.25); background: linear-gradient(135deg, rgba(6,9,19,0.9), rgba(10,25,47,0.7));">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-          <h3 style="margin: 0; display: flex; align-items: center; gap: 8px; color: #fff;">
-            <span>🤖 NOC Global AI Assistant</span>
-          </h3>
-          <span id="aiModelBadge" style="font-size: 11px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; padding: 3px 8px; border-radius: 6px; font-family: var(--font-mono); font-weight: 600;">AI Powered</span>
-        </div>
-        <p style="color: var(--text-muted); font-size: 13.5px; margin-top: 0; margin-bottom: 16px; line-height: 1.5;">
-          Ask any questions about CCNA topics, get tips, or ask about the platform's question bank. This AI has full awareness of the entire website's data and Odom cert guides.
-        </p>
-        
-        <!-- Live Chat Widget -->
-        <div id="homeAiChatBox" style="display: none; flex-direction: column; height: 320px; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 16px; background: rgba(2, 4, 10, 0.8);">
-          <div id="homeAiHistory" style="flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
-            <!-- Chats injected here -->
-          </div>
-          <div id="homeAiLoading" class="hidden" style="padding: 8px 14px; display: flex; align-items: center; gap: 6px; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
-            <div class="ai-dots"><span></span><span></span><span></span></div>
-            <span style="font-size: 11.5px; color: var(--text-muted);">Assistant is composing reply...</span>
-          </div>
-        </div>
-
-        <form id="homeAiChatForm" style="display: flex; gap: 10px; margin-bottom: 0;">
-          <input type="text" id="inputHomeAi" placeholder="Ask Gemini about CCNA routing metrics, ACLs, or study bank questions..." style="flex: 1; font-size: 13.5px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 14px; color: #fff;" required />
-          <button type="submit" class="primary" style="padding: 0 20px; height: 38px;">Ask Assistant</button>
-        </form>
-      </section>
 
       <!-- NOC Packet Traversal Simulator -->
       <section class="card">
@@ -891,7 +856,6 @@
           <div class="card terminal-box" style="padding: 16px; min-height: 260px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 0;">
             <h4 id="labConsoleHeader" style="font-size: 13px; color: #10b981; border-bottom: 1px solid rgba(16,185,129,0.15); padding-bottom: 6px; text-transform: uppercase; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
               <span>💻 Cisco IOS Command Console</span>
-              <button id="btnLabAskAI" class="ghost" style="padding: 2px 8px; font-size: 11px; height: auto; border: 1px solid #10b981; color: #10b981; display: none;">💡 Ask AI Coach</button>
             </h4>
             <div id="labCliOutput" style="font-family: var(--font-mono); font-size: 12.5px; color: #34d399; line-height: 1.45; overflow-y: auto; flex: 1; max-height: 160px; white-space: pre-wrap;"></div>
             
@@ -951,95 +915,7 @@
     </section>
 
 
-    <!-- GEMINI AI COACH PAGE -->
-    <section id="ai-coach" class="page">
-      <article class="hero" style="position: relative; overflow: hidden;">
-        <div class="cyber-grid" aria-hidden="true"></div>
-        <h2 class="reveal-text glow-accent" style="position: relative; z-index: 1;">NOC AI Study Coach</h2>
-        <p style="position: relative; z-index: 1; color: var(--text-muted); margin-bottom: 0;">Context-aware Gemini assistant to master exam topics, debug labs, and explain protocol concepts.</p>
-      </article>
 
-      <div class="grid labs" style="grid-template-columns: 1fr 2.5fr; gap: 24px;">
-        <!-- Left: Coach Settings -->
-        <div class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 16px; height: fit-content;">
-          <h4 style="font-size: 15px; color: #fff; margin-bottom: 4px;">🔧 Assistant Settings</h4>
-          
-          <div>
-            <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Gemini API Key</label>
-            <div style="display: flex; gap: 8px;">
-              <input type="password" id="inputGeminiKey" placeholder="Paste your API key here..." style="flex: 1; font-size: 13px;" />
-              <button type="button" id="btnToggleKeyVis" class="ghost" style="padding: 0 10px;" aria-label="Toggle Visibility">👁️</button>
-            </div>
-            <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
-              Get a free API Key from <a href="https://aistudio.google.com/" target="_blank" style="color: #00f2fe; text-decoration: underline;">Google AI Studio</a>. Keys are stored locally on your device.
-            </p>
-          </div>
-
-          <div style="display: flex; gap: 8px;">
-            <button id="btnSaveGeminiKey" class="primary" style="flex: 1; font-size: 12px; padding: 6px 12px;">Save Key</button>
-            <button id="btnDeleteGeminiKey" class="secondary" style="font-size: 12px; padding: 6px 12px;">Clear</button>
-          </div>
-
-          <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 8px 0;" />
-
-          <div>
-            <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">Model Selection</label>
-            <select id="selectGeminiModel" style="width: 100%; font-size: 13px; padding: 6px; margin-bottom: 8px;">
-              <option value="gemini-2.0-flash">Gemini 2.0 Flash (Fast, Default)</option>
-              <option value="gemini-2.0-pro">Gemini 2.0 Pro (High intelligence)</option>
-              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy)</option>
-              <option value="gemini-1.5-pro">Gemini 1.5 Pro (Legacy)</option>
-              <option value="custom">Custom Model ID...</option>
-            </select>
-            <input type="text" id="inputCustomModel" placeholder="e.g. gemini-2.5-flash" style="width: 100%; font-size: 13px; display: none; margin-top: 4px; padding: 6px;" />
-          </div>
-
-          <div id="aiKeyStatus" style="font-size: 12px; padding: 8px; border-radius: 6px; text-align: center; font-weight: bold; background: rgba(239,68,68,0.1); color: #ef4444;">
-            ❌ Key not configured
-          </div>
-        </div>
-
-        <!-- Right: Chat Console -->
-        <div class="card" style="padding: 0; display: flex; flex-direction: column; height: 500px; overflow: hidden; margin-bottom: 0;">
-          <!-- Chat Header -->
-          <div style="padding: 12px 18px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.01);">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></div>
-              <strong style="font-size: 13px; letter-spacing: 0.5px; color: #fff;">ACTIVE STUDY COACH</strong>
-            </div>
-            <button id="btnClearChat" class="ghost" style="padding: 2px 8px; font-size: 11px; height: auto;">Clear Conversation</button>
-          </div>
-
-          <!-- Message History -->
-          <div id="aiChatHistory" style="flex: 1; padding: 18px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; background: rgba(6,9,19,0.35);">
-            <!-- Welcome message will be dynamically injected here -->
-          </div>
-
-          <!-- Loading Indicator -->
-          <div id="aiLoadingIndicator" class="hidden" style="padding: 10px 18px; display: flex; align-items: center; gap: 8px; background: rgba(0, 242, 254, 0.02); border-top: 1px solid var(--border-color);">
-            <div class="ai-dots"><span></span><span></span><span></span></div>
-            <span style="font-size: 12px; color: var(--text-muted);">AI Coach is thinking...</span>
-          </div>
-
-          <!-- Chat Inputs -->
-          <div style="padding: 14px 18px; border-top: 1px solid var(--border-color); background: rgba(255,255,255,0.02); display: flex; flex-direction: column; gap: 10px;">
-            <!-- Suggestion Tags -->
-            <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; white-space: nowrap;" id="aiQuickPrompts">
-              <button class="ai-quick-tag">Explain OSPF Area Types</button>
-              <button class="ai-quick-tag">Subnetting Shortcut Tips</button>
-              <button class="ai-quick-tag">RESTCONF vs NETCONF</button>
-              <button class="ai-quick-tag">Explain DSCP & CoS</button>
-            </div>
-
-            <!-- Text Input Area -->
-            <form id="aiChatForm" style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 0;">
-              <textarea id="aiChatInput" rows="2" placeholder="Ask anything about CCNA exam topics..." style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; padding: 8px 12px; font-size: 13.5px; resize: none; line-height: 1.4; outline: none; transition: border-color 0.2s;" required></textarea>
-              <button type="submit" id="btnSendAiChat" class="primary" style="height: 38px; display: flex; align-items: center; justify-content: center; padding: 0 16px;">Send</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- VIDEO LESSONS PAGE -->
     <section id="videos" class="page">

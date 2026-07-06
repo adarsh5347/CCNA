@@ -2,7 +2,6 @@ import { blueprint, generateBank } from "./data.js";
 import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgress, mergeProgress } from "./firebase.js";
 import { labs } from "./labs.js";
 import { bugsData, cliOutputs } from "./cli.js";
-import { aiConfig, askGemini } from "./ai.js";
 import { ccnaVideos } from "./videos.js";
 
 let authResolve;
@@ -65,9 +64,7 @@ const state = {
   user: null,
   muted: localStorage.getItem("ccna_muted") === "true",
   highContrast: localStorage.getItem("ccna_high_contrast") === "true",
-  simBugsFixed: {},
-  ai: { history: [] },
-  homeAi: { history: [] }
+  simBugsFixed: {}
 };
 
 function safeHTML(str) {
@@ -539,12 +536,6 @@ function renderHome() {
     { k: "Question Types", v: "Single/Multi/Matching/Drag/Scenario" }
   ]);
 
-  // Dynamically update AI model badge
-  const modelBadge = byId("aiModelBadge");
-  if (modelBadge) {
-    const currentModel = aiConfig.getModel();
-    modelBadge.textContent = `${currentModel} Powered`;
-  }
 
   // Identify two weakest domains for Smart Adaptive Quiz
   const domainAccuracies = blueprint.map((d) => {
@@ -897,7 +888,7 @@ function explanationBlock(q, ok) {
     });
     if (matchedVideo) {
       videoBtnHtml = `
-        <button class="secondary btn-video-watch" style="margin-top: 12px; margin-left: 8px; padding: 4px 10px; font-size: 11.5px; height: auto;" data-youtube-id="${matchedVideo.youtubeId}" data-video-title="${matchedVideo.title}" data-video-id="${matchedVideo.id}">📺 Watch Related Lesson</button>
+        <button class="secondary btn-video-watch" style="margin-top: 12px; padding: 4px 10px; font-size: 11.5px; height: auto;" data-youtube-id="${matchedVideo.youtubeId}" data-video-title="${matchedVideo.title}" data-video-id="${matchedVideo.id}">📺 Watch Related Lesson</button>
       `;
     }
   }
@@ -908,7 +899,6 @@ function explanationBlock(q, ok) {
         <h4>Detailed Explanation</h4>
         <p>${safeHTML(e.text)}</p>
         ${e.tip ? `<p><strong>Cisco exam tip:</strong> ${safeHTML(e.tip)}</p>` : ""}
-        <button class="secondary btn-ai-ask" style="margin-top: 12px; padding: 4px 10px; font-size: 11.5px; height: auto;" data-q-idx="${state.session.idx}">💡 Ask Gemini Coach</button>
         ${videoBtnHtml}
       </section>
     `;
@@ -927,7 +917,6 @@ function explanationBlock(q, ok) {
       ${e.memory ? `<p><strong>Memory trick:</strong> ${safeHTML(e.memory)}</p>` : ""}
       ${e.real ? `<p><strong>Real world example:</strong> ${safeHTML(e.real)}</p>` : ""}
       ${e.commands && e.commands.length > 0 ? `<p><strong>Related commands:</strong> ${e.commands.map(x => safeHTML(x)).join(" | ")}</p>` : ""}
-      <button class="secondary btn-ai-ask" style="margin-top: 12px; padding: 4px 10px; font-size: 11.5px; height: auto;" data-q-idx="${state.session.idx}">💡 Ask Gemini Coach</button>
       ${videoBtnHtml}
     </section>
   `;
@@ -4933,427 +4922,7 @@ Correct Answer: ${q.options[q.correct[0]] || q.correct.join(", ")}
 Explanation: ${q.expl.why || q.expl.text || "None"}`).join("\n\n")}`;
 }
 
-function appendHomeChatBubble(role, text) {
-  const container = byId("homeAiHistory");
-  if (!container) return;
-  
-  const row = document.createElement("div");
-  row.className = `ai-message-row ${role}`;
-  
-  const bubble = document.createElement("div");
-  bubble.className = `ai-message ${role}`;
-  bubble.innerHTML = renderMarkdown(text);
-  
-  row.appendChild(bubble);
-  container.appendChild(row);
-  container.scrollTop = container.scrollHeight;
-}
-
-async function sendHomeChatPrompt(promptText) {
-  if (!promptText.trim()) return;
-  if (!aiConfig.hasApiKey()) {
-    showToast("Gemini API Key is not configured. Please paste your key in the AI Coach settings panel.", "warn", 5000);
-    return;
-  }
-
-  const chatBox = byId("homeAiChatBox");
-  if (chatBox) chatBox.style.display = "flex";
-
-  appendHomeChatBubble("user", promptText);
-  
-  const questionCtx = getQuestionsContext(promptText);
-  const systemContext = `You are the NOC Global AI Assistant for the CCNA Prep Platform (NOC Command Center).
-The platform includes these modules:
-- Study Mode: instant explanations and drills.
-- Section Quiz: timed customizable practice.
-- Real Exam: 120-minute simulated test.
-- Smart Adaptive Quiz: targets weak spots.
-- Spaced Repetition: reviews incorrect questions.
-- Subnetting Arcade: timed Subnetting trainer.
-- Virtual Labs: interactive IOS CLI configuration.
-- Packet Traversal Simulator: hop-by-hop OSI layer decapsulation.
-
-You have direct, verbatim access to the Wendell Odom Official Cert Guides (Volume 1 & Volume 2) and all questions in the bank. Keep answers highly professional, concise, correct, and cite official standard behaviors where possible. Ensure all code/CLI blocks are properly enclosed in triple backticks.
-${questionCtx}`;
-
-  const payload = [
-    { role: "user", text: systemContext },
-    ...state.homeAi.history,
-    { role: "user", text: promptText }
-  ];
-
-  state.homeAi.history.push({ role: "user", text: promptText });
-
-  const inputEl = byId("inputHomeAi");
-  const loading = byId("homeAiLoading");
-  const historyContainer = byId("homeAiHistory");
-
-  if (inputEl) inputEl.value = "";
-  if (inputEl) inputEl.disabled = true;
-  if (loading) loading.classList.remove("hidden");
-  if (historyContainer) historyContainer.scrollTop = historyContainer.scrollHeight;
-
-  try {
-    const reply = await askGemini(payload);
-    appendHomeChatBubble("coach", reply);
-    state.homeAi.history.push({ role: "coach", text: reply });
-  } catch (err) {
-    console.error("Gemini Global API Error:", err);
-    appendHomeChatBubble("coach", `⚠️ **Error communicating with Gemini:** ${err.message}`);
-    showToast("Global Assistant request failed.", "error");
-  } finally {
-    if (inputEl) inputEl.disabled = false;
-    if (loading) loading.classList.add("hidden");
-    if (inputEl) inputEl.focus();
-  }
-}
-
-function initHomeAICoach() {
-  const form = byId("homeAiChatForm");
-  const input = byId("inputHomeAi");
-  
-  if (form && input) {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const val = input.value.trim();
-      if (!val) return;
-      playNetSound("click");
-      sendHomeChatPrompt(val);
-    });
-  }
-}
-
-function escapeHtml(str) {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function renderMarkdown(str) {
-  if (!str) return "";
-  // Escape HTML entities first to prevent XSS from user input or API responses
-  let html = escapeHtml(str);
-  // Code blocks: ```cmd\n...\n```
-  html = html.replace(/```(?:[a-zA-Z0-9_-]+)?\n([\s\S]*?)\n```/g, '<pre><code>$1</code></pre>');
-  // Inline code: `cmd`
-  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-  // Bold: **text**
-  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  
-  // Lists & Paragraphs split
-  const lines = html.split("\n");
-  let inList = false;
-  let result = [];
-  
-  for (let line of lines) {
-    if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
-      if (!inList) {
-        result.push("<ul>");
-        inList = true;
-      }
-      result.push(`<li>${line.trim().substring(2)}</li>`);
-    } else {
-      if (inList) {
-        result.push("</ul>");
-        inList = false;
-      }
-      if (line.trim() === "") {
-        result.push("<br />");
-      } else {
-        result.push(line);
-      }
-    }
-  }
-  if (inList) result.push("</ul>");
-  
-  let textResult = result.join("\n");
-  textResult = textResult.replace(/(?:<br \/>\s*){2,}/g, "</p><p>");
-  return `<p>${textResult}</p>`.replace(/<p><br \/>/g, "<p>").replace(/<p>\s*<\/p>/g, "");
-}
-
-function appendChatBubble(role, text) {
-  const container = byId("aiChatHistory");
-  if (!container) return;
-  
-  const row = document.createElement("div");
-  row.className = `ai-message-row ${role}`;
-  
-  const bubble = document.createElement("div");
-  bubble.className = `ai-message ${role}`;
-  bubble.innerHTML = renderMarkdown(text);
-  
-  row.appendChild(bubble);
-  container.appendChild(row);
-  container.scrollTop = container.scrollHeight;
-}
-
-async function sendChatPrompt(promptText) {
-  if (!promptText.trim()) return;
-  if (!aiConfig.hasApiKey()) {
-    showToast("Gemini API Key is not configured. Please paste your key in the settings panel.", "warn", 4000);
-    return;
-  }
-
-  appendChatBubble("user", promptText);
-  state.ai.history.push({ role: "user", text: promptText });
-
-  const inputEl = byId("aiChatInput");
-  const sendBtn = byId("btnSendAiChat");
-  const loading = byId("aiLoadingIndicator");
-  const historyContainer = byId("aiChatHistory");
-
-  if (inputEl) inputEl.value = "";
-  if (inputEl) inputEl.disabled = true;
-  if (sendBtn) sendBtn.disabled = true;
-  if (loading) loading.classList.remove("hidden");
-  if (historyContainer) historyContainer.scrollTop = historyContainer.scrollHeight;
-
-  try {
-    const reply = await askGemini(state.ai.history);
-    appendChatBubble("coach", reply);
-    state.ai.history.push({ role: "coach", text: reply });
-  } catch (err) {
-    console.error("Gemini API Error:", err);
-    appendChatBubble("coach", `⚠️ **Error communicating with Gemini:** ${err.message}`);
-    showToast("Gemini Coach request failed.", "error");
-  } finally {
-    if (inputEl) inputEl.disabled = false;
-    if (sendBtn) sendBtn.disabled = false;
-    if (loading) loading.classList.add("hidden");
-    if (inputEl) inputEl.focus();
-  }
-}
-
-export function askCoachForQuestion(qIdx) {
-  const s = state.session;
-  if (!s) return;
-  const q = s.questions[qIdx];
-  if (!q) return;
-
-  const correctText = q.options[q.correct[0]] || q.correct.join(", ");
-  const userAnsIdx = s.answers[qIdx];
-  const userAnsText = userAnsIdx != null ? (q.options[userAnsIdx] || userAnsIdx) : "Not Answered";
-
-  const prompt = `I am currently studying for my CCNA 200-301 exam and need help understanding this question from the database:
-
-**Domain:** ${q.domain}
-**Topic:** ${q.topic}
-**Difficulty:** ${q.difficulty}
-**Question:** ${q.text}
-
-**Options:**
-${q.options.map((opt, idx) => `${String.fromCharCode(65 + idx)}) ${opt}`).join("\n")}
-
-**My Answer:** ${userAnsText}
-**Correct Answer:** ${correctText}
-**Standard Explanation:** ${q.expl.why || q.expl.text || "None"}
-
-Please explain:
-1. Why the correct option is correct.
-2. Why my answer is incorrect (if different).
-3. The underlying networking concepts, referencing official standards.`;
-
-  setPage("ai-coach");
-  sendChatPrompt(prompt);
-}
-
-export function askCoachForLab() {
-  const labId = state.lab.currentLabId;
-  const lab = labs.find(l => l.id === labId);
-  if (!lab) return;
-
-  const prompt = `I am currently working on a Cisco IOS configuration lab on the platform and I am stuck. 
-
-**Lab Title:** ${lab.title}
-**Scenario:** ${lab.desc}
-**Current Node:** ${state.lab.currentPrompt.replace("(config)#", "")}
-**My Commands History:** 
-${state.lab.userCommands.length > 0 ? state.lab.userCommands.join("\n") : "(No commands entered yet)"}
-
-Please provide troubleshooting steps:
-1. Explain what I should check next.
-2. Guide me to the correct Cisco IOS commands without just writing down the final configuration snippet immediately. Ask me to run specific show commands to verify first.`;
-
-  setPage("ai-coach");
-  sendChatPrompt(prompt);
-}
-
-function initAICoach() {
-  const inputKey = byId("inputGeminiKey");
-  const btnSave = byId("btnSaveGeminiKey");
-  const btnDelete = byId("btnDeleteGeminiKey");
-  const btnToggleVis = byId("btnToggleKeyVis");
-  const selectModel = byId("selectGeminiModel");
-  const keyStatus = byId("aiKeyStatus");
-  const chatForm = byId("aiChatForm");
-  const chatInput = byId("aiChatInput");
-  const clearChatBtn = byId("btnClearChat");
-
-  const updateStatus = () => {
-    const hasKey = aiConfig.hasApiKey();
-    if (keyStatus) {
-      if (hasKey) {
-        keyStatus.textContent = "✅ Key configured";
-        keyStatus.style.background = "rgba(16,185,129,0.1)";
-        keyStatus.style.color = "#10b981";
-      } else {
-        keyStatus.textContent = "❌ Key not configured";
-        keyStatus.style.background = "rgba(239,68,68,0.1)";
-        keyStatus.style.color = "#ef4444";
-      }
-    }
-  };
-
-  // Load saved state
-  if (inputKey) inputKey.value = aiConfig.getApiKey();
-  const savedModel = aiConfig.getModel();
-  const inputCustom = byId("inputCustomModel");
-  
-  if (selectModel) {
-    const optionValues = Array.from(selectModel.options).map(opt => opt.value);
-    if (optionValues.includes(savedModel)) {
-      selectModel.value = savedModel;
-      if (inputCustom) inputCustom.style.display = "none";
-    } else {
-      selectModel.value = "custom";
-      if (inputCustom) {
-        inputCustom.value = savedModel;
-        inputCustom.style.display = "block";
-      }
-    }
-  }
-  updateStatus();
-
-  // Settings Handlers
-  if (btnSave && inputKey) {
-    btnSave.addEventListener("click", () => {
-      const val = inputKey.value.trim();
-      if (!val) {
-        showToast("Please enter a valid API Key.", "warn");
-        return;
-      }
-      aiConfig.setApiKey(val);
-      updateStatus();
-      playNetSound("success");
-      showToast("Gemini API Key saved locally.", "info");
-    });
-  }
-
-  if (btnDelete && inputKey) {
-    btnDelete.addEventListener("click", () => {
-      aiConfig.setApiKey("");
-      inputKey.value = "";
-      updateStatus();
-      playNetSound("click");
-      showToast("API Key cleared.", "info");
-    });
-  }
-
-  if (btnToggleVis && inputKey) {
-    btnToggleVis.addEventListener("click", () => {
-      const isPass = inputKey.type === "password";
-      inputKey.type = isPass ? "text" : "password";
-      btnToggleVis.textContent = isPass ? "🔒" : "👁️";
-    });
-  }
-
-  if (selectModel) {
-    selectModel.addEventListener("change", () => {
-      const val = selectModel.value;
-      if (val === "custom") {
-        if (inputCustom) {
-          inputCustom.style.display = "block";
-          inputCustom.focus();
-          aiConfig.setModel(inputCustom.value || "gemini-2.0-flash");
-        }
-      } else {
-        if (inputCustom) inputCustom.style.display = "none";
-        aiConfig.setModel(val);
-        showToast(`Model switched to ${val}`, "info", 2000);
-      }
-    });
-  }
-
-  if (inputCustom) {
-    inputCustom.addEventListener("input", () => {
-      const val = inputCustom.value.trim();
-      if (val) {
-        aiConfig.setModel(val);
-      }
-    });
-  }
-
-  // Chat conversation
-  if (chatForm && chatInput) {
-    chatForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const val = chatInput.value.trim();
-      if (!val) return;
-      playNetSound("click");
-      sendChatPrompt(val);
-    });
-    
-    // Support submitting on Enter (but allow Shift+Enter for newlines)
-    chatInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        chatForm.dispatchEvent(new Event("submit"));
-      }
-    });
-  }
-
-  // Suggestion tags
-  document.querySelectorAll(".ai-quick-tag").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      if (chatInput) {
-        chatInput.value = btn.textContent;
-        chatForm.dispatchEvent(new Event("submit"));
-      }
-    });
-  });
-
-  // Clear Chat
-  const resetChat = () => {
-    state.ai.history = [];
-    const container = byId("aiChatHistory");
-    if (container) {
-      container.innerHTML = "";
-      appendChatBubble("coach", "Hello! I am your **NOC AI Study Coach**. I have full context on your CCNA questions and IOS terminal simulation state.\n\nAsk me any concept explanation or click **Ask AI Coach** inside your quizzes and CLI console to debug configurations.");
-    }
-  };
-
-  if (clearChatBtn) {
-    clearChatBtn.addEventListener("click", () => {
-      resetChat();
-      playNetSound("click");
-      showToast("Conversation history cleared.", "info");
-    });
-  }
-
-  // Initial welcome message
-  resetChat();
-
-  // Contextual Trigger inside Lab Center
-  const btnLabAskAI = byId("btnLabAskAI");
-  if (btnLabAskAI) {
-    btnLabAskAI.addEventListener("click", () => {
-      playNetSound("click");
-      askCoachForLab();
-    });
-  }
-
-  // Delegated click handler for quiz explanation Ask buttons & Video watch buttons
   document.addEventListener("click", (e) => {
-    const btn = e.target.closest(".btn-ai-ask");
-    if (btn) {
-      playNetSound("click");
-      const idx = Number(btn.dataset.qIdx);
-      askCoachForQuestion(idx);
-    }
-    
     const videoBtn = e.target.closest(".btn-video-watch");
     if (videoBtn) {
       const yid = videoBtn.dataset.youtubeId;
@@ -5376,8 +4945,6 @@ function init() {
   setupCanvasConstellation();
   setupTraversalSimulator();
   setupSupportDesk();
-  initAICoach();
-  initHomeAICoach();
   initVideos();
   
   // Custom load sequence

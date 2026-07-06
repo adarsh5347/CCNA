@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ccna-prep-v15';
+const CACHE_NAME = 'ccna-prep-v16';
 const ASSETS = [
   '/',
   '/index.html',
@@ -6,7 +6,6 @@ const ASSETS = [
   '/assets/js/app.js',
   '/assets/js/data.js',
   '/assets/js/firebase.js',
-  '/assets/js/ai.js',
   '/assets/js/videos.js',
   '/assets/icon.svg'
 ];
