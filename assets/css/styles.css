@@ -170,6 +170,8 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
 
 .brand {
@@ -295,13 +297,15 @@ nav {
   display: flex;
   align-items: center;
   gap: var(--sp-1);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .topbar-utils {
   display: flex;
   align-items: center;
   gap: var(--sp-3);
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 /* ─── Nav Buttons ──────────────────────────────────── */
@@ -1509,10 +1513,18 @@ textarea {
 }
 
 /* Consolidated Optimization Styles */
-.auth-container, .user-profile {
+.auth-container {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+.user-profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 #btnSignIn {
@@ -1525,16 +1537,20 @@ textarea {
   height: 32px;
   border-radius: 50%;
   border: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 #userName {
   font-size: 13px;
   font-weight: 500;
+  white-space: nowrap !important;
 }
 
 #btnSignOut {
   padding: 6px 10px;
   font-size: 11px;
+  white-space: nowrap !important;
+  flex-shrink: 0;
 }
 
 .quiz-info-text {
@@ -2001,6 +2017,14 @@ button:focus, select:focus, input:focus, textarea:focus {
   .brand h1 {
     font-size: 16px !important;
     white-space: nowrap;
+  }
+  #headerXPBadge {
+    max-width: 140px !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
   }
   header.topbar nav {
     position: fixed !important;
