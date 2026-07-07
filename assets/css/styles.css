@@ -2984,6 +2984,48 @@ button.primary:hover::after {
   40% { transform: scale(1); }
 }
 
+/* ─── Premium Cyber Aesthetic Enhancements ──────────────── */
+
+/* Animated 3D Scrolling Grid */
+@keyframes gridTravel {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 32px; }
+}
+
+.cyber-grid {
+  animation: gridTravel 8s linear infinite !important;
+}
+
+/* Animated Flowing Gradient for Hero Readiness Bar */
+#heroReadinessBar {
+  background: linear-gradient(90deg, #00f2fe, #4facfe, #00f2fe) !important;
+  background-size: 200% 100% !important;
+  animation: gradientFlow 2s linear infinite !important;
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* Cyber Glow Focus States */
+select:focus, input:focus, textarea:focus {
+  border-color: #00f2fe !important;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.25) !important;
+}
+
+/* Dynamic Interactive Cards */
+.card, .stat {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.card:hover, .stat:hover {
+  border-color: rgba(0, 242, 254, 0.35) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 18px rgba(0, 242, 254, 0.15) !important;
+  transform: translateY(-3px) scale(1.005) !important;
+}
+
 
 
 
