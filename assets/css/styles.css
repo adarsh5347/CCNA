@@ -166,6 +166,12 @@ body {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
 }
 
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -1983,6 +1989,9 @@ button:focus, select:focus, input:focus, textarea:focus {
     padding: 8px 16px !important;
     gap: 8px !important;
   }
+  .topbar-right {
+    gap: 8px !important;
+  }
   .brand {
     gap: 8px !important;
   }
@@ -1990,7 +1999,8 @@ button:focus, select:focus, input:focus, textarea:focus {
     display: none !important;
   }
   .brand h1 {
-    font-size: 20px !important;
+    font-size: 16px !important;
+    white-space: nowrap;
   }
   header.topbar nav {
     position: fixed !important;
@@ -2010,6 +2020,9 @@ button:focus, select:focus, input:focus, textarea:focus {
     gap: 0 !important;
     margin: 0 !important;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4) !important;
+  }
+  body[data-active-page="engine"] header.topbar nav {
+    display: none !important;
   }
   .nav-btn {
     padding: 4px 8px !important;

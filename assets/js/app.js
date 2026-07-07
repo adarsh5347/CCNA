@@ -256,6 +256,7 @@ function setPage(page, push = true) {
 
   document.querySelectorAll(".page").forEach((p) => p.classList.remove("active"));
   byId(page).classList.add("active");
+  document.body.dataset.activePage = page;
 
   // Update nav buttons active highlight
   document.querySelectorAll("[data-page]").forEach((btn) => {
