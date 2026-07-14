@@ -1456,32 +1456,7 @@ textarea {
     display: flex;
     gap: 8px;
   }
-  .exam-footer {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 12px;
-  }
-  .exam-footer #prevQ {
-    order: 1;
-    width: 100%;
-  }
-  .exam-footer #nextQ {
-    order: 2;
-    width: 100%;
-  }
-  .exam-footer .inline {
-    grid-column: 1 / span 2;
-    order: 3;
-    margin-top: 0;
-    display: flex;
-    gap: 8px;
-    width: 100%;
-  }
-  .exam-footer .inline button {
-    flex: 1;
-    width: 100%;
-  }
+  /* exam-footer overrides handled consolidated under max-width: 760px */
   #supportForm .row-compact {
     grid-template-columns: 1fr !important;
   }
@@ -1504,17 +1479,7 @@ textarea {
   .scroll {
     padding: 16px;
   }
-  .exam-footer {
-    padding: 10px 12px;
-    gap: 6px;
-  }
-  .exam-footer button {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-  #prevQ span, #nextQ span, #submitSession span {
-    display: none;
-  }
+  /* exam-footer overrides handled consolidated under max-width: 760px */
 }
 
 /* Consolidated Optimization Styles */
@@ -2209,27 +2174,7 @@ button:focus, select:focus, input:focus, textarea:focus {
     grid-template-columns: repeat(5, 1fr) !important;
     gap: 6px !important;
   }
-  .exam-footer {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 9998 !important;
-    padding: 10px 14px !important;
-    background: rgba(15, 23, 42, 0.96) !important;
-    border-top: 1px solid var(--border-color) !important;
-    gap: 6px !important;
-    box-sizing: border-box !important;
-  }
-  .exam-footer button {
-    padding: 10px 8px !important;
-    font-size: 11px !important;
-    height: 44px !important;
-    flex: 1 !important;
-  }
-  .exam-shell {
-    padding-bottom: 70px !important;
-  }
+  /* exam-footer styles consolidated in max-width: 760px block below */
 }
 
 @media (max-width: 760px) {
@@ -2265,25 +2210,42 @@ button:focus, select:focus, input:focus, textarea:focus {
     max-width: none !important;
   }
   .exam-footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9998 !important;
+    padding: 10px 14px !important;
+    background: rgba(15, 23, 42, 0.96) !important;
+    backdrop-filter: blur(16px) !important;
+    border-top: 1px solid var(--border-color) !important;
     display: flex !important;
-    flex-wrap: wrap !important;
+    flex-direction: row !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
     justify-content: space-between !important;
-    padding: 12px !important;
-    gap: 10px !important;
   }
-  .exam-footer #prevQ, .exam-footer #nextQ {
+  .exam-footer-actions {
+    display: contents !important;
+  }
+  .exam-footer button {
     flex: 1 !important;
-    min-width: 80px !important;
-  }
-  .exam-footer .inline {
-    width: 100% !important;
-    display: flex !important;
-    gap: 8px !important;
     margin: 0 !important;
-    justify-content: center !important;
+    padding: 10px 8px !important;
+    font-size: 11px !important;
+    height: 44px !important;
   }
-  .exam-footer .inline button {
-    flex: 1 !important;
+  .exam-shell {
+    padding-bottom: 70px !important;
+  }
+  #prevQ span, #saveNext span, #submitSession span {
+    display: none !important;
+  }
+  
+  /* Optimize metadata cards grid on mobile to be slightly more compact */
+  .meta > div {
+    padding: 8px !important;
+    font-size: 11.5px !important;
   }
 }
 
