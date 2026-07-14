@@ -16,6 +16,11 @@
   --color-warn:    #f59e0b;
   --color-info:    #00f2fe;
 
+  /* Aliases for inline styles and JS consistency */
+  --color-success: var(--color-ok);
+  --color-accent:  var(--color-info);
+  --color-error:   #ff5e3a;
+
   /* ─── Surface Hierarchy ────────────────────────────── */
   --surface-0: rgba(255, 255, 255, 0.00);
   --surface-1: rgba(255, 255, 255, 0.02);

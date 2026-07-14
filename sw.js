@@ -1,9 +1,14 @@
-const CACHE_NAME = 'ccna-prep-v23';
+const CACHE_NAME = 'ccna-prep-v25';
 const ASSETS = [
   '/',
   '/index.html',
   '/assets/css/styles.css',
   '/assets/js/app.js',
+  '/assets/js/core.js',
+  '/assets/js/auth.js',
+  '/assets/js/quiz-engine.js',
+  '/assets/js/subnetting.js',
+  '/assets/js/topology.js',
   '/assets/js/data.js',
   '/assets/js/firebase.js',
   '/assets/js/videos.js',
