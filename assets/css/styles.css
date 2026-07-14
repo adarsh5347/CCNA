@@ -2238,9 +2238,7 @@ button:focus, select:focus, input:focus, textarea:focus {
   .exam-shell {
     padding-bottom: 70px !important;
   }
-  #prevQ span, #saveNext span, #submitSession span {
-    display: none !important;
-  }
+  /* display button text spans on mobile */
   
   /* Optimize metadata cards grid on mobile to be slightly more compact */
   .meta > div {
