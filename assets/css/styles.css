@@ -1,4 +1,10 @@
 :root {
+  /* ─── Safe Area Variables ──────────────────────────── */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
   /* ─── Colour Palette ───────────────────────────────── */
   --bg-dark:        #060913;
   --bg-panel:       rgba(13, 19, 36, 0.78);
@@ -39,15 +45,15 @@
   --accent-orange: linear-gradient(135deg, #ff5e3a, #ff9233);
   --accent-cyan:   linear-gradient(135deg, #00f2fe, #4facfe);
 
-  /* ─── Typography Scale (Major Third 1.25×) ─────────── */
-  --text-xs:   11px;
-  --text-sm:   13px;
-  --text-base: 15px;
-  --text-md:   17px;
-  --text-lg:   18px;
-  --text-xl:   22px;
-  --text-2xl:  28px;
-  --text-3xl:  36px;
+  /* ─── Typography Scale (Responsive clamp scale) ────── */
+  --text-xs:   clamp(10px, 2.2vw, 11px);
+  --text-sm:   clamp(12px, 2.5vw, 13px);
+  --text-base: clamp(13.5px, 2.8vw, 15px);
+  --text-md:   clamp(15px, 3vw, 17px);
+  --text-lg:   clamp(16px, 3.2vw, 18px);
+  --text-xl:   clamp(18px, 3.5vw, 22px);
+  --text-2xl:  clamp(22px, 4vw, 28px);
+  --text-3xl:  clamp(26px, 5vw, 36px);
 
   /* ─── Line Heights ─────────────────────────────────── */
   --lh-tight:  1.25;
@@ -152,6 +158,7 @@ body {
     radial-gradient(circle at 85% 85%, rgba(255, 94, 58, 0.08), transparent 40%),
     linear-gradient(145deg, var(--bg-dark), #091220 50%, #03060c);
   min-height: 100vh;
+  min-height: 100dvh;
   line-height: 1.6;
 }
 
@@ -164,7 +171,7 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  padding: 14px 28px;
+  padding: calc(14px + var(--safe-top)) calc(28px + var(--safe-right)) 14px calc(28px + var(--safe-left));
   border-bottom: 1px solid var(--border-color);
   background: rgba(6, 9, 19, 0.82);
   backdrop-filter: blur(16px);
@@ -506,11 +513,7 @@ button.ghost:hover {
   transition: var(--transition-lucid);
 }
 
-.card:hover {
-  border-color: rgba(0, 242, 254, 0.35);
-  transform: translateY(-2px);
-  box-shadow: 0 16px 35px -5px rgba(0, 0, 0, 0.45), 0 0 15px rgba(0, 242, 254, 0.1);
-}
+
 
 .hero {
   background: 
@@ -1138,12 +1141,7 @@ textarea {
     box-shadow var(--dur-base) var(--ease-std);
 }
 
-.stat:hover {
-  border-color: rgba(0, 242, 254, 0.28);
-  background: var(--surface-2);
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: var(--elev-glow-cyan);
-}
+
 
 .stat .k {
   color: var(--text-secondary);
@@ -1248,7 +1246,7 @@ textarea {
 }
 
 /* Sidebar drawer defaults for desktop layout */
-#toggleSidebar {
+#btnToggleSidebar {
   display: none;
 }
 .drawer-header {
@@ -1319,8 +1317,12 @@ textarea {
     font-weight: 600;
     color: #00f2fe;
   }
-  #toggleSidebar {
+  #btnToggleSidebar {
     display: inline-flex;
+    min-height: 44px;
+    min-width: 44px;
+    align-items: center;
+    justify-content: center;
   }
   .qnav {
     max-height: 50vh;
@@ -1473,7 +1475,7 @@ textarea {
   #progressPct {
     font-size: 12px;
   }
-  #toggleSidebar span {
+  #btnToggleSidebar span {
     display: none;
   }
   .scroll {
@@ -2005,7 +2007,7 @@ button:focus, select:focus, input:focus, textarea:focus {
     backdrop-filter: blur(16px) !important;
     border-top: 1px solid var(--border-color) !important;
     border-bottom: none !important;
-    padding: 8px 6px !important;
+    padding: 8px 6px calc(8px + var(--safe-bottom)) 6px !important;
     display: flex !important;
     justify-content: space-around !important;
     align-items: center !important;
@@ -2032,7 +2034,7 @@ button:focus, select:focus, input:focus, textarea:focus {
     display: none !important;
   }
   .container {
-    padding-bottom: 80px !important;
+    padding-bottom: calc(80px + var(--safe-bottom)) !important;
   }
   .topology-main {
     overflow-x: auto !important;
@@ -2175,6 +2177,56 @@ button:focus, select:focus, input:focus, textarea:focus {
     gap: 6px !important;
   }
   /* exam-footer styles consolidated in max-width: 760px block below */
+
+  /* Compact metadata chips on mobile */
+  .meta {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin: 10px 0 !important;
+  }
+  .meta > div {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
+    margin: 0 !important;
+    background: rgba(0, 242, 254, 0.05) !important;
+    border: 1px solid rgba(0, 242, 254, 0.15) !important;
+    color: #00f2fe !important;
+  }
+  .meta strong {
+    display: inline !important;
+    font-size: 11px !important;
+    margin-right: 4px !important;
+    color: var(--text-secondary) !important;
+    text-transform: uppercase;
+  }
+
+  /* Compact option cards on mobile */
+  .opt {
+    margin-top: 8px !important;
+    padding: 10px 12px !important;
+    font-size: 13.5px !important;
+    gap: 8px !important;
+  }
+  .opt .opt-key {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 11px !important;
+  }
+
+  /* Question area height layout fix */
+  #questionArea, #reviewArea, #resultArea {
+    min-height: auto !important;
+  }
+
+  /* Touch target sizes for key inputs */
+  select, input[type="text"], textarea {
+    min-height: 44px !important;
+  }
 }
 
 @media (max-width: 760px) {
@@ -2215,7 +2267,7 @@ button:focus, select:focus, input:focus, textarea:focus {
     left: 0 !important;
     right: 0 !important;
     z-index: 9998 !important;
-    padding: 10px 14px !important;
+    padding: 10px 14px calc(10px + var(--safe-bottom)) 14px !important;
     background: rgba(15, 23, 42, 0.96) !important;
     backdrop-filter: blur(16px) !important;
     border-top: 1px solid var(--border-color) !important;
@@ -2236,7 +2288,7 @@ button:focus, select:focus, input:focus, textarea:focus {
     height: 44px !important;
   }
   .exam-shell {
-    padding-bottom: 70px !important;
+    padding-bottom: calc(70px + var(--safe-bottom)) !important;
   }
   /* display button text spans on mobile */
   
@@ -2473,11 +2525,34 @@ textarea:focus-visible,
   position: fixed;
   bottom: var(--sp-6);
   right: var(--sp-6);
-  z-index: 9999;
+  z-index: 10005;
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
   pointer-events: none;
+}
+
+/* Accessibility Skip-Link */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--sp-4);
+  background: #00f2fe;
+  color: #060913;
+  padding: 12px 20px;
+  z-index: 100000;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  box-shadow: var(--elev-3);
+  transition: top var(--dur-fast) var(--ease-std);
+  text-decoration: none;
+}
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid #00f2fe !important;
+  outline-offset: 2px;
 }
 
 .toast {
@@ -2781,11 +2856,7 @@ nav [data-page].active {
   transition-duration: 0.8s;
 }
 
-.card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(0, 242, 254, 0.24);
-  box-shadow: var(--elev-glow-cyan);
-}
+
 
 /* ─── Grid Overlay Overlay Shading ────────────────────────── */
 .topology-main svg {
@@ -3009,10 +3080,12 @@ select:focus, input:focus, textarea:focus {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
 }
 
-.card:hover, .stat:hover {
-  border-color: rgba(0, 242, 254, 0.35) !important;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 18px rgba(0, 242, 254, 0.15) !important;
-  transform: translateY(-3px) scale(1.005) !important;
+@media (hover: hover) {
+  .card:hover, .stat:hover {
+    border-color: rgba(0, 242, 254, 0.35) !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 18px rgba(0, 242, 254, 0.15) !important;
+    transform: translateY(-3px) scale(1.005) !important;
+  }
 }
 
 /* Fix matching question options text wrap */
