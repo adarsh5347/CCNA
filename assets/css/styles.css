@@ -3015,6 +3015,19 @@ select:focus, input:focus, textarea:focus {
   transform: translateY(-3px) scale(1.005) !important;
 }
 
+/* Fix matching question options text wrap */
+.opt:has(select[data-match]) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+}
+
+.opt:has(select[data-match]) br {
+  display: none !important;
+}
+
+
 
 
 
