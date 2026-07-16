@@ -526,7 +526,7 @@ export function renderQuestion() {
       if (!s._matchOpts) s._matchOpts = {};
       if (!s._matchOpts[s.idx]) s._matchOpts[s.idx] = shuffle(q.pairs.map((x) => x[1]));
       const opts = s._matchOpts[s.idx];
-      html += `<div class="opt"><strong>${safeHTML(pair[0])}</strong><br /><select data-match="${i}"><option value="">Select</option>${opts.map((x) => `<option ${cur[i] === x ? "selected" : ""} value="${x}">${safeHTML(x)}</option>`).join("")}</select></div>`;
+      html += `<div class="opt" style="display: flex; flex-direction: column; align-items: stretch; gap: 8px;"><strong>${safeHTML(pair[0])}</strong><select data-match="${i}"><option value="">Select</option>${opts.map((x) => `<option ${cur[i] === x ? "selected" : ""} value="${x}">${safeHTML(x)}</option>`).join("")}</select></div>`;
     });
   } else {
     const order = s.answers[s.idx] || [...q.order];
