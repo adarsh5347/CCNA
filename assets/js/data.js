@@ -122,7 +122,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Place the decapsulation steps of an incoming packet in the correct order, from receipt on physical media to application consumption.",
+    "text": "Place the decapsulation steps of an incoming packet in the correct order, from receipt on physical media to application consumption.",
     "order": [
       "Physical layer receives bits and converts them into an electrical/optical signal.",
       "Data Link layer verifies the FCS trailer and strips the Ethernet header.",
@@ -153,7 +153,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. A network topology consists of a single 24-port switch. Ports 1 through 10 are assigned to VLAN 10, ports 11 through 20 are assigned to VLAN 20, and ports 21 through 24 are unassigned in VLAN 1. How many broadcast domains exist on this switch?",
+    "text": "A network topology consists of a single 24-port switch. Ports 1 through 10 are assigned to VLAN 10, ports 11 through 20 are assigned to VLAN 20, and ports 21 through 24 are unassigned in VLAN 1. How many broadcast domains exist on this switch?",
     "options": [
       "3 broadcast domains",
       "2 broadcast domains",
@@ -187,7 +187,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which type of fiber-optic cabling is optimized for long-distance, high-bandwidth WAN applications by utilizing a very narrow core and a single ray of laser light?",
+    "text": "Which type of fiber-optic cabling is optimized for long-distance, high-bandwidth WAN applications by utilizing a very narrow core and a single ray of laser light?",
     "options": [
       "Single-mode Fiber (SMF)",
       "Multimode Fiber (MMF)",
@@ -221,7 +221,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. Which two wire pairs are swapped between the T568A and T568B wiring standards for terminating RJ-45 Ethernet cables?",
+    "text": "Which two wire pairs are swapped between the T568A and T568B wiring standards for terminating RJ-45 Ethernet cables?",
     "options": [
       "Brown pair (Pins 7 and 8)",
       "Blue pair (Pins 4 and 5)",
@@ -256,7 +256,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. What does a Layer 2 switch do when it receives an Ethernet frame with a destination MAC address that is not present in its MAC address table?",
+    "text": "What does a Layer 2 switch do when it receives an Ethernet frame with a destination MAC address that is not present in its MAC address table?",
     "options": [
       "It drops the frame immediately.",
       "It sends an ARP request to learn the destination port.",
@@ -290,7 +290,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which destination MAC address is utilized in the Ethernet header of an ARP Request packet?",
+    "text": "Which destination MAC address is utilized in the Ethernet header of an ARP Request packet?",
     "options": [
       "FFFF.FFFF.FFFF",
       "0000.0000.0000",
@@ -392,7 +392,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which two statements correctly describe the characteristics of IPv6 Link-Local addresses?",
+    "text": "Which two statements correctly describe the characteristics of IPv6 Link-Local addresses?",
     "options": [
       "They are automatically generated using the prefix FE80::/10.",
       "They require a DHCPv6 server to be assigned.",
@@ -493,7 +493,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Host A is assigned the IP address 10.1.1.99/29 and Host B is assigned 10.1.1.105/29. They are connected to the same switch, but they cannot ping each other. What is the reason for this issue?",
+    "text": "Host A is assigned the IP address 10.1.1.99/29 and Host B is assigned 10.1.1.105/29. They are connected to the same switch, but they cannot ping each other. What is the reason for this issue?",
     "options": [
       "The IP addresses are in different subnets, preventing direct local Layer 2 communication.",
       "They are on the same subnet but require a default gateway to communicate.",
@@ -527,7 +527,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. Which ICMPv6 message type is sent by an IPv6 host to request the link-layer MAC address of a target neighbor node?",
+    "text": "Which ICMPv6 message type is sent by an IPv6 host to request the link-layer MAC address of a target neighbor node?",
     "options": [
       "Router Solicitation (RS)",
       "Neighbor Solicitation (NS)",
@@ -561,7 +561,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Match the network protocol characteristics to the correct transport protocol (TCP or UDP).",
+    "text": "Match the network protocol characteristics to the correct transport protocol (TCP or UDP).",
     "pairs": [
       [
         "Uses windowing and flow control",
@@ -604,7 +604,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which DNS resource record type is responsible for mapping a hostname to an IPv6 address?",
+    "text": "Which DNS resource record type is responsible for mapping a hostname to an IPv6 address?",
     "options": [
       "MX",
       "A",
@@ -638,7 +638,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Order the steps in the DHCPv4 DORA exchange process as they occur between a client and a server.",
+    "text": "Order the steps in the DHCPv4 DORA exchange process as they occur between a client and a server.",
     "order": [
       "Discover: The client broadcasts a message to locate available DHCP servers.",
       "Offer: The server unicasts/broadcasts an IP address proposal to the client.",
@@ -669,7 +669,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. What is the primary function of the Frame Check Sequence (FCS) field located in the Ethernet frame trailer?",
+    "text": "What is the primary function of the Frame Check Sequence (FCS) field located in the Ethernet frame trailer?",
     "options": [
       "To specify frame forwarding priority",
       "To verify Layer 3 packet encapsulation integrity",
@@ -703,7 +703,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. What is the standard Maximum Transmission Unit (MTU) size for a default Ethernet frame payload?",
+    "text": "What is the standard Maximum Transmission Unit (MTU) size for a default Ethernet frame payload?",
     "options": [
       "1500 bytes",
       "9000 bytes",
@@ -737,7 +737,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. How does a host construct its 64-bit interface identifier from a 48-bit MAC address using the modified EUI-64 process?",
+    "text": "How does a host construct its 64-bit interface identifier from a 48-bit MAC address using the modified EUI-64 process?",
     "options": [
       "By appending FFFE to the end of the MAC address",
       "By prepending FE80:: to the MAC address",
@@ -771,7 +771,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. A subnet needs to accommodate exactly 60 host devices. Which subnet mask is the most efficient choice to meet this requirement without wasting IP addresses?",
+    "text": "A subnet needs to accommodate exactly 60 host devices. Which subnet mask is the most efficient choice to meet this requirement without wasting IP addresses?",
     "options": [
       "255.255.255.224 (/27)",
       "255.255.255.240 (/28)",
@@ -915,7 +915,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. What is the destination MAC address used when an ARP reply is sent back to the requesting host?",
+    "text": "What is the destination MAC address used when an ARP reply is sent back to the requesting host?",
     "options": [
       "FFFF.FFFF.FFFF",
       "The unicast MAC address of the requesting host",
@@ -986,7 +986,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. What is the valid range of VLAN IDs for Normal Range VLANs configured on a Cisco Catalyst switch?",
+    "text": "What is the valid range of VLAN IDs for Normal Range VLANs configured on a Cisco Catalyst switch?",
     "options": [
       "2 - 1024",
       "1006 - 4094",
@@ -1169,7 +1169,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Match the Spanning Tree port roles to their correct operational definitions.",
+    "text": "Match the Spanning Tree port roles to their correct operational definitions.",
     "pairs": [
       [
         "Root Port",
@@ -1208,7 +1208,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which of the following lists the three port states utilized by Rapid Spanning Tree Protocol (RSTP / 802.1w)?",
+    "text": "Which of the following lists the three port states utilized by Rapid Spanning Tree Protocol (RSTP / 802.1w)?",
     "options": [
       "Disabled, Blocking, Learning",
       "Discarding, Learning, Forwarding",
@@ -1242,7 +1242,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. A port-level security feature is configured on an access port connected to an office desk. If BPDU Guard is enabled, what action does the switch take if it receives a Spanning Tree BPDU on that port?",
+    "text": "A port-level security feature is configured on an access port connected to an office desk. If BPDU Guard is enabled, what action does the switch take if it receives a Spanning Tree BPDU on that port?",
     "options": [
       "It blocks the BPDU but keeps the port operational in access mode.",
       "It changes the port role to a designated port.",
@@ -1277,7 +1277,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which open standard protocol is defined by IEEE 802.3ad/802.1AX to negotiate EtherChannel links between devices?",
+    "text": "Which open standard protocol is defined by IEEE 802.3ad/802.1AX to negotiate EtherChannel links between devices?",
     "options": [
       "VTP (VLAN Trunking Protocol)",
       "LACP (Link Aggregation Control Protocol)",
@@ -1311,7 +1311,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. Switch A is configured with 'channel-group 1 mode auto'. Switch B is configured with 'channel-group 1 mode auto'. What is the status of the resulting PAgP EtherChannel?",
+    "text": "Switch A is configured with 'channel-group 1 mode auto'. Switch B is configured with 'channel-group 1 mode auto'. What is the status of the resulting PAgP EtherChannel?",
     "options": [
       "The EtherChannel will form successfully.",
       "The EtherChannel will fail to form because both ports are in passive negotiation mode.",
@@ -1345,7 +1345,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which three configuration parameters must match exactly on all physical interfaces to successfully form an EtherChannel bundle?",
+    "text": "Which three configuration parameters must match exactly on all physical interfaces to successfully form an EtherChannel bundle?",
     "options": [
       "Spanning Tree cost values",
       "Speed and Duplex settings",
@@ -1417,7 +1417,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. In the 2.4 GHz wireless spectrum, which three channels are standard non-overlapping channels in North America?",
+    "text": "In the 2.4 GHz wireless spectrum, which three channels are standard non-overlapping channels in North America?",
     "options": [
       "2, 7, 12",
       "3, 8, 13",
@@ -1451,7 +1451,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. What cryptographic authentication protocol is introduced in WPA3 to replace the vulnerable Pre-Shared Key (PSK) handshake used in WPA2?",
+    "text": "What cryptographic authentication protocol is introduced in WPA3 to replace the vulnerable Pre-Shared Key (PSK) handshake used in WPA2?",
     "options": [
       "WEP (Wired Equivalent Privacy)",
       "TKIP (Temporal Key Integrity Protocol)",
@@ -1485,7 +1485,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. What does a Basic Service Set Identifier (BSSID) represent in an 802.11 wireless network?",
+    "text": "What does a Basic Service Set Identifier (BSSID) represent in an 802.11 wireless network?",
     "options": [
       "The IP address of the Wireless LAN Controller",
       "The physical MAC address of the access point's radio interface",
@@ -1519,7 +1519,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "Low",
-    "text": "A network engineer is troubleshooting an issue. On a Cisco Catalyst switch, what does a blinking green port status LED indicate during normal operation?",
+    "text": "On a Cisco Catalyst switch, what does a blinking green port status LED indicate during normal operation?",
     "options": [
       "The port is actively sending or receiving network traffic.",
       "The port is disabled by an administrator.",
@@ -1553,7 +1553,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. What configuration command must be applied to a router subinterface to configure Router-on-a-Stick for VLAN 20?",
+    "text": "What configuration command must be applied to a router subinterface to configure Router-on-a-Stick for VLAN 20?",
     "options": [
       "switchport access vlan 20",
       "ip address vlan 20",
@@ -1587,7 +1587,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. What interface is configured on a Layer 3 switch to assign an IP address and act as a default gateway for a local VLAN?",
+    "text": "What interface is configured on a Layer 3 switch to assign an IP address and act as a default gateway for a local VLAN?",
     "options": [
       "A loopback interface",
       "An SVI (Switch Virtual Interface)",
@@ -1658,7 +1658,7 @@ const questionBank = [
     "difficulty": "Medium",
     "examWeight": "20%",
     "frequency": "Low",
-    "text": "A network engineer is troubleshooting an issue. Which lightweight AP mode is designed to dedicate its radios to scanning the RF channels for rogue APs and wireless attacks without serving client traffic?",
+    "text": "Which lightweight AP mode is designed to dedicate its radios to scanning the RF channels for rogue APs and wireless attacks without serving client traffic?",
     "options": [
       "FlexConnect Mode",
       "Bridge Mode",
@@ -1729,7 +1729,7 @@ const questionBank = [
     "difficulty": "Medium",
     "examWeight": "20%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. Which Layer 2 port security action is the default violation mode on Cisco Catalyst switches?",
+    "text": "Which Layer 2 port security action is the default violation mode on Cisco Catalyst switches?",
     "options": [
       "Block",
       "Shutdown",
@@ -1763,7 +1763,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which field in the 802.1Q header tag is used to identify the VLAN to which the frame belongs?",
+    "text": "Which field in the 802.1Q header tag is used to identify the VLAN to which the frame belongs?",
     "options": [
       "DEI (Drop Eligible Indicator)",
       "TPID (Tag Protocol Identifier)",
@@ -1797,7 +1797,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. Which switch command assigns Voice VLAN 150 to a physical interface already configured for access VLAN 10?",
+    "text": "Which switch command assigns Voice VLAN 150 to a physical interface already configured for access VLAN 10?",
     "options": [
       "switchport trunk allowed vlan 10,150",
       "switchport access vlan 150 voice",
@@ -1831,7 +1831,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. A router receives a packet destined for IP address 172.16.5.37. The routing table contains four matching routes. Which route will the router select to forward the packet?",
+    "text": "A router receives a packet destined for IP address 172.16.5.37. The routing table contains four matching routes. Which route will the router select to forward the packet?",
     "options": [
       "172.16.5.32/28 [1/0] via Static",
       "172.16.5.0/24 [110/20] via OSPF",
@@ -1865,7 +1865,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Match the routing protocols to their default Administrative Distance (AD) values as defined in Cisco IOS.",
+    "text": "Match the routing protocols to their default Administrative Distance (AD) values as defined in Cisco IOS.",
     "pairs": [
       [
         "Static Route",
@@ -1908,7 +1908,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. What is the correct syntax to configure a default static route pointing to the next-hop IP address 192.168.1.1?",
+    "text": "What is the correct syntax to configure a default static route pointing to the next-hop IP address 192.168.1.1?",
     "options": [
       "ip route 255.255.255.255 255.255.255.255 192.168.1.1",
       "ip route 0.0.0.0 0.0.0.0 192.168.1.1",
@@ -1976,7 +1976,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. What are the default OSPF Hello and Dead timer intervals on a standard Ethernet broadcast multi-access interface?",
+    "text": "What are the default OSPF Hello and Dead timer intervals on a standard Ethernet broadcast multi-access interface?",
     "options": [
       "Hello: 5 seconds; Dead: 20 seconds",
       "Hello: 60 seconds; Dead: 180 seconds",
@@ -2011,7 +2011,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Order the OSPF neighbor states in the sequence they occur as two routers establish a full adjacency on a multi-access link.",
+    "text": "Order the OSPF neighbor states in the sequence they occur as two routers establish a full adjacency on a multi-access link.",
     "order": [
       "Init: The router receives a Hello packet containing its own Router ID.",
       "2-Way: Bidirectional communication is established, and DR/BDR election occurs.",
@@ -2043,7 +2043,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. How does OSPF select the Designated Router (DR) on an Ethernet multi-access segment if all router interface priorities are left at the default value of 1?",
+    "text": "How does OSPF select the Designated Router (DR) on an Ethernet multi-access segment if all router interface priorities are left at the default value of 1?",
     "options": [
       "A DR is not elected on Ethernet networks.",
       "The router with the lowest IP address on the interface is elected.",
@@ -2114,7 +2114,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "25%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. What formula does OSPF use to calculate the cost metric of a physical interface by default on Cisco IOS routers?",
+    "text": "What formula does OSPF use to calculate the cost metric of a physical interface by default on Cisco IOS routers?",
     "options": [
       "Cost = 100,000,000 / Interface Bandwidth (in bps)",
       "Cost = Reliability / Interface Bandwidth",
@@ -2260,7 +2260,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. What is the effect of configuring the OSPF command 'passive-interface GigabitEthernet0/1'?",
+    "text": "What is the effect of configuring the OSPF command 'passive-interface GigabitEthernet0/1'?",
     "options": [
       "The interface will not send or receive OSPF Hellos, but its connected subnet will still be advertised to neighbors.",
       "OSPF will not run on the interface, and its subnet will not be advertised.",
@@ -2328,7 +2328,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which three parameters must match exactly between two adjacent OSPFv2 routers to form an adjacency?",
+    "text": "Which three parameters must match exactly between two adjacent OSPFv2 routers to form an adjacency?",
     "options": [
       "Interface IP Subnet and Subnet Mask",
       "Hello and Dead Intervals",
@@ -2365,7 +2365,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which command is used to display OSPF neighbor relationships, their state, and their interface IPs?",
+    "text": "Which command is used to display OSPF neighbor relationships, their state, and their interface IPs?",
     "options": [
       "show ip route ospf",
       "show ip ospf neighbor",
@@ -2399,7 +2399,7 @@ const questionBank = [
     "difficulty": "Medium",
     "examWeight": "25%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. Why is it recommended to configure a Loopback interface on a router running OSPF?",
+    "text": "Why is it recommended to configure a Loopback interface on a router running OSPF?",
     "options": [
       "A loopback interface never goes down unless manually shut, providing a stable Router ID.",
       "OSPF requires at least one loopback interface to operate.",
@@ -2434,7 +2434,7 @@ const questionBank = [
     "difficulty": "Medium",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which command configures an OSPF router to advertise its local default static route to all other routers in the OSPF area?",
+    "text": "Which command configures an OSPF router to advertise its local default static route to all other routers in the OSPF area?",
     "options": [
       "ip route 0.0.0.0 0.0.0.0 interface",
       "default-router originate",
@@ -2468,7 +2468,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "25%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. A router receives an IPv6 packet destined for 2001:db8:acad:1::55. The routing table contains three matching routes. Which route will the router use to forward the packet?",
+    "text": "A router receives an IPv6 packet destined for 2001:db8:acad:1::55. The routing table contains three matching routes. Which route will the router use to forward the packet?",
     "options": [
       "2001:db8:acad::/48 [110/10]",
       "2001:db8:acad:1::/64 [90/2000]",
@@ -2502,7 +2502,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which command configures an IPv6 static default route pointing to the next-hop address 2001:db8:a::1?",
+    "text": "Which command configures an IPv6 static default route pointing to the next-hop address 2001:db8:a::1?",
     "options": [
       "ipv6 route 2001:db8:a::1 ::/0",
       "ip route ::/0 2001:db8:a::1",
@@ -2572,7 +2572,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "25%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. What is the specific MAC address prefix range reserved for Hot Standby Router Protocol (HSRP) version 1 virtual MAC addresses?",
+    "text": "What is the specific MAC address prefix range reserved for Hot Standby Router Protocol (HSRP) version 1 virtual MAC addresses?",
     "options": [
       "0000.0c9f.f000 to 0000.0c9f.fFFF",
       "0000.0c07.ac00 to 0000.0c07.acFF",
@@ -2640,7 +2640,7 @@ const questionBank = [
     "difficulty": "Medium",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which command changes the OSPF reference bandwidth to 10 Gbps (10000 Mbps) to ensure OSPF cost calculations can differentiate between Gigabit and 10-Gigabit links?",
+    "text": "Which command changes the OSPF reference bandwidth to 10 Gbps (10000 Mbps) to ensure OSPF cost calculations can differentiate between Gigabit and 10-Gigabit links?",
     "options": [
       "auto-cost reference-bandwidth 10000",
       "bandwidth 10000000",
@@ -2674,7 +2674,7 @@ const questionBank = [
     "difficulty": "Medium",
     "examWeight": "25%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. What happens to a static route in the routing table if its exit interface transitions to a down state?",
+    "text": "What happens to a static route in the routing table if its exit interface transitions to a down state?",
     "options": [
       "The router changes the next-hop IP to 127.0.0.1.",
       "The router queries OSPF to locate a backup path.",
@@ -2744,7 +2744,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. When configuring an IPv6 static route using a link-local next-hop address (FE80::/10), what additional parameter must be specified in the command?",
+    "text": "When configuring an IPv6 static route using a link-local next-hop address (FE80::/10), what additional parameter must be specified in the command?",
     "options": [
       "The next-hop link-local address is sufficient.",
       "The local exit interface.",
@@ -2778,7 +2778,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. In the output of the 'show ip route' command on a Cisco router, which character code identifies a route learned via EIGRP?",
+    "text": "In the output of the 'show ip route' command on a Cisco router, which character code identifies a route learned via EIGRP?",
     "options": [
       "E",
       "D",
@@ -2812,7 +2812,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which two factors are compared by a router to select the best path when it learns multiple routes to the exact same destination prefix from different routing sources?",
+    "text": "Which two factors are compared by a router to select the best path when it learns multiple routes to the exact same destination prefix from different routing sources?",
     "options": [
       "Routing Metric",
       "Administrative Distance (AD)",
@@ -2847,7 +2847,7 @@ const questionBank = [
     "difficulty": "Medium",
     "examWeight": "25%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. OSPF neighbors are stuck in the 'ExStart' or 'Exchange' state. What is the most common cause of this issue?",
+    "text": "OSPF neighbors are stuck in the 'ExStart' or 'Exchange' state. What is the most common cause of this issue?",
     "options": [
       "Mismatched MTU settings on the connecting interfaces",
       "Mismatched OSPF Process IDs",
@@ -2881,7 +2881,7 @@ const questionBank = [
     "difficulty": "Medium",
     "examWeight": "10%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Match the NAT translation terms to their correct definitions.",
+    "text": "Match the NAT translation terms to their correct definitions.",
     "pairs": [
       [
         "Inside Local",
@@ -2924,7 +2924,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "10%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which command configures a static NAT translation to map the internal server IP 10.1.1.10 to the public IP address 203.0.113.10?",
+    "text": "Which command configures a static NAT translation to map the internal server IP 10.1.1.10 to the public IP address 203.0.113.10?",
     "options": [
       "ip nat outside source static 203.0.113.10 10.1.1.10",
       "ip nat translation static 10.1.1.10 203.0.113.10",
@@ -2958,7 +2958,7 @@ const questionBank = [
     "difficulty": "Medium",
     "examWeight": "10%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. A router is configured with dynamic NAT using an IP pool. What happens to subsequent inside host packets if all addresses in the public pool are exhausted?",
+    "text": "A router is configured with dynamic NAT using an IP pool. What happens to subsequent inside host packets if all addresses in the public pool are exhausted?",
     "options": [
       "The router routes the packets without translating them.",
       "The router dynamically requests more IP addresses from the ISP.",
@@ -2992,7 +2992,7 @@ const questionBank = [
     "difficulty": "Medium",
     "examWeight": "10%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which command configures Port Address Translation (PAT) to overload internal traffic onto the public IP address of the GigabitEthernet0/0 interface?",
+    "text": "Which command configures Port Address Translation (PAT) to overload internal traffic onto the public IP address of the GigabitEthernet0/0 interface?",
     "options": [
       "ip nat overload list 1 interface GigabitEthernet0/0",
       "ip nat inside source list 1 interface GigabitEthernet0/0 overload",
@@ -3026,7 +3026,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "10%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which command displays active NAT translations on a Cisco router, including protocols, ports, and IP addresses?",
+    "text": "Which command displays active NAT translations on a Cisco router, including protocols, ports, and IP addresses?",
     "options": [
       "show ip nat table",
       "show translation rules",
@@ -3060,7 +3060,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "10%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. Which command configures a Cisco device to synchronize its system clock with an external time source at IP address 203.0.113.50?",
+    "text": "Which command configures a Cisco device to synchronize its system clock with an external time source at IP address 203.0.113.50?",
     "options": [
       "ntp peer 203.0.113.50",
       "clock set 203.0.113.50",
@@ -3128,7 +3128,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "10%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. A host on VLAN 10 needs to receive an IP address from a DHCP server located on VLAN 20. What command must be applied to the router's VLAN 10 interface to facilitate this?",
+    "text": "A host on VLAN 10 needs to receive an IP address from a DHCP server located on VLAN 20. What command must be applied to the router's VLAN 10 interface to facilitate this?",
     "options": [
       "ip helper-address 10.1.20.10 (DHCP Server IP)",
       "ip helper-address 255.255.255.255",
@@ -3162,7 +3162,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "10%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. Match the Syslog severity levels to their correct descriptive names.",
+    "text": "Match the Syslog severity levels to their correct descriptive names.",
     "pairs": [
       [
         "Severity 0",
@@ -5438,7 +5438,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. Which of the following standards specifies 10 Gigabit Ethernet over single-mode fiber (SMF) with a maximum distance of up to 10 kilometers?",
+    "text": "Which of the following standards specifies 10 Gigabit Ethernet over single-mode fiber (SMF) with a maximum distance of up to 10 kilometers?",
     "options": [
       "10GBASE-SR",
       "10GBASE-ER",
@@ -5743,7 +5743,7 @@ const questionBank = [
     "difficulty": "Medium",
     "examWeight": "20%",
     "frequency": "Medium",
-    "text": "A network engineer is troubleshooting an issue. Which of the following ports states is present in IEEE 802.1D Spanning Tree Protocol but is merged into the Discarding state in 802.1w (RSTP)?",
+    "text": "Which of the following ports states is present in IEEE 802.1D Spanning Tree Protocol but is merged into the Discarding state in 802.1w (RSTP)?",
     "options": [
       "Disabled and Forwarding",
       "Learning and Forwarding",
@@ -5916,7 +5916,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "20%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which of the following channel selections represents the three non-overlapping channels available in the 2.4 GHz wireless band?",
+    "text": "Which of the following channel selections represents the three non-overlapping channels available in the 2.4 GHz wireless band?",
     "options": [
       "Channels 36, 40, and 44",
       "Channels 1, 6, and 11",
@@ -6265,7 +6265,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which of the following lists the correct default administrative distances (AD) for connected, static, OSPF, and RIP routes in Cisco IOS?",
+    "text": "Which of the following lists the correct default administrative distances (AD) for connected, static, OSPF, and RIP routes in Cisco IOS?",
     "options": [
       "Connected: 0, Static: 1, OSPF: 90, RIP: 120",
       "Connected: 1, Static: 0, OSPF: 120, RIP: 110",
@@ -6403,7 +6403,7 @@ const questionBank = [
     "difficulty": "Hard",
     "examWeight": "25%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which of the following interface configuration parameters must match exactly between two OSPFv2 routers to establish a neighbor relationship?",
+    "text": "Which of the following interface configuration parameters must match exactly between two OSPFv2 routers to establish a neighbor relationship?",
     "options": [
       "Loopback IP addresses",
       "Hostnames and switch port priority",
@@ -6884,7 +6884,7 @@ const questionBank = [
     "difficulty": "Easy",
     "examWeight": "10%",
     "frequency": "High",
-    "text": "A network engineer is troubleshooting an issue. Which of the following character combinations is used to enclose a key-value dictionary (object) and a list (array) in a standard JSON file?",
+    "text": "Which of the following character combinations is used to enclose a key-value dictionary (object) and a list (array) in a standard JSON file?",
     "options": [
       "Dictionary: Angle brackets < >, Array: Parentheses ( )",
       "Dictionary: Parentheses ( ), Array: Angle brackets < >",
