@@ -330,20 +330,37 @@ export function startSessionTimer() {
     clearInterval(state.session.timer);
   }
   
-  const timer = byId("timer");
-  if (!timer) return;
+  const timerEl = byId("timer");
+  if (!timerEl) return;
 
-  timer.classList.remove("hidden", "warn", "danger");
-  timer.textContent = toMMSS(state.session.timeLeft);
+  timerEl.classList.remove("hidden", "warn", "danger");
+  timerEl.textContent = toMMSS(state.session.timeLeft);
+
+  let lastWarn = null;
+  let lastDanger = null;
 
   state.session.timer = setInterval(() => {
     state.session.timeLeft = Math.max(0, state.session.timeLeft - 1);
     
-    const tEl = byId("timer");
-    if (tEl) {
-      tEl.textContent = toMMSS(state.session.timeLeft);
-      tEl.classList.toggle("warn", state.session.timeLeft <= 600 && state.session.timeLeft > 180);
-      tEl.classList.toggle("danger", state.session.timeLeft <= 180);
+    if (timerEl) {
+      timerEl.textContent = toMMSS(state.session.timeLeft);
+      
+      const isWarn = state.session.timeLeft <= 600 && state.session.timeLeft > 180;
+      const isDanger = state.session.timeLeft <= 180;
+      
+      if (isWarn !== lastWarn) {
+        timerEl.classList.toggle("warn", isWarn);
+        lastWarn = isWarn;
+      }
+      if (isDanger !== lastDanger) {
+        timerEl.classList.toggle("danger", isDanger);
+        lastDanger = isDanger;
+      }
+    }
+    
+    // Throttle sessionStorage writes: only persist every 5 seconds instead of every 1 second
+    if (state.session.timeLeft % 5 === 0) {
+      persistSession();
     }
     
     if (state.session.timeLeft <= 0) {
