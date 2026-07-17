@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ccna-prep-v30';
+const CACHE_NAME = 'ccna-prep-v31';
 const ASSETS = [
   '/',
   '/index.html',
@@ -33,6 +33,11 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Only intercept GET requests from the local origin to prevent crashes on POST / third-party API writes
+  if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+  
   // Stale-While-Revalidate strategy
   e.respondWith(
     caches.open(CACHE_NAME).then(cache => {

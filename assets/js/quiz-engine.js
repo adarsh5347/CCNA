@@ -536,7 +536,11 @@ export function renderQuestion() {
   }
 
   const ok = s.feedback[s.idx];
-  if (ok != null) html += explanationBlock(q, ok);
+  if (ok != null) {
+    html += explanationBlock(q, ok);
+  } else if (s.mode === "study" && q.type !== "single" && q.type !== "scenario") {
+    html += `<div style="margin-top: 20px;"><button id="btnCheckAnswer" class="primary" style="width: 100%; max-width: 240px; height: 44px; font-weight: bold;">Check Answer</button></div>`;
+  }
 
   byId("questionArea").innerHTML = html;
   
@@ -583,7 +587,6 @@ export function wireQuestionInputs() {
   byId("questionArea").querySelectorAll("input[type='checkbox']").forEach((el) => {
     el.addEventListener("change", (e) => {
       s.answers[s.idx] = [...byId("questionArea").querySelectorAll("input[type='checkbox']:checked")].map((x) => Number(x.value));
-      instantStudyFeedback(e);
       persistSession();
       renderNavigator();
     });
@@ -594,7 +597,6 @@ export function wireQuestionInputs() {
       const cur = s.answers[s.idx] || {};
       cur[Number(el.dataset.match)] = el.value;
       s.answers[s.idx] = cur;
-      instantStudyFeedback(e);
       persistSession();
       renderNavigator();
     });
@@ -607,7 +609,6 @@ export function wireQuestionInputs() {
       if (i <= 0) return;
       [list[i], list[i - 1]] = [list[i - 1], list[i]];
       s.answers[s.idx] = list;
-      instantStudyFeedback(e);
       persistSession();
       renderQuestion();
       renderNavigator();
@@ -621,12 +622,18 @@ export function wireQuestionInputs() {
       if (i >= list.length - 1) return;
       [list[i], list[i + 1]] = [list[i + 1], list[i]];
       s.answers[s.idx] = list;
-      instantStudyFeedback(e);
       persistSession();
       renderQuestion();
       renderNavigator();
     });
   });
+
+  const checkBtn = byId("btnCheckAnswer");
+  if (checkBtn) {
+    checkBtn.addEventListener("click", (e) => {
+      instantStudyFeedback(e);
+    });
+  }
 }
 
 export function instantStudyFeedback(e) {
@@ -949,8 +956,8 @@ export function submitSession(force) {
             userAnsText = list.length > 0 ? list.map(v => String.fromCharCode(65 + v)).join(", ") : "No Answer";
             correctAnsText = q.correct.map(v => String.fromCharCode(65 + v)).join(", ");
           } else if (q.type === "matching") {
-            userAnsText = userAns ? JSON.stringify(userAns) : "No Answer";
-            correctAnsText = "Matching format resolved correctly";
+            userAnsText = userAns ? q.pairs.map((p, i) => `${p[0]}: ${userAns[i] || 'None'}`).join(", ") : "No Answer";
+            correctAnsText = q.pairs.map(p => `${p[0]}: ${p[1]}`).join(", ");
           } else {
             userAnsText = userAns ? userAns.join(" -> ") : "No Answer";
             correctAnsText = q.order.join(" -> ");

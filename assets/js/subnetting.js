@@ -273,6 +273,12 @@ export function ensureSubnetQuestion(force) {
   if (force || !state.subnet.q) {
     state.subnet.q = makeSubnetQuestion(mode === "Timed" ? "Hard" : mode);
     byId("subnetPrompt").innerHTML = `<strong>Question:</strong> ${state.subnet.q.prompt}`;
+    state.subnet.answered = false;
+    if (subnetSubmit) subnetSubmit.textContent = "Submit Answer";
+    if (subnetAnswer) {
+      subnetAnswer.disabled = false;
+      subnetAnswer.value = "";
+    }
     if (force) {
       byId("subnetOut").innerHTML = "";
       const diagram = byId("subnetRangeDiagram");
@@ -286,6 +292,25 @@ export function ensureSubnetQuestion(force) {
 export function submitSubnet() {
   const ansInput = byId("subnetAnswer");
   if (!ansInput) return;
+  const submitBtn = byId("subnetSubmit");
+
+  // If already answered, this click acts as "Next Question"
+  if (state.subnet.answered) {
+    state.subnet.q = null;
+    state.subnet.answered = false;
+    if (submitBtn) submitBtn.textContent = "Submit Answer";
+    ansInput.disabled = false;
+    ansInput.value = "";
+    byId("subnetOut").innerHTML = "";
+    const diagram = byId("subnetRangeDiagram");
+    if (diagram) {
+      diagram.innerHTML = `<span style="font-style: italic;">Submit an answer to visualize host ranges, network ID, and broadcast boundaries.</span>`;
+    }
+    ensureSubnetQuestion(false);
+    ansInput.focus();
+    return;
+  }
+
   const ans = ansInput.value.trim();
   if (!ans) return;
 
@@ -294,6 +319,9 @@ export function submitSubnet() {
 
   const isCorrect = ans.toLowerCase() === q.answer.toLowerCase();
   state.subnet.attempts = (state.subnet.attempts || 0) + 1;
+  state.subnet.answered = true;
+  if (submitBtn) submitBtn.textContent = "Next Question";
+  ansInput.disabled = true;
 
   const diagram = byId("subnetRangeDiagram");
 
@@ -308,7 +336,6 @@ export function submitSubnet() {
     
     gainXP(gainedXP);
 
-    const submitBtn = byId("subnetSubmit");
     let x = window.innerWidth / 2;
     let y = window.innerHeight / 2;
     if (submitBtn) {
@@ -388,7 +415,6 @@ export function submitSubnet() {
     }
   }
 
-  ansInput.value = "";
   ensureSubnetQuestion(false);
 }
 

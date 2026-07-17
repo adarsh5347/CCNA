@@ -345,7 +345,7 @@ function wireEvents() {
   if (subSkip) {
     subSkip.addEventListener("click", () => {
       playNetSound("click");
-      state.subnet.q = makeSubnetQuestion(state.subnet.mode === "Timed" ? "Hard" : state.subnet.mode);
+      state.subnet.q = null;
       ensureSubnetQuestion(false);
     });
   }
