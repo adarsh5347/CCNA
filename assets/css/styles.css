@@ -3349,5 +3349,53 @@ select:focus, input:focus, textarea:focus {
     justify-content: space-between !important;
     z-index: 9998 !important;
   }
+
+  /* STEP 9: Revamp metadata to be extremely compact on mobile.
+     Instead of large vertical blocks, render it as a single centered line
+     of bullet-separated text. Hide the redundant Topic Domain block. */
+  body[data-active-page="engine"] .meta {
+    display: block !important;
+    text-align: center !important;
+    font-size: 11px !important;
+    color: var(--text-muted) !important;
+    margin: 10px 0 !important;
+    border: none !important;
+    background: none !important;
+    padding: 0 !important;
+  }
+  body[data-active-page="engine"] .meta > div {
+    display: inline !important;
+    border: none !important;
+    background: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: var(--text-muted) !important;
+    font-size: 11px !important;
+  }
+  body[data-active-page="engine"] .meta > div:not(:last-child)::after {
+    content: "  •  " !important;
+    color: rgba(255, 255, 255, 0.15) !important;
+    font-weight: bold !important;
+  }
+  body[data-active-page="engine"] .meta > div:nth-child(3) {
+    display: none !important; /* Hide redundant domain chip */
+  }
+  body[data-active-page="engine"] .meta strong {
+    display: inline !important;
+    font-weight: 500 !important;
+    font-size: 10px !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-right: 4px !important;
+  }
+
+  /* STEP 10: Make the question text slightly more compact on mobile */
+  body[data-active-page="engine"] .scroll h3 {
+    font-size: 14.5px !important;
+    line-height: 1.4 !important;
+    margin: 8px 0 !important;
+    font-weight: 600 !important;
+  }
 }
 
