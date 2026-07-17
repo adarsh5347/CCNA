@@ -4,6 +4,8 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
+  --bottom-nav-height: 0px;
+  --header-height: 0px;
 
   /* ─── Colour Palette ───────────────────────────────── */
   --bg-dark:        #060913;
@@ -980,6 +982,18 @@ textarea {
   width: 100%;
   word-break: break-word;
   overflow-wrap: break-word;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: var(--sp-4);
+  width: 100%;
+}
+
+.options-list .opt {
+  margin-top: 0 !important;
 }
 
 /* Letter key badge (A / B / C / D) */
@@ -2230,23 +2244,49 @@ button:focus, select:focus, input:focus, textarea:focus {
 }
 
 @media (max-width: 760px) {
+  :root {
+    --bottom-nav-height: 64px;
+    --header-height: 136px;
+  }
   .exam-shell {
     min-width: 0 !important;
     max-width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border: none !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+    padding-bottom: 0 !important;
   }
   .exam-shell > div {
     min-width: 0 !important;
     max-width: 100% !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    min-height: 0 !important;
+    position: relative !important;
+    overflow: hidden !important;
   }
   .exam-shell > div > div {
     min-width: 0 !important;
     max-width: 100% !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
   }
   .scroll {
     min-width: 0 !important;
     max-width: 100% !important;
     overflow-x: hidden !important;
-    padding: 16px !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+    height: calc(100dvh - var(--header-height) - var(--bottom-nav-height) - var(--safe-bottom)) !important;
+    padding: 16px 16px calc(var(--bottom-nav-height) + var(--safe-bottom) + 24px) 16px !important;
   }
   .exam-header {
     display: flex !important;
@@ -2267,6 +2307,7 @@ button:focus, select:focus, input:focus, textarea:focus {
     left: 0 !important;
     right: 0 !important;
     z-index: 9998 !important;
+    height: calc(var(--bottom-nav-height) + var(--safe-bottom)) !important;
     padding: 10px 14px calc(10px + var(--safe-bottom)) 14px !important;
     background: rgba(15, 23, 42, 0.96) !important;
     backdrop-filter: blur(16px) !important;
@@ -2287,10 +2328,6 @@ button:focus, select:focus, input:focus, textarea:focus {
     font-size: 11px !important;
     height: 44px !important;
   }
-  .exam-shell {
-    padding-bottom: calc(70px + var(--safe-bottom)) !important;
-  }
-  /* display button text spans on mobile */
   
   /* Optimize metadata cards grid on mobile to be slightly more compact */
   .meta > div {

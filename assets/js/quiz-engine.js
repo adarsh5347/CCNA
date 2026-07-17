@@ -526,7 +526,7 @@ export function renderQuestion() {
 
   if (q.type === "single" || q.type === "scenario") {
     const v = s.answers[s.idx];
-    html += q.options.map((o, i) => {
+    html += `<div class="options-list">` + q.options.map((o, i) => {
       const letter = String.fromCharCode(65 + i);
       const isSelected = v === i;
       return `<label class="opt${isSelected ? ' selected' : ''}" data-idx="${i}">
@@ -534,10 +534,10 @@ export function renderQuestion() {
         <span class="opt-key" aria-hidden="true">${letter}</span>
         <span>${safeHTML(o)}</span>
       </label>`;
-    }).join("");
+    }).join("") + `</div>`;
   } else if (q.type === "multi") {
     const selected = Array.isArray(s.answers[s.idx]) ? s.answers[s.idx] : [];
-    html += q.options.map((o, i) => {
+    html += `<div class="options-list">` + q.options.map((o, i) => {
       const letter = String.fromCharCode(65 + i);
       const isSelected = selected.includes(i);
       return `<label class="opt${isSelected ? ' selected' : ''}" data-idx="${i}">
@@ -545,20 +545,24 @@ export function renderQuestion() {
         <span class="opt-key" aria-hidden="true">${letter}</span>
         <span>${safeHTML(o)}</span>
       </label>`;
-    }).join("");
+    }).join("") + `</div>`;
   } else if (q.type === "matching") {
     const cur = s.answers[s.idx] || {};
+    html += `<div class="options-list">`;
     q.pairs.forEach((pair, i) => {
       if (!s._matchOpts) s._matchOpts = {};
       if (!s._matchOpts[s.idx]) s._matchOpts[s.idx] = shuffle(q.pairs.map((x) => x[1]));
       const opts = s._matchOpts[s.idx];
       html += `<div class="opt" style="display: flex; flex-direction: column; align-items: stretch; gap: 8px;"><strong>${safeHTML(pair[0])}</strong><select data-match="${i}"><option value="">Select</option>${opts.map((x) => `<option ${cur[i] === x ? "selected" : ""} value="${x}">${safeHTML(x)}</option>`).join("")}</select></div>`;
     });
+    html += `</div>`;
   } else {
     const order = s.answers[s.idx] || [...q.order];
+    html += `<div class="options-list">`;
     order.forEach((step, i) => {
       html += `<div class="opt"><strong>${i + 1}.</strong> <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 16px; flex-wrap: wrap;"><span style="flex: 1; min-width: 150px;">${safeHTML(step)}</span><div class="inline" style="margin-top: 0; display: flex; gap: 8px;"><button class="secondary" data-up="${i}" style="padding: 6px 12px; font-size: 11px; height: auto;">Up</button><button class="secondary" data-down="${i}" style="padding: 6px 12px; font-size: 11px; height: auto;">Down</button></div></div></div>`;
     });
+    html += `</div>`;
   }
 
   const ok = s.feedback[s.idx];
