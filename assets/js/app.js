@@ -90,6 +90,9 @@ window.renderAnalytics = renderAnalytics;
 window.renderAchievements = renderAchievements;
 window.showOsiLayerDetail = showOsiLayerDetail;
 window.updateOsiLabels = updateOsiLabels;
+// Exposed for cross-module call from quiz-engine.js after renderQuestion
+window.setupScrollCollapseHeader = setupScrollCollapseHeader;
+window.syncHeaderHeight = syncHeaderHeight;
 
 function handleEngineKeyDown(e) {
   if (!state.session || state.session.submitted) return;
@@ -884,6 +887,80 @@ document.addEventListener("click", (e) => {
   }
 });
 
+// ─── Phase 3: Dynamically sync --header-height from actual rendered header ───
+// Uses ResizeObserver so the variable stays accurate if font scale/zoom changes.
+let _headerResizeObserver = null;
+
+function syncHeaderHeight() {
+  if (window.innerWidth > 760) return; // desktop untouched
+  const header = document.querySelector(".exam-header");
+  if (!header) return;
+  const h = header.getBoundingClientRect().height;
+  document.documentElement.style.setProperty("--header-height", `${Math.ceil(h)}px`);
+}
+
+function watchHeaderHeight() {
+  if (window.innerWidth > 760) return;
+  const header = document.querySelector(".exam-header");
+  if (!header) return;
+  if (_headerResizeObserver) _headerResizeObserver.disconnect();
+  _headerResizeObserver = new ResizeObserver(() => syncHeaderHeight());
+  _headerResizeObserver.observe(header);
+  syncHeaderHeight(); // initial sync
+}
+
+// ─── Phase 2: IntersectionObserver scroll-collapse header ────────────────────
+// Adds .collapsed to .exam-header once user scrolls past a sentinel div placed
+// at the very top of #questionArea content. Smooth transition via CSS.
+let _scrollCollapseObserver = null;
+
+function setupScrollCollapseHeader() {
+  if (window.innerWidth > 760) return; // desktop untouched
+
+  // Clean up previous observer if navigating between questions
+  if (_scrollCollapseObserver) {
+    _scrollCollapseObserver.disconnect();
+    _scrollCollapseObserver = null;
+  }
+
+  const questionArea = byId("questionArea");
+  const examHeader = document.querySelector(".exam-header");
+  if (!questionArea || !examHeader) return;
+
+  // Remove any stale sentinel
+  const stale = questionArea.querySelector(".scroll-sentinel");
+  if (stale) stale.remove();
+
+  // Re-expand header when navigating to a new question (scroll reset)
+  examHeader.classList.remove("collapsed");
+  syncHeaderHeight();
+
+  // Inject sentinel as first child of questionArea
+  const sentinel = document.createElement("div");
+  sentinel.className = "scroll-sentinel";
+  sentinel.setAttribute("aria-hidden", "true");
+  sentinel.style.cssText = "position:absolute;top:0;left:0;width:1px;height:1px;pointer-events:none;";
+  questionArea.insertBefore(sentinel, questionArea.firstChild);
+
+  // Observe: when sentinel leaves viewport top, collapse header; when re-enters, expand
+  _scrollCollapseObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        const shouldCollapse = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+        examHeader.classList.toggle("collapsed", shouldCollapse);
+        // Update --header-height immediately after collapse/expand
+        requestAnimationFrame(syncHeaderHeight);
+      });
+    },
+    {
+      root: questionArea,
+      rootMargin: "0px",
+      threshold: 0,
+    }
+  );
+  _scrollCollapseObserver.observe(sentinel);
+}
+
 function init() {
   state.bank = generateBank(rand);
   state.analytics = loadAnalytics();
@@ -910,6 +987,12 @@ function init() {
   if (typeof loadLab === "function") {
     loadLab(1);
   }
+
+  // Phase 3: Start watching header height with ResizeObserver
+  watchHeaderHeight();
+
+  // Re-sync header height on orientation/resize (desktop guard is inside)
+  window.addEventListener("resize", syncHeaderHeight, { passive: true });
   
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {

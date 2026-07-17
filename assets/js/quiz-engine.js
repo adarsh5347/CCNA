@@ -599,6 +599,14 @@ export function renderQuestion() {
   }
 
   wireQuestionInputs();
+
+  // Phase 2: Reset scroll to top, then set up IntersectionObserver for header collapse
+  // Guarded in a rAF so the DOM is fully painted before we measure/observe.
+  requestAnimationFrame(() => {
+    const qa = byId("questionArea");
+    if (qa) qa.scrollTop = 0;
+    if (window.setupScrollCollapseHeader) window.setupScrollCollapseHeader();
+  });
 }
 
 export function wireQuestionInputs() {
