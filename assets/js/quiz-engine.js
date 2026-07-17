@@ -1447,6 +1447,10 @@ export function setupCanvasConstellation() {
   }
 
   const animate = () => {
+    if (!canvas.offsetParent) {
+      animFrameId = requestAnimationFrame(animate);
+      return;
+    }
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       particles.forEach(p => p.draw());

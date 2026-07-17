@@ -1034,6 +1034,10 @@ function init() {
 
     const drawSphere = () => {
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      if (!canvas.offsetParent) {
+        requestAnimationFrame(drawSphere);
+        return;
+      }
       ctx.clearRect(0, 0, width, height);
 
       const cx = width / 2;
