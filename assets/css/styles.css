@@ -3238,6 +3238,95 @@ select:focus, input:focus, textarea:focus {
 }
 
 
+/* ═══════════════════════════════════════════════════════════════
+   DEFINITIVE MOBILE EXAM LAYOUT FIX
+   Root cause: body was scrolling instead of #questionArea because
+   html/body had no height constraint on mobile.
+   Fix: when engine page is active, lock page to viewport height
+   and make only #questionArea the scroll container.
+   body[data-active-page="engine"] is set by setPage() in app.js.
+   ═══════════════════════════════════════════════════════════════ */
 
+@media (max-width: 760px) {
 
+  /* STEP 1: Lock body scroll in exam mode */
+  body[data-active-page="engine"] {
+    overflow: hidden !important;
+    height: 100dvh !important;
+    height: 100vh !important;
+  }
+
+  /* STEP 2: Make #engine fill exactly the viewport */
+  body[data-active-page="engine"] #engine.page {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100dvh !important;
+    height: 100vh !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+  }
+
+  /* STEP 3: .exam-shell fills #engine vertically */
+  body[data-active-page="engine"] .exam-shell {
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    flex: 1 !important;
+  }
+
+  /* STEP 4: Inner div wrapper (holds aside + main column) */
+  body[data-active-page="engine"] .exam-shell > div {
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: row !important;
+    position: relative !important;
+  }
+
+  /* STEP 5: Main column (holds scroll areas + footer) */
+  body[data-active-page="engine"] .exam-shell > div > div {
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* STEP 6: Header must not grow — only take its intrinsic height */
+  body[data-active-page="engine"] .exam-header {
+    flex-shrink: 0 !important;
+  }
+
+  /* STEP 7: THE SCROLL CONTAINER
+     flex: 1 makes it fill the remaining space between header and footer.
+     Bottom padding keeps last option above the fixed footer bar. */
+  body[data-active-page="engine"] .scroll {
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: auto !important;
+    padding: 12px 14px calc(var(--bottom-nav-height) + var(--safe-bottom) + 20px) 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* STEP 8: Footer is fixed so it lifts out of flex flow */
+  body[data-active-page="engine"] .exam-footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
 
