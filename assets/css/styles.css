@@ -3254,12 +3254,10 @@ select:focus, input:focus, textarea:focus {
     display: none !important;
   }
 
-  /* STEP 1: Lock body scroll in exam mode */
+  /* STEP 1: Lock body scroll in exam mode (no position:fixed to avoid background gradient rendering bug) */
   body[data-active-page="engine"] {
-    position: fixed !important;
     overflow: hidden !important;
     width: 100% !important;
-    height: 100% !important;
     height: 100dvh !important;
     height: 100vh !important;
   }
@@ -3268,7 +3266,6 @@ select:focus, input:focus, textarea:focus {
   body[data-active-page="engine"] #engine.page {
     display: flex !important;
     flex-direction: column !important;
-    height: 100% !important;
     height: 100dvh !important;
     height: 100vh !important;
     width: 100% !important;
@@ -3316,26 +3313,27 @@ select:focus, input:focus, textarea:focus {
   }
 
   /* STEP 7: THE SCROLL CONTAINER
-     flex: 1 makes it fill the remaining space between header and footer.
-     No padding-bottom nav offset is needed since the footer is relative/in-flow. */
+     We set the height explicitly using calc to fit exactly between header and footer.
+     This ensures it scrolls internally and works reliably on iOS Safari.
+     Padding-bottom handles safe-area offset so last card can scroll fully above footer. */
   body[data-active-page="engine"] .scroll {
-    flex: 1 !important;
     min-height: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
-    height: auto !important;
-    padding: 12px 14px 24px 14px !important;
+    height: calc(100vh - var(--header-height) - var(--bottom-nav-height) - var(--safe-bottom)) !important;
+    height: calc(100dvh - var(--header-height) - var(--bottom-nav-height) - var(--safe-bottom)) !important;
+    padding: 12px 14px calc(var(--bottom-nav-height) + var(--safe-bottom) + 24px) 14px !important;
     box-sizing: border-box !important;
   }
 
-  /* STEP 8: Footer is relative/in-flow so it stacks below the scroll container.
-     This mathematically guarantees no option can ever render behind it. */
+  /* STEP 8: Footer is fixed to the bottom of the viewport so it never disappears on mobile. */
   body[data-active-page="engine"] .exam-footer {
-    position: relative !important;
-    bottom: auto !important;
-    left: auto !important;
-    right: auto !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9998 !important;
     flex-shrink: 0 !important;
     box-sizing: border-box !important;
     height: calc(var(--bottom-nav-height) + var(--safe-bottom)) !important;
@@ -3347,7 +3345,6 @@ select:focus, input:focus, textarea:focus {
     flex-direction: row !important;
     gap: 6px !important;
     justify-content: space-between !important;
-    z-index: 9998 !important;
   }
 
   /* STEP 9: Revamp metadata to be extremely compact on mobile.
