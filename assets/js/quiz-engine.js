@@ -1,18 +1,10 @@
-import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML, pick, rand, shuffle, showToast } from "./core.js";
+import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML, pick, rand, shuffle, showToast, persistSession } from "./core.js";
 import { blueprint } from "./data.js";
 import { ccnaVideos } from "./videos.js";
 
 // We need these utility page/navigation functions from app.js / global scope
 function setPage(pageId) {
   if (window.setPage) window.setPage(pageId);
-}
-
-function persistSession() {
-  try {
-    sessionStorage.setItem("ccna_session_state", JSON.stringify(state.session));
-  } catch (e) {
-    console.error("Session persistence failed:", e);
-  }
 }
 
 export function toMMSS(sec) {
@@ -321,17 +313,7 @@ export function startSession(mode) {
   const modeDescEl = byId("modeDesc");
   if (modeDescEl) modeDescEl.textContent = conf.desc;
 
-  const timer = byId("timer");
-  timer.classList.remove("hidden", "warn", "danger");
-  timer.textContent = toMMSS(state.session.timeLeft);
-
-  state.session.timer = setInterval(() => {
-    state.session.timeLeft = Math.max(0, state.session.timeLeft - 1);
-    timer.textContent = toMMSS(state.session.timeLeft);
-    timer.classList.toggle("warn", state.session.timeLeft <= 600 && state.session.timeLeft > 180);
-    timer.classList.toggle("danger", state.session.timeLeft <= 180);
-    if (state.session.timeLeft <= 0) submitSession(true);
-  }, 1000);
+  startSessionTimer();
 
   setPage("engine");
   byId("reviewArea").classList.add("hidden");
@@ -341,6 +323,33 @@ export function startSession(mode) {
   if (examFooter) examFooter.style.display = "flex";
   renderNavigator();
   renderQuestion();
+}
+
+export function startSessionTimer() {
+  if (state.session && state.session.timer) {
+    clearInterval(state.session.timer);
+  }
+  
+  const timer = byId("timer");
+  if (!timer) return;
+
+  timer.classList.remove("hidden", "warn", "danger");
+  timer.textContent = toMMSS(state.session.timeLeft);
+
+  state.session.timer = setInterval(() => {
+    state.session.timeLeft = Math.max(0, state.session.timeLeft - 1);
+    
+    const tEl = byId("timer");
+    if (tEl) {
+      tEl.textContent = toMMSS(state.session.timeLeft);
+      tEl.classList.toggle("warn", state.session.timeLeft <= 600 && state.session.timeLeft > 180);
+      tEl.classList.toggle("danger", state.session.timeLeft <= 180);
+    }
+    
+    if (state.session.timeLeft <= 0) {
+      submitSession(true);
+    }
+  }, 1000);
 }
 
 export function navToQuestion(i) {

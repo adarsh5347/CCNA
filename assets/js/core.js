@@ -247,6 +247,22 @@ export function gainXP(amount) {
   }
 }
 
+export function persistSession() {
+  if (!state || !state.session || state.session.submitted) {
+    try {
+      sessionStorage.removeItem("ccna_session");
+    } catch (e) {}
+    return;
+  }
+  try {
+    const copy = { ...state.session };
+    delete copy.timer;
+    sessionStorage.setItem("ccna_session", JSON.stringify(copy));
+  } catch (e) {
+    console.error("Session persistence failed:", e);
+  }
+}
+
 export const state = {
   seed: Math.floor(Math.random() * 1000000) + 1,
   bank: [],

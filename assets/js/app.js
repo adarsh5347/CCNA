@@ -14,7 +14,8 @@ import {
   safeSetStorage, 
   showToast, 
   createDefaultAnalytics, 
-  loadAnalytics 
+  loadAnalytics,
+  persistSession
 } from "./core.js";
 
 import { 
@@ -74,7 +75,8 @@ import {
   passProbability, 
   renderAchievements,
   toMMSS,
-  markCurrent
+  markCurrent,
+  startSessionTimer
 } from "./quiz-engine.js";
 
 import { generateBank, blueprint } from "./data.js";
@@ -88,6 +90,57 @@ window.renderAnalytics = renderAnalytics;
 window.renderAchievements = renderAchievements;
 window.showOsiLayerDetail = showOsiLayerDetail;
 window.updateOsiLabels = updateOsiLabels;
+
+function handleEngineKeyDown(e) {
+  if (!state.session || state.session.submitted) return;
+  const tag = document.activeElement ? document.activeElement.tagName : "";
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+  const q = state.session.questions[state.session.idx];
+  if (!q) return;
+
+  const keyMap = { KeyA: 0, KeyB: 1, KeyC: 2, KeyD: 3 };
+
+  if (e.code in keyMap && (q.type === "single" || q.type === "scenario" || q.type === "multi")) {
+    e.preventDefault();
+    const optIdx = keyMap[e.code];
+    const opts = document.querySelectorAll(".opt input[type='radio'], .opt input[type='checkbox']");
+    if (opts[optIdx]) {
+      opts[optIdx].click();
+      const labels = document.querySelectorAll(".opt");
+      labels.forEach((l, i) => l.classList.toggle("selected", i === optIdx));
+    }
+    return;
+  }
+
+  switch (e.code) {
+    case "ArrowRight":
+    case "KeyN": {
+      e.preventDefault();
+      const nb = byId("nextQ") || byId("saveNext");
+      if (nb && !nb.disabled) nb.click();
+      break;
+    }
+    case "ArrowLeft":
+    case "KeyP": {
+      e.preventDefault();
+      const pb = byId("prevQ");
+      if (pb && !pb.disabled) pb.click();
+      break;
+    }
+    case "KeyF": {
+      e.preventDefault();
+      const fb = byId("toggleMark");
+      if (fb) {
+        fb.click();
+        const isFlagged = state.session.flagged[state.session.idx];
+        showToast(isFlagged ? "Question flagged for review" : "Flag removed", "info", 1800);
+      }
+      break;
+    }
+  }
+}
 
 export function setPage(page, push = true) {
   if (push) {
@@ -110,6 +163,12 @@ export function setPage(page, push = true) {
     persistSession();
   }
 
+  // Bind/unbind keydown listener dynamically to prevent performance degradation on other pages
+  document.removeEventListener("keydown", handleEngineKeyDown);
+  if (page === "engine") {
+    document.addEventListener("keydown", handleEngineKeyDown);
+  }
+
   document.querySelectorAll(".page").forEach((p) => p.classList.remove("active"));
   const targetPage = byId(page);
   if (targetPage) targetPage.classList.add("active");
@@ -124,16 +183,6 @@ export function setPage(page, push = true) {
   if (page === "subnet") ensureSubnetQuestion(true);
   if (page === "videos") renderVideos();
   window.scrollTo(0, 0);
-}
-
-function persistSession() {
-  if (!state.session) {
-    sessionStorage.removeItem("ccna_session");
-    return;
-  }
-  const copy = { ...state.session };
-  delete copy.timer;
-  safeSetStorage(sessionStorage, "ccna_session", JSON.stringify(copy));
 }
 
 function restoreSession() {
@@ -153,22 +202,7 @@ function restoreSession() {
         saved.answers = arr;
       }
       state.session = saved;
-      const timer = byId("timer");
-      if (timer) {
-        timer.classList.remove("hidden", "warn", "danger");
-        timer.textContent = toMMSS(state.session.timeLeft);
-      }
-      state.session.timer = setInterval(() => {
-        state.session.timeLeft = Math.max(0, state.session.timeLeft - 1);
-        const tEl = byId("timer");
-        if (tEl) {
-          tEl.textContent = toMMSS(state.session.timeLeft);
-          tEl.classList.toggle("warn", state.session.timeLeft <= 600 && state.session.timeLeft > 180);
-          tEl.classList.toggle("danger", state.session.timeLeft <= 180);
-        }
-        persistSession();
-        if (state.session.timeLeft <= 0) submitSession(true);
-      }, 1000);
+      startSessionTimer();
       
       setPage("engine");
       byId("reviewArea").classList.add("hidden");
@@ -187,8 +221,11 @@ function restoreSession() {
 }
 
 function navSetup() {
-  document.querySelectorAll("[data-page]").forEach((btn) => {
-    btn.addEventListener("click", () => setPage(btn.dataset.page));
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-page]");
+    if (btn) {
+      setPage(btn.dataset.page);
+    }
   });
 }
 
@@ -257,56 +294,6 @@ function wireEvents() {
     });
   }
 
-  document.addEventListener("keydown", (e) => {
-    if (!state.session || state.session.submitted) return;
-    const tag = document.activeElement ? document.activeElement.tagName : "";
-    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-
-    const q = state.session.questions[state.session.idx];
-    if (!q) return;
-
-    const keyMap = { KeyA: 0, KeyB: 1, KeyC: 2, KeyD: 3 };
-
-    if (e.code in keyMap && (q.type === "single" || q.type === "scenario" || q.type === "multi")) {
-      e.preventDefault();
-      const optIdx = keyMap[e.code];
-      const opts = document.querySelectorAll(".opt input[type='radio'], .opt input[type='checkbox']");
-      if (opts[optIdx]) {
-        opts[optIdx].click();
-        const labels = document.querySelectorAll(".opt");
-        labels.forEach((l, i) => l.classList.toggle("selected", i === optIdx));
-      }
-      return;
-    }
-
-    switch (e.code) {
-      case "ArrowRight":
-      case "KeyN": {
-        e.preventDefault();
-        const nb = byId("nextQ") || byId("saveNext");
-        if (nb && !nb.disabled) nb.click();
-        break;
-      }
-      case "ArrowLeft":
-      case "KeyP": {
-        e.preventDefault();
-        const pb = byId("prevQ");
-        if (pb && !pb.disabled) pb.click();
-        break;
-      }
-      case "KeyF": {
-        e.preventDefault();
-        const fb = byId("toggleMark");
-        if (fb) {
-          fb.click();
-          const isFlagged = state.session.flagged[state.session.idx];
-          showToast(isFlagged ? "Question flagged for review" : "Flag removed", "info", 1800);
-        }
-        break;
-      }
-    }
-  });
 
   const chkTrouble = byId("chkTroubleshooting");
   if (chkTrouble) {
@@ -924,6 +911,12 @@ function init() {
     loadLab(1);
   }
   
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      persistSession();
+    }
+  });
+
   window.addEventListener("beforeunload", (e) => {
     if (state.session && !state.session.submitted) {
       e.preventDefault();
