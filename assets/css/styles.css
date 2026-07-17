@@ -3249,9 +3249,17 @@ select:focus, input:focus, textarea:focus {
 
 @media (max-width: 760px) {
 
+  /* STEP 0: Hide the global topbar entirely in simulator mode */
+  body[data-active-page="engine"] header.topbar {
+    display: none !important;
+  }
+
   /* STEP 1: Lock body scroll in exam mode */
   body[data-active-page="engine"] {
+    position: fixed !important;
     overflow: hidden !important;
+    width: 100% !important;
+    height: 100% !important;
     height: 100dvh !important;
     height: 100vh !important;
   }
@@ -3260,6 +3268,7 @@ select:focus, input:focus, textarea:focus {
   body[data-active-page="engine"] #engine.page {
     display: flex !important;
     flex-direction: column !important;
+    height: 100% !important;
     height: 100dvh !important;
     height: 100vh !important;
     width: 100% !important;
@@ -3269,6 +3278,7 @@ select:focus, input:focus, textarea:focus {
     left: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
+    z-index: 500 !important; /* sit above background but under modals */
   }
 
   /* STEP 3: .exam-shell fills #engine vertically */
@@ -3307,7 +3317,7 @@ select:focus, input:focus, textarea:focus {
 
   /* STEP 7: THE SCROLL CONTAINER
      flex: 1 makes it fill the remaining space between header and footer.
-     Bottom padding keeps last option above the fixed footer bar. */
+     No padding-bottom nav offset is needed since the footer is relative/in-flow. */
   body[data-active-page="engine"] .scroll {
     flex: 1 !important;
     min-height: 0 !important;
@@ -3315,18 +3325,29 @@ select:focus, input:focus, textarea:focus {
     overflow-x: hidden !important;
     -webkit-overflow-scrolling: touch !important;
     height: auto !important;
-    padding: 12px 14px calc(var(--bottom-nav-height) + var(--safe-bottom) + 20px) 14px !important;
+    padding: 12px 14px 24px 14px !important;
     box-sizing: border-box !important;
   }
 
-  /* STEP 8: Footer is fixed so it lifts out of flex flow */
+  /* STEP 8: Footer is relative/in-flow so it stacks below the scroll container.
+     This mathematically guarantees no option can ever render behind it. */
   body[data-active-page="engine"] .exam-footer {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
     flex-shrink: 0 !important;
     box-sizing: border-box !important;
+    height: calc(var(--bottom-nav-height) + var(--safe-bottom)) !important;
+    padding: 10px 14px calc(10px + var(--safe-bottom)) 14px !important;
+    background: rgba(15, 23, 42, 0.96) !important;
+    backdrop-filter: blur(16px) !important;
+    border-top: 1px solid var(--border-color) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 6px !important;
+    justify-content: space-between !important;
+    z-index: 9998 !important;
   }
 }
 
