@@ -2218,8 +2218,10 @@ button:focus, select:focus, input:focus, textarea:focus {
     font-size: 11px !important;
     margin-right: 4px !important;
     color: var(--text-secondary) !important;
-    text-transform: uppercase;
+  #heroInteractiveSphere, .hero-graphics {
+    display: none !important;
   }
+
 
   /* Compact option cards on mobile */
   .opt {
