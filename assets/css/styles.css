@@ -1393,6 +1393,10 @@ textarea {
     flex-shrink: 1 !important;
   }
   #btnSignIn {
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -1509,6 +1513,11 @@ textarea {
     justify-content: flex-end;
     flex: 1;
     gap: 6px;
+  }
+  /* Mobile fix: allow top‑bar items to wrap so the Sign‑In button stays visible */
+  .topbar-right {
+    flex-wrap: wrap;
+    gap: 8px;
   }
   .topbar {
     padding: 10px 12px;
