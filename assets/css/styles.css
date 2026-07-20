@@ -1393,10 +1393,19 @@ textarea {
     flex-shrink: 1 !important;
   }
   #btnSignIn {
-    padding: 6px 12px !important;
-    font-size: 12px !important;
-    flex-shrink: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 7px 14px !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    color: #060913 !important;
+    background: linear-gradient(135deg, #00f2fe, #4facfe) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 0 12px rgba(0, 242, 254, 0.4) !important;
     white-space: nowrap !important;
+    flex-shrink: 0 !important;
   }
   #userName {
     display: none !important;
@@ -1442,8 +1451,6 @@ textarea {
   .container {
     padding: 12px !important;
     padding-bottom: calc(70px + var(--safe-bottom)) !important;
-  }
-    padding: 12px;
   }
   .hero {
     padding: 16px;
