@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ccna-prep-v47';
+const CACHE_NAME = 'ccna-prep-v48';
 const ASSETS = [
   '/',
   '/index.html',
@@ -33,23 +33,21 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Only intercept GET requests from the local origin to prevent crashes on POST / third-party API writes
+  // Only intercept GET requests from the local origin
   if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) {
     return;
   }
-  
-  // Stale-While-Revalidate strategy
+
+  // Network-first strategy: always try the network, fall back to cache when offline
   e.respondWith(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.match(e.request).then(response => {
-        const fetchPromise = fetch(e.request).then(networkResponse => {
-          if (networkResponse && networkResponse.status === 200) {
-            cache.put(e.request, networkResponse.clone());
-          }
-          return networkResponse;
-        }).catch(() => {});
-        return response || fetchPromise;
-      });
-    })
+    fetch(e.request)
+      .then(networkResponse => {
+        if (networkResponse && networkResponse.status === 200) {
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+        }
+        return networkResponse;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
