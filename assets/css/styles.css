@@ -2007,12 +2007,25 @@ button:focus, select:focus, input:focus, textarea:focus {
     white-space: nowrap;
   }
   #headerXPBadge {
-    max-width: 140px !important;
+    max-width: 90px !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     display: inline-block !important;
     vertical-align: middle !important;
+    flex-shrink: 1 !important;
+  }
+  .topbar-utils {
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+  #btnSignIn {
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
   }
   header.topbar nav {
     position: fixed !important;
