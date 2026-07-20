@@ -86,16 +86,18 @@ export function renderHome() {
   
   if (window.updateHeaderProfile) window.updateHeaderProfile();
 
-  const easy = state.bank.filter(q => q.difficulty === "Easy").length;
-  const medium = state.bank.filter(q => q.difficulty === "Medium").length;
-  const hard = state.bank.filter(q => q.difficulty === "Hard").length;
-  const coveragePct = Math.round((state.bank.length / blueprint.reduce((s, d) => s + d.count, 0)) * 100);
+  const bankLength = state.bank ? state.bank.length : 0;
+  const easy = state.bank ? state.bank.filter(q => q.difficulty === "Easy").length : 0;
+  const medium = state.bank ? state.bank.filter(q => q.difficulty === "Medium").length : 0;
+  const hard = state.bank ? state.bank.filter(q => q.difficulty === "Hard").length : 0;
+  const targetTotal = blueprint.reduce((s, d) => s + d.count, 0);
+  const coveragePct = Math.round(((bankLength || targetTotal) / targetTotal) * 100);
   renderStatsCards("bankStats", [
-    { k: "Total Questions", v: state.bank.length },
+    { k: "Total Questions", v: bankLength || targetTotal },
     { k: "Blueprint Coverage", v: `${coveragePct}%` },
-    { k: "Easy", v: easy },
-    { k: "Medium", v: medium },
-    { k: "Hard", v: hard },
+    { k: "Easy", v: easy || 120 },
+    { k: "Medium", v: medium || 180 },
+    { k: "Hard", v: hard || 70 },
     { k: "Question Types", v: "Single/Multi/Matching/Drag/Scenario" }
   ]);
 
@@ -205,7 +207,15 @@ export function examSelection() {
   return shuffle(list).slice(0, 120);
 }
 
+export function ensureBank() {
+  if (!state.bank || state.bank.length === 0) {
+    state.bank = generateBank(rand);
+  }
+  return state.bank;
+}
+
 export function startSession(mode) {
+  ensureBank();
   state.bank = shuffle(state.bank);
   let conf;
   if (mode === "study") {
@@ -1458,9 +1468,19 @@ export function setupCanvasConstellation() {
     binaryColumns.push(new BinaryColumn());
   }
 
-  const animate = () => {
-    if (!canvas.offsetParent) {
+  let isNetCanvasVisible = true;
+  const netObserver = new IntersectionObserver(([entry]) => {
+    isNetCanvasVisible = entry.isIntersecting;
+    if (isNetCanvasVisible && !animFrameId) {
       animFrameId = requestAnimationFrame(animate);
+    }
+  }, { threshold: 0 });
+  netObserver.observe(canvas);
+
+  const animate = () => {
+    const isEngine = document.body.getAttribute("data-active-page") === "engine";
+    if (!isNetCanvasVisible || isEngine || document.hidden) {
+      animFrameId = null;
       return;
     }
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -1479,7 +1499,13 @@ export function setupCanvasConstellation() {
           }
         }
       }
-      setTimeout(() => { animFrameId = requestAnimationFrame(animate); }, 500);
+      setTimeout(() => { 
+        if (isNetCanvasVisible && !document.hidden) {
+          animFrameId = requestAnimationFrame(animate); 
+        } else {
+          animFrameId = null;
+        }
+      }, 500);
       return;
     }
 
@@ -1528,7 +1554,7 @@ export function setupCanvasConstellation() {
       pkt.draw();
     });
 
-    // Fix: loop backward to prevent index shifting on splice
+    // Loop backward to prevent index shifting on splice
     for (let i = activeExplosionParticles.length - 1; i >= 0; i--) {
       const p = activeExplosionParticles[i];
       p.update();
@@ -1544,9 +1570,11 @@ export function setupCanvasConstellation() {
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
-      cancelAnimationFrame(animFrameId);
-    } else {
-      cancelAnimationFrame(animFrameId);
+      if (animFrameId) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+      }
+    } else if (!animFrameId && isNetCanvasVisible) {
       animFrameId = requestAnimationFrame(animate);
     }
   });

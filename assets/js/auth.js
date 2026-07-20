@@ -12,7 +12,11 @@ export function updateHeaderProfile() {
   const info = getLevelInfo(xp);
   const badge = byId("headerXPBadge");
   if (badge) {
-    badge.textContent = `Lvl ${info.level} (${info.label}) - ${xp} XP`;
+    if (window.innerWidth < 600) {
+      badge.textContent = `Lvl ${info.level}`;
+    } else {
+      badge.textContent = `Lvl ${info.level} (${info.label}) - ${xp} XP`;
+    }
   }
 }
 

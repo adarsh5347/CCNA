@@ -888,15 +888,16 @@ document.addEventListener("click", (e) => {
 });
 
 // ─── Phase 3: Dynamically sync --header-height from actual rendered header ───
-// Uses ResizeObserver so the variable stays accurate if font scale/zoom changes.
-let _headerResizeObserver = null;
-
+// Uses ResizeObserver so the variable stays accurate if fontlet _lastHeaderHeight = 0;
 function syncHeaderHeight() {
   if (window.innerWidth > 760) return; // desktop untouched
   const header = document.querySelector(".exam-header");
   if (!header) return;
-  const h = header.getBoundingClientRect().height;
-  document.documentElement.style.setProperty("--header-height", `${Math.ceil(h)}px`);
+  const h = Math.ceil(header.getBoundingClientRect().height);
+  if (h > 0 && h !== _lastHeaderHeight) {
+    _lastHeaderHeight = h;
+    document.documentElement.style.setProperty("--header-height", `${h}px`);
+  }
 }
 
 function watchHeaderHeight() {
@@ -962,7 +963,7 @@ function setupScrollCollapseHeader() {
 }
 
 function init() {
-  state.bank = generateBank(rand);
+  state.bank = [];
   state.analytics = loadAnalytics();
   navSetup();
   renderDomainChecks();
@@ -988,10 +989,23 @@ function init() {
     loadLab(1);
   }
 
+  // Defer heavy question bank generation until idle microtask after paint
+  const buildBank = () => {
+    if (!state.bank || state.bank.length === 0) {
+      state.bank = generateBank(rand);
+      renderHome();
+    }
+  };
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(buildBank);
+  } else {
+    setTimeout(buildBank, 20);
+  }
+
   // Phase 3: Start watching header height with ResizeObserver
   watchHeaderHeight();
 
-  // Re-sync header height on orientation/resize (desktop guard is inside)
+  // Re-sync header height on orientation/resize
   window.addEventListener("resize", syncHeaderHeight, { passive: true });
   
   document.addEventListener("visibilitychange", () => {
@@ -1018,41 +1032,118 @@ function init() {
       if (!confirm("You have an active CCNA quiz session. Are you sure you want to leave? Your progress will be lost.")) {
         history.pushState({ page: "engine" }, "", "?page=engine");
         return;
-      } else {
-        if (state.session.timer) clearInterval(state.session.timer);
-        const headerTimerEl = byId("headerTimer");
-        if (headerTimerEl) headerTimerEl.classList.add("hidden");
-        state.session = null;
-        persistSession();
       }
     }
-    const page = e.state?.page || "home";
+    const page = (e.state && e.state.page) ? e.state.page : "home";
     setPage(page, false);
   });
-  
-  if (!restoreSession()) {
-    setPage("home");
+}
+
+function navSetup() {
+  document.querySelectorAll("[data-page]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setPage(btn.dataset.page);
+    });
+  });
+}
+
+function setPage(pageId, pushState = true) {
+  if (state.currentPage === pageId) return;
+
+  if (state.session && !state.session.submitted && pageId !== "engine") {
+    if (!confirm("You have an active CCNA quiz session running. Leaving this view will forfeit your current exam attempt. Continue?")) {
+      return;
+    }
   }
 
-  /* ─── Premium 3D Perspective Tilt Interaction ───────────── */
+  document.querySelectorAll(".page").forEach((sec) => sec.classList.remove("active"));
+  const target = byId(pageId);
+  if (target) {
+    target.classList.add("active");
+    state.currentPage = pageId;
+    document.body.setAttribute("data-active-page", pageId);
+
+    if (pushState) {
+      history.pushState({ page: pageId }, "", pageId === "home" ? window.location.pathname : `?page=${pageId}`);
+    }
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (pageId === "home") renderHome();
+    if (pageId === "analytics") {
+      renderAnalytics();
+      renderAchievements();
+    }
+    if (pageId === "videos") renderVideos();
+
+    playNetSound("click");
+  }
+}
+
+function wireEvents() {
+  byId("startStudyMode")?.addEventListener("click", () => startSession("study"));
+  byId("startExamMode")?.addEventListener("click", () => startSession("exam"));
+  byId("startQuizMode")?.addEventListener("click", () => startSession("quiz"));
+  byId("startAdaptiveMode")?.addEventListener("click", () => startSession("adaptive"));
+  byId("startMissedQuiz")?.addEventListener("click", () => startSession("missed"));
+
+  byId("prevQ")?.addEventListener("click", prevQuestion);
+  byId("toggleMark")?.addEventListener("click", markCurrent);
+  byId("openReview")?.addEventListener("click", openReview);
+  byId("saveNext")?.addEventListener("click", saveAndNext);
+  byId("submitSession")?.addEventListener("click", submitSession);
+
+  byId("btnToggleSidebar")?.addEventListener("click", () => {
+    const nav = byId("examNavigator");
+    if (nav) nav.classList.toggle("active");
+  });
+  byId("btnCloseSidebar")?.addEventListener("click", () => {
+    const nav = byId("examNavigator");
+    if (nav) nav.classList.remove("active");
+  });
+
+  document.addEventListener("keydown", handleEngineKeyDown);
+
+  byId("btnToggleFullScreen")?.addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+    }
+  });
+
+  byId("exitSession")?.addEventListener("click", () => {
+    if (state.session && !state.session.submitted) {
+      if (confirm("Are you sure you want to exit? Your exam progress will be lost.")) {
+        state.session = null;
+        setPage("home");
+      }
+    } else {
+      state.session = null;
+      setPage("home");
+    }
+  });
+
+  /* ─── Modern Interactive Enhancements ─────────────────── */
   const initTiltEffect = () => {
-    const card = document.querySelector(".hero-dashboard");
-    if (!card) return;
+    const cards = document.querySelectorAll(".hero-dashboard, #home .card, #engine .card");
+    cards.forEach(card => {
+      card.addEventListener("mousemove", (e) => {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -3;
+        const rotateY = ((x - centerX) / centerX) * 3;
 
-    card.addEventListener("mousemove", (e) => {
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width / 2;
-      const y = e.clientY - rect.top - rect.height / 2;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
+      }, { passive: true });
 
-      const rotateX = -(y / rect.height) * 4;
-      const rotateY = (x / rect.width) * 4;
-
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
-    });
-
-    card.addEventListener("mouseleave", () => {
-      card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)";
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)";
+      }, { passive: true });
     });
   };
 
@@ -1062,8 +1153,8 @@ function init() {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
 
-    let width = canvas.offsetWidth;
-    let height = canvas.offsetHeight;
+    let width = canvas.offsetWidth || 360;
+    let height = canvas.offsetHeight || 200;
     canvas.width = width;
     canvas.height = height;
 
@@ -1083,6 +1174,8 @@ function init() {
 
     let rotationX = 0.002;
     let rotationY = 0.003;
+    let isVisible = false;
+    let sphereAnimId = null;
 
     const heroCard = document.querySelector(".hero-dashboard");
     if (heroCard) {
@@ -1092,12 +1185,20 @@ function init() {
         const my = e.clientY - rect.top - rect.height / 2;
         rotationX = (my / rect.height) * 0.015;
         rotationY = (mx / rect.width) * 0.015;
-      });
+      }, { passive: true });
       heroCard.addEventListener("mouseleave", () => {
         rotationX = 0.002;
         rotationY = 0.003;
-      });
+      }, { passive: true });
     }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+      if (isVisible && !sphereAnimId) {
+        sphereAnimId = requestAnimationFrame(drawSphere);
+      }
+    }, { threshold: 0 });
+    observer.observe(canvas);
 
     const rotateNode = (node, rx, ry) => {
       let cosY = Math.cos(ry);
@@ -1116,9 +1217,8 @@ function init() {
     };
 
     const drawSphere = () => {
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      if (!canvas.offsetParent) {
-        requestAnimationFrame(drawSphere);
+      if (!isVisible || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        sphereAnimId = null;
         return;
       }
       ctx.clearRect(0, 0, width, height);
@@ -1168,14 +1268,12 @@ function init() {
         ctx.fill();
       });
 
-      requestAnimationFrame(drawSphere);
+      sphereAnimId = requestAnimationFrame(drawSphere);
     };
-
-    drawSphere();
   };
 
   const initMagneticButtons = () => {
-    const btns = document.querySelectorAll(".magnetic-btn");
+    const btns = document.querySelectorAll(".primary, .secondary");
     btns.forEach(btn => {
       btn.addEventListener("mousemove", (e) => {
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -1183,10 +1281,10 @@ function init() {
         const x = e.clientX - rect.left - rect.width / 2;
         const y = e.clientY - rect.top - rect.height / 2;
         btn.style.transform = `translate(${x * 0.28}px, ${y * 0.28}px)`;
-      });
+      }, { passive: true });
       btn.addEventListener("mouseleave", () => {
         btn.style.transform = "translate(0, 0)";
-      });
+      }, { passive: true });
     });
   };
 
@@ -1273,7 +1371,7 @@ function renderVideos() {
       <article class="card video-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 16px; border: 1.5px solid ${isWatched ? "rgba(16, 185, 129, 0.3)" : "var(--border-color)"}; background: rgba(13, 19, 36, 0.4); position: relative; transition: border-color 0.2s;">
         <div>
           <div class="video-thumbnail-container" data-video-id="${v.id}" style="position: relative; width: 100%; padding-bottom: 56.25%; background: rgba(0,0,0,0.6); border-radius: 8px; margin-bottom: 12px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; display: flex; align-items: center; justify-content: center;">
-            <img src="https://img.youtube.com/vi/${v.youtubeId}/mqdefault.jpg" alt="${v.title}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.75; transition: transform 0.3s;" />
+            <img src="https://img.youtube.com/vi/${v.youtubeId}/mqdefault.jpg" alt="${v.title}" loading="lazy" decoding="async" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.75; transition: transform 0.3s;" />
             <div class="play-icon-overlay" style="position: absolute; font-size: 32px; color: var(--accent-color); opacity: 0.85; filter: drop-shadow(0 0 10px rgba(0,242,254,0.5)); transition: transform 0.2s;">▶</div>
             <span style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.85); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono);">${v.duration}</span>
           </div>
