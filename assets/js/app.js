@@ -145,6 +145,43 @@ function handleEngineKeyDown(e) {
   }
 }
 
+let _subnetInitialized = false;
+let _videosInitialized = false;
+let _labsInitialized = false;
+let _traversalInitialized = false;
+
+export function ensureSubnetInit() {
+  if (_subnetInitialized) return;
+  _subnetInitialized = true;
+  renderSubnetLeaderboard();
+  ensureSubnetQuestion(true);
+  setupSubnetCalculator();
+  setupFlashcards();
+}
+
+export function ensureVideosInit() {
+  if (_videosInitialized) return;
+  _videosInitialized = true;
+  initVideos();
+  renderVideos();
+}
+
+export function ensureLabsInit() {
+  if (_labsInitialized) return;
+  _labsInitialized = true;
+  initLabSelector();
+  initLabModes();
+  if (typeof loadLab === "function") {
+    loadLab(1);
+  }
+}
+
+export function ensureTraversalInit() {
+  if (_traversalInitialized) return;
+  _traversalInitialized = true;
+  setupTraversalSimulator();
+}
+
 export function setPage(page, push = true) {
   if (push) {
     history.pushState({ page }, "", "?page=" + page);
@@ -182,9 +219,13 @@ export function setPage(page, push = true) {
     btn.classList.toggle("active", btn.dataset.page === page);
   });
 
-  if (page === "analytics") renderAnalytics();
-  if (page === "subnet") ensureSubnetQuestion(true);
-  if (page === "videos") renderVideos();
+  if (page === "analytics") {
+    renderAnalytics();
+    renderAchievements();
+  }
+  if (page === "subnet") ensureSubnetInit();
+  if (page === "videos") ensureVideosInit();
+  if (page === "labs") ensureLabsInit();
   window.scrollTo(0, 0);
 }
 
@@ -971,35 +1012,28 @@ function init() {
   wireEvents();
   setupAuth();
   setupCanvasConstellation();
-  setupTraversalSimulator();
-  setupSupportDesk();
-  initVideos();
   
   updateMuteButton();
   updateContrastButton();
-  renderSubnetLeaderboard();
-  ensureSubnetQuestion(true);
-  setupSubnetCalculator();
-  setupFlashcards();
-  
-  initLabSelector();
-  initLabModes();
-  
-  if (typeof loadLab === "function") {
-    loadLab(1);
-  }
 
-  // Defer heavy question bank generation until idle microtask after paint
-  const buildBank = () => {
+  // Defer all non-critical page initializations until idle microtask after landing page paint
+  const initNonCritical = () => {
+    ensureTraversalInit();
+    setupSupportDesk();
+    ensureVideosInit();
+    ensureSubnetInit();
+    ensureLabsInit();
+
     if (!state.bank || state.bank.length === 0) {
       state.bank = generateBank(rand);
       renderHome();
     }
   };
+
   if ('requestIdleCallback' in window) {
-    requestIdleCallback(buildBank);
+    requestIdleCallback(initNonCritical);
   } else {
-    setTimeout(buildBank, 20);
+    setTimeout(initNonCritical, 50);
   }
 
   // Phase 3: Start watching header height with ResizeObserver

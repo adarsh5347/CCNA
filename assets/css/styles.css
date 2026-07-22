@@ -515,6 +515,30 @@ button.ghost:hover {
   transition: var(--transition-lucid);
 }
 
+/* ─── Performance Isolation & Subtree Style Recalculation Containment ─── */
+.card,
+.hero-dashboard,
+.page.active,
+.quiz-shell,
+.lab-shell,
+.meta {
+  contain: layout style paint;
+}
+
+/* Placeholder sizing strategy to prevent dynamic content layout shifts */
+.hero-dashboard { min-height: 200px; }
+#bankStats      { min-height: 100px; }
+#questionArea   { min-height: 280px; }
+#videoLessonsGrid { min-height: 320px; }
+#labContainer   { min-height: 380px; }
+
+/* Eliminate LCP entry animation delay on hero title element */
+.hero-dashboard .reveal-text {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 
 
 .hero {
@@ -2680,16 +2704,19 @@ textarea:focus-visible,
 .skeleton-line.w-80  { width: 80%; }
 .skeleton-line.w-100 { width: 100%; }
 
-/* ─── Toast Notification System ─────────────────────────── */
+/* ─── Toast Notification System (Fixed Overlay Layer - Zero CLS) ─────────────────────────── */
 #toastContainer {
   position: fixed;
-  bottom: var(--sp-6);
-  right: var(--sp-6);
-  z-index: 10005;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  z-index: 100005;
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
   pointer-events: none;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  contain: layout style paint;
 }
 
 /* Accessibility Skip-Link */
@@ -2734,6 +2761,7 @@ textarea:focus-visible,
   pointer-events: auto;
   cursor: pointer;
   animation: toastIn var(--dur-slow) var(--ease-spring) both;
+  will-change: transform, opacity;
 }
 
 .toast::before {
@@ -2758,15 +2786,16 @@ textarea:focus-visible,
   to   { opacity: 1; transform: translateX(0)    scale(1);    }
 }
 @keyframes toastOut {
-  from { opacity: 1; transform: translateX(0) scale(1);    max-height: 80px; }
-  to   { opacity: 0; transform: translateX(16px) scale(0.95); max-height: 0; padding: 0; margin: 0; }
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to   { opacity: 0; transform: translateX(16px) scale(0.95); }
 }
 
 @media (max-width: 600px) {
   #toastContainer {
-    bottom: 88px;
-    right: var(--sp-3);
-    left: var(--sp-3);
+    top: 1rem;
+    right: 1rem;
+    left: 1rem;
+    max-width: calc(100vw - 2rem);
   }
   .toast { min-width: unset; max-width: 100%; }
 }
