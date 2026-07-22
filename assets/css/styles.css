@@ -1605,21 +1605,14 @@ textarea {
 
 @media (max-width: 600px) {
   .brand div:last-child {
-    display: none;
-  }
-  nav {
-    justify-content: flex-end;
-    flex: 1;
-    gap: 6px;
-  }
-  /* Mobile fix: allow top‑bar items to wrap so the Sign‑In button stays visible */
-  .topbar-right {
-    flex-wrap: wrap;
-    gap: 8px;
+    display: none !important;
   }
   .topbar {
-    padding: 10px 12px;
-    gap: 6px;
+    padding: 8px 12px !important;
+    gap: 6px !important;
+  }
+  #headerXPBadge {
+    display: none !important;
   }
   .stats {
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
