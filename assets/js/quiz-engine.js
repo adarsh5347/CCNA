@@ -176,7 +176,9 @@ export function weakTopicBoost(q) {
 export function weightedSelection(count, domains) {
   const set = domains && domains.length ? new Set(domains) : null;
   const pool = state.bank.filter((q) => !set || set.has(q.domain));
-  const scored = pool.map((q) => ({ q, w: weakTopicBoost(q) * (q.difficulty === "Hard" ? 0.9 : 1) }));
+  // Shuffle scored pool before weighted iteration to prevent deterministic ordering
+  // from always picking the same questions when weights are similar
+  const scored = shuffle(pool.map((q) => ({ q, w: weakTopicBoost(q) * (q.difficulty === "Hard" ? 0.9 : 1) })));
   const out = [];
   const used = new Set();
 
@@ -750,7 +752,10 @@ export function applyQuestionTime() {
 export function openReview() {
   const s = state.session;
   const unanswered = s.questions.filter((_, i) => s.answers[i] == null).length;
-  let html = `<h3>Review Screen</h3><p>Unanswered: ${unanswered} | Flagged: ${Object.values(s.flagged).filter(Boolean).length}</p><div class="review-table">`;
+  let html = `<h3>Review Screen</h3><p>Unanswered: ${unanswered} | Flagged: ${Object.values(s.flagged).filter(Boolean).length}</p>`;
+  // Add a prominent "Back to Quiz" button at the top of the review screen
+  html += `<div style="margin-bottom: 16px;"><button class="secondary" id="backToQuizFromReview" style="padding: 10px 20px; font-size: 13px; min-height: 44px;">⬅️ Back to Quiz</button></div>`;
+  html += `<div class="review-table">`;
   s.questions.forEach((q, i) => {
     html += `<div class="review-row"><div>Q${i + 1}</div><div>${q.domain} - ${q.topic}</div><div>${s.answers[i] != null ? "Answered" : "Pending"}</div><div><button class="ghost" data-jump="${i}">Open</button></div></div>`;
   });
@@ -765,6 +770,16 @@ export function openReview() {
   const ra = byId("reviewArea");
   if (ra) ra.scrollTop = 0;
   window.scrollTo(0, 0);
+
+  // Wire "Back to Quiz" button at top of review
+  const backBtn = byId("backToQuizFromReview");
+  if (backBtn) {
+    backBtn.addEventListener("click", () => {
+      byId("reviewArea").classList.add("hidden");
+      byId("questionArea").classList.remove("hidden");
+      renderQuestion();
+    });
+  }
 
   byId("reviewArea").querySelectorAll("[data-jump]").forEach((b) => {
     b.addEventListener("click", () => {
@@ -783,7 +798,28 @@ export function openReview() {
   const saveNextBtn = byId("saveNext");
   const submitSessionBtn = byId("submitSession");
 
-  if (prevBtn) prevBtn.style.display = "none";
+  // Repurpose "Previous" button as "Back to Quiz" in footer
+  if (prevBtn) {
+    prevBtn.style.display = "";
+    prevBtn.disabled = false;
+    const fullText = prevBtn.querySelector(".btn-full-text");
+    const mobileText = prevBtn.querySelector(".btn-mobile-text");
+    if (fullText) fullText.textContent = "⬅️ Back to Quiz";
+    if (mobileText) mobileText.textContent = "⬅️ Back";
+    // Clone to remove old listeners, then re-attach
+    const newPrev = prevBtn.cloneNode(true);
+    prevBtn.parentNode.replaceChild(newPrev, prevBtn);
+    newPrev.addEventListener("click", () => {
+      byId("reviewArea").classList.add("hidden");
+      byId("questionArea").classList.remove("hidden");
+      // Restore original button labels
+      const ft = newPrev.querySelector(".btn-full-text");
+      const mt = newPrev.querySelector(".btn-mobile-text");
+      if (ft) ft.textContent = "⬅️ Previous";
+      if (mt) mt.textContent = "⬅️ Prev";
+      renderQuestion();
+    });
+  }
   if (markBtn) markBtn.style.display = "none";
   if (openReviewBtn) openReviewBtn.style.display = "none";
   if (saveNextBtn) saveNextBtn.style.display = "none";
