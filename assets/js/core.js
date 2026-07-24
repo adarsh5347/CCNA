@@ -85,6 +85,7 @@ export function createDefaultAnalytics() {
     studyMin: 0,
     xp: 0,
     streak: 0,
+    lastAttemptDate: null,
     labsCompleted: 0,
     subnetMaxStreak: 0,
     ach: {},

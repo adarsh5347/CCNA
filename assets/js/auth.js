@@ -106,6 +106,8 @@ export function setupAuth() {
           merged.totalTime = merged.totalTime || 0;
           merged.studyMin = merged.studyMin || 0;
           merged.xp = merged.xp || 0;
+          merged.streak = merged.streak || 0;
+          merged.lastAttemptDate = merged.lastAttemptDate || null;
           merged.ach = merged.ach || {};
           merged.missedIds = merged.missedIds || [];
           merged.simPathsRun = merged.simPathsRun || { ospf: false, roas: false };

@@ -111,7 +111,29 @@ export function mergeProgress(local, cloud) {
   merged.totalTime = Math.max(local.totalTime || 0, cloud.totalTime || 0);
   merged.labsCompleted = Math.max(local.labsCompleted || 0, cloud.labsCompleted || 0);
   merged.subnetMaxStreak = Math.max(local.subnetMaxStreak || 0, cloud.subnetMaxStreak || 0);
-  merged.streak = Math.max(local.streak || 0, cloud.streak || 0);
+
+  // Merge streak + lastAttemptDate: keep the data from whichever source has the most recent activity date
+  const localDate = local.lastAttemptDate || null;
+  const cloudDate = cloud.lastAttemptDate || null;
+  if (localDate && cloudDate) {
+    // Both have dates — use the newer one and its associated streak
+    if (localDate >= cloudDate) {
+      merged.lastAttemptDate = localDate;
+      merged.streak = local.streak || 0;
+    } else {
+      merged.lastAttemptDate = cloudDate;
+      merged.streak = cloud.streak || 0;
+    }
+  } else if (localDate) {
+    merged.lastAttemptDate = localDate;
+    merged.streak = local.streak || 0;
+  } else if (cloudDate) {
+    merged.lastAttemptDate = cloudDate;
+    merged.streak = cloud.streak || 0;
+  } else {
+    merged.lastAttemptDate = null;
+    merged.streak = Math.max(local.streak || 0, cloud.streak || 0);
+  }
 
   // Merge simPathsRun
   const localPaths = local.simPathsRun || { ospf: false, roas: false };

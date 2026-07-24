@@ -1051,18 +1051,41 @@ export function submitSession(force) {
 }
 
 export function updateStreakOnAttempt() {
-  const todayStr = new Date().toDateString();
-  const lastAttemptDateStr = state.analytics.lastAttemptDate;
-  if (!lastAttemptDateStr) {
+  // Normalize to local calendar date YYYY-MM-DD to avoid timezone and locale issues
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const lastDate = state.analytics.lastAttemptDate;
+
+  // Migrate legacy toDateString() format (e.g. "Thu Jul 24 2025") to YYYY-MM-DD
+  let normalizedLast = lastDate;
+  if (lastDate && lastDate.length > 10) {
+    try {
+      const parsed = new Date(lastDate);
+      if (!isNaN(parsed.getTime())) {
+        normalizedLast = `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}-${String(parsed.getDate()).padStart(2, '0')}`;
+      }
+    } catch { /* keep original if parse fails */ }
+  }
+
+  if (!normalizedLast) {
+    // First ever activity
     state.analytics.streak = 1;
+  } else if (normalizedLast === todayStr) {
+    // Same calendar day — do NOT increment, do NOT reset. Preserve current streak.
+    return;
   } else {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toDateString();
-    
-    if (lastAttemptDateStr === yesterdayStr) {
+    // Calculate calendar day difference
+    const lastParts = normalizedLast.split('-').map(Number);
+    const todayParts = todayStr.split('-').map(Number);
+    const lastMidnight = new Date(lastParts[0], lastParts[1] - 1, lastParts[2]);
+    const todayMidnight = new Date(todayParts[0], todayParts[1] - 1, todayParts[2]);
+    const diffDays = Math.round((todayMidnight - lastMidnight) / 86400000);
+
+    if (diffDays === 1) {
+      // Consecutive day — increment streak
       state.analytics.streak = (state.analytics.streak || 0) + 1;
-    } else if (lastAttemptDateStr !== todayStr) {
+    } else {
+      // Gap of 2+ days — reset streak
       state.analytics.streak = 1;
     }
   }
