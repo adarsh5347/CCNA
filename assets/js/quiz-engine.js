@@ -16,24 +16,30 @@ export function toMMSS(sec) {
 export function readinessScore() {
   const a = state.analytics;
   if (!a || !a.totalQ) return 0;
-  const acc = (a.correct / a.totalQ) * 100;
-  const avgSec = a.totalTime / a.totalQ;
-  const speed = Math.max(0, Math.min(100, 100 - ((avgSec - 45) * 0.9)));
-  const baseScore = acc * 0.75 + speed * 0.25;
+  
+  // 1. Overall Accuracy (80% weight)
+  const overallAcc = (a.correct / a.totalQ) * 100;
 
-  const solvedCount = a.totalQ || 0;
-  const quizzesCompleted = a.attempts ? a.attempts.length : 0;
-  const qFactor = Math.min(1, solvedCount / 150);
-  const quizFactor = Math.min(1, quizzesCompleted / 5);
-  const volumeMultiplier = 0.5 * qFactor + 0.5 * quizFactor;
+  // 2. Domain Balance Accuracy (20% weight across attempted domains)
+  const attemptedDomains = blueprint.map((d) => a.domain && a.domain[d.name]).filter((s) => s && s.total > 0);
+  let domainAcc = overallAcc;
+  if (attemptedDomains.length > 0) {
+    const sumDomainAcc = attemptedDomains.reduce((sum, s) => sum + ((s.correct / s.total) * 100), 0);
+    domainAcc = sumDomainAcc / attemptedDomains.length;
+  }
 
-  return Math.round(baseScore * volumeMultiplier);
+  const baseScore = overallAcc * 0.8 + domainAcc * 0.2;
+
+  // 3. Volume Confidence Factor (scales smoothly up to 1.0 at 50 solved questions)
+  const volumeFactor = Math.min(1, Math.max(0.2, a.totalQ / 50));
+
+  return Math.round(baseScore * volumeFactor);
 }
 
 export function passProbability() {
   const a = state.analytics;
   if (!a || !a.totalQ) return 0;
-  return Math.max(5, Math.min(98, Math.round(readinessScore() * 0.92 + 5)));
+  return Math.max(5, Math.min(98, Math.round(readinessScore() * 0.95 + 5)));
 }
 
 export function readinessLabel(score) {
@@ -453,11 +459,11 @@ export function answerEquals(q, ans) {
   return false;
 }
 
-export function applyStats(q, ok, sec) {
+export function applyStats(q, ok, sec = 0) {
   const a = state.analytics;
   a.totalQ += 1;
   if (ok) a.correct += 1;
-  a.totalTime += sec;
+  if (sec && typeof sec === "number") a.totalTime += sec;
 
   if (!a.domain[q.domain]) a.domain[q.domain] = { total: 0, correct: 0 };
   a.domain[q.domain].total += 1;
@@ -875,7 +881,7 @@ export function submitSession(force) {
     if (!s.statsApplied) s.statsApplied = {};
     if (!s.statsApplied[i]) {
       s.statsApplied[i] = true;
-      applyStats(q, ok, 55);
+      applyStats(q, ok, 0);
     }
     if (!ok) wrong.push({ i, q });
   });
