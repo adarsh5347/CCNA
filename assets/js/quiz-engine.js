@@ -442,12 +442,12 @@ export function markCurrent() {
 }
 
 export function answerEquals(q, ans) {
-  if (ans == null) return false;
-  if (q.type === "single" || q.type === "scenario") return ans === q.correct[0];
-  if (q.type === "multi") {
+  const isMulti = q.type === "multi" || (Array.isArray(q.correct) && q.correct.length > 1);
+  if (isMulti) {
     if (!Array.isArray(ans)) return false;
     return [...ans].sort((a, b) => a - b).join(",") === [...q.correct].sort((a, b) => a - b).join(",");
   }
+  if (q.type === "single" || q.type === "scenario") return ans === q.correct[0];
   if (q.type === "matching") {
     if (!ans) return false;
     return q.pairs.every((p, i) => ans[i] === p[1]);
@@ -542,24 +542,26 @@ export function renderQuestion() {
     ${q.packet ? `<div class="block packet">Packet: ${safeHTML(q.packet)}</div>` : ""}
   `;
 
-  if (q.type === "single" || q.type === "scenario") {
-    const v = s.answers[s.idx];
-    html += `<div class="options-list">` + q.options.map((o, i) => {
-      const letter = String.fromCharCode(65 + i);
-      const isSelected = v === i;
-      return `<label class="opt${isSelected ? ' selected' : ''}" data-idx="${i}">
-        <input type="radio" name="single" value="${i}" ${isSelected ? "checked" : ""}/ aria-label="Option ${letter}">
-        <span class="opt-key" aria-hidden="true">${letter}</span>
-        <span>${safeHTML(o)}</span>
-      </label>`;
-    }).join("") + `</div>`;
-  } else if (q.type === "multi") {
+  const isMulti = q.type === "multi" || (Array.isArray(q.correct) && q.correct.length > 1);
+
+  if (isMulti) {
     const selected = Array.isArray(s.answers[s.idx]) ? s.answers[s.idx] : [];
     html += `<div class="options-list">` + q.options.map((o, i) => {
       const letter = String.fromCharCode(65 + i);
       const isSelected = selected.includes(i);
       return `<label class="opt${isSelected ? ' selected' : ''}" data-idx="${i}">
         <input type="checkbox" value="${i}" ${isSelected ? "checked" : ""} aria-label="Option ${letter}">
+        <span class="opt-key" aria-hidden="true">${letter}</span>
+        <span>${safeHTML(o)}</span>
+      </label>`;
+    }).join("") + `</div>`;
+  } else if (q.type === "single" || q.type === "scenario") {
+    const v = s.answers[s.idx];
+    html += `<div class="options-list">` + q.options.map((o, i) => {
+      const letter = String.fromCharCode(65 + i);
+      const isSelected = v === i;
+      return `<label class="opt${isSelected ? ' selected' : ''}" data-idx="${i}">
+        <input type="radio" name="single" value="${i}" ${isSelected ? "checked" : ""}/ aria-label="Option ${letter}">
         <span class="opt-key" aria-hidden="true">${letter}</span>
         <span>${safeHTML(o)}</span>
       </label>`;
@@ -586,7 +588,7 @@ export function renderQuestion() {
   const ok = s.feedback[s.idx];
   if (ok != null) {
     html += explanationBlock(q, ok);
-  } else if (s.mode === "study" && q.type !== "single" && q.type !== "scenario") {
+  } else if (s.mode === "study" && (isMulti || q.type === "matching" || q.type === "dragdrop")) {
     html += `<div style="margin-top: 20px;"><button id="btnCheckAnswer" class="primary" style="width: 100%; max-width: 240px; height: 44px; font-weight: bold;">Check Answer</button></div>`;
   }
 
@@ -1038,13 +1040,14 @@ export function submitSession(force) {
           let userAnsText = "";
           let correctAnsText = "";
           
-          if (q.type === "single" || q.type === "scenario") {
-            userAnsText = userAns !== undefined ? `${String.fromCharCode(65 + userAns)}. ${q.options[userAns]}` : "No Answer";
-            correctAnsText = `${String.fromCharCode(65 + q.correct[0])}. ${q.options[q.correct[0]]}`;
-          } else if (q.type === "multi") {
+          const isMulti = q.type === "multi" || (Array.isArray(q.correct) && q.correct.length > 1);
+          if (isMulti) {
             const list = Array.isArray(userAns) ? userAns : [];
             userAnsText = list.length > 0 ? list.map(v => String.fromCharCode(65 + v)).join(", ") : "No Answer";
             correctAnsText = q.correct.map(v => String.fromCharCode(65 + v)).join(", ");
+          } else if (q.type === "single" || q.type === "scenario") {
+            userAnsText = userAns !== undefined ? `${String.fromCharCode(65 + userAns)}. ${q.options[userAns]}` : "No Answer";
+            correctAnsText = `${String.fromCharCode(65 + q.correct[0])}. ${q.options[q.correct[0]]}`;
           } else if (q.type === "matching") {
             userAnsText = userAns ? q.pairs.map((p, i) => `${p[0]}: ${userAns[i] || 'None'}`).join(", ") : "No Answer";
             correctAnsText = q.pairs.map(p => `${p[0]}: ${p[1]}`).join(", ");
