@@ -196,9 +196,10 @@ export function mergeProgress(local, cloud) {
     }
   });
   // Sort by date ascending and slice last 40
-  merged.attempts = uniqueAttempts
-    .sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime())
-    .slice(-40);
+  // Merge watched videos progress
+  const localWatched = local.watchedVideos || [];
+  const cloudWatched = cloud.watchedVideos || [];
+  merged.watchedVideos = Array.from(new Set([...localWatched, ...cloudWatched]));
 
   return merged;
 }

@@ -739,6 +739,23 @@ export function updateSubnetCalculator() {
   else if (firstOctet === 169 && ((ipNum >>> 16) & 255) === 254) scope = "Link-Local (APIPA)";
   byId("calcScope").textContent = scope;
 
+  const bitGrid = byId("calcBitGrid");
+  if (bitGrid) {
+    let gridHtml = "";
+    for (let i = 0; i < 32; i++) {
+      const isNetBit = i < cidr;
+      const bitVal = (ipNum >>> (31 - i)) & 1;
+      const bg = isNetBit ? "rgba(0, 242, 254, 0.2)" : "rgba(255, 94, 58, 0.15)";
+      const border = isNetBit ? "#00f2fe" : "#ff5e3a";
+      const color = isNetBit ? "#00f2fe" : "#ff5e3a";
+      gridHtml += `<span style="display:inline-flex; align-items:center; justify-content:center; width:22px; height:24px; border-radius:4px; background:${bg}; border:1px solid ${border}; color:${color}; font-size:12px; font-family:var(--font-mono); font-weight:bold;">${bitVal}</span>`;
+      if ((i + 1) % 8 === 0 && i < 31) {
+        gridHtml += `<span style="font-size: 16px; color: var(--text-muted); margin: 0 4px;">.</span>`;
+      }
+    }
+    bitGrid.innerHTML = gridHtml;
+  }
+
   // Highlight active row in the CIDR cheat sheet
   document.querySelectorAll(".cheat-sheet-row").forEach(row => {
     const rowCidr = Number(row.dataset.cidr);

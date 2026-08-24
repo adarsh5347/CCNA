@@ -1,5 +1,5 @@
 import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML, pick, rand, shuffle, showToast, persistSession } from "./core.js";
-import { blueprint } from "./data.js";
+import { blueprint, generateBank } from "./data.js";
 import { ccnaVideos } from "./videos.js";
 
 // We need these utility page/navigation functions from app.js / global scope
@@ -577,7 +577,10 @@ export function renderQuestion() {
     });
     html += `</div>`;
   } else {
-    const order = s.answers[s.idx] || [...q.order];
+    if (!s._dragInit) s._dragInit = {};
+    if (!s._dragInit[s.idx]) s._dragInit[s.idx] = shuffle([...q.order]);
+    const order = s.answers[s.idx] || s._dragInit[s.idx];
+    if (!s.answers[s.idx]) s.answers[s.idx] = [...order];
     html += `<div class="options-list">`;
     order.forEach((step, i) => {
       html += `<div class="opt"><strong>${i + 1}.</strong> <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 16px; flex-wrap: wrap;"><span style="flex: 1; min-width: 150px;">${safeHTML(step)}</span><div class="inline" style="margin-top: 0; display: flex; gap: 8px;"><button class="secondary" data-up="${i}" style="padding: 6px 12px; font-size: 11px; height: auto;">Up</button><button class="secondary" data-down="${i}" style="padding: 6px 12px; font-size: 11px; height: auto;">Down</button></div></div></div>`;
@@ -935,9 +938,20 @@ export function submitSession(force) {
 
   if (s.mode !== "exam") {
     html += `<div class="card"><h3>Review (first 20 misses)</h3>${wrong.slice(0, 20).map((x) => {
-      const correctVal = x.q.expl.correct || x.q.correct.map(idx => String.fromCharCode(65 + idx)).join(", ");
-      const whyVal = x.q.expl.why || x.q.expl.text || "";
-      const tipVal = x.q.expl.tip || "";
+      let correctVal = x.q.expl?.correct;
+      if (!correctVal) {
+        if (x.q.type === "matching" && Array.isArray(x.q.pairs)) {
+          correctVal = x.q.pairs.map(p => `${p[0]}: ${p[1]}`).join(", ");
+        } else if (x.q.type === "dragdrop" && Array.isArray(x.q.order)) {
+          correctVal = x.q.order.join(" -> ");
+        } else if (Array.isArray(x.q.correct)) {
+          correctVal = x.q.correct.map(idx => String.fromCharCode(65 + idx)).join(", ");
+        } else {
+          correctVal = "See explanation";
+        }
+      }
+      const whyVal = x.q.expl?.why || x.q.expl?.text || "";
+      const tipVal = x.q.expl?.tip || "";
       return `<div class="output"><strong>Q${x.i + 1}</strong> ${x.q.topic} | Correct: ${correctVal}<br /><span style="display:block; margin-top:6px; color:#a1b2c8"><strong>Explanation:</strong> ${safeHTML(whyVal)}</span>${tipVal ? `<span style="display:block; margin-top:4px; color:#a1b2c8"><strong>Tip:</strong> ${safeHTML(tipVal)}</span>` : ""}</div>`;
     }).join("") || "No incorrect answers."}</div>`;
   } else {

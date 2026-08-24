@@ -356,27 +356,21 @@ ${nodeName.toUpperCase()}(config)# ${option.cmd.trim().replace(/\n/g, '\n' + nod
         const correctOption = bug.options.find(o => o.correct);
         if (!correctOption) return;
         
-        const cleanTyped = val.replace(/\s+/g, " ")
-                            .replace(/^interface\s/, "int ")
-                            .replace(/^gigabitethernet/, "gi")
-                            .replace(/^fastethernet/, "fa")
-                            .replace(/^ethernet/, "eth")
-                            .replace(/^shutdown/, "shut")
-                            .replace(/^no shutdown/, "no shut");
+        const normalizeCiscoCmd = (str) => {
+          return str.trim().toLowerCase()
+            .replace(/\bgigabitethernet\b/g, "gi")
+            .replace(/\bfastethernet\b/g, "fa")
+            .replace(/\bethernet\b/g, "eth")
+            .replace(/\binterface\s+/g, "int ")
+            .replace(/\bshutdown\b/g, "shut")
+            .replace(/\s+/g, " ");
+        };
                             
-        const cleanCorrect = correctOption.cmd.toLowerCase().replace(/\s+/g, " ")
-                            .replace(/^interface\s/, "int ")
-                            .replace(/^gigabitethernet/, "gi")
-                            .replace(/^fastethernet/, "fa")
-                            .replace(/^ethernet/, "eth")
-                            .replace(/^shutdown/, "shut")
-                            .replace(/^no shutdown/, "no shut");
-                            
-        const typedLines = cleanTyped.split(/\s*\\n\s*|\s*\n\s*/);
-        const correctLines = cleanCorrect.split(/\s*\\n\s*|\s*\n\s*/);
+        const typedLines = typedInput.value.split(/[\r\n]+/).map(normalizeCiscoCmd).filter(Boolean);
+        const correctLines = correctOption.cmd.split(/[\r\n]+/).map(normalizeCiscoCmd).filter(Boolean);
         
         let allMatch = typedLines.length === correctLines.length && typedLines.every((line, idx) => {
-          return line.trim() === correctLines[idx].trim();
+          return line === correctLines[idx];
         });
         
         if (allMatch) {

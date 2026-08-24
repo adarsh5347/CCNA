@@ -653,6 +653,11 @@ function loadLab(labId) {
   state.lab.userCommands = [];
   state.lab.currentPrompt = (labId === 1 || labId === 7 || labId === 8) ? "Switch(config)#" : "Router(config)#";
   
+  const labTitleEl = byId("labTitle");
+  const labScenarioEl = byId("labScenario");
+  if (labTitleEl) labTitleEl.textContent = `Lab ${lab.id}: ${lab.title} (${lab.difficulty})`;
+  if (labScenarioEl) labScenarioEl.textContent = lab.scenario;
+
   drawLabTopology(lab);
   renderLabObjectives(lab);
   
@@ -704,6 +709,7 @@ function loadLab(labId) {
 }
 
 function handleLabCommandClick(cmd, lab) {
+  if (!lab || !lab.commands || state.lab.userCommands.length >= lab.commands.length) return;
   const nextExpectedIdx = state.lab.userCommands.length;
   const nextExpectedCmd = lab.commands[nextExpectedIdx].cmd;
   const output = byId("labCliOutput");
@@ -929,7 +935,10 @@ document.addEventListener("click", (e) => {
 });
 
 // ─── Phase 3: Dynamically sync --header-height from actual rendered header ───
-// Uses ResizeObserver so the variable stays accurate if fontlet _lastHeaderHeight = 0;
+// Uses ResizeObserver so the variable stays accurate if font sizes change
+let _lastHeaderHeight = 0;
+let _headerResizeObserver = null;
+
 function syncHeaderHeight() {
   if (window.innerWidth > 760) return; // desktop untouched
   const header = document.querySelector(".exam-header");
