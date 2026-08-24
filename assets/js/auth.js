@@ -30,25 +30,29 @@ export function setupAuth() {
   const userPhoto = byId("userPhoto");
   const userName = byId("userName");
 
-  btnSignIn.addEventListener("click", async () => {
-    try {
-      showToast("Opening Google Sign-In...", "info", 2000);
-      await loginWithGoogle();
-    } catch (err) {
-      console.error("Login failed:", err);
-      showToast("Authentication failed.", "error");
-    }
-  });
+  if (btnSignIn) {
+    btnSignIn.addEventListener("click", async () => {
+      try {
+        showToast("Opening Google Sign-In...", "info", 2000);
+        await loginWithGoogle();
+      } catch (err) {
+        console.error("Login failed:", err);
+        showToast("Authentication failed.", "error");
+      }
+    });
+  }
 
-  btnSignOut.addEventListener("click", async () => {
-    try {
-      await logout();
-      showToast("Signed out successfully.", "info");
-    } catch (err) {
-      console.error("Logout failed:", err);
-      showToast("Failed to sign out.", "error");
-    }
-  });
+  if (btnSignOut) {
+    btnSignOut.addEventListener("click", async () => {
+      try {
+        await logout();
+        showToast("Signed out successfully.", "info");
+      } catch (err) {
+        console.error("Logout failed:", err);
+        showToast("Failed to sign out.", "error");
+      }
+    });
+  }
 
   onAuthChange(async (user) => {
     try {

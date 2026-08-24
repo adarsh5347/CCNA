@@ -41,7 +41,7 @@ export function getSubnetDetails(ipStr, prefix) {
     firstUsable: numToIp((netNum + 1) >>> 0),
     lastUsable: numToIp((broadNum - 1) >>> 0),
     totalHosts: Math.pow(2, 32 - prefix),
-    usableHosts: prefix >= 31 ? 0 : Math.pow(2, 32 - prefix) - 2
+    usableHosts: prefix === 31 ? 2 : (prefix >= 32 ? 1 : Math.pow(2, 32 - prefix) - 2)
   };
 }
 

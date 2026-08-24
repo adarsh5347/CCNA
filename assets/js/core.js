@@ -221,8 +221,7 @@ export function playNetSound(type) {
 }
 
 export function getLevelInfo(xp) {
-  const lvl = Math.floor((xp || 0) / 100) + 1;
-  const level = Math.min(5, lvl);
+  const level = Math.floor((xp || 0) / 100) + 1;
   const labels = {
     1: "Cable Puller",
     2: "Jr. Network Administrator",
@@ -230,9 +229,10 @@ export function getLevelInfo(xp) {
     4: "Senior Infrastructure Engineer",
     5: "Lead Network Architect"
   };
+  const labelKey = Math.min(5, level);
   return {
     level,
-    label: labels[level] || "Lead Network Architect",
+    label: labels[labelKey] || "Lead Network Architect",
     currentXP: (xp || 0) % 100,
     nextXP: 100
   };
