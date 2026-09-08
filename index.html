@@ -96,8 +96,8 @@
         <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true" fill="none" stroke="currentColor"><path d="M4 10l3 3 3-3 4-4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="15" cy="5" r="2"/><rect x="2" y="2" width="16" height="16" rx="2"/></svg>
         <span class="nav-label">Pricing</span>
       </button>
-      <!-- Admin nav — shown only to admin users via JS -->
-      <button id="btnNavAdmin" data-page="admin" class="nav-btn ghost" aria-label="Admin Panel" style="display:none;color:#ef4444;">
+      <!-- Admin nav -->
+      <button id="btnNavAdmin" data-page="admin" class="nav-btn ghost" aria-label="Admin Panel" style="display:inline-flex;color:#ef4444;">
         <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><path d="M10 2l2.4 4.9 5.4.8-3.9 3.8.9 5.3L10 14.1l-4.8 2.7.9-5.3-3.9-3.8 5.4-.8z" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span class="nav-label">Admin</span>
       </button>
@@ -118,6 +118,7 @@
           <img id="userPhoto" class="user-photo" src="" alt="User Photo" />
           <span id="userName" class="user-name"></span>
           <button data-page="account" class="ghost" style="font-size:11px;padding:4px 10px;">My Account</button>
+          <button data-page="admin" class="ghost" style="font-size:11px;padding:4px 10px;color:#ef4444;">Admin</button>
           <button id="btnSignOut" class="ghost">Sign Out</button>
         </div>
       </div>
@@ -135,7 +136,7 @@
         <canvas id="heroInteractiveSphere" style="position: absolute; right: 0; top: 0; width: 360px; height: 100%; pointer-events: none; opacity: 0.85; z-index: 0;"></canvas>
 
         <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-          <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap; flex: 1; min-width: 280px;">
+          <div style="display: flex; align-items: gap: 24px; flex-wrap: wrap; flex: 1; min-width: 280px;">
             <div class="hero-graphics" style="width: 100px; height: 100px; position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
               <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
                 <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(0, 242, 254, 0.12)" stroke-width="1.5" />
@@ -166,6 +167,7 @@
             <button id="btnLaunchStudy" class="primary magnetic-btn" style="padding: 8px 16px; font-size: 13px;">⚡ Start Studying</button>
             <button id="btnLaunchExam" class="secondary magnetic-btn" style="padding: 8px 16px; font-size: 13px;">🏆 Take Exam</button>
             <button id="btnLaunchLabs" class="secondary magnetic-btn" style="padding: 8px 16px; font-size: 13px;">🧪 Virtual Labs</button>
+            <button data-page="admin" class="secondary magnetic-btn" style="padding: 8px 16px; font-size: 13px; color: #ef4444; border-color: rgba(239, 68, 68, 0.4);">⚡ Admin Panel</button>
           </div>
         </div>
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; position: relative; z-index: 2;" />
