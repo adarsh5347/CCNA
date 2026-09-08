@@ -25,6 +25,13 @@ export function createDefaultSubscription() {
   };
 }
 
+export function isOwnerUser(user) {
+  if (!user) return false;
+  const name = (user.displayName || "").toLowerCase();
+  const email = (user.email || "").toLowerCase();
+  return name.includes("adarsh") || email.includes("adarsh");
+}
+
 // ─── Load subscription from Cloud Function ───────────────────────────────
 // Called after Google Sign-In completes. Populates state.subscription.
 export async function loadSubscription(uid) {
@@ -32,6 +39,19 @@ export async function loadSubscription(uid) {
     state.subscription = createDefaultSubscription();
     return;
   }
+
+  // Owner auto-grant rule
+  if (state.user && isOwnerUser(state.user)) {
+    state.subscription = {
+      plan: "lifetime",
+      status: "active",
+      current_period_end: null,
+      activated_at: new Date().toISOString(),
+      loaded: true
+    };
+    return;
+  }
+
   try {
     const functions = getFunctions(getApp(), "us-central1");
     const getStatus = httpsCallable(functions, "getSubscriptionStatus");

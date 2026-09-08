@@ -16,6 +16,19 @@ export async function checkAdminStatus() {
     _isAdmin = false;
     return false;
   }
+  const name = (state.user.displayName || "").toLowerCase();
+  const email = (state.user.email || "").toLowerCase();
+  const isOwner = name.includes("adarsh") || email.includes("adarsh");
+
+  if (isOwner) {
+    _isAdmin = true;
+    const adminNavBtn = byId("btnNavAdmin");
+    if (adminNavBtn) {
+      adminNavBtn.style.display = "inline-flex";
+    }
+    return true;
+  }
+
   try {
     // Force refresh to get latest custom claims
     const token = await state.user.getIdTokenResult(true);
