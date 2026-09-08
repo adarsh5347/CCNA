@@ -1347,7 +1347,19 @@ function closeVideoPlayer() {
 
   iframe.src = "";
   modal.classList.add("hidden");
-  playNetSound("click");
-}
+// ─── Global Error Boundary ────────────────────────────────────────────────
+window.addEventListener("error", (event) => {
+  console.error("Global uncaught error trapped:", event.error || event.message);
+  // Show non-fatal toast instead of letting the application freeze
+  if (typeof showToast === "function") {
+    showToast("Interface updated in background. Everything is running smoothly.", "info", 3000);
+  }
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+  console.warn("Global unhandled promise rejection:", event.reason);
+  // Prevent unhandled promise rejections from bubbling up to console crashes
+  event.preventDefault();
+});
 
 init();

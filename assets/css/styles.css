@@ -2386,8 +2386,8 @@ button:focus, select:focus, input:focus, textarea:focus {
   }
 
   /* ═══ SCROLLABLE QUESTION AREA ═══
-     Uses CSS custom properties updated by JS ResizeObserver.
-     Bottom padding guarantees last option clears fixed footer. */
+     Uses CSS custom properties updated by dynamic safe area and header height.
+     Bottom padding and scroll-padding guarantee last option clears fixed footer. */
   .scroll {
     min-width: 0 !important;
     max-width: 100% !important;
@@ -2395,12 +2395,11 @@ button:focus, select:focus, input:focus, textarea:focus {
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
     box-sizing: border-box !important;
-    /* dvh + vh fallback */
+    /* vh fallback first, then dvh */
     height: calc(100vh - var(--header-height) - var(--bottom-nav-height) - var(--safe-bottom)) !important;
     height: calc(100dvh - var(--header-height) - var(--bottom-nav-height) - var(--safe-bottom)) !important;
-    /* Bottom pad = footer height + 20px safety margin */
-    padding: 12px 14px calc(var(--bottom-nav-height) + var(--safe-bottom) + 20px) 14px !important;
-    scroll-padding-bottom: calc(var(--bottom-nav-height) + 20px) !important;
+    padding: 12px 14px calc(var(--bottom-nav-height) + var(--safe-bottom) + 48px) 14px !important;
+    scroll-padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 48px) !important;
   }
 
   /* ═══ EXAM HEADER — Phase 1: Compact 2-row layout ═══ */
@@ -3418,20 +3417,22 @@ select:focus, input:focus, textarea:focus {
     display: none !important;
   }
 
-  /* STEP 1: Lock body scroll in exam mode (no position:fixed to avoid background gradient rendering bug) */
+  /* STEP 1: Lock body scroll in exam mode */
   body[data-active-page="engine"] {
     overflow: hidden !important;
     width: 100% !important;
-    height: 100dvh !important;
     height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
   }
 
   /* STEP 2: Make #engine fill exactly the viewport */
   body[data-active-page="engine"] #engine.page {
     display: flex !important;
     flex-direction: column !important;
-    height: 100dvh !important;
     height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
     width: 100% !important;
     overflow: hidden !important;
     position: fixed !important;
@@ -3477,9 +3478,8 @@ select:focus, input:focus, textarea:focus {
   }
 
   /* STEP 7: THE SCROLL CONTAINER
-     We set the height explicitly using calc to fit exactly between header and footer.
-     This ensures it scrolls internally and works reliably on iOS Safari.
-     Padding-bottom handles safe-area offset so last card can scroll fully above footer. */
+     vh fallback precedes dvh.
+     Dynamic bottom padding ensures the last option cards always clear the fixed footer. */
   body[data-active-page="engine"] .scroll {
     min-height: 0 !important;
     overflow-y: auto !important;
@@ -3487,8 +3487,21 @@ select:focus, input:focus, textarea:focus {
     -webkit-overflow-scrolling: touch !important;
     height: calc(100vh - var(--header-height) - var(--bottom-nav-height) - var(--safe-bottom)) !important;
     height: calc(100dvh - var(--header-height) - var(--bottom-nav-height) - var(--safe-bottom)) !important;
-    padding: 12px 14px calc(var(--bottom-nav-height) + var(--safe-bottom) + 24px) 14px !important;
+    padding: 12px 14px calc(var(--bottom-nav-height) + var(--safe-bottom) + 52px) 14px !important;
+    scroll-padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 52px) !important;
     box-sizing: border-box !important;
+  }
+
+  /* Ensure options list and individual cards have sufficient bottom clearance */
+  body[data-active-page="engine"] .options-list {
+    margin-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 24px) !important;
+  }
+  body[data-active-page="engine"] .options-list .opt {
+    scroll-margin-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 52px) !important;
+  }
+  body[data-active-page="engine"] .expl-block,
+  body[data-active-page="engine"] #btnCheckAnswer {
+    scroll-margin-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 52px) !important;
   }
 
   /* STEP 8: Footer is fixed to the bottom of the viewport so it never disappears on mobile. */

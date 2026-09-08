@@ -182,7 +182,7 @@ exports.verifyRazorpayPayment = functions.https.onCall(async (data, context) => 
 // Razorpay POSTs to this endpoint on payment events.
 // Set this URL in your Razorpay dashboard: Webhooks → Add New Webhook
 // URL: https://us-central1-ccna-prep-platform.cloudfunctions.net/handleRazorpayWebhook
-exports.handleRazorpayWebhook = functions.https.onRequest(async (req, res) => {
+exports.handleRazorpayWebhook = functions.runWith({ maxInstances: 10 }).https.onRequest(async (req, res) => {
   if (req.method !== "POST") {
     return res.status(405).send("Method Not Allowed");
   }
@@ -190,18 +190,31 @@ exports.handleRazorpayWebhook = functions.https.onRequest(async (req, res) => {
   const { keySecret } = getRazorpayConfig();
   const webhookSecret = keySecret; // Razorpay uses the same secret for webhooks
 
-  // Verify webhook signature
+  // Verify webhook signature with timing-safe comparison
   const signature = req.headers["x-razorpay-signature"];
   const body = JSON.stringify(req.body);
   const expectedSig = crypto.createHmac("sha256", webhookSecret).update(body).digest("hex");
 
-  if (!signature || signature !== expectedSig) {
-    functions.logger.warn("Webhook signature mismatch");
+  let isSigValid = false;
+  try {
+    if (signature && typeof signature === "string") {
+      const sigBuf = Buffer.from(signature);
+      const expBuf = Buffer.from(expectedSig);
+      if (sigBuf.length === expBuf.length) {
+        isSigValid = crypto.timingSafeEqual(sigBuf, expBuf);
+      }
+    }
+  } catch (sigErr) {
+    functions.logger.error("Signature comparison error", sigErr);
+  }
+
+  if (!isSigValid) {
+    functions.logger.warn("Webhook signature mismatch or invalid header", { hasSignature: !!signature });
     return res.status(400).send("Invalid signature");
   }
 
   const event = req.body;
-  functions.logger.info("Razorpay webhook received", { event: event.event });
+  functions.logger.info("Razorpay webhook received", { event: event.event, id: event.payload && event.payload.payment && event.payload.payment.entity ? event.payload.payment.entity.id : null });
 
   try {
     if (event.event === "payment.captured") {
@@ -211,21 +224,21 @@ exports.handleRazorpayWebhook = functions.https.onRequest(async (req, res) => {
       const plan = notes.plan;
 
       if (!uid || !plan) {
-        functions.logger.warn("Webhook missing uid or plan in notes", { notes });
-        return res.status(200).send("OK"); // Acknowledge but skip
+        functions.logger.warn("Webhook missing uid or plan in notes", { notes, paymentId: payment.id });
+        return res.status(200).send("OK"); // Acknowledge to prevent unnecessary retries
       }
 
       await activateSubscription(uid, plan, payment.id, payment.order_id);
-      functions.logger.info("Subscription activated via webhook", { uid, plan });
+      functions.logger.info("Subscription activated via webhook", { uid, plan, paymentId: payment.id });
     }
 
     if (event.event === "payment.failed") {
       const payment = event.payload.payment.entity;
       const notes = payment.notes || {};
       const uid = notes.uid;
-      functions.logger.warn("Payment failed", { uid, paymentId: payment.id });
+      functions.logger.warn("Payment failed event recorded", { uid, paymentId: payment.id });
 
-      if (uid) {
+      if (uid && payment.order_id) {
         await db.collection("users").doc(uid).collection("orders").doc(payment.order_id).set({
           status: "failed",
           updatedAt: admin.firestore.FieldValue.serverTimestamp()
@@ -240,8 +253,16 @@ exports.handleRazorpayWebhook = functions.https.onRequest(async (req, res) => {
   }
 });
 
-// ─── Helper: Activate subscription in Firestore ─────────────────────────────
+// ─── Helper: Activate subscription in Firestore (Idempotent) ────────────────
 async function activateSubscription(uid, plan, paymentId, orderId) {
+  // Idempotency check: check if this payment ID was already processed
+  const paymentRef = db.collection("users").doc(uid).collection("payments").doc(paymentId);
+  const paymentSnap = await paymentRef.get();
+  if (paymentSnap.exists && paymentSnap.data().status === "captured") {
+    functions.logger.info("Payment already processed previously (idempotent skip)", { uid, paymentId });
+    return;
+  }
+
   const now = new Date();
   let current_period_end = null;
 
@@ -263,8 +284,7 @@ async function activateSubscription(uid, plan, paymentId, orderId) {
     updatedAt: admin.firestore.FieldValue.serverTimestamp()
   }, { merge: false }); // Full overwrite to clear any stale data
 
-  // Also write to payments history
-  const paymentRef = db.collection("users").doc(uid).collection("payments").doc(paymentId);
+  // Write to payments history (acts as idempotency latch)
   await paymentRef.set({
     paymentId,
     orderId,

@@ -85,8 +85,10 @@ export function setupAuth() {
           }
         }
 
-        // Merge with guest data if present
-        const guestRaw = localStorage.getItem(STORE);
+        // Merge with guest data if present (only if not a different previous user account)
+        const lastUid = localStorage.getItem("ccna_last_uid");
+        const isAccountSwitch = Boolean(lastUid && lastUid !== user.uid);
+        const guestRaw = isAccountSwitch ? null : localStorage.getItem(STORE);
         let didMergeGuest = false;
         if (guestRaw) {
           try {
@@ -101,6 +103,7 @@ export function setupAuth() {
             console.error("Error parsing guest progress:", e);
           }
         }
+        localStorage.setItem("ccna_last_uid", user.uid);
 
         if (!merged) {
           merged = createDefaultAnalytics();
