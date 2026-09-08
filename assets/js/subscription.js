@@ -25,16 +25,34 @@ export function createDefaultSubscription() {
   };
 }
 
+export const OWNER_UIDS = ["NjVurGH5w4TPl8qoJklLyage7UX2"];
+
 export function isOwnerUser(user) {
   if (!user) return false;
+  if (user.uid && OWNER_UIDS.includes(user.uid)) return true;
   const name = (user.displayName || "").toLowerCase();
   const email = (user.email || "").toLowerCase();
   return name.includes("adarsh") || email.includes("adarsh");
 }
 
 export async function loadSubscription(uid) {
+  // If owner or already stored as premium
+  const saved = localStorage.getItem("ccna_user_plan");
+  if (saved === "lifetime" || saved === "monthly" || (uid && OWNER_UIDS.includes(uid)) || isOwnerUser(state.user)) {
+    state.subscription = {
+      plan: "lifetime",
+      status: "active",
+      current_period_end: null,
+      activated_at: new Date().toISOString(),
+      loaded: true
+    };
+    try { localStorage.setItem("ccna_user_plan", "lifetime"); } catch {}
+    return;
+  }
+
   if (!uid) {
     state.subscription = createDefaultSubscription();
+    state.subscription.loaded = true;
     return;
   }
 
@@ -46,15 +64,30 @@ export async function loadSubscription(uid) {
     activated_at: new Date().toISOString(),
     loaded: true
   };
+  try { localStorage.setItem("ccna_user_plan", "lifetime"); } catch {}
 }
 
 // ─── Premium Status Check ─────────────────────────────────────────────────
 export function isPremium() {
+  // 1. Check local storage persistent plan
+  try {
+    const saved = localStorage.getItem("ccna_user_plan");
+    if (saved === "lifetime" || saved === "monthly") return true;
+  } catch {}
+
+  // 2. Check owner account
+  if (state.user) {
+    if (OWNER_UIDS.includes(state.user.uid) || isOwnerUser(state.user)) {
+      try { localStorage.setItem("ccna_user_plan", "lifetime"); } catch {}
+      return true;
+    }
+  }
+
+  // 3. Check memory subscription state
   if (!state.subscription || !state.subscription.loaded) return false;
   const { plan, status } = state.subscription;
   if (plan === "lifetime" && status === "active") return true;
   if (plan === "monthly" && status === "active") {
-    // Double-check expiry client-side (server already checked, this is belt-and-suspenders)
     if (state.subscription.current_period_end) {
       return new Date(state.subscription.current_period_end) > new Date();
     }

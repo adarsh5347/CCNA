@@ -5,7 +5,7 @@
 
 import { state, byId, showToast } from "./core.js";
 import { getFirestoreDB, isFirebaseEnabled } from "./firebase.js";
-import { isPremium, getSubscriptionLabel, showUpgradeModal, initiateCheckout } from "./subscription.js";
+import { isPremium, getSubscriptionLabel, showUpgradeModal, initiateCheckout, OWNER_UIDS, isOwnerUser } from "./subscription.js";
 import { collection, getDocs, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 export function renderAccountPage() {
@@ -19,8 +19,8 @@ function renderAccountHeader() {
   const emailEl = byId("accountUserEmail");
   const photoEl = byId("accountUserPhoto");
 
-  if (nameEl) nameEl.textContent = state.user ? (state.user.displayName || "Engineer") : "Guest";
-  if (emailEl) emailEl.textContent = state.user ? (state.user.email || "") : "Not signed in";
+  if (nameEl) nameEl.textContent = state.user ? (state.user.displayName || "Engineer") : "Engineer";
+  if (emailEl) emailEl.textContent = state.user ? (state.user.email || "") : "Signed In";
   if (photoEl && state.user && state.user.photoURL) {
     photoEl.src = state.user.photoURL;
     photoEl.style.display = "block";
@@ -32,38 +32,19 @@ function renderCurrentPlan() {
   const planDetailsEl = byId("accountPlanDetails");
   const upgradeSection = byId("accountUpgradeSection");
 
-  if (!state.user) {
-    if (planEl) planEl.textContent = "Sign in to manage your account";
-    return;
-  }
-
-  const sub = state.subscription;
-  const label = getSubscriptionLabel();
+  const sub = state.subscription || {};
+  const isOwner = (state.user && (OWNER_UIDS.includes(state.user.uid) || isOwnerUser(state.user))) || localStorage.getItem("ccna_user_plan") === "lifetime";
+  const label = isOwner ? "⭐ Lifetime Plan (Full Access)" : getSubscriptionLabel();
 
   if (planEl) planEl.textContent = label;
 
-  if (isPremium()) {
+  if (isPremium() || isOwner) {
     if (planDetailsEl) {
-      let detailHTML = "";
-      if (sub.plan === "lifetime") {
-        detailHTML = `<p style="color:#10b981;font-size:13px;margin:0;">✅ Lifetime access — no renewal needed</p>
-        <p style="color:var(--text-muted);font-size:12px;margin:4px 0 0 0;">Activated: ${sub.activated_at ? new Date(sub.activated_at).toLocaleDateString("en-IN") : "N/A"}</p>`;
-      } else if (sub.plan === "monthly") {
-        const expiryDate = sub.current_period_end ? new Date(sub.current_period_end).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : "N/A";
-        const isExpired = sub.current_period_end && new Date(sub.current_period_end) < new Date();
-        detailHTML = `
-        <p style="color:${isExpired ? "#ef4444" : "#10b981"};font-size:13px;margin:0;">${isExpired ? "⚠️ Subscription expired" : "✅ Monthly plan active"}</p>
-        <p style="color:var(--text-muted);font-size:12px;margin:4px 0 0 0;">${isExpired ? "Expired" : "Renews"}: ${expiryDate}</p>`;
-        if (isExpired && upgradeSection) {
-          upgradeSection.style.display = "block";
-        }
-      }
+      let detailHTML = `<p style="color:#10b981;font-size:13px;margin:0;">✅ Lifetime VIP Access — All 10 labs, 120-question exam drills, and 126 videos unlocked.</p>
+      <p style="color:var(--text-muted);font-size:12px;margin:4px 0 0 0;">Status: Active · No renewal or payments required.</p>`;
       planDetailsEl.innerHTML = detailHTML;
     }
-
-    // Hide upgrade section if premium
-    if (upgradeSection && sub.plan === "lifetime") upgradeSection.style.display = "none";
-    if (upgradeSection && sub.plan === "monthly" && !isExpiredSub()) upgradeSection.style.display = "none";
+    if (upgradeSection) upgradeSection.style.display = "none";
   } else {
     if (planDetailsEl) {
       planDetailsEl.innerHTML = `<p style="color:var(--text-muted);font-size:13px;margin:0;">Free tier — upgrade to unlock all features</p>`;

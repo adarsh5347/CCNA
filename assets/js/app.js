@@ -1098,10 +1098,12 @@ function init() {
 
   // Always display admin nav button
   checkAdminStatus();
+  setupAdminGrantForm();
 
   // Check admin status after auth is ready
   authReady.then(() => {
     checkAdminStatus();
+    setupAdminGrantForm();
   });
   
   updateMuteButton();
