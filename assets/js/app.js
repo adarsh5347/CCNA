@@ -1347,6 +1347,9 @@ function closeVideoPlayer() {
 
   iframe.src = "";
   modal.classList.add("hidden");
+  playNetSound("click");
+}
+
 // ─── Global Error Boundary ────────────────────────────────────────────────
 window.addEventListener("error", (event) => {
   console.error("Global uncaught error trapped:", event.error || event.message);
