@@ -87,6 +87,8 @@ export function createDefaultAnalytics() {
     streak: 0,
     lastAttemptDate: null,
     labsCompleted: 0,
+    completedLabIds: [],
+    lastWatchedVideoId: null,
     subnetMaxStreak: 0,
     ach: {},
     simPathsRun: { ospf: false, roas: false },
@@ -103,6 +105,7 @@ export function validateAnalyticsSchema(data) {
   }
   if (!data.simPathsRun || typeof data.simPathsRun !== 'object') return false;
   if (!Array.isArray(data.missedIds)) return false;
+  if (data.completedLabIds && !Array.isArray(data.completedLabIds)) return false;
   if (!data.ach || typeof data.ach !== 'object') return false;
   if (!data.domain || typeof data.domain !== 'object') return false;
   if (!data.topic || typeof data.topic !== 'object') return false;

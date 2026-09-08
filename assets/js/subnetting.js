@@ -27,21 +27,37 @@ export function getSubnetMask(prefix) {
 
 export function getSubnetDetails(ipStr, prefix) {
   const ipNum = ipToNum(ipStr);
-  const maskNum = (prefix === 0 ? 0 : (0xffffffff << (32 - prefix)) >>> 0);
+  const maskNum = (prefix === 0 ? 0 : (prefix === 32 ? 0xffffffff : (0xffffffff << (32 - prefix)))) >>> 0;
+  const wildcardNum = (~maskNum) >>> 0;
   const netNum = (ipNum & maskNum) >>> 0;
-  const broadNum = (netNum | ~maskNum) >>> 0;
+  const broadNum = (netNum | wildcardNum) >>> 0;
+
+  let firstUsable, lastUsable, usableHosts;
+  if (prefix <= 30) {
+    firstUsable = numToIp((netNum + 1) >>> 0);
+    lastUsable = numToIp((broadNum - 1) >>> 0);
+    usableHosts = prefix === 0 ? 4294967294 : Math.pow(2, 32 - prefix) - 2;
+  } else if (prefix === 31) {
+    firstUsable = numToIp(netNum);
+    lastUsable = numToIp(broadNum);
+    usableHosts = 2;
+  } else {
+    firstUsable = numToIp(netNum);
+    lastUsable = numToIp(netNum);
+    usableHosts = 1;
+  }
   
   return {
     ip: ipStr,
     prefix: prefix,
     mask: numToIp(maskNum),
-    wildcard: numToIp(~maskNum >>> 0),
+    wildcard: numToIp(wildcardNum),
     network: numToIp(netNum),
     broadcast: numToIp(broadNum),
-    firstUsable: numToIp((netNum + 1) >>> 0),
-    lastUsable: numToIp((broadNum - 1) >>> 0),
-    totalHosts: Math.pow(2, 32 - prefix),
-    usableHosts: prefix === 31 ? 2 : (prefix >= 32 ? 1 : Math.pow(2, 32 - prefix) - 2)
+    firstUsable,
+    lastUsable,
+    totalHosts: prefix === 0 ? 4294967296 : Math.pow(2, 32 - prefix),
+    usableHosts
   };
 }
 

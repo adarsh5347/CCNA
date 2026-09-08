@@ -606,9 +606,10 @@ export function setupTraversalSimulator() {
 
   btnStart.addEventListener("click", async () => {
     btnStart.disabled = true;
-    const type = byId("simPacketType").value;
-    const activePkt = activeTopology === 1 ? byId("simPacket") : byId("simPacket2");
-    if (!activePkt) return;
+    try {
+      const type = byId("simPacketType").value;
+      const activePkt = activeTopology === 1 ? byId("simPacket") : byId("simPacket2");
+      if (!activePkt) return;
 
     resetTopology2Links();
 
@@ -1183,9 +1184,11 @@ export function setupTraversalSimulator() {
       }
     }
 
-    await sleep(1000);
-    highlightNode(null);
-    btnStart.disabled = false;
+      await sleep(1000);
+    } finally {
+      highlightNode(null);
+      btnStart.disabled = false;
+    }
   });
 
   btnReset.addEventListener("click", () => {

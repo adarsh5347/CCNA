@@ -1505,6 +1505,12 @@ textarea {
     gap: 0 !important;
     margin: 0 !important;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4) !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+  header.topbar nav::-webkit-scrollbar {
+    display: none !important;
   }
   body[data-active-page="engine"] header.topbar nav {
     display: none !important;
@@ -3572,4 +3578,33 @@ select:focus, input:focus, textarea:focus {
     font-weight: 600 !important;
   }
 }
+
+/* ─── Modal Overlay & Mobile Viewport Hardening ─── */
+.modal-overlay {
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-overlay .card {
+  box-sizing: border-box;
+  max-width: min(92vw, 520px) !important;
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 12px !important;
+  }
+  .modal-overlay .card {
+    padding: 16px !important;
+  }
+  #upgradeModal .card div[style*="grid-template-columns:1fr 1fr"],
+  #upgradeModal .card div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+}
+
 

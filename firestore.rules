@@ -1,41 +1,47 @@
-﻿rules_version = '2';
+rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Helper: Platform Admin check (Owner UID or custom admin claim)
+    function isPlatformAdmin() {
+      return request.auth != null && (
+        request.auth.uid == 'NjVurGH5w4TPl8qoJklLyage7UX2' ||
+        request.auth.token.admin == true
+      );
+    }
+
     // ─── Users collection ───────────────────────────────────────────────
-    // Each user can only read/write their own top-level document (analytics).
+    // Each user can read/write their own document; platform admin can read for support.
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && (request.auth.uid == userId || isPlatformAdmin());
+      allow write: if request.auth != null && (request.auth.uid == userId || isPlatformAdmin());
 
       // ─── Subscription subcollection ─────────────────────────────────
-      // Readable by owner. Writable ONLY by Firebase Admin SDK (Cloud Functions).
-      // The admin SDK bypasses security rules entirely, so no write rule needed here.
-      // Frontend READS subscription to show premium status.
+      // Readable by owner and platform admin. Writable ONLY by Cloud Functions (Admin SDK).
       match /subscription/{subDoc} {
-        allow read: if request.auth != null && request.auth.uid == userId;
+        allow read: if request.auth != null && (request.auth.uid == userId || isPlatformAdmin());
         allow write: if false; // Only Cloud Functions (admin SDK) can write
       }
 
       // ─── Payments subcollection ─────────────────────────────────────
-      // Readable by owner. Writable ONLY by Cloud Functions.
+      // Readable by owner and platform admin. Writable ONLY by Cloud Functions.
       match /payments/{paymentId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
+        allow read: if request.auth != null && (request.auth.uid == userId || isPlatformAdmin());
         allow write: if false; // Only Cloud Functions (admin SDK) can write
       }
 
       // ─── Orders subcollection ────────────────────────────────────────
-      // Created by Cloud Functions when user initiates checkout.
-      // Frontend does NOT need to read individual orders directly.
       match /orders/{orderId} {
-        allow read: if request.auth != null && request.auth.uid == userId;
+        allow read: if request.auth != null && (request.auth.uid == userId || isPlatformAdmin());
         allow write: if false; // Only Cloud Functions (admin SDK) can write
       }
     }
 
     // ─── Admin collection ───────────────────────────────────────────────
-    // Completely closed to frontend. Admin stats are served via Cloud Functions.
+    // Platform admin can read dashboard data. Writes restricted to Cloud Functions.
     match /admin/{document=**} {
-      allow read, write: if false;
+      allow read: if isPlatformAdmin();
+      allow write: if false;
     }
 
     // ─── Default deny ───────────────────────────────────────────────────

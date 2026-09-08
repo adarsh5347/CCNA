@@ -213,5 +213,14 @@ export function mergeProgress(local, cloud) {
   const cloudWatched = cloud.watchedVideos || [];
   merged.watchedVideos = Array.from(new Set([...localWatched, ...cloudWatched]));
 
+  // Merge unique completed lab IDs
+  const localLabIds = local.completedLabIds || [];
+  const cloudLabIds = cloud.completedLabIds || [];
+  merged.completedLabIds = Array.from(new Set([...localLabIds, ...cloudLabIds]));
+  merged.labsCompleted = Math.max(merged.labsCompleted || 0, merged.completedLabIds.length);
+
+  // Preserve last watched video pointer
+  merged.lastWatchedVideoId = local.lastWatchedVideoId || cloud.lastWatchedVideoId || null;
+
   return merged;
 }

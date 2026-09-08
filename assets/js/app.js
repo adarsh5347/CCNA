@@ -806,8 +806,11 @@ function handleLabCommandClick(cmd, lab) {
         feedback.textContent = `✔ Lab Completed! +50 XP Awarded.`;
       }
       gainXP(50);
-      
-      state.analytics.labsCompleted = Math.min(10, (state.analytics.labsCompleted || 0) + 1);
+      state.analytics.completedLabIds = Array.isArray(state.analytics.completedLabIds) ? state.analytics.completedLabIds : [];
+      if (!state.analytics.completedLabIds.includes(lab.id)) {
+        state.analytics.completedLabIds.push(lab.id);
+      }
+      state.analytics.labsCompleted = Math.min(10, state.analytics.completedLabIds.length);
       saveAnalytics();
       renderHome();
       
@@ -942,7 +945,11 @@ function renderExamMatchInterface(lab) {
         });
         renderLabObjectives(lab);
         
-        state.analytics.labsCompleted = Math.min(10, (state.analytics.labsCompleted || 0) + 1);
+        state.analytics.completedLabIds = Array.isArray(state.analytics.completedLabIds) ? state.analytics.completedLabIds : [];
+        if (!state.analytics.completedLabIds.includes(lab.id)) {
+          state.analytics.completedLabIds.push(lab.id);
+        }
+        state.analytics.labsCompleted = Math.min(10, state.analytics.completedLabIds.length);
         saveAnalytics();
         renderHome();
         
@@ -1109,10 +1116,14 @@ function init() {
   updateMuteButton();
   updateContrastButton();
 
-  // Handle URL parameter deep linking e.g. ?page=admin or ?page=pricing
-  const initialPage = new URLSearchParams(window.location.search).get("page");
-  if (initialPage) {
-    setPage(initialPage, false);
+  // Restore active quiz session if user refreshed mid-exam
+  const sessionRestored = restoreSession();
+  if (!sessionRestored) {
+    // Handle URL parameter deep linking e.g. ?page=admin or ?page=pricing
+    const initialPage = new URLSearchParams(window.location.search).get("page");
+    if (initialPage) {
+      setPage(initialPage, false);
+    }
   }
 
   // Defer all non-critical page initializations until idle microtask after landing page paint
@@ -1335,8 +1346,13 @@ function playVideo(youtubeId, title, vidId) {
   modal.classList.remove("hidden");
   playNetSound("success");
 
-  if (vidId && state.analytics.watchedVideos && !state.analytics.watchedVideos.includes(vidId)) {
-    toggleVideoWatchedState(vidId, true);
+  if (vidId) {
+    state.analytics.lastWatchedVideoId = vidId;
+    if (state.analytics.watchedVideos && !state.analytics.watchedVideos.includes(vidId)) {
+      toggleVideoWatchedState(vidId, true);
+    } else {
+      saveAnalytics();
+    }
   }
 }
 

@@ -40,7 +40,15 @@ export function setupAuth() {
         await loginWithGoogle();
       } catch (err) {
         console.error("Login failed:", err);
-        showToast("Authentication failed.", "error");
+        if (err && err.code === "auth/popup-closed-by-user") {
+          showToast("Sign-in cancelled.", "info");
+        } else if (err && err.code === "auth/popup-blocked") {
+          showToast("Pop-up blocked by browser. Please allow pop-ups for this site.", "warn");
+        } else if (err && err.code === "auth/network-request-failed") {
+          showToast("Network error. Please check your internet connection.", "error");
+        } else {
+          showToast("Authentication failed.", "error");
+        }
       }
     });
   }
