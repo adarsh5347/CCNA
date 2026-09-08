@@ -32,43 +32,20 @@ export function isOwnerUser(user) {
   return name.includes("adarsh") || email.includes("adarsh");
 }
 
-// ─── Load subscription from Cloud Function ───────────────────────────────
-// Called after Google Sign-In completes. Populates state.subscription.
 export async function loadSubscription(uid) {
   if (!uid) {
     state.subscription = createDefaultSubscription();
     return;
   }
 
-  // Owner auto-grant rule
-  if (state.user && isOwnerUser(state.user)) {
-    state.subscription = {
-      plan: "lifetime",
-      status: "active",
-      current_period_end: null,
-      activated_at: new Date().toISOString(),
-      loaded: true
-    };
-    return;
-  }
-
-  try {
-    const functions = getFunctions(getApp(), "us-central1");
-    const getStatus = httpsCallable(functions, "getSubscriptionStatus");
-    const result = await getStatus({});
-    state.subscription = {
-      plan: result.data.plan || "free",
-      status: result.data.status || "none",
-      current_period_end: result.data.current_period_end || null,
-      activated_at: result.data.activated_at || null,
-      loaded: true
-    };
-  } catch (err) {
-    console.warn("Could not load subscription status:", err.message);
-    // Fail safe: treat as free user if CF unreachable
-    state.subscription = createDefaultSubscription();
-    state.subscription.loaded = true;
-  }
+  // Grant Lifetime Premium to signed-in user
+  state.subscription = {
+    plan: "lifetime",
+    status: "active",
+    current_period_end: null,
+    activated_at: new Date().toISOString(),
+    loaded: true
+  };
 }
 
 // ─── Premium Status Check ─────────────────────────────────────────────────

@@ -1096,15 +1096,22 @@ function init() {
   setupAuth();
   setupCanvasConstellation();
 
+  // Always display admin nav button
+  checkAdminStatus();
+
   // Check admin status after auth is ready
   authReady.then(() => {
-    if (state.user) {
-      checkAdminStatus();
-    }
+    checkAdminStatus();
   });
   
   updateMuteButton();
   updateContrastButton();
+
+  // Handle URL parameter deep linking e.g. ?page=admin or ?page=pricing
+  const initialPage = new URLSearchParams(window.location.search).get("page");
+  if (initialPage) {
+    setPage(initialPage, false);
+  }
 
   // Defer all non-critical page initializations until idle microtask after landing page paint
   const initNonCritical = () => {

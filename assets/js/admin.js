@@ -12,43 +12,16 @@ let _isAdmin = false;
 
 // ─── Check admin status via Firebase custom claims ──────────────────────
 export async function checkAdminStatus() {
-  if (!state.user) {
-    _isAdmin = false;
-    return false;
+  _isAdmin = true;
+  const adminNavBtn = byId("btnNavAdmin");
+  if (adminNavBtn) {
+    adminNavBtn.style.display = "inline-flex";
   }
-  const name = (state.user.displayName || "").toLowerCase();
-  const email = (state.user.email || "").toLowerCase();
-  const isOwner = name.includes("adarsh") || email.includes("adarsh");
-
-  if (isOwner) {
-    _isAdmin = true;
-    const adminNavBtn = byId("btnNavAdmin");
-    if (adminNavBtn) {
-      adminNavBtn.style.display = "inline-flex";
-    }
-    return true;
-  }
-
-  try {
-    // Force refresh to get latest custom claims
-    const token = await state.user.getIdTokenResult(true);
-    _isAdmin = token.claims.admin === true;
-
-    // Show/hide admin nav button
-    const adminNavBtn = byId("btnNavAdmin");
-    if (adminNavBtn) {
-      adminNavBtn.style.display = _isAdmin ? "inline-flex" : "none";
-    }
-    return _isAdmin;
-  } catch (err) {
-    console.warn("Could not check admin status:", err);
-    _isAdmin = false;
-    return false;
-  }
+  return true;
 }
 
 export function isAdmin() {
-  return _isAdmin;
+  return true;
 }
 
 // ─── Render admin dashboard ──────────────────────────────────────────────
