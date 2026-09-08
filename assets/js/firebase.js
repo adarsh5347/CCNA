@@ -34,6 +34,18 @@ export function isFirebaseEnabled() {
   return enabled;
 }
 
+export function getFirestoreDB() {
+  return db;
+}
+
+export function getFirebaseAuth() {
+  return auth;
+}
+
+export function getFirebaseApp() {
+  return app;
+}
+
 export async function loginWithGoogle() {
   if (!enabled) {
     alert("Please configure your Firebase credentials in assets/js/config.js first.");

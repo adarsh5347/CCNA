@@ -82,6 +82,9 @@ import {
 import { generateBank, blueprint } from "./data.js";
 import { labs } from "./labs.js";
 import { ccnaVideos } from "./videos.js";
+import { checkPremiumGate, isPremium, showUpgradeModal, initiateCheckout } from "./subscription.js";
+import { renderAccountPage } from "./account.js";
+import { renderAdminDashboard, checkAdminStatus, setupAdminGrantForm, isAdmin } from "./admin.js";
 
 // Make sure other legacy files or script tags can find these methods on window
 window.setPage = setPage;
@@ -90,6 +93,8 @@ window.renderAnalytics = renderAnalytics;
 window.renderAchievements = renderAchievements;
 window.showOsiLayerDetail = showOsiLayerDetail;
 window.updateOsiLabels = updateOsiLabels;
+window.showUpgradeModal = showUpgradeModal;
+window.initiateCheckout = initiateCheckout;
 // Exposed for cross-module call from quiz-engine.js after renderQuestion
 window.setupScrollCollapseHeader = setupScrollCollapseHeader;
 window.syncHeaderHeight = syncHeaderHeight;
@@ -226,6 +231,22 @@ export function setPage(page, push = true) {
   if (page === "subnet") ensureSubnetInit();
   if (page === "videos") ensureVideosInit();
   if (page === "labs") ensureLabsInit();
+  if (page === "pricing") renderPricingPage();
+  if (page === "account") {
+    if (!state.user) {
+      showToast("Please sign in to view your account.", "warn");
+      return;
+    }
+    renderAccountPage();
+  }
+  if (page === "admin") {
+    if (!isAdmin()) {
+      showToast("Admin access required.", "error");
+      return;
+    }
+    renderAdminDashboard();
+    setupAdminGrantForm();
+  }
   window.scrollTo(0, 0);
 }
 
@@ -293,7 +314,10 @@ function wireEvents() {
   byId("startStudy").addEventListener("click", () => startSession("study"));
   byId("startQuiz").addEventListener("click", () => startSession("quiz"));
   byId("startSmartQuiz").addEventListener("click", () => startSession("smart"));
-  byId("startExam").addEventListener("click", () => startSession("exam"));
+  byId("startExam").addEventListener("click", () => {
+    if (!checkPremiumGate("Full 120-Question Exam Simulation")) return;
+    startSession("exam");
+  });
 
   const btnLaunchStudy = byId("btnLaunchStudy");
   const btnLaunchExam = byId("btnLaunchExam");
@@ -307,6 +331,7 @@ function wireEvents() {
   }
   if (btnLaunchExam) {
     btnLaunchExam.addEventListener("click", () => {
+      if (!checkPremiumGate("Full 120-Question Exam Simulation")) return;
       setPage("engine");
       startSession("exam");
     });
@@ -569,9 +594,20 @@ const distractorCommands = {
 function initLabSelector() {
   const sel = byId("labSelector");
   if (!sel) return;
-  sel.innerHTML = labs.map((l) => `<option value="${l.id}">Lab ${l.id}: ${l.title}</option>`).join("");
+  sel.innerHTML = labs.map((l) => {
+    const lockIcon = (l.premium && !isPremium()) ? " 🔒" : "";
+    return `<option value="${l.id}"${l.premium && !isPremium() ? " data-premium='true'" : ""}>Lab ${l.id}: ${l.title}${lockIcon}</option>`;
+  }).join("");
   sel.addEventListener("change", () => {
-    state.lab.currentLabId = Number(sel.value);
+    const labId = Number(sel.value);
+    const lab = labs.find(l => l.id === labId);
+    if (lab && lab.premium && !isPremium()) {
+      // Reset selector to last free lab
+      sel.value = String(state.lab.currentLabId);
+      showUpgradeModal(`Lab ${labId}: ${lab.title}`);
+      return;
+    }
+    state.lab.currentLabId = labId;
     loadLab(state.lab.currentLabId);
   });
 }
@@ -1012,6 +1048,44 @@ function setupScrollCollapseHeader() {
   _scrollCollapseObserver.observe(sentinel);
 }
 
+function renderPricingPage() {
+  // Update "Current Plan" highlight on pricing cards
+  const freePlanCta = byId("pricingFreeCtaText");
+  const monthlyPlanCta = byId("pricingMonthlyBtn");
+  const lifetimePlanCta = byId("pricingLifetimeBtn");
+
+  const sub = state.subscription;
+  const plan = sub ? sub.plan : "free";
+  const isPrem = isPremium ? isPremium() : false;
+
+  if (freePlanCta) {
+    freePlanCta.textContent = (!isPrem || !state.user) ? "Current Plan" : "Downgrade to Free";
+  }
+  if (monthlyPlanCta) {
+    if (plan === "monthly" && isPrem) {
+      monthlyPlanCta.textContent = "✅ Current Plan";
+      monthlyPlanCta.disabled = true;
+    } else if (plan === "lifetime" && isPrem) {
+      monthlyPlanCta.textContent = "Already on Lifetime";
+      monthlyPlanCta.disabled = true;
+    } else {
+      monthlyPlanCta.textContent = state.user ? "Upgrade — ₹299/month" : "Sign in to Upgrade";
+      monthlyPlanCta.disabled = false;
+    }
+  }
+  if (lifetimePlanCta) {
+    if (plan === "lifetime" && isPrem) {
+      lifetimePlanCta.textContent = "✅ Current Plan";
+      lifetimePlanCta.disabled = true;
+    } else {
+      lifetimePlanCta.textContent = state.user ? "Get Lifetime — ₹999" : "Sign in to Upgrade";
+      lifetimePlanCta.disabled = false;
+    }
+  }
+}
+
+window.renderPricingPage = renderPricingPage;
+
 function init() {
   state.bank = [];
   state.analytics = loadAnalytics();
@@ -1021,6 +1095,13 @@ function init() {
   wireEvents();
   setupAuth();
   setupCanvasConstellation();
+
+  // Check admin status after auth is ready
+  authReady.then(() => {
+    if (state.user) {
+      checkAdminStatus();
+    }
+  });
   
   updateMuteButton();
   updateContrastButton();

@@ -1,5 +1,6 @@
 import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgress, mergeProgress } from "./firebase.js";
 import { state, STORE, authResolve, safeSetStorage, showToast, createDefaultAnalytics, byId, getLevelInfo } from "./core.js";
+import { loadSubscription, renderSubscriptionBadge, createDefaultSubscription } from "./subscription.js";
 
 // We need these UI functions from app.js / global scope
 function refreshUI() {
@@ -18,6 +19,8 @@ export function updateHeaderProfile() {
       badge.textContent = `Lvl ${info.level} (${info.label}) - ${xp} XP`;
     }
   }
+  // Update subscription badge
+  renderSubscriptionBadge();
 }
 
 // Bind to window to allow core.js (gainXP) to update the header
@@ -138,12 +141,22 @@ export function setupAuth() {
             showToast("Local save complete (offline)", "warn");
           });
 
+        // Load subscription status from Cloud Functions (premium gating source of truth)
+        loadSubscription(user.uid).then(() => {
+          renderSubscriptionBadge();
+        });
+
         refreshUI();
       } else {
         btnSignIn.classList.remove("hidden");
         userProfile.classList.add("hidden");
         userPhoto.src = "";
         userName.textContent = "";
+
+        // Reset subscription to free on logout
+        state.subscription = createDefaultSubscription();
+        state.subscription.loaded = true;
+        renderSubscriptionBadge();
 
         console.log("User logged out. Restoring guest progress...");
         let guestData = localStorage.getItem(STORE);

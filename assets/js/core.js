@@ -287,6 +287,13 @@ export const state = {
   },
   lab: { currentLabId: 1, mode: "step", completedSteps: {}, userCommands: [], currentPrompt: "Switch(config)#" },
   user: null,
+  subscription: {
+    plan: "free",
+    status: "none",
+    current_period_end: null,
+    activated_at: null,
+    loaded: false
+  },
   muted: localStorage.getItem("ccna_muted") === "true",
   highContrast: localStorage.getItem("ccna_high_contrast") === "true",
   simBugsFixed: {}

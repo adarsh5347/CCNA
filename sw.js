@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ccna-prep-v62';
+const CACHE_NAME = 'ccna-prep-v63';
 const ASSETS = [
   '/',
   '/index.html',
@@ -15,6 +15,9 @@ const ASSETS = [
   '/assets/js/config.js',
   '/assets/js/cli.js',
   '/assets/js/labs.js',
+  '/assets/js/subscription.js',
+  '/assets/js/account.js',
+  '/assets/js/admin.js',
   '/assets/icon.svg'
 ];
 
