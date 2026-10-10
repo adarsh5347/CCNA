@@ -1209,9 +1209,16 @@
     </div>
   </div>
 
-  <script type="module" src="assets/js/app.js?v=70"></script>
+  <script type="module" src="assets/js/app.js?v=71"></script>
 <script>
   if ('serviceWorker' in navigator) {
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js').then(reg => {
         reg.update();

@@ -1057,7 +1057,7 @@ function renderPricingPage() {
 window.renderPricingPage = renderPricingPage;
 
 function init() {
-  state.bank = [];
+  state.bank = generateBank(rand);
   state.analytics = loadAnalytics();
   navSetup();
   renderDomainChecks();

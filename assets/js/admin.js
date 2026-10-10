@@ -24,7 +24,7 @@ export async function renderAdminDashboard() {
   const statsEl = byId("adminStats");
   const activityEl = byId("adminRecentActivity");
 
-  const totalQuestions = (state.bank && state.bank.length) || 328;
+  const totalQuestions = (state.bank && state.bank.length) || 241;
   const labsCount = 10;
   const videosCount = 126;
   const userXp = state.analytics ? (state.analytics.xp || 0) : 0;
