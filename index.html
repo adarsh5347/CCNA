@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -94,7 +94,7 @@
       </button>
       </button>
       <!-- Admin nav -->
-      <button id="btnNavAdmin" data-page="admin" class="nav-btn ghost" aria-label="Admin Panel" style="display:inline-flex;color:#ef4444;">
+      <button id="btnNavAdmin" data-page="admin" class="nav-btn ghost" aria-label="Admin Panel" style="display:none;color:#ef4444;">
         <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><path d="M10 2l2.4 4.9 5.4.8-3.9 3.8.9 5.3L10 14.1l-4.8 2.7.9-5.3-3.9-3.8 5.4-.8z" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span class="nav-label">Admin</span>
       </button>
@@ -106,7 +106,7 @@
       <button id="btnToggleContrast" class="nav-util-btn ghost" aria-label="Toggle High Contrast">
         <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 3v14" stroke-linecap="round"/><path d="M10 3a7 7 0 0 1 0 14V3z" fill="currentColor" stroke="none"/></svg>
       </button>
-      <span id="headerSubscriptionBadge" class="premium-badge" style="display:none;" aria-label="Subscription plan"></span>
+      
       <span id="headerXPBadge" class="xp-badge" aria-label="Experience level">Lvl 1</span>
       <span id="headerTimer" class="timer hidden" aria-live="polite">120:00</span>
       <div id="authContainer" class="auth-container">
@@ -115,7 +115,7 @@
           <img id="userPhoto" class="user-photo" src="" alt="User Photo" />
           <span id="userName" class="user-name"></span>
           <button data-page="account" class="ghost" style="font-size:11px;padding:4px 10px;">My Account</button>
-          <button data-page="admin" class="ghost" style="font-size:11px;padding:4px 10px;color:#ef4444;">Admin</button>
+          <button data-page="admin" class="ghost" style="display:none;font-size:11px;padding:4px 10px;color:#ef4444;">Admin</button>
           <button id="btnSignOut" class="ghost">Sign Out</button>
         </div>
       </div>
@@ -164,7 +164,7 @@
             <button id="btnLaunchStudy" class="primary magnetic-btn" style="padding: 8px 16px; font-size: 13px;">⚡ Start Studying</button>
             <button id="btnLaunchExam" class="secondary magnetic-btn" style="padding: 8px 16px; font-size: 13px;">🏆 Take Exam</button>
             <button id="btnLaunchLabs" class="secondary magnetic-btn" style="padding: 8px 16px; font-size: 13px;">🧪 Virtual Labs</button>
-            <button data-page="admin" class="secondary magnetic-btn" style="padding: 8px 16px; font-size: 13px; color: #ef4444; border-color: rgba(239, 68, 68, 0.4);">⚡ Admin Panel</button>
+            <button data-page="admin" class="secondary magnetic-btn" style="display:none; padding: 8px 16px; font-size: 13px; color: #ef4444; border-color: rgba(239, 68, 68, 0.4);">⚡ Admin Panel</button>
           </div>
         </div>
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; position: relative; z-index: 2;" />
@@ -1209,7 +1209,7 @@
     </div>
   </div>
 
-  <script type="module" src="assets/js/app.js?v=68"></script>
+  <script type="module" src="assets/js/app.js?v=69"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

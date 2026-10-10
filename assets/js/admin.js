@@ -1,22 +1,23 @@
-﻿/**
+/**
  * NetOps Command — Admin & NOC Station Operations Module
  * Provides platform telemetry, station diagnostics, and operational controls.
  * Zero subscription dependencies and resilient local/cloud status reporting.
  */
 
 import { state, byId, showToast, playNetSound } from "./core.js";
-import { isFirebaseEnabled, getFirestoreDB } from "./firebase.js";
-
-export async function checkAdminStatus() {
-  const adminNavBtn = byId("btnNavAdmin");
-  if (adminNavBtn) {
-    adminNavBtn.style.display = "inline-flex";
-  }
-  return true;
-}
+import { isOwnerUser } from "./subscription.js";
 
 export function isAdmin() {
-  return true;
+  return isOwnerUser(state.user);
+}
+
+// Show or hide every admin entry point depending on who is signed in
+export async function checkAdminStatus() {
+  const allowed = isAdmin();
+  document.querySelectorAll('[data-page="admin"]').forEach((el) => {
+    el.style.display = allowed ? "" : "none";
+  });
+  return allowed;
 }
 
 export async function renderAdminDashboard() {

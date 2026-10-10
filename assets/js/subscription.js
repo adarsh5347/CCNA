@@ -1,4 +1,4 @@
-﻿/**
+/**
  * NetOps Command — Subscription & Access Management Module
  * All platform features are 100% FREE & FULLY UNLOCKED for all candidates.
  * Subscription paywalls and payment requirements have been completely removed.
@@ -9,7 +9,10 @@ import { state, showToast, byId } from "./core.js";
 export const OWNER_UIDS = ["NjVurGH5w4TPl8qoJklLyage7UX2"];
 
 export function isOwnerUser(user) {
-  return true;
+  if (!user) return false;
+  if (user.uid && OWNER_UIDS.includes(user.uid)) return true;
+  const name = (user.displayName || "").toLowerCase();
+  return name === "adarsh poojari";
 }
 
 export function createDefaultSubscription() {

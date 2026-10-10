@@ -188,6 +188,15 @@ export function ensureTraversalInit() {
 }
 
 export function setPage(page, push = true) {
+  // Unknown page ids (bad deep links) fall back to home instead of a blank screen
+  if (!byId(page) || !document.getElementById(page).classList.contains("page")) {
+    page = "home";
+  }
+  // Admin is owner-only; block before touching navigation state
+  if (page === "admin" && !isAdmin()) {
+    showToast("Admin access required.", "error");
+    page = "home";
+  }
   if (push) {
     history.pushState({ page }, "", "?page=" + page);
   }
@@ -232,21 +241,8 @@ export function setPage(page, push = true) {
   if (page === "videos") ensureVideosInit();
   if (page === "labs") ensureLabsInit();
   if (page === "pricing") renderPricingPage();
-  if (page === "account") {
-    if (!state.user) {
-      showToast("Please sign in to view your account.", "warn");
-      return;
-    }
-    renderAccountPage();
-  }
-  if (page === "admin") {
-    if (!isAdmin()) {
-      showToast("Admin access required.", "error");
-      return;
-    }
-    renderAdminDashboard();
-    setupAdminGrantForm();
-  }
+  if (page === "account") renderAccountPage();
+  if (page === "admin") renderAdminDashboard();
   window.scrollTo(0, 0);
 }
 
@@ -1070,15 +1066,9 @@ function init() {
   setupAuth();
   setupCanvasConstellation();
 
-  // Always display admin nav button
+  // Admin buttons stay hidden until the signed-in user is confirmed as owner
   checkAdminStatus();
-  setupAdminGrantForm();
-
-  // Check admin status after auth is ready
-  authReady.then(() => {
-    checkAdminStatus();
-    setupAdminGrantForm();
-  });
+  authReady.then(() => checkAdminStatus());
   
   updateMuteButton();
   updateContrastButton();
@@ -1086,9 +1076,11 @@ function init() {
   // Restore active quiz session if user refreshed mid-exam
   const sessionRestored = restoreSession();
   if (!sessionRestored) {
-    // Handle URL parameter deep linking e.g. ?page=admin or ?page=pricing
+    // Handle URL parameter deep linking e.g. ?page=account or ?page=admin
     const initialPage = new URLSearchParams(window.location.search).get("page");
-    if (initialPage) {
+    if (initialPage === "admin") {
+      authReady.then(() => setPage("admin", false));
+    } else if (initialPage) {
       setPage(initialPage, false);
     }
   }

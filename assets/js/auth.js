@@ -191,6 +191,7 @@ export function setupAuth() {
     } catch (err) {
       console.error("Error in onAuthChange handler:", err);
     } finally {
+      if (window.checkAdminStatus) window.checkAdminStatus();
       authResolve();
     }
   });
