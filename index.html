@@ -92,9 +92,6 @@
         <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 11v-1c0-.6.4-1 .9-1.2.5-.2.9-.8.9-1.4C11.8 8 11 7.3 10 7.3c-.9 0-1.5.6-1.7 1.3" stroke-linecap="round"/><circle cx="10" cy="13.5" r="0.5" fill="currentColor" stroke="none"/></svg>
         <span class="nav-label">Support</span>
       </button>
-      <button data-page="pricing" class="nav-btn ghost" aria-label="Pricing" style="color:#f59e0b;">
-        <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true" fill="none" stroke="currentColor"><path d="M4 10l3 3 3-3 4-4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="15" cy="5" r="2"/><rect x="2" y="2" width="16" height="16" rx="2"/></svg>
-        <span class="nav-label">Pricing</span>
       </button>
       <!-- Admin nav -->
       <button id="btnNavAdmin" data-page="admin" class="nav-btn ghost" aria-label="Admin Panel" style="display:inline-flex;color:#ef4444;">
@@ -1103,68 +1100,30 @@
 
   <!-- ═══════════════════════════════════════════════════════ PRICING PAGE -->
   <section id="pricing" class="page">
-    <div class="card" style="max-width:900px;margin:0 auto;">
-      <div style="text-align:center;margin-bottom:32px;">
-        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:42px;background:linear-gradient(to right,#00f2fe,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;">UPGRADE TO PREMIUM</h2>
-        <p style="color:var(--text-muted);font-size:14px;">One time or monthly — unlock everything. No tricks.</p>
+    <div class="card" style="max-width:800px;margin:0 auto;text-align:center;padding:36px 24px;">
+      <div style="margin-bottom:24px;">
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:42px;background:linear-gradient(to right,#00f2fe,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;">100% FREE &amp; FULL ACCESS</h2>
+        <p style="color:var(--text-muted);font-size:15px;max-width:540px;margin:0 auto 24px auto;">Every Cisco CCNA 200-301 training resource is permanently unlocked for all candidates. No paywalls, no subscriptions, no credit card required.</p>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:32px;">
-
-        <!-- Free Card -->
-        <div class="card" style="border:1px solid var(--border-color);padding:24px;text-align:center;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--text-muted);margin-bottom:4px;">FREE</div>
-          <div style="font-size:32px;font-weight:700;color:#e2e8f0;margin-bottom:4px;">₹0</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:20px;">forever</div>
-          <ul style="list-style:none;padding:0;margin-bottom:20px;text-align:left;display:flex;flex-direction:column;gap:8px;">
-            <li style="font-size:13px;color:#94a3b8;display:flex;gap:8px;"><span style="color:#10b981;">✓</span> Adaptive quiz — study &amp; smart modes</li>
-            <li style="font-size:13px;color:#94a3b8;display:flex;gap:8px;"><span style="color:#10b981;">✓</span> Subnetting practice (unlimited)</li>
-            <li style="font-size:13px;color:#94a3b8;display:flex;gap:8px;"><span style="color:#10b981;">✓</span> Labs 1–5 (VLAN, ROAS, OSPF, ACL, DHCP)</li>
-            <li style="font-size:13px;color:#94a3b8;display:flex;gap:8px;"><span style="color:#10b981;">✓</span> 30 curated lecture videos</li>
-            <li style="font-size:13px;color:#94a3b8;display:flex;gap:8px;"><span style="color:#10b981;">✓</span> Progress analytics</li>
-            <li style="font-size:13px;color:#64748b;display:flex;gap:8px;"><span>✗</span> Full 120-question exam simulation</li>
-            <li style="font-size:13px;color:#64748b;display:flex;gap:8px;"><span>✗</span> Labs 6–10 (NAT, STP, VPN, WLC...)</li>
-            <li style="font-size:13px;color:#64748b;display:flex;gap:8px;"><span>✗</span> Full 126-video library</li>
-          </ul>
-          <span id="pricingFreeCtaText" style="display:inline-block;padding:10px 20px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;color:var(--text-muted);">Current Plan</span>
+      <div class="grid stats" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px;text-align:left;">
+        <div class="card" style="border:1px solid rgba(0,242,254,0.3);padding:18px;">
+          <h4 style="color:#00f2fe;margin:0 0 6px 0;">✔ Adaptive Quiz Engine</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin:0;">328+ realistic scenario questions, full 120-question exam drills, smart spaced repetition.</p>
         </div>
-
-        <!-- Monthly Card -->
-        <div class="card" style="border:1.5px solid #00f2fe;padding:24px;text-align:center;position:relative;">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#00f2fe;margin-bottom:4px;">MONTHLY</div>
-          <div style="font-size:32px;font-weight:700;color:#e2e8f0;margin-bottom:4px;">₹299</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:20px;">per month · cancel anytime</div>
-          <ul style="list-style:none;padding:0;margin-bottom:20px;text-align:left;display:flex;flex-direction:column;gap:8px;">
-            <li style="font-size:13px;color:#e2e8f0;display:flex;gap:8px;"><span style="color:#10b981;">✓</span> Everything in Free</li>
-            <li style="font-size:13px;color:#e2e8f0;display:flex;gap:8px;"><span style="color:#10b981;">✓</span> Full 120-question Pearson VUE exam drills</li>
-            <li style="font-size:13px;color:#e2e8f0;display:flex;gap:8px;"><span style="color:#10b981;">✓</span> All 10 virtual IOS CLI labs</li>
-            <li style="font-size:13px;color:#e2e8f0;display:flex;gap:8px;"><span style="color:#10b981;">✓</span> Full 126-video lecture library</li>
-            <li style="font-size:13px;color:#e2e8f0;display:flex;gap:8px;"><span style="color:#10b981;">✓</span> Advanced analytics &amp; heatmap</li>
-            <li style="font-size:13px;color:#e2e8f0;display:flex;gap:8px;"><span style="color:#10b981;">✓</span> ⭐ Premium badge</li>
-          </ul>
-          <button id="pricingMonthlyBtn" class="primary" style="width:100%;padding:12px;" onclick="window.initiateCheckout && window.initiateCheckout('monthly')">Upgrade — ₹299/month</button>
+        <div class="card" style="border:1px solid rgba(16,185,129,0.3);padding:18px;">
+          <h4 style="color:#10b981;margin:0 0 6px 0;">✔ 10 Virtual IOS Labs</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin:0;">All guided labs: VLANs, ROAS, OSPF, ACLs, DHCP, NAT Overload, STP, EtherChannel, WLC, VPN.</p>
         </div>
-
-        <!-- Lifetime Card -->
-        <div class="card" style="border:1.5px solid #f59e0b;padding:24px;text-align:center;position:relative;background:linear-gradient(135deg,rgba(245,158,11,0.05),rgba(255,94,58,0.05));">
-          <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#f59e0b,#ff5e3a);color:#fff;font-size:10px;font-weight:700;padding:4px 14px;border-radius:12px;white-space:nowrap;letter-spacing:0.5px;">BEST VALUE</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:#f59e0b;margin-bottom:4px;">LIFETIME</div>
-          <div style="font-size:32px;font-weight:700;color:#e2e8f0;margin-bottom:4px;">₹999</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:20px;">one-time · never pay again</div>
-          <ul style="list-style:none;padding:0;margin-bottom:20px;text-align:left;display:flex;flex-direction:column;gap:8px;">
-            <li style="font-size:13px;color:#e2e8f0;display:flex;gap:8px;"><span style="color:#10b981;">✓</span> Everything in Monthly</li>
-            <li style="font-size:13px;color:#e2e8f0;display:flex;gap:8px;"><span style="color:#f59e0b;">★</span> Pay once, access forever</li>
-            <li style="font-size:13px;color:#e2e8f0;display:flex;gap:8px;"><span style="color:#f59e0b;">★</span> All future features included</li>
-            <li style="font-size:13px;color:#e2e8f0;display:flex;gap:8px;"><span style="color:#f59e0b;">★</span> No subscription management</li>
-            <li style="font-size:13px;color:#10b981;display:flex;gap:8px;font-weight:600;"><span>💡</span> Saves ₹2,589/year vs monthly</li>
-          </ul>
-          <button id="pricingLifetimeBtn" class="primary" style="width:100%;padding:12px;background:linear-gradient(135deg,#f59e0b,#ff5e3a);border:none;" onclick="window.initiateCheckout && window.initiateCheckout('lifetime')">Get Lifetime — ₹999</button>
+        <div class="card" style="border:1px solid rgba(245,158,11,0.3);padding:18px;">
+          <h4 style="color:#f59e0b;margin:0 0 6px 0;">✔ 126 Video Lessons</h4>
+          <p style="font-size:12px;color:var(--text-muted);margin:0;">Complete structured CCNA syllabus videos with interactive progress tracking.</p>
         </div>
       </div>
 
-      <div style="text-align:center;margin-top:16px;">
-        <p style="color:var(--text-muted);font-size:12px;">🔒 Secure payments via Razorpay &nbsp;·&nbsp; UPI, Cards, Net Banking, Wallets accepted &nbsp;·&nbsp; Indian residents only (INR)</p>
-        <p style="color:var(--text-muted);font-size:12px;margin-top:4px;">Questions? <a href="#" data-page="support" style="color:#00f2fe;text-decoration:none;">Contact Support</a></p>
+      <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+        <button class="primary" style="padding:12px 28px;" onclick="window.setPage && window.setPage('engine')">Start Practice Drills</button>
+        <button class="secondary" style="padding:12px 28px;" onclick="window.setPage && window.setPage('labs')">Open IOS Labs</button>
       </div>
     </div>
   </section>
@@ -1181,24 +1140,11 @@
       </div>
 
       <div class="card" style="border:1px solid var(--border-color);padding:20px;margin-bottom:20px;">
-        <h3 style="margin:0 0 12px 0;font-size:16px;">Current Plan</h3>
-        <div id="accountPlanLabel" style="font-size:20px;font-weight:700;color:#00f2fe;margin-bottom:8px;">Loading...</div>
-        <div id="accountPlanDetails"></div>
-      </div>
-
-      <div id="accountUpgradeSection" class="card" style="border:1px solid #f59e0b;padding:20px;margin-bottom:20px;display:none;">
-        <h3 style="margin:0 0 12px 0;font-size:16px;color:#f59e0b;">🚀 Upgrade to Premium</h3>
-        <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;">Unlock all 10 labs, 120-question exam simulations, and the full video library.</p>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;">
-          <button class="primary" style="padding:10px 20px;" onclick="window.initiateCheckout && window.initiateCheckout('monthly')">Monthly — ₹299</button>
-          <button class="primary" style="padding:10px 20px;background:linear-gradient(135deg,#f59e0b,#ff5e3a);border:none;" onclick="window.initiateCheckout && window.initiateCheckout('lifetime')">Lifetime — ₹999 ⭐</button>
-        </div>
-      </div>
-
-      <div class="card" style="border:1px solid var(--border-color);padding:20px;">
-        <h3 style="margin:0 0 16px 0;font-size:16px;">Payment History</h3>
-        <div id="accountPaymentHistory">
-          <p style="color:var(--text-muted);font-size:13px;">Loading...</p>
+        <h3 style="margin:0 0 12px 0;font-size:16px;">Current Access Level</h3>
+        <div id="accountPlanLabel" style="font-size:20px;font-weight:700;color:#00f2fe;margin-bottom:8px;">⭐ Full Access (100% Free)</div>
+        <div id="accountPlanDetails">
+          <p style="color:#10b981;font-size:13px;margin:0;">✅ All Features Fully Unlocked — All 10 virtual IOS labs, 120-question exam drills, and 126 video lectures are permanently accessible.</p>
+          <p style="color:var(--text-muted);font-size:12px;margin:4px 0 0 0;">Status: Full Unlocked Access · No subscription or payments required.</p>
         </div>
       </div>
     </div>
@@ -1207,38 +1153,21 @@
   <!-- ═══════════════════════════════════════════════════════ ADMIN PAGE -->
   <section id="admin" class="page">
     <div class="card" style="max-width:900px;margin:0 auto;">
-      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:#ef4444;margin-bottom:8px;">⚡ ADMIN DASHBOARD</h2>
-      <p style="color:var(--text-muted);font-size:13px;margin-bottom:24px;">Platform analytics and user management. Admin access only.</p>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:8px;">
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:#ef4444;margin:0;">⚡ NOC COMMAND STATION</h2>
+        <span style="background:rgba(16,185,129,0.15);color:#10b981;font-size:12px;font-weight:700;padding:4px 12px;border-radius:12px;border:1px solid #10b981;">ALL SYSTEMS OPERATIONAL</span>
+      </div>
+      <p style="color:var(--text-muted);font-size:13px;margin-bottom:24px;">Platform telemetry, station diagnostics, and operational controls. 100% Full Access Mode.</p>
 
       <div id="adminContent">
-        <section style="margin-bottom:28px;">
-          <h3 style="font-size:15px;margin-bottom:16px;color:#e2e8f0;">Platform Stats</h3>
+        <section style="margin-bottom:24px;">
+          <h3 style="font-size:15px;margin-bottom:16px;color:#e2e8f0;">Platform Telemetry</h3>
           <div id="adminStats">
-            <p style="color:var(--text-muted);">Loading stats...</p>
+            <p style="color:var(--text-muted);">Aggregating station parameters...</p>
           </div>
         </section>
 
-        <section class="card" style="border:1px solid var(--border-color);padding:20px;">
-          <h3 style="font-size:15px;margin-bottom:16px;color:#e2e8f0;">Grant / Revoke Premium</h3>
-          <p style="color:var(--text-muted);font-size:12px;margin-bottom:12px;">Enter exact Firebase UID from Firebase Console → Authentication.</p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
-            <div style="flex:1;min-width:200px;">
-              <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:4px;">Target User UID</label>
-              <input id="adminGrantUid" type="text" placeholder="Firebase UID..." style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border-color);background:#0d1324;color:#e2e8f0;font-size:13px;font-family:'JetBrains Mono',monospace;" />
-            </div>
-            <div style="width:150px;">
-              <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:4px;">Plan</label>
-              <select id="adminGrantPlan" style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border-color);background:#0d1324;color:#e2e8f0;font-size:13px;">
-                <option value="monthly">Monthly</option>
-                <option value="lifetime">Lifetime</option>
-                <option value="free">Revoke (Free)</option>
-              </select>
-            </div>
-            <button id="adminGrantBtn" class="primary" style="padding:8px 18px;height:38px;">Apply</button>
-          </div>
-        </section>
-
-        <div id="adminRecentActivity" style="margin-top:20px;"></div>
+        <div id="adminRecentActivity"></div>
       </div>
     </div>
   </section>
@@ -1280,7 +1209,7 @@
     </div>
   </div>
 
-  <script type="module" src="assets/js/app.js?v=67"></script>
+  <script type="module" src="assets/js/app.js?v=68"></script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

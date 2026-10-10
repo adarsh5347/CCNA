@@ -1,18 +1,13 @@
-/**
- * NetOps Command — Admin Dashboard Module
- * Platform analytics and user management.
+﻿/**
+ * NetOps Command — Admin & NOC Station Operations Module
+ * Provides platform telemetry, station diagnostics, and operational controls.
+ * Zero subscription dependencies and resilient local/cloud status reporting.
  */
 
-import { state, byId, showToast } from "./core.js";
-import { getFirestoreDB, isFirebaseEnabled } from "./firebase.js";
-import { collection, doc, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { OWNER_UIDS } from "./subscription.js";
+import { state, byId, showToast, playNetSound } from "./core.js";
+import { isFirebaseEnabled, getFirestoreDB } from "./firebase.js";
 
-let _isAdmin = true;
-
-// ─── Check admin status ───────────────────────────────────────────────────
 export async function checkAdminStatus() {
-  _isAdmin = true;
   const adminNavBtn = byId("btnNavAdmin");
   if (adminNavBtn) {
     adminNavBtn.style.display = "inline-flex";
@@ -24,157 +19,128 @@ export function isAdmin() {
   return true;
 }
 
-// ─── Render admin dashboard ──────────────────────────────────────────────
 export async function renderAdminDashboard() {
   const statsEl = byId("adminStats");
-  const uidInput = byId("adminGrantUid");
+  const activityEl = byId("adminRecentActivity");
 
-  // Auto-fill target UID with current user's UID if available
-  if (uidInput && !uidInput.value) {
-    uidInput.value = state.user ? state.user.uid : "NjVurGH5w4TPl8qoJklLyage7UX2";
-  }
-
-  if (statsEl) statsEl.innerHTML = `<p style="color:var(--text-muted);">Aggregating platform telemetry...</p>`;
-
-  let totalUsers = 1;
-  let premiumUsers = 1;
-  let monthlyUsers = 0;
-  let lifetimeUsers = 1;
-  let freeUsers = 0;
-  let estimatedRevenue = 999;
-
-  try {
-    const db = getFirestoreDB();
-    if (db) {
-      const snap = await getDocs(collection(db, "users"));
-      if (!snap.empty) {
-        totalUsers = snap.size;
-        premiumUsers = 0;
-        monthlyUsers = 0;
-        lifetimeUsers = 0;
-
-        snap.forEach(d => {
-          const data = d.data();
-          const p = data.plan;
-          if (p === "lifetime" || OWNER_UIDS.includes(d.id)) {
-            premiumUsers++;
-            lifetimeUsers++;
-          } else if (p === "monthly") {
-            premiumUsers++;
-            monthlyUsers++;
-          }
-        });
-
-        // Ensure owner is counted in premium
-        if (lifetimeUsers === 0) {
-          premiumUsers = Math.max(1, premiumUsers);
-          lifetimeUsers = 1;
-        }
-
-        freeUsers = Math.max(0, totalUsers - premiumUsers);
-        estimatedRevenue = (monthlyUsers * 299) + (lifetimeUsers * 999);
-      }
-    }
-  } catch (err) {
-    console.warn("Firestore query error (using telemetry estimate):", err);
-  }
+  const totalQuestions = (state.bank && state.bank.length) || 328;
+  const labsCount = 10;
+  const videosCount = 126;
+  const userXp = state.analytics ? (state.analytics.xp || 0) : 0;
+  const userStreak = state.analytics ? (state.analytics.streak || 0) : 0;
+  const userLabsCompleted = state.analytics ? (state.analytics.labsCompleted || 0) : 0;
+  const isOnline = navigator.onLine;
 
   if (statsEl) {
     statsEl.innerHTML = `
       <div class="grid stats" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">
         <div class="stat">
-          <div class="k">Total Users</div>
-          <div class="v" style="color:#00f2fe;">${totalUsers.toLocaleString()}</div>
+          <div class="k">Platform Mode</div>
+          <div class="v" style="color:#10b981;font-size:16px;">100% UNLOCKED</div>
         </div>
         <div class="stat">
-          <div class="k">Premium Users</div>
-          <div class="v" style="color:#10b981;">${premiumUsers.toLocaleString()}</div>
+          <div class="k">Question Bank</div>
+          <div class="v" style="color:#00f2fe;">${totalQuestions} Drills</div>
         </div>
         <div class="stat">
-          <div class="k">Monthly Subs</div>
-          <div class="v" style="color:#f59e0b;">${monthlyUsers.toLocaleString()}</div>
+          <div class="k">Virtual Labs</div>
+          <div class="v" style="color:#10b981;">${labsCount} / 10 Active</div>
         </div>
         <div class="stat">
-          <div class="k">Lifetime Subs</div>
-          <div class="v" style="color:#a78bfa;">${lifetimeUsers.toLocaleString()}</div>
+          <div class="k">Video Lessons</div>
+          <div class="v" style="color:#f59e0b;">${videosCount} Categorized</div>
         </div>
         <div class="stat">
-          <div class="k">Free Users</div>
-          <div class="v" style="color:var(--text-muted);">${freeUsers.toLocaleString()}</div>
+          <div class="k">Network Status</div>
+          <div class="v" style="color:${isOnline ? "#10b981" : "#f59e0b"};">${isOnline ? "Online (Cloud)" : "Offline (PWA)"}</div>
         </div>
         <div class="stat">
-          <div class="k">Est. Revenue</div>
-          <div class="v" style="color:#10b981;">₹${estimatedRevenue.toLocaleString()}</div>
+          <div class="k">Session XP</div>
+          <div class="v" style="color:#00f2fe;">${userXp} XP</div>
         </div>
         <div class="stat">
-          <div class="k">Conversion Rate</div>
-          <div class="v">${totalUsers > 0 ? ((premiumUsers / totalUsers) * 100).toFixed(1) : "100"}%</div>
+          <div class="k">Labs Passed</div>
+          <div class="v" style="color:#a78bfa;">${userLabsCompleted} / 10</div>
         </div>
-      </div>`;
+        <div class="stat">
+          <div class="k">Active Streak</div>
+          <div class="v" style="color:#f59e0b;">🔥 ${userStreak} Days</div>
+        </div>
+      </div>
+    `;
+  }
+
+  if (activityEl) {
+    const currentUid = state.user ? state.user.uid : "Local Guest Engineer";
+    const currentName = state.user ? (state.user.displayName || state.user.email) : "Adarsh Poojari (Owner)";
+    
+    activityEl.innerHTML = `
+      <div class="card" style="border:1px solid var(--border-color);padding:20px;margin-top:20px;">
+        <h4 style="margin-top:0;color:#00f2fe;font-size:15px;">Station Controls & Utilities</h4>
+        <p style="color:var(--text-muted);font-size:12px;margin-bottom:16px;">
+          Active Station: <strong>${currentName}</strong> &nbsp;·&nbsp; UID: <code>${currentUid}</code>
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <button id="adminBtnForceRefresh" class="secondary" style="font-size:12px;padding:8px 14px;">
+            🔄 Force Reload PWA Cache
+          </button>
+          <button id="adminBtnTestAudio" class="secondary" style="font-size:12px;padding:8px 14px;">
+            🔊 Test Audio Engine
+          </button>
+          <button id="adminBtnExportAnalytics" class="secondary" style="font-size:12px;padding:8px 14px;">
+            💾 Export Station Analytics
+          </button>
+        </div>
+      </div>
+    `;
+
+    // Bind station utility buttons
+    const btnRefresh = byId("adminBtnForceRefresh");
+    if (btnRefresh && !btnRefresh._bound) {
+      btnRefresh._bound = true;
+      btnRefresh.addEventListener("click", () => {
+        showToast("Updating Service Worker and refreshing...", "info");
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.getRegistrations().then(regs => {
+            for (let reg of regs) reg.update();
+            setTimeout(() => window.location.reload(true), 600);
+          });
+        } else {
+          window.location.reload();
+        }
+      });
+    }
+
+    const btnAudio = byId("adminBtnTestAudio");
+    if (btnAudio && !btnAudio._bound) {
+      btnAudio._bound = true;
+      btnAudio.addEventListener("click", () => {
+        playNetSound("success");
+        showToast("Audio synthesizer operational.", "ok");
+      });
+    }
+
+    const btnExport = byId("adminBtnExportAnalytics");
+    if (btnExport && !btnExport._bound) {
+      btnExport._bound = true;
+      btnExport.addEventListener("click", () => {
+        try {
+          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.analytics, null, 2));
+          const dlAnchor = document.createElement("a");
+          dlAnchor.setAttribute("href", dataStr);
+          dlAnchor.setAttribute("download", `ccna_analytics_backup_${Date.now()}.json`);
+          dlAnchor.click();
+          showToast("Analytics export downloaded.", "ok");
+        } catch (e) {
+          showToast("Export failed: " + e.message, "error");
+        }
+      });
+    }
   }
 }
 
-// ─── Grant / Revoke Premium ──────────────────────────────────────────────
-export async function adminGrantPremium(targetUid, plan) {
-  try {
-    const isFree = (plan === "free");
-    const status = isFree ? "free" : "active";
-
-    // 1. Direct Firestore write
-    const db = getFirestoreDB();
-    if (db && isFirebaseEnabled()) {
-      try {
-        const userDocRef = doc(db, "users", targetUid);
-        await setDoc(userDocRef, {
-          plan: plan,
-          status: status,
-          activated_at: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
-      } catch (fsErr) {
-        console.warn("Firestore write error:", fsErr);
-      }
-    }
-
-    // 2. Local persistent plan store
-    try {
-      localStorage.setItem(`ccna_user_plan_${targetUid}`, plan);
-      // If updating self or current device
-      if (!state.user || state.user.uid === targetUid || OWNER_UIDS.includes(targetUid)) {
-        localStorage.setItem("ccna_user_plan", plan);
-        state.subscription = {
-          plan: plan,
-          status: status,
-          current_period_end: null,
-          activated_at: new Date().toISOString(),
-          loaded: true
-        };
-        if (window.renderSubscriptionBadge) window.renderSubscriptionBadge();
-        if (window.renderAccountPage) window.renderAccountPage();
-      }
-    } catch (lsErr) {
-      console.warn("LocalStorage write error:", lsErr);
-    }
-
-    showToast(`✅ Successfully set ${plan.toUpperCase()} for UID: ${targetUid.substring(0, 12)}...`, "ok", 4000);
-    renderAdminDashboard();
-  } catch (err) {
-    console.error("Admin grant error:", err);
-    showToast(`Failed: ${err.message}`, "error");
-  }
-}
-
-// ─── Set up admin grant form ─────────────────────────────────────────────
 export function setupAdminGrantForm() {
-  const grantBtn = byId("adminGrantBtn");
-  if (!grantBtn || grantBtn._bound) return;
-  grantBtn._bound = true;
-
-  grantBtn.addEventListener("click", async () => {
-    const uid = byId("adminGrantUid")?.value?.trim() || (state.user ? state.user.uid : "NjVurGH5w4TPl8qoJklLyage7UX2");
-    const plan = byId("adminGrantPlan")?.value || "lifetime";
-    await adminGrantPremium(uid, plan);
-  });
+  // Grant form obsolete: all accounts permanently possess full access.
 }
 
 window.renderAdminDashboard = renderAdminDashboard;

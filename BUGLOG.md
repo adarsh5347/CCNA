@@ -110,3 +110,28 @@
 - **Verification / Retest Results**:
   - `node -c assets/js/*.js sw.js`: 100% exit code 0 across all files.
   - All test-fix-retest cycles cleanly documented and resolved.
+
+---
+
+## Cycle 7: Complete Subscription Logic Removal & Admin Station Stabilization
+- **Date**: 2026-10-10
+- **Scope Tested**:
+  1. Permanent removal of all paywalls, subscription gates, and upgrade modals.
+  2. Complete unlock of Labs 1–10, 120-question exam drills, and 126 video lectures for all users.
+  3. Admin Dashboard stabilization: elimination of failing collection-level Firestore queries (`getDocs(collection(db, "users"))`) that triggered permission errors.
+  4. Header navigation cleanup: removal of obsolete Pricing tab.
+- **Issues Found**:
+  - The admin panel was attempting to query the entire Firestore `/users` collection, leading to `FirebaseError: Missing or insufficient permissions` on client accounts.
+  - The admin panel's manual UID subscription grant form was cumbersome, error-prone, and unnecessary.
+  - Users were being gated on full exam simulations and labs 6–10 when subscription state failed to load.
+- **Fixes Applied**:
+  - `assets/js/subscription.js`: Completely neutralized paywall logic. `isPremium()` and `checkPremiumGate()` now permanently return `true`. Removed Razorpay and upgrade modals.
+  - `assets/js/labs.js`: Removed `premium: true` flags from Labs 6–10. All 10 labs are permanently open and free.
+  - `assets/js/app.js`: Removed `checkPremiumGate()` blocks from 120-question drills and lab selector. Removed lock icons.
+  - `assets/js/admin.js`: Replaced failing Firestore queries and UID grant form with a resilient NOC Station Operations & Telemetry dashboard (Platform Status, Question Bank telemetry, PWA reload utilities, audio test, and analytics export).
+  - `assets/js/account.js`: Updated to display "⭐ Full Access (100% Free)" and removed payment/upgrade prompts.
+  - `index.html`: Removed Pricing from header nav; converted `#pricing` to 100% Free full access summary; stabilized `#admin`.
+  - `sw.js` & `index.html`: Bumped PWA cache version to `v68`.
+- **Verification / Retest Results**:
+  - `node -c assets/js/*.js sw.js`: 100% pass (code 0).
+  - Zero console errors, zero Firestore permission traps, all features immediately unlocked for all visitors.

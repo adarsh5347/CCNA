@@ -315,7 +315,6 @@ function wireEvents() {
   byId("startQuiz").addEventListener("click", () => startSession("quiz"));
   byId("startSmartQuiz").addEventListener("click", () => startSession("smart"));
   byId("startExam").addEventListener("click", () => {
-    if (!checkPremiumGate("Full 120-Question Exam Simulation")) return;
     startSession("exam");
   });
 
@@ -331,7 +330,6 @@ function wireEvents() {
   }
   if (btnLaunchExam) {
     btnLaunchExam.addEventListener("click", () => {
-      if (!checkPremiumGate("Full 120-Question Exam Simulation")) return;
       setPage("engine");
       startSession("exam");
     });
@@ -594,20 +592,9 @@ const distractorCommands = {
 function initLabSelector() {
   const sel = byId("labSelector");
   if (!sel) return;
-  sel.innerHTML = labs.map((l) => {
-    const lockIcon = (l.premium && !isPremium()) ? " 🔒" : "";
-    return `<option value="${l.id}"${l.premium && !isPremium() ? " data-premium='true'" : ""}>Lab ${l.id}: ${l.title}${lockIcon}</option>`;
-  }).join("");
+  sel.innerHTML = labs.map((l) => `<option value="${l.id}">Lab ${l.id}: ${l.title}</option>`).join("");
   sel.addEventListener("change", () => {
-    const labId = Number(sel.value);
-    const lab = labs.find(l => l.id === labId);
-    if (lab && lab.premium && !isPremium()) {
-      // Reset selector to last free lab
-      sel.value = String(state.lab.currentLabId);
-      showUpgradeModal(`Lab ${labId}: ${lab.title}`);
-      return;
-    }
-    state.lab.currentLabId = labId;
+    state.lab.currentLabId = Number(sel.value);
     loadLab(state.lab.currentLabId);
   });
 }
@@ -1056,38 +1043,18 @@ function setupScrollCollapseHeader() {
 }
 
 function renderPricingPage() {
-  // Update "Current Plan" highlight on pricing cards
   const freePlanCta = byId("pricingFreeCtaText");
   const monthlyPlanCta = byId("pricingMonthlyBtn");
   const lifetimePlanCta = byId("pricingLifetimeBtn");
 
-  const sub = state.subscription;
-  const plan = sub ? sub.plan : "free";
-  const isPrem = isPremium ? isPremium() : false;
-
-  if (freePlanCta) {
-    freePlanCta.textContent = (!isPrem || !state.user) ? "Current Plan" : "Downgrade to Free";
-  }
+  if (freePlanCta) freePlanCta.textContent = "✅ Active — 100% Free";
   if (monthlyPlanCta) {
-    if (plan === "monthly" && isPrem) {
-      monthlyPlanCta.textContent = "✅ Current Plan";
-      monthlyPlanCta.disabled = true;
-    } else if (plan === "lifetime" && isPrem) {
-      monthlyPlanCta.textContent = "Already on Lifetime";
-      monthlyPlanCta.disabled = true;
-    } else {
-      monthlyPlanCta.textContent = state.user ? "Upgrade — ₹299/month" : "Sign in to Upgrade";
-      monthlyPlanCta.disabled = false;
-    }
+    monthlyPlanCta.textContent = "Full Access Unlocked";
+    monthlyPlanCta.disabled = true;
   }
   if (lifetimePlanCta) {
-    if (plan === "lifetime" && isPrem) {
-      lifetimePlanCta.textContent = "✅ Current Plan";
-      lifetimePlanCta.disabled = true;
-    } else {
-      lifetimePlanCta.textContent = state.user ? "Get Lifetime — ₹999" : "Sign in to Upgrade";
-      lifetimePlanCta.disabled = false;
-    }
+    lifetimePlanCta.textContent = "Full Access Unlocked";
+    lifetimePlanCta.disabled = true;
   }
 }
 

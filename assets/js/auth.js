@@ -152,10 +152,9 @@ export function setupAuth() {
             showToast("Local save complete (offline)", "warn");
           });
 
-        // Load subscription status from Cloud Functions (premium gating source of truth)
-        loadSubscription(user.uid).then(() => {
-          renderSubscriptionBadge();
-        });
+        // Full access unlocked for all users
+        loadSubscription(user.uid);
+        renderSubscriptionBadge();
 
         refreshUI();
       } else {
@@ -164,9 +163,7 @@ export function setupAuth() {
         userPhoto.src = "";
         userName.textContent = "";
 
-        // Reset subscription to free on logout
         state.subscription = createDefaultSubscription();
-        state.subscription.loaded = true;
         renderSubscriptionBadge();
 
         console.log("User logged out. Restoring guest progress...");

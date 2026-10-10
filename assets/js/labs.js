@@ -135,7 +135,6 @@ export const labs = [
   },
   {
     id: 6,
-    premium: true,
     title: "NAT Overload (PAT) Configurations",
     domain: "IP Services",
     difficulty: "Hard",
@@ -163,7 +162,6 @@ export const labs = [
   },
   {
     id: 7,
-    premium: true,
     title: "Spanning Tree (STP) Bridge Priority Tuning",
     domain: "Network Access",
     difficulty: "Easy",
@@ -184,7 +182,6 @@ export const labs = [
   },
   {
     id: 8,
-    premium: true,
     title: "EtherChannel Bundling via LACP Configuration",
     domain: "Network Access",
     difficulty: "Medium",
@@ -205,7 +202,6 @@ export const labs = [
   },
   {
     id: 9,
-    premium: true,
     title: "WLAN WPA2 Wireless Network Configuration",
     domain: "Network Access",
     difficulty: "Easy",
@@ -231,7 +227,6 @@ export const labs = [
   },
   {
     id: 10,
-    premium: true,
     title: "Site-to-Site IPSec VPN Tunnel Configurations",
     domain: "Security Fundamentals",
     difficulty: "Hard",
