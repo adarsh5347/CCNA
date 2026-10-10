@@ -1,4 +1,4 @@
-﻿# Bug Hunt & Iterative Testing Protocol: NetOps Command CCNA Platform
+# Bug Hunt & Iterative Testing Protocol: NetOps Command CCNA Platform
 
 ## 0. Protocol Summary
 - **Live URL**: https://ccna-prep-platform.vercel.app
@@ -135,3 +135,40 @@
 - **Verification / Retest Results**:
   - `node -c assets/js/*.js sw.js`: 100% pass (code 0).
   - Zero console errors, zero Firestore permission traps, all features immediately unlocked for all visitors.
+
+---
+
+## Cycle 8: CCNA 200-301 Question Bank Rebuild & Gradual Progression Engine
+- **Date**: 2026-10-10
+- **Scope Tested**:
+  1. Complete overhaul of the legacy 328-question bank (`assets/js/data.js`).
+  2. Construction of 241 authentic, blueprint-weighted Cisco CCNA 200-301 scenario questions.
+  3. Elimination of filler stems and longest-option bias.
+  4. Authoring granular explanations (`expl.why`, specific `expl.wrong` reasoning per distractor, `expl.tip`, and CLI commands).
+  5. Implementation of adaptive cognitive difficulty progression in `quiz-engine.js` (Easy [foundations] -> Medium [application] -> Hard [troubleshoot]).
+- **Issues Found in Legacy Bank**:
+  - Domain weights deviated from official Cisco specifications (Automation 15% vs 10%, Security 12% vs 15%).
+  - Correct option was the longest in 58% of questions.
+  - Difficulty tags ("Easy", "Medium", "Hard") were cosmetic with no pedagogical progression in study/quiz sessions.
+- **Fixes Applied**:
+  - Modularized question authoring into `assets/js/qb/` (`build.js`, `nf.js`, `na.js`, `ipc.js`, `ips.js`, `sec.js`, `auto.js`, `index.js`).
+  - Total 241 high-yield, blueprint-aligned questions across all 6 CCNA domains:
+    - **Network Fundamentals (20%)**: 49 questions
+    - **Network Access (20%)**: 48 questions
+    - **IP Connectivity (25%)**: 60 questions
+    - **IP Services (10%)**: 24 questions
+    - **Security Fundamentals (15%)**: 36 questions
+    - **Automation & Programmability (10%)**: 24 questions
+  - PRNG-seeded option shuffling in `assets/js/qb/build.js` ensures unbiased correct-answer positioning.
+  - `assets/js/quiz-engine.js`:
+    - Updated `weakTopicBoost(q)` with adaptive difficulty tier multipliers: beginners get foundation Easy questions; intermediate get Medium; advanced (>=75% accuracy) get Hard troubleshooting scenarios.
+    - Added `gradualOrder = true` in `weightedSelection()` so delivered study and quiz sessions follow smooth cognitive scaffolding: Easy -> Medium -> Hard.
+    - Updated Bank & Distribution statistics cards to dynamically display exact counts (75 Easy, 101 Medium, 65 Hard).
+  - Backed up legacy bank to `assets/js/data.legacy.js`.
+  - Bumped PWA cache version to `ccna-prep-v70` in `sw.js` and `app.js?v=70` in `index.html`. Precached all new `assets/js/qb/*.js` modules for offline PWA operation.
+- **Verification / Retest Results**:
+  - `node -c` on all JavaScript files in the repository: 100% pass (code 0).
+  - Verified 0 duplicate question IDs, 0 duplicate question stems.
+  - Verified 100% option validity across all single, multi, dragdrop, and scenario questions.
+  - Confirmed 120-question real exam drill picks cleanly across all domains according to blueprint percentages.
+

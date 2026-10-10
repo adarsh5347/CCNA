@@ -101,9 +101,9 @@ export function renderHome() {
   renderStatsCards("bankStats", [
     { k: "Total Questions", v: bankLength || targetTotal },
     { k: "Blueprint Coverage", v: `${coveragePct}%` },
-    { k: "Easy", v: easy || 120 },
-    { k: "Medium", v: medium || 180 },
-    { k: "Hard", v: hard || 70 },
+    { k: "Easy", v: easy || 75 },
+    { k: "Medium", v: medium || 101 },
+    { k: "Hard", v: hard || 65 },
     { k: "Question Types", v: "Single/Multi/Matching/Drag/Scenario" }
   ]);
 
@@ -176,15 +176,34 @@ export function renderDomainChecks() {
 export function weakTopicBoost(q) {
   const t = state.analytics.topic[q.topic] || { total: 0, correct: 0 };
   const acc = t.total ? t.correct / t.total : 0.55;
-  return Math.max(0.2, 1.3 - acc);
+  // Adaptive difficulty tier multiplier based on user proficiency in this topic
+  let diffMultiplier = 1.0;
+  if (t.total < 3) {
+    // Beginner / unpracticed topic: favor Easy heavily, reduce Hard
+    if (q.difficulty === "Easy") diffMultiplier = 1.5;
+    else if (q.difficulty === "Medium") diffMultiplier = 0.9;
+    else if (q.difficulty === "Hard") diffMultiplier = 0.4;
+  } else if (acc >= 0.75) {
+    // Advanced: student has mastered basics, ramp up Hard and Medium
+    if (q.difficulty === "Easy") diffMultiplier = 0.5;
+    else if (q.difficulty === "Medium") diffMultiplier = 1.2;
+    else if (q.difficulty === "Hard") diffMultiplier = 1.6;
+  } else {
+    // Intermediate: standard gradual spread
+    if (q.difficulty === "Easy") diffMultiplier = 1.0;
+    else if (q.difficulty === "Medium") diffMultiplier = 1.2;
+    else if (q.difficulty === "Hard") diffMultiplier = 0.8;
+  }
+  return Math.max(0.2, (1.3 - acc) * diffMultiplier);
 }
 
-export function weightedSelection(count, domains) {
+const DIFF_ORDER = { Easy: 1, Medium: 2, Hard: 3 };
+
+export function weightedSelection(count, domains, gradualOrder = true) {
   const set = domains && domains.length ? new Set(domains) : null;
   const pool = state.bank.filter((q) => !set || set.has(q.domain));
   // Shuffle scored pool before weighted iteration to prevent deterministic ordering
-  // from always picking the same questions when weights are similar
-  const scored = shuffle(pool.map((q) => ({ q, w: weakTopicBoost(q) * (q.difficulty === "Hard" ? 0.9 : 1) })));
+  const scored = shuffle(pool.map((q) => ({ q, w: weakTopicBoost(q) })));
   const out = [];
   const used = new Set();
 
@@ -203,6 +222,12 @@ export function weightedSelection(count, domains) {
       }
     }
   }
+
+  // Gradual progression: sequence the delivered session from Easy (foundations) -> Medium (application) -> Hard (troubleshooting)
+  if (gradualOrder) {
+    out.sort((a, b) => (DIFF_ORDER[a.difficulty] || 2) - (DIFF_ORDER[b.difficulty] || 2));
+  }
+
   return out;
 }
 
