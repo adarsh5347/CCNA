@@ -1,6 +1,6 @@
-import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML, pick, rand, shuffle, showToast, persistSession } from "./core.js";
-import { blueprint, generateBank } from "./data.js";
-import { ccnaVideos } from "./videos.js";
+import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML, pick, rand, shuffle, showToast, persistSession } from "./core.js?v=74";
+import { blueprint, generateBank } from "./data.js?v=74";
+import { ccnaVideos } from "./videos.js?v=74";
 
 // We need these utility page/navigation functions from app.js / global scope
 function setPage(pageId) {

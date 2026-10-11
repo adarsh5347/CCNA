@@ -1,4 +1,4 @@
-import { mk } from "./build.js";
+import { mk } from "./build.js?v=74";
 
 // Security Fundamentals - 15% of exam -> 36 questions
 const { s, m, d, t } = mk("Security Fundamentals", 15);

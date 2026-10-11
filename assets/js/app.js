@@ -17,12 +17,12 @@ import {
   loadAnalytics,
   persistSession,
   BANK_VERSION
-} from "./core.js";
+} from "./core.js?v=74";
 
 import { 
   setupAuth, 
   updateHeaderProfile 
-} from "./auth.js";
+} from "./auth.js?v=74";
 
 import { 
   submitSubnet, 
@@ -34,7 +34,7 @@ import {
   renderSubnetLeaderboard, 
   updateSubnetLeaderboard,
   makeSubnetQuestion
-} from "./subnetting.js";
+} from "./subnetting.js?v=74";
 
 import { 
   setupTraversalSimulator, 
@@ -47,7 +47,7 @@ import {
   showOsiLayerDetail,
   updateOsiLabels,
   highlightNode
-} from "./topology.js";
+} from "./topology.js?v=74";
 
 import { 
   setupCanvasConstellation, 
@@ -78,14 +78,14 @@ import {
   toMMSS,
   markCurrent,
   startSessionTimer
-} from "./quiz-engine.js";
+} from "./quiz-engine.js?v=74";
 
-import { generateBank, blueprint } from "./data.js";
-import { labs } from "./labs.js";
-import { ccnaVideos } from "./videos.js";
-import { checkPremiumGate, isPremium, showUpgradeModal, initiateCheckout } from "./subscription.js";
-import { renderAccountPage } from "./account.js";
-import { renderAdminDashboard, checkAdminStatus, setupAdminGrantForm, isAdmin } from "./admin.js";
+import { generateBank, blueprint } from "./data.js?v=74";
+import { labs } from "./labs.js?v=74";
+import { ccnaVideos } from "./videos.js?v=74";
+import { checkPremiumGate, isPremium, showUpgradeModal, initiateCheckout } from "./subscription.js?v=74";
+import { renderAccountPage } from "./account.js?v=74";
+import { renderAdminDashboard, checkAdminStatus, setupAdminGrantForm, isAdmin } from "./admin.js?v=74";
 
 // Make sure other legacy files or script tags can find these methods on window
 window.setPage = setPage;

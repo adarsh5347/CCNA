@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ccna-prep-v73';
+const CACHE_NAME = 'ccna-prep-v74';
 const ASSETS = [
   '/',
   '/index.html',
@@ -62,6 +62,6 @@ self.addEventListener('fetch', e => {
         }
         return networkResponse;
       })
-      .catch(() => caches.match(e.request))
+      .catch(() => caches.match(e.request, { ignoreSearch: true }))
   );
 });

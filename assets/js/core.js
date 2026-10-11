@@ -1,4 +1,4 @@
-import { saveUserProgress } from "./firebase.js";
+import { saveUserProgress } from "./firebase.js?v=74";
 
 export const STORE = "ccna_full_site_v1";
 

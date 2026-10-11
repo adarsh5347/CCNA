@@ -190,3 +190,8 @@
 - **Matching dropdown values were not HTML-escaped** (`value=""`). Now escaped.
 - **Mid-quiz sessions saved on the old bank could be restored** after the update with stale ids. Sessions are now version-stamped and dropped on mismatch.
 - Cache `ccna-prep-v73`.
+
+### Cycle 9 addendum 2 - production crash after v73 (`core.js does not export BANK_VERSION`)
+- **Root cause**: `vercel.json` served everything under `/assets/` as `immutable, max-age=1y`, but ES modules import each other with no version query (only `app.js?v=` changed). Browsers kept the old `core.js` forever while loading the new `app.js`, so any export added to a non-entry module crashed the app for returning users. Every earlier multi-file release carried this risk.
+- **Fix**: (1) every local import is now versioned (`./core.js?v=74` etc., identical in every importer so there is a single module instance); (2) `/assets/*` is now `max-age=0, must-revalidate` so deploys apply immediately; (3) SW offline fallback uses `ignoreSearch`; (4) cache `ccna-prep-v74`.
+- **Release rule**: bump `?v=` in index.html and all imports together (find/replace `.js?v=74`) whenever JS changes.

@@ -1,10 +1,10 @@
-import { blueprintDef } from "./build.js";
-import nf from "./nf.js";
-import na from "./na.js";
-import ipc from "./ipc.js";
-import ips from "./ips.js";
-import sec from "./sec.js";
-import auto from "./auto.js";
+import { blueprintDef } from "./build.js?v=74";
+import nf from "./nf.js?v=74";
+import na from "./na.js?v=74";
+import ipc from "./ipc.js?v=74";
+import ips from "./ips.js?v=74";
+import sec from "./sec.js?v=74";
+import auto from "./auto.js?v=74";
 
 // Concatenate all domains in fixed blueprint order so ID sequences remain stable.
 const rawBank = [...nf, ...na, ...ipc, ...ips, ...sec, ...auto];
