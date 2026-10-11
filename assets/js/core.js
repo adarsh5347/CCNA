@@ -273,7 +273,7 @@ export function persistSession() {
     return;
   }
   try {
-    const copy = { ...state.session };
+    const copy = { ...state.session, bankVersion: BANK_VERSION };
     delete copy.timer;
     sessionStorage.setItem("ccna_session", JSON.stringify(copy));
   } catch (e) {

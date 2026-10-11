@@ -15,7 +15,8 @@ import {
   showToast, 
   createDefaultAnalytics, 
   loadAnalytics,
-  persistSession
+  persistSession,
+  BANK_VERSION
 } from "./core.js";
 
 import { 
@@ -251,6 +252,11 @@ function restoreSession() {
   if (!raw) return false;
   try {
     const saved = JSON.parse(raw);
+    if (saved && saved.bankVersion !== BANK_VERSION) {
+      // Saved against an older question bank: ids/questions no longer match, so drop it.
+      sessionStorage.removeItem("ccna_session");
+      return false;
+    }
     if (saved && !saved.submitted) {
       if (saved.answers && !Array.isArray(saved.answers)) {
         const arr = new Array(saved.questions.length).fill(null);

@@ -184,3 +184,9 @@
   4. Bumped cache to `ccna-prep-v72`.
 - **Audit results**: 0 schema errors across 241 questions (topics in blueprint, no duplicate options, wrong[] lengths valid).
 - **Still open (quality, not a crash)**: correct option is the longest in 67.7% of single-choice questions (ideal ~25%). Needs a content pass on distractor length.
+
+### Cycle 9 addendum
+- **Ordering questions could start already correct**: the initial shuffle was auto-saved as the answer, so an untouched drag-and-drop question could score correct by chance. Now reshuffled until it differs from the answer.
+- **Matching dropdown values were not HTML-escaped** (`value=""`). Now escaped.
+- **Mid-quiz sessions saved on the old bank could be restored** after the update with stale ids. Sessions are now version-stamped and dropped on mismatch.
+- Cache `ccna-prep-v73`.

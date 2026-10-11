@@ -611,12 +611,21 @@ export function renderQuestion() {
       if (!s._matchOpts) s._matchOpts = {};
       if (!s._matchOpts[s.idx]) s._matchOpts[s.idx] = shuffle(q.pairs.map((x) => x[1]));
       const opts = s._matchOpts[s.idx];
-      html += `<div class="opt" style="display: flex; flex-direction: column; align-items: stretch; gap: 8px;"><strong>${safeHTML(pair[0])}</strong><select data-match="${i}"><option value="">Select</option>${opts.map((x) => `<option ${cur[i] === x ? "selected" : ""} value="${x}">${safeHTML(x)}</option>`).join("")}</select></div>`;
+      html += `<div class="opt" style="display: flex; flex-direction: column; align-items: stretch; gap: 8px;"><strong>${safeHTML(pair[0])}</strong><select data-match="${i}"><option value="">Select</option>${opts.map((x) => `<option ${cur[i] === x ? "selected" : ""} value="${safeHTML(x)}">${safeHTML(x)}</option>`).join("")}</select></div>`;
     });
     html += `</div>`;
   } else {
     if (!s._dragInit) s._dragInit = {};
-    if (!s._dragInit[s.idx]) s._dragInit[s.idx] = shuffle([...q.order]);
+    if (!s._dragInit[s.idx]) {
+      // An untouched ordering question is auto-saved as its starting order below, so that
+      // order must never equal the correct one or doing nothing would score as correct.
+      let start = shuffle([...q.order]);
+      for (let tries = 0; tries < 20 && start.join("||") === q.order.join("||"); tries++) {
+        start = shuffle([...q.order]);
+      }
+      if (start.join("||") === q.order.join("||") && start.length > 1) start = [...start.slice(1), start[0]];
+      s._dragInit[s.idx] = start;
+    }
     const order = s.answers[s.idx] || s._dragInit[s.idx];
     if (!s.answers[s.idx]) s.answers[s.idx] = [...order];
     html += `<div class="options-list">`;
