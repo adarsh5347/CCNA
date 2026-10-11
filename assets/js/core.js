@@ -74,8 +74,22 @@ export function byId(id) {
   return document.getElementById(id);
 }
 
+// Bump whenever question ids change meaning (bank rebuild). Stored ids from older versions
+// (state.analytics.missedIds) would otherwise point at unrelated questions.
+export const BANK_VERSION = 2;
+
+export function migrateBankVersion(a) {
+  if (!a || typeof a !== "object") return a;
+  if (a.bankVersion !== BANK_VERSION) {
+    a.missedIds = [];
+    a.bankVersion = BANK_VERSION;
+  }
+  return a;
+}
+
 export function createDefaultAnalytics() {
   return {
+    bankVersion: BANK_VERSION,
     attempts: [],
     domain: {},
     topic: {},
@@ -120,7 +134,7 @@ export function loadAnalytics() {
     const key = (typeof state !== 'undefined' && state && state.user) ? `${STORE}_${state.user.uid}` : STORE;
     const raw = localStorage.getItem(key);
     if (!raw) return base;
-    return { ...base, ...JSON.parse(raw) };
+    return migrateBankVersion({ ...base, ...JSON.parse(raw), bankVersion: JSON.parse(raw).bankVersion });
   } catch {
     return base;
   }

@@ -498,6 +498,25 @@ export function applyStats(q, ok, sec = 0) {
   a.topic[q.topic].total += 1;
   if (ok) a.topic[q.topic].correct += 1;
 }
+// Question topic -> video hub topic. Question topics come from the blueprint; video topics use
+// the hub's own category names, so a plain string match misses most of them.
+const VIDEO_TOPIC_MAP = {
+  "osi/tcp-ip": "OSI / TCP-IP", "tcp/udp": "OSI / TCP-IP", "switching": "VLANs", "cabling": "Hardware",
+  "ipv4": "IPv4", "subnetting": "Subnetting", "ipv6": "IPv6", "wireless": "Wireless", "wlan": "Wireless",
+  "virtualization": "CCNA Core", "vlans": "VLANs", "trunking": "VLANs", "dtp/vtp": "VLANs", "cdp/lldp": "CCNA Core",
+  "stp": "STP", "etherchannel": "EtherChannel", "routing table": "CCNA Core", "static routes": "CCNA Core",
+  "ospf": "OSPF", "fhrp": "FHRP / HSRP", "nat": "NAT", "ntp": "NTP", "dhcp": "DHCP", "dns": "DNS",
+  "snmp": "SNMP", "syslog": "Syslog", "qos": "QoS", "ssh/tftp": "SSH", "threats": "Security", "acls": "ACLs",
+  "port security": "Security", "dhcp snooping/dai": "Security", "aaa": "Security", "vpn": "Security",
+  "wireless security": "Security", "sdn": "Automation", "controllers": "Automation", "rest/json": "APIs / Data",
+  "config management": "DevOps / IAC"
+};
+
+export function findVideoForTopic(topic) {
+  if (!topic) return null;
+  const want = (VIDEO_TOPIC_MAP[String(topic).toLowerCase()] || topic).toLowerCase();
+  return ccnaVideos.find((v) => String(v.topic || "").toLowerCase() === want) || null;
+}
 
 export function explanationBlock(q, ok) {
   if (!state.session.showFeedback) return "";
@@ -505,17 +524,11 @@ export function explanationBlock(q, ok) {
   if (!e) return "";
   
   let videoBtnHtml = "";
-  if (q.topic) {
-    const topicLower = q.topic.toLowerCase();
-    const matchedVideo = ccnaVideos.find(v => {
-      const vTopic = v.topic.toLowerCase();
-      return topicLower === vTopic || topicLower.includes(vTopic) || vTopic.includes(topicLower);
-    });
-    if (matchedVideo) {
-      videoBtnHtml = `
-        <button class="secondary btn-video-watch" style="margin-top: 12px; padding: 4px 10px; font-size: 11.5px; height: auto;" data-youtube-id="${matchedVideo.youtubeId}" data-video-title="${matchedVideo.title}" data-video-id="${matchedVideo.id}">📺 Watch Related Lesson</button>
+  const matchedVideo = findVideoForTopic(q.topic);
+  if (matchedVideo) {
+    videoBtnHtml = `
+        <button class="secondary btn-video-watch" style="margin-top: 12px; padding: 4px 10px; font-size: 11.5px; height: auto;" data-youtube-id="${safeHTML(String(matchedVideo.youtubeId))}" data-video-title="${safeHTML(String(matchedVideo.title))}" data-video-id="${safeHTML(String(matchedVideo.id))}">📺 Watch Related Lesson</button>
       `;
-    }
   }
   
   if (e.text && !e.why) {

@@ -1,5 +1,5 @@
 import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgress, mergeProgress } from "./firebase.js";
-import { state, STORE, authResolve, safeSetStorage, showToast, createDefaultAnalytics, byId, getLevelInfo } from "./core.js";
+import { state, STORE, authResolve, safeSetStorage, showToast, createDefaultAnalytics, byId, getLevelInfo, migrateBankVersion } from "./core.js";
 import { loadSubscription, renderSubscriptionBadge, createDefaultSubscription } from "./subscription.js";
 
 // We need these UI functions from app.js / global scope
@@ -132,7 +132,7 @@ export function setupAuth() {
           merged.watchedVideos = merged.watchedVideos || [];
         }
 
-        state.analytics = merged;
+        state.analytics = migrateBankVersion(merged);
 
         // Clear guest progress so it isn't merged again on next login
         if (didMergeGuest) {
@@ -181,7 +181,7 @@ export function setupAuth() {
           }
         }
 
-        state.analytics = parsedGuest || createDefaultAnalytics();
+        state.analytics = migrateBankVersion(parsedGuest || createDefaultAnalytics());
         state.analytics.missedIds = state.analytics.missedIds || [];
         state.analytics.simPathsRun = state.analytics.simPathsRun || { ospf: false, roas: false };
         state.analytics.watchedVideos = state.analytics.watchedVideos || [];

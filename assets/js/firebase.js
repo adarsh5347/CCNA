@@ -159,6 +159,9 @@ export function mergeProgress(local, cloud) {
   const localMissed = local.missedIds || [];
   const cloudMissed = cloud.missedIds || [];
   merged.missedIds = Array.from(new Set([...localMissed, ...cloudMissed]));
+  // Question ids are only meaningful within one bank version; if either side is stale, the
+  // merged result stays stale so migrateBankVersion() (core.js) will drop the dangling ids.
+  merged.bankVersion = Math.min(local.bankVersion || 0, cloud.bankVersion || 0);
 
   // Merge achievements (keep any that are unlocked in either)
   merged.ach = { ...(local.ach || {}), ...(cloud.ach || {}) };

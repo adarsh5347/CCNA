@@ -172,3 +172,15 @@
   - Verified 100% option validity across all single, multi, dragdrop, and scenario questions.
   - Confirmed 120-question real exam drill picks cleanly across all domains according to blueprint percentages.
 
+
+---
+
+## Cycle 9: Post-rebuild audit
+- **Date**: 2026-10-11
+- **Found and fixed**:
+  1. **Stale `missedIds` pointed at wrong questions.** The new bank reuses ids 1-241, so old stored ids (1-328) mapped to unrelated questions in Spaced Repetition. Added `BANK_VERSION` and `migrateBankVersion()` (core.js), applied on local load, login merge and logout restore; `mergeProgress` carries the version so cloud data is migrated too. One-time reset of the missed list.
+  2. **"Watch Related Lesson" never appeared for new topics.** Question topics did not match video hub categories. Added explicit `VIDEO_TOPIC_MAP` + `findVideoForTopic()`; all 40 topics now resolve. Video attributes are now HTML-escaped.
+  3. **Stale copy**: "328+ questions" in index.html and README, now 241.
+  4. Bumped cache to `ccna-prep-v72`.
+- **Audit results**: 0 schema errors across 241 questions (topics in blueprint, no duplicate options, wrong[] lengths valid).
+- **Still open (quality, not a crash)**: correct option is the longest in 67.7% of single-choice questions (ideal ~25%). Needs a content pass on distractor length.

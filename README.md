@@ -1,4 +1,4 @@
-# NetOps Command — Cisco CCNA 200-301 Preparation Platform
+﻿# NetOps Command — Cisco CCNA 200-301 Preparation Platform
 
 A production-ready, interactive single-page learning platform for Cisco CCNA 200-301 certification prep. Built with high performance, mobile-first design, and offline PWA capability.
 
@@ -55,7 +55,7 @@ A production-ready, interactive single-page learning platform for Cisco CCNA 200
 │       ├── account.js          # User account dashboard & payment history table
 │       ├── admin.js            # Admin dashboard: telemetry analytics & manual UID access controls
 │       ├── quiz-engine.js      # Exam engine, scoring formulas, readiness score, pass probability
-│       ├── data.js             # Official CCNA blueprint + 328+ question bank database
+│       ├── data.js             # Official CCNA blueprint + 241-question bank database
 │       ├── labs.js             # 10 interactive Cisco IOS configuration labs
 │       ├── topology.js         # Packet traversal SVG animation & CLI simulator
 │       ├── subnetting.js       # IPv4 subnetting calculator & speed challenge
