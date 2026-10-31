@@ -10,3 +10,7 @@ coverage/
 Thumbs.db
 *.pdf
 
+
+# Copyrighted reference books - never commit
+*.pdf
+_book/

@@ -1,13 +1,12 @@
-import { blueprintDef } from "./build.js?v=74";
-import nf from "./nf.js?v=74";
-import na from "./na.js?v=74";
-import ipc from "./ipc.js?v=74";
-import ips from "./ips.js?v=74";
-import sec from "./sec.js?v=74";
-import auto from "./auto.js?v=74";
+import { blueprintDef } from "./build.js?v=75";
+import v1p1 from "./chapters/v1p1.js?v=75";
+import v1p2 from "./chapters/v1p2.js?v=75";
+import v1p3 from "./chapters/v1p3.js?v=75";
+import v2p1 from "./chapters/v2p1.js?v=75";
+import v2p2 from "./chapters/v2p2.js?v=75";
 
-// Concatenate all domains in fixed blueprint order so ID sequences remain stable.
-const rawBank = [...nf, ...na, ...ipc, ...ips, ...sec, ...auto];
+// Concatenate all 48 Official Cert Guide chapters (Vol 1 Ch 1-29, Vol 2 Ch 1-19) in fixed order so ID sequences remain stable.
+const rawBank = [...v1p1, ...v1p2, ...v1p3, ...v2p1, ...v2p2];
 
 // Populate exact question count into blueprint definition
 export const blueprint = blueprintDef.map((d) => {

@@ -1,5 +1,5 @@
-import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML } from "./core.js?v=74";
-import { bugsData, cliOutputs } from "./cli.js?v=74";
+import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML } from "./core.js?v=75";
+import { bugsData, cliOutputs } from "./cli.js?v=75";
 
 // Global active topology state
 export let activeTopology = 1;

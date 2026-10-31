@@ -1,4 +1,4 @@
-import { state, byId, playNetSound, gainXP, safeSetStorage, saveAnalytics, pick, rand } from "./core.js?v=74";
+import { state, byId, playNetSound, gainXP, safeSetStorage, saveAnalytics, pick, rand } from "./core.js?v=75";
 
 // IP Address Conversion Helpers
 export function ipToNum(ip) {
@@ -440,94 +440,148 @@ let flashcardFlipped = false;
 
 const ccnaFlashcards = [
   {
-    topic: "Routing Protocols",
-    q: "What is the default Administrative Distance (AD) of OSPF?",
-    a: "110",
-    note: "OSPF relies on path cost (bandwidth) to determine the best path, with an AD of 110."
+    topic: "Routing Protocols (Vol 1 Ch 16)",
+    q: "What are the default Administrative Distances (AD) for Connected, Static, EIGRP, OSPF, and RIP?",
+    a: "Connected: 0 | Static: 1 | EIGRP: 90 | OSPF: 110 | RIP: 120",
+    note: "Lower AD wins when a router learns the exact same prefix/mask from multiple routing sources."
   },
   {
-    topic: "Routing Protocols",
-    q: "What is the default Administrative Distance (AD) of EIGRP?",
-    a: "90",
-    note: "EIGRP uses a composite metric (bandwidth and delay by default) and has an AD of 90."
+    topic: "OSPFv2 (Vol 1 Ch 19-21)",
+    q: "What are the default OSPF Hello and Dead timers on Broadcast vs. Non-Broadcast/Multipoint networks?",
+    a: "Broadcast / Point-to-Point: 10s Hello / 40s Dead | NBMA / Point-to-Multipoint: 30s Hello / 120s Dead",
+    note: "Hello and Dead timers must match between OSPF neighbors or adjacency fails to form."
   },
   {
-    topic: "Routing Protocols",
-    q: "What is the default Administrative Distance (AD) of RIP?",
-    a: "120",
-    note: "RIP uses hop count as its metric (maximum 15 hops) and has an AD of 120."
+    topic: "OSPFv2 (Vol 1 Ch 19)",
+    q: "What are the 7 OSPF neighbor states in order, and which two states are stable?",
+    a: "Down → Attempt/Init → 2-Way → ExStart → Exchange → Loading → Full",
+    note: "2-Way (DROther-to-DROther on broadcast links) and Full (with DR/BDR or point-to-point) are normal stable states."
   },
   {
-    topic: "IP Services",
-    q: "Which port does SSH use, and what layer does it operate on?",
-    a: "TCP Port 22 (Layer 4)",
-    note: "SSH provides secure command-line access. Telnet uses unencrypted TCP Port 23."
+    topic: "OSPFv2 (Vol 1 Ch 19)",
+    q: "What are the OSPF multicast IPv4 addresses for AllSPFouters and AllDRouters?",
+    a: "AllSPFouters: 224.0.0.5 | AllDRouters: 224.0.0.6",
+    note: "DROthers send LSUs to 224.0.0.6 (DR/BDR), and the DR floods LSUs to 224.0.0.5 (all OSPF routers)."
   },
   {
-    topic: "IP Services",
-    q: "Which port does DHCP Server listen on, and which port does DHCP Client use?",
-    a: "Server: UDP Port 67, Client: UDP Port 68",
-    note: "DHCP processes use UDP packets to dynamically allocate network parameters to hosts."
+    topic: "Spanning Tree Protocol (Vol 1 Ch 9)",
+    q: "What are the IEEE 802.1D / RSTP default port costs for 10 Mbps, 100 Mbps, 1 Gbps, and 10 Gbps?",
+    a: "10M: 100 | 100M: 19 | 1G: 4 | 10G: 2",
+    note: "Root Port is elected based on lowest cumulative Root Path Cost, then lowest sender Bridge ID, then lowest sender Port ID."
   },
   {
-    topic: "Security Fundamentals",
-    q: "What range of numbers represents Standard IP Access Control Lists (ACLs)?",
-    a: "1 - 99 and 1300 - 1999",
-    note: "Standard ACLs filter traffic based *only* on source IP address and should be applied close to destination."
+    topic: "RSTP 802.1w (Vol 1 Ch 10)",
+    q: "How do RSTP (802.1w) port states compare to classic 802.1D STP states?",
+    a: "RSTP uses 3 states: Discarding (replaces Disabled/Blocking/Listening), Learning, and Forwarding.",
+    note: "RSTP adds Alternate (backup to Root Port) and Backup (backup to Designated Port on shared media) port roles."
   },
   {
-    topic: "Security Fundamentals",
-    q: "What range of numbers represents Extended IP Access Control Lists (ACLs)?",
-    a: "100 - 199 and 2000 - 2699",
-    note: "Extended ACLs filter by source, destination, protocol type (TCP/UDP), and port number."
+    topic: "EtherChannel (Vol 1 Ch 10)",
+    q: "Which EtherChannel channel-group modes form an LACP (802.3ad) vs. PAgP bundle?",
+    a: "LACP: active/active or active/passive | PAgP: desirable/desirable or desirable/auto | Static: on/on",
+    note: "Both passive/passive (LACP) and auto/auto (PAgP) fail to form an EtherChannel because neither side initiates negotiation."
   },
   {
-    topic: "Network Access",
-    q: "What is the default bridge priority value for Spanning Tree Protocol (STP)?",
-    a: "32768",
-    note: "Bridge ID consists of Priority (default 32768) + System ID Extension (VLAN ID) + MAC Address."
+    topic: "VLANs & Trunking (Vol 1 Ch 8)",
+    q: "Which DTP (Dynamic Trunking Protocol) switchport modes successfully negotiate an 802.1Q trunk?",
+    a: "dynamic desirable + dynamic desirable | dynamic desirable + dynamic auto | dynamic desirable + trunk",
+    note: "dynamic auto + dynamic auto results in an access port! Always disable DTP on production trunks with 'switchport nonegotiate'."
   },
   {
-    topic: "Network Access",
-    q: "What is the destination MAC address for an ARP Request frame?",
-    a: "FF:FF:FF:FF:FF:FF",
-    note: "ARP Requests are broadcast frames sent to all devices on the local segment to resolve an IP to MAC."
+    topic: "Ethernet & Cabling (Vol 1 Ch 2)",
+    q: "Which UTP wire pairs do 10BASE-T/100BASE-TX use vs. 1000BASE-T, and which pins transmit?",
+    a: "10/100M uses 2 pairs (pins 1,2 & 3,6). 1000BASE-T uses all 4 pairs bidirectionally.",
+    note: "NICs/Routers/APs transmit on pins 1&2 and receive on 3&6; Switches/Hubs transmit on 3&6 and receive on 1&2."
   },
   {
-    topic: "IP Connectivity",
-    q: "What is the OSPFv2 link-state multicast destination IP address for all SPF routers?",
-    a: "224.0.0.5",
-    note: "All OSPF routers listen on 224.0.0.5. DR/BDR routers also listen on 224.0.0.6."
+    topic: "IPv6 Addressing (Vol 1 Ch 22-23)",
+    q: "What are the IPv6 address prefixes for Global Unicast, Unique Local, Link-Local, and Multicast?",
+    a: "Global Unicast: 2000::/3 | Unique Local: FC00::/7 (FD00::/8) | Link-Local: FE80::/10 | Multicast: FF00::/8",
+    note: "IPv6 has no broadcast addresses; it uses Link-Local (FE80::/10) for next-hop routing and NDP."
   },
   {
-    topic: "IP Connectivity",
-    q: "What is the default Administrative Distance (AD) of a Static Route?",
-    a: "1",
-    note: "Static routes are highly trusted and have a default AD of 1. Directly connected networks have AD of 0."
+    topic: "IPv6 Neighbor Discovery (Vol 1 Ch 24)",
+    q: "What are the 5 ICMPv6 Neighbor Discovery Protocol (NDP) message types and key multicast groups?",
+    a: "RS (133), RA (134), NS (135), NA (136), Redirect (137) | All-Nodes: FF02::1 | All-Routers: FF02::2 | Solicited-Node: FF02::1:FFxx:xxxx",
+    note: "SLAAC uses RS/RA to learn the /64 prefix and default gateway; DAD and MAC resolution use NS/NA sent to the Solicited-Node multicast."
   },
   {
-    topic: "IP Services",
-    q: "Which port does NTP (Network Time Protocol) use?",
-    a: "UDP Port 123",
-    note: "NTP synchronizes clocks across networking devices for accurate log timestamps."
+    topic: "Wireless LANs (Vol 1 Ch 26-28)",
+    q: "Which CAPWAP UDP ports are used between Lightweight APs (LAPs) and a Cisco WLC?",
+    a: "UDP 5246 (CAPWAP Control - encrypted with DTLS) and UDP 5247 (CAPWAP Data)",
+    note: "In FlexConnect mode, LAPs can switch traffic locally at a branch site even if the WAN link to the WLC fails."
   },
   {
-    topic: "IP Connectivity",
-    q: "What IPv6 address prefix represents Link-Local addresses?",
-    a: "FE80::/10",
-    note: "Link-local addresses are auto-configured on every IPv6-enabled interface and are only routable locally."
+    topic: "Wireless Security (Vol 1 Ch 28)",
+    q: "What encryption/integrity protocols correspond to WPA, WPA2, and WPA3?",
+    a: "WPA: TKIP/RC4 | WPA2: AES-CCMP | WPA3: AES-GCMP/CCMP + SAE (Simultaneous Authentication of Equals) + Mandatory PMF (802.11w)",
+    note: "WPA3 replaces the vulnerable 4-way PSK handshake with SAE (Dragonfly) for forward secrecy and offline dictionary protection."
   },
   {
-    topic: "IP Connectivity",
-    q: "What IPv6 multicast address represents the All-Nodes multicast group?",
-    a: "FF02::1",
-    note: "FF02::1 acts as the local broadcast equivalent for all IPv6 hosts on the link segment."
+    topic: "TCP & UDP Ports (Vol 2 Ch 1)",
+    q: "What are the well-known ports for FTP, SSH, Telnet, SMTP, DNS, DHCP, TFTP, HTTP, NTP, SNMP, and HTTPS?",
+    a: "FTP: TCP 20/21 | SSH: TCP 22 | Telnet: TCP 23 | SMTP: TCP 25 | DNS: UDP/TCP 53 | DHCP: UDP 67/68 | TFTP: UDP 69 | HTTP: TCP 80 | NTP: UDP 123 | SNMP: UDP 161/162 | HTTPS: TCP 443",
+    note: "DNS uses UDP 53 for standard queries and TCP 53 for zone transfers or responses > 512 bytes."
   },
   {
-    topic: "Network Access",
-    q: "What is the default priority value for HSRP (Hot Standby Router Protocol)?",
-    a: "100",
-    note: "HSRP priority default is 100. The router with the highest HSRP priority is elected as the Active router."
+    topic: "IPv4 ACLs (Vol 2 Ch 2-3)",
+    q: "What are the numbered ranges and placement rules for Standard vs. Extended IPv4 ACLs?",
+    a: "Standard: 1–99, 1300–1999 (place near destination) | Extended: 100–199, 2000–2699 (place near source)",
+    note: "Standard ACLs match ONLY source IPv4 address; placing them near the source could unintentionally block legitimate traffic to other subnets."
+  },
+  {
+    topic: "Port Security (Vol 2 Ch 6)",
+    q: "How do the three Switch Port Security violation modes (Protect, Restrict, Shutdown) differ?",
+    a: "Protect: drops offending frames silently | Restrict: drops frames + increments counter + sends Syslog/SNMP | Shutdown (default): err-disables port + sends Syslog/SNMP",
+    note: "Recover an err-disabled port using 'shutdown' followed by 'no shutdown' (or configure errdisable recovery)."
+  },
+  {
+    topic: "DHCP Snooping & DAI (Vol 2 Ch 8)",
+    q: "Which ports should be Trusted vs. Untrusted for DHCP Snooping and Dynamic ARP Inspection (DAI)?",
+    a: "Trusted: uplinks/trunks toward legitimate DHCP servers and routers | Untrusted (default): all end-host access ports",
+    note: "DHCP Snooping drops DHCPOFFER/DHCPACK on untrusted ports and builds the Binding Database used by DAI to validate ARP packets."
+  },
+  {
+    topic: "Syslog (Vol 2 Ch 9)",
+    q: "What are the 8 Syslog severity levels (0 through 7) in order?",
+    a: "0: Emergencies | 1: Alerts | 2: Critical | 3: Errors | 4: Warnings | 5: Notifications | 6: Informational | 7: Debugging",
+    note: "Memory mnemonic: 'Every Awesome Cisco Engineer Will Need Icecream Daily' (0 to 7). 'logging trap warnings' logs levels 0–4."
+  },
+  {
+    topic: "NAT (Vol 2 Ch 10)",
+    q: "Define Inside Local, Inside Global, Outside Local, and Outside Global NAT addresses.",
+    a: "Inside Local: private host IP | Inside Global: public NAT IP of inside host | Outside Global: public IP of remote server | Outside Local: how inside host sees remote server",
+    note: "PAT (NAT Overload) appends the keyword 'overload' and uses TCP/UDP source port numbers to multiplex thousands of inside hosts onto one Inside Global IP."
+  },
+  {
+    topic: "QoS (Vol 2 Ch 11)",
+    q: "What are the key DSCP Per-Hop Behaviors (EF, AF, CS) and their recommended traffic types?",
+    a: "EF (DSCP 46 / binary 101110): Voice payload (LLQ priority queue) | AF41 (DSCP 34): Interactive Video | CS3 (DSCP 24): Voice signaling | Default (DSCP 0): Best Effort",
+    note: "LLQ (Low Latency Queuing) provides strict priority scheduling with policing so voice never starves other queues during congestion."
+  },
+  {
+    topic: "FHRP: HSRP, VRRP, GLBP (Vol 2 Ch 12)",
+    q: "What are the virtual MAC address formats for HSRPv1, HSRPv2, VRRP, and GLBP?",
+    a: "HSRPv1: 0000.0c07.acXX | HSRPv2: 0000.0c9f.fXXX | VRRP: 0000.5e00.01XX | GLBP: 0007.b400.XXYY",
+    note: "HSRP default priority is 100 (Hello 3s / Hold 10s, multicast 224.0.0.2 v1 or 224.0.0.102 v2). Preemption is disabled by default in HSRP."
+  },
+  {
+    topic: "AAA Security (Vol 2 Ch 4-5)",
+    q: "How do TACACS+ and RADIUS compare in protocol, encryption, and AAA separation?",
+    a: "TACACS+: Cisco-oriented, TCP 49, encrypts entire payload, separates Auth/Authz/Acct (ideal for device admin) | RADIUS: IETF standard, UDP 1812/1813 (or 1645/1646), encrypts password only, combines Auth+Authz",
+    note: "Use TACACS+ for router/switch CLI command authorization; use RADIUS for 802.1X network access authentication."
+  },
+  {
+    topic: "SDN & Cisco SDA (Vol 2 Ch 16-17)",
+    q: "Which protocols operate in the Control Plane, Data Plane, and Policy Plane of Cisco SD-Access (SDA)?",
+    a: "Control Plane: LISP (Location/ID Separation) | Data Plane: VXLAN (UDP 4789 fabric overlay) | Policy Plane: Cisco TrustSec SGTs (Scalable Group Tags)",
+    note: "Northbound APIs (REST/JSON) connect applications to the controller; Southbound APIs (NETCONF, RESTCONF, OpenFlow, SSH/SNMP) connect the controller to network devices."
+  },
+  {
+    topic: "Automation & Config Mgmt (Vol 2 Ch 18-19)",
+    q: "Compare Ansible, Puppet, and Chef in architecture (Agent vs. Agentless), push/pull model, and language.",
+    a: "Ansible: Agentless (SSH/NETCONF), Push model, YAML Playbooks | Puppet: Agent-based, Pull model, Puppet DSL Manifests | Chef: Agent-based, Pull model, Ruby Recipes/Cookbooks",
+    note: "Remember: Ansible is the ONLY agentless push-based tool of the three on the CCNA blueprint."
   }
 ];
 

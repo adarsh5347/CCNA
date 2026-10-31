@@ -17,12 +17,12 @@ import {
   loadAnalytics,
   persistSession,
   BANK_VERSION
-} from "./core.js?v=74";
+} from "./core.js?v=75";
 
 import { 
   setupAuth, 
   updateHeaderProfile 
-} from "./auth.js?v=74";
+} from "./auth.js?v=75";
 
 import { 
   submitSubnet, 
@@ -34,7 +34,7 @@ import {
   renderSubnetLeaderboard, 
   updateSubnetLeaderboard,
   makeSubnetQuestion
-} from "./subnetting.js?v=74";
+} from "./subnetting.js?v=75";
 
 import { 
   setupTraversalSimulator, 
@@ -47,7 +47,7 @@ import {
   showOsiLayerDetail,
   updateOsiLabels,
   highlightNode
-} from "./topology.js?v=74";
+} from "./topology.js?v=75";
 
 import { 
   setupCanvasConstellation, 
@@ -77,18 +77,21 @@ import {
   renderAchievements,
   toMMSS,
   markCurrent,
-  startSessionTimer
-} from "./quiz-engine.js?v=74";
+  startSessionTimer,
+  startChapterSession
+} from "./quiz-engine.js?v=75";
 
-import { generateBank, blueprint } from "./data.js?v=74";
-import { labs } from "./labs.js?v=74";
-import { ccnaVideos } from "./videos.js?v=74";
-import { checkPremiumGate, isPremium, showUpgradeModal, initiateCheckout } from "./subscription.js?v=74";
-import { renderAccountPage } from "./account.js?v=74";
-import { renderAdminDashboard, checkAdminStatus, setupAdminGrantForm, isAdmin } from "./admin.js?v=74";
+import { generateBank, blueprint } from "./data.js?v=75";
+import { labs } from "./labs.js?v=75";
+import { ccnaVideos } from "./videos.js?v=75";
+import { checkPremiumGate, isPremium, showUpgradeModal, initiateCheckout } from "./subscription.js?v=75";
+import { renderAccountPage } from "./account.js?v=75";
+import { renderAdminDashboard, checkAdminStatus, setupAdminGrantForm, isAdmin } from "./admin.js?v=75";
+import { initStudyGuide } from "./guide-ui.js?v=75";
 
 // Make sure other legacy files or script tags can find these methods on window
 window.setPage = setPage;
+window.startChapterSession = startChapterSession;
 window.renderHome = renderHome;
 window.renderAnalytics = renderAnalytics;
 window.renderAchievements = renderAchievements;
@@ -238,6 +241,7 @@ export function setPage(page, push = true) {
     renderAnalytics();
     renderAchievements();
   }
+  if (page === "guide") initStudyGuide();
   if (page === "subnet") ensureSubnetInit();
   if (page === "videos") ensureVideosInit();
   if (page === "labs") ensureLabsInit();

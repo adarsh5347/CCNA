@@ -4,7 +4,7 @@
  * Subscription paywalls and payment requirements have been completely removed.
  */
 
-import { state, showToast, byId } from "./core.js?v=74";
+import { state, showToast, byId } from "./core.js?v=75";
 
 export const OWNER_UIDS = ["NjVurGH5w4TPl8qoJklLyage7UX2"];
 

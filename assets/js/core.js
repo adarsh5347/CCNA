@@ -1,4 +1,4 @@
-import { saveUserProgress } from "./firebase.js?v=74";
+import { saveUserProgress } from "./firebase.js?v=75";
 
 export const STORE = "ccna_full_site_v1";
 
@@ -76,10 +76,11 @@ export function byId(id) {
 
 // Bump whenever question ids change meaning (bank rebuild). Stored ids from older versions
 // (state.analytics.missedIds) would otherwise point at unrelated questions.
-export const BANK_VERSION = 2;
+export const BANK_VERSION = 3;
 
 export function migrateBankVersion(a) {
   if (!a || typeof a !== "object") return a;
+  if (!a.chapter || typeof a.chapter !== "object") a.chapter = {};
   if (a.bankVersion !== BANK_VERSION) {
     a.missedIds = [];
     a.bankVersion = BANK_VERSION;
@@ -93,6 +94,7 @@ export function createDefaultAnalytics() {
     attempts: [],
     domain: {},
     topic: {},
+    chapter: {},
     totalQ: 0,
     correct: 0,
     totalTime: 0,
@@ -123,6 +125,7 @@ export function validateAnalyticsSchema(data) {
   if (!data.ach || typeof data.ach !== 'object') return false;
   if (!data.domain || typeof data.domain !== 'object') return false;
   if (!data.topic || typeof data.topic !== 'object') return false;
+  if (data.chapter && typeof data.chapter !== 'object') return false;
   if (!Array.isArray(data.attempts)) return false;
   if (data.watchedVideos && !Array.isArray(data.watchedVideos)) return false;
   return true;

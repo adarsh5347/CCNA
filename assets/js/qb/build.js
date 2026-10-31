@@ -33,16 +33,18 @@ function shuffled(arr, rnd) {
   return a;
 }
 
+const NUM = { 2: "two", 3: "three", 4: "four" };
 const FREQ = { Easy: "High", Medium: "Medium", Hard: "Low" };
 
 let counter = 0;
 
-export function mk(domain, weight) {
+export function mk(domain, weight, chapter = "") {
   const base = (topic, diff, text, extra) => ({
     domain,
     topic,
     difficulty: diff,
     examWeight: weight + "%",
+    ...(chapter ? { chapter } : {}),
     frequency: FREQ[diff],
     text,
     ...(extra && extra.cli ? { cli: extra.cli } : {}),
@@ -85,7 +87,7 @@ export function mk(domain, weight) {
     const order = shuffled(opts, rnd);
     const correct = order.map((o, i) => (o.i < rights.length ? i : -1)).filter((i) => i >= 0);
     return {
-      ...base(topic, diff, text + " (Choose two.)", extra),
+      ...base(topic, diff, text + ` (Choose ${NUM[rights.length] || rights.length}.)`, extra),
       id,
       type: "multi",
       options: order.map((o) => o.v.t),
@@ -141,12 +143,13 @@ export function mk(domain, weight) {
   return { s, m, d, t };
 }
 
-// Blueprint: weights mirror the CCNA 200-301 exam objectives.
+// Blueprint: weights mirror the CCNA 200-301 exam objectives. Topics cover every chapter of the
+// two Official Cert Guide volumes; the question builder/validator reject topics not listed here.
 export const blueprintDef = [
-  { name: "Network Fundamentals", weight: 20, topics: ["OSI/TCP-IP", "Cabling", "IPv4", "Subnetting", "IPv6", "TCP/UDP", "Wireless", "Virtualization", "Switching"] },
-  { name: "Network Access", weight: 20, topics: ["VLANs", "Trunking", "DTP/VTP", "CDP/LLDP", "STP", "EtherChannel", "WLAN"] },
-  { name: "IP Connectivity", weight: 25, topics: ["Routing table", "Static routes", "OSPF", "FHRP"] },
+  { name: "Network Fundamentals", weight: 20, topics: ["OSI/TCP-IP", "TCP/UDP", "Ethernet", "Cabling", "Switching", "IPv4", "Subnetting", "IPv6", "Wireless", "Virtualization", "Cloud", "Network architecture"] },
+  { name: "Network Access", weight: 20, topics: ["Switch CLI", "Switch interfaces", "VLANs", "Trunking", "DTP/VTP", "CDP/LLDP", "STP", "EtherChannel", "WLAN"] },
+  { name: "IP Connectivity", weight: 25, topics: ["Router CLI", "Routing table", "Static routes", "IP routing", "OSPF", "IPv6 routing", "FHRP", "WAN"] },
   { name: "IP Services", weight: 10, topics: ["NAT", "NTP", "DHCP", "DNS", "SNMP", "Syslog", "QoS", "SSH/TFTP"] },
-  { name: "Security Fundamentals", weight: 15, topics: ["Threats", "ACLs", "Port security", "DHCP snooping/DAI", "AAA", "VPN", "Wireless security"] },
+  { name: "Security Fundamentals", weight: 15, topics: ["Threats", "Security architecture", "ACLs", "Device security", "Port security", "DHCP snooping/DAI", "AAA", "VPN", "Wireless security"] },
   { name: "Automation and Programmability", weight: 10, topics: ["SDN", "Controllers", "REST/JSON", "Config management"] }
 ];

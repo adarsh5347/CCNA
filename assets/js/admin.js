@@ -4,8 +4,8 @@
  * Zero subscription dependencies and resilient local/cloud status reporting.
  */
 
-import { state, byId, showToast, playNetSound } from "./core.js?v=74";
-import { isOwnerUser } from "./subscription.js?v=74";
+import { state, byId, showToast, playNetSound } from "./core.js?v=75";
+import { isOwnerUser } from "./subscription.js?v=75";
 
 export function isAdmin() {
   return isOwnerUser(state.user);

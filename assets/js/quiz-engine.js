@@ -1,6 +1,6 @@
-import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML, pick, rand, shuffle, showToast, persistSession } from "./core.js?v=74";
-import { blueprint, generateBank } from "./data.js?v=74";
-import { ccnaVideos } from "./videos.js?v=74";
+import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML, pick, rand, shuffle, showToast, persistSession } from "./core.js?v=75";
+import { blueprint, generateBank } from "./data.js?v=75";
+import { ccnaVideos } from "./videos.js?v=75";
 
 // We need these utility page/navigation functions from app.js / global scope
 function setPage(pageId) {
@@ -245,6 +245,65 @@ export function ensureBank() {
     state.bank = generateBank(rand);
   }
   return state.bank;
+}
+
+export function startChapterSession(chapterId, chapterTitle = "") {
+  ensureBank();
+  const chQs = shuffle(state.bank.filter((q) => q.chapter === chapterId));
+  if (!chQs.length) {
+    showToast(`No practice questions found for chapter ${chapterId}.`, "warn", 3500);
+    return;
+  }
+  // Order Easy -> Medium -> Hard for gradual chapter mastery
+  chQs.sort((a, b) => (DIFF_ORDER[a.difficulty] || 2) - (DIFF_ORDER[b.difficulty] || 2));
+
+  const m = /^v(\d+)c(\d+)$/i.exec(chapterId);
+  const label = m ? `Vol ${m[1]} Ch ${Number(m[2])}` : chapterId.toUpperCase();
+  const conf = {
+    title: `${label}${chapterTitle ? `: ${chapterTitle}` : ""} Drill`,
+    desc: `Official Cert Guide Chapter Drill (${chQs.length} questions, Easy → Medium → Hard with instant coaching).`,
+    showFeedback: true,
+    hideScoreUntilEnd: false,
+    minutes: Math.max(15, chQs.length * 2),
+    questions: chQs
+  };
+
+  showToast(`${conf.title} initiated (${chQs.length} questions).`, "info", 3000);
+
+  if (state.session && state.session.timer) clearInterval(state.session.timer);
+
+  state.session = {
+    mode: "study",
+    chapterId,
+    ...conf,
+    idx: 0,
+    answers: new Array(conf.questions.length).fill(null),
+    flagged: {},
+    feedback: {},
+    statsApplied: {},
+    startedAt: Date.now(),
+    qStartAt: Date.now(),
+    timeLeft: conf.minutes * 60,
+    timer: null,
+    submitted: false
+  };
+  persistSession();
+
+  const modeTitleEl = byId("modeTitle");
+  if (modeTitleEl) modeTitleEl.textContent = conf.title;
+  const modeDescEl = byId("modeDesc");
+  if (modeDescEl) modeDescEl.textContent = conf.desc;
+
+  startSessionTimer();
+
+  setPage("engine");
+  byId("reviewArea").classList.add("hidden");
+  byId("resultArea").classList.add("hidden");
+  byId("questionArea").classList.remove("hidden");
+  const examFooter = byId("examFooter") || document.querySelector(".exam-footer");
+  if (examFooter) examFooter.style.display = "flex";
+  renderNavigator();
+  renderQuestion();
 }
 
 export function startSession(mode) {
@@ -497,11 +556,22 @@ export function applyStats(q, ok, sec = 0) {
   if (!a.topic[q.topic]) a.topic[q.topic] = { total: 0, correct: 0 };
   a.topic[q.topic].total += 1;
   if (ok) a.topic[q.topic].correct += 1;
+
+  if (q.chapter) {
+    if (!a.chapter) a.chapter = {};
+    if (!a.chapter[q.chapter]) a.chapter[q.chapter] = { total: 0, correct: 0 };
+    a.chapter[q.chapter].total += 1;
+    if (ok) a.chapter[q.chapter].correct += 1;
+  }
 }
 // Question topic -> video hub topic. Question topics come from the blueprint; video topics use
 // the hub's own category names, so a plain string match misses most of them.
 const VIDEO_TOPIC_MAP = {
   "osi/tcp-ip": "OSI / TCP-IP", "tcp/udp": "OSI / TCP-IP", "switching": "VLANs", "cabling": "Hardware",
+  "ethernet": "Hardware", "cloud": "CCNA Core", "network architecture": "CCNA Core",
+  "switch cli": "CCNA Core", "switch interfaces": "Hardware", "router cli": "CCNA Core",
+  "ip routing": "CCNA Core", "ipv6 routing": "IPv6", "wan": "CCNA Core",
+  "security architecture": "Security", "device security": "Security",
   "ipv4": "IPv4", "subnetting": "Subnetting", "ipv6": "IPv6", "wireless": "Wireless", "wlan": "Wireless",
   "virtualization": "CCNA Core", "vlans": "VLANs", "trunking": "VLANs", "dtp/vtp": "VLANs", "cdp/lldp": "CCNA Core",
   "stp": "STP", "etherchannel": "EtherChannel", "routing table": "CCNA Core", "static routes": "CCNA Core",
@@ -518,6 +588,12 @@ export function findVideoForTopic(topic) {
   return ccnaVideos.find((v) => String(v.topic || "").toLowerCase() === want) || null;
 }
 
+function formatChapterBadge(chapterId) {
+  if (!chapterId) return "";
+  const m = /^v(\d+)c(\d+)$/i.exec(chapterId);
+  return m ? `OCG Vol ${m[1]} Ch ${Number(m[2])}` : String(chapterId).toUpperCase();
+}
+
 export function explanationBlock(q, ok) {
   if (!state.session.showFeedback) return "";
   const e = q.expl;
@@ -526,8 +602,14 @@ export function explanationBlock(q, ok) {
   let videoBtnHtml = "";
   const matchedVideo = findVideoForTopic(q.topic);
   if (matchedVideo) {
-    videoBtnHtml = `
+    videoBtnHtml += `
         <button class="secondary btn-video-watch" style="margin-top: 12px; padding: 4px 10px; font-size: 11.5px; height: auto;" data-youtube-id="${safeHTML(String(matchedVideo.youtubeId))}" data-video-title="${safeHTML(String(matchedVideo.title))}" data-video-id="${safeHTML(String(matchedVideo.id))}">📺 Watch Related Lesson</button>
+      `;
+  }
+  if (q.chapter) {
+    const chLabel = formatChapterBadge(q.chapter);
+    videoBtnHtml += `
+        <button class="secondary" style="margin-top: 12px; margin-left: 6px; padding: 4px 10px; font-size: 11.5px; height: auto; border-color: rgba(0,242,254,0.35); color: #00f2fe;" onclick="window.openGuideChapter && window.openGuideChapter('${safeHTML(String(q.chapter))}')">📖 Open ${safeHTML(chLabel)} in Study Guide</button>
       `;
   }
   
@@ -565,8 +647,9 @@ export function renderQuestion() {
   const q = s.questions[s.idx];
   if (!q) return;
 
+  const chBadge = q.chapter ? `<span class="badge" style="border-color:rgba(16,185,129,0.45);color:#10b981;">📖 ${safeHTML(formatChapterBadge(q.chapter))}</span>` : "";
   let html = `
-    <span class="badge">${safeHTML(q.domain)}</span><span class="badge">${safeHTML(q.topic)}</span>
+    <span class="badge">${safeHTML(q.domain)}</span><span class="badge">${safeHTML(q.topic)}</span>${chBadge}
     ${q.scenario ? `<div class="block"><strong>Scenario:</strong> ${safeHTML(q.scenario)}</div>` : ""}
     <h3>${safeHTML(q.text)}</h3>
     <div class="meta">
