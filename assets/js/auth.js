@@ -1,6 +1,6 @@
-import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgress, mergeProgress } from "./firebase.js?v=75";
-import { state, STORE, authResolve, safeSetStorage, showToast, createDefaultAnalytics, byId, getLevelInfo, migrateBankVersion } from "./core.js?v=75";
-import { loadSubscription, renderSubscriptionBadge, createDefaultSubscription } from "./subscription.js?v=75";
+import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgress, mergeProgress } from "./firebase.js?v=76";
+import { state, STORE, authResolve, safeSetStorage, showToast, createDefaultAnalytics, byId, getLevelInfo, migrateBankVersion } from "./core.js?v=76";
+import { loadSubscription, renderSubscriptionBadge, createDefaultSubscription } from "./subscription.js?v=76";
 
 // We need these UI functions from app.js / global scope
 function refreshUI() {

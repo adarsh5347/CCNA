@@ -1,4 +1,4 @@
-import { state, byId, playNetSound, gainXP, safeSetStorage, saveAnalytics, pick, rand } from "./core.js?v=75";
+import { state, byId, playNetSound, gainXP, safeSetStorage, saveAnalytics, pick, rand } from "./core.js?v=76";
 
 // IP Address Conversion Helpers
 export function ipToNum(ip) {
@@ -831,7 +831,9 @@ export function updateSubnetCalculator() {
     const rowCidr = Number(row.dataset.cidr);
     if (rowCidr === cidr) {
       row.classList.add("highlighted-row");
-      row.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      if (byId("subnet")?.classList.contains("active")) {
+        row.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
     } else {
       row.classList.remove("highlighted-row");
     }

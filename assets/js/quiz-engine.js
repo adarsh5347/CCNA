@@ -1,6 +1,6 @@
-import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML, pick, rand, shuffle, showToast, persistSession } from "./core.js?v=75";
-import { blueprint, generateBank } from "./data.js?v=75";
-import { ccnaVideos } from "./videos.js?v=75";
+import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML, pick, rand, shuffle, showToast, persistSession } from "./core.js?v=76";
+import { blueprint, generateBank } from "./data.js?v=76";
+import { ccnaVideos } from "./videos.js?v=76";
 
 // We need these utility page/navigation functions from app.js / global scope
 function setPage(pageId) {
@@ -1340,6 +1340,20 @@ export function renderAnalytics() {
     { k: "Weakest Domain", v: weak ? `${weak[0]} (${weak[1]}%)` : "N/A" },
     { k: "Strongest Domain", v: strong ? `${strong[0]} (${strong[1]}%)` : "N/A" }
   ]);
+
+  const trendEl = byId("trend");
+  if (trendEl) {
+    const recent = attempts.slice(-10).reverse();
+    trendEl.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px;">${recent.map((att, idx) => {
+      const score = Number(att.score) || 0;
+      const col = score >= 80 ? "#10b981" : score >= 60 ? "#f59e0b" : "#ef4444";
+      const dateStr = att.at ? new Date(att.at).toLocaleDateString() : `Session #${attempts.length - idx}`;
+      return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border-radius:8px;background:rgba(6,9,19,0.55);border:1px solid rgba(255,255,255,0.06);">
+        <div style="font-size:12.5px;color:#e2e8f0;"><strong>${safeHTML(String(att.mode || "quiz").toUpperCase())}</strong> · ${att.correct || 0}/${att.total || 0} Qs <span style="color:var(--text-muted);font-size:11px;margin-left:6px;">${safeHTML(dateStr)}</span></div>
+        <span style="font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:${col};">${score}%</span>
+      </div>`;
+    }).join("")}</div>`;
+  }
 
   const dasharray = 132;
   byId("domainBreakdown").innerHTML = `

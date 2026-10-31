@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>NetOps Command | Cisco CCNA 200-301 Engine</title>
   <meta name="description" content="NetOps Command — The ultimate Cisco CCNA 200-301 preparation platform featuring adaptive quizzes, interactive Packet Tracer lab simulations, and realistic Pearson VUE exam drills." />
   <meta name="keywords" content="NetOps Command, Cisco, CCNA, 200-301, OSPF, Subnetting, Routing, VLANs, Switch, Exam Simulation, Prep Engine" />
@@ -16,8 +16,8 @@
   <link rel="apple-touch-icon" href="assets/icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" href="assets/css/styles.css?v=66" as="style" />
-  <link rel="stylesheet" href="assets/css/styles.css?v=66" />
+  <link rel="preload" href="assets/css/styles.css?v=76" as="style" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=76" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&display=swap" media="print" onload="this.media='all'" />
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&display=swap" /></noscript>
 </head>
@@ -201,7 +201,7 @@
 
       <!-- NOC Packet Traversal Simulator -->
       <section class="card">
-        <h3>🕸️ NOC Packet Traversal Simulator</h3>
+        <h3 id="simulatorHeading">🕸️ NOC Packet Traversal Simulator</h3>
         <p>Choose a packet type, click "Run Simulation", and watch how data traverses network nodes and gets encapsulated/decapsulated at each hop.</p>
         
         <div class="row row-compact" style="margin-bottom: 16px; display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
@@ -241,6 +241,13 @@
           <button id="btnTopo2" class="secondary" style="padding: 6px 12px; font-size: 12.5px;">Topology 2: Enterprise ROAS & VPN</button>
         </div>
 
+        <div class="mobile-topo-toolbar" aria-label="Topology display controls">
+          <span class="mobile-topo-hint">💡 Tap any node to inspect CLI • Swipe or toggle zoom</span>
+          <div class="mobile-topo-zoom-btns">
+            <button type="button" id="btnTopoZoomFit" class="secondary active">Fit View</button>
+            <button type="button" id="btnTopoZoomPan" class="ghost">Pan / 1.5×</button>
+          </div>
+        </div>
         <div class="topology-wrapper">
           <div class="topology-left" style="display: flex; flex-direction: column; gap: 16px;">
             <div class="topology-main">
@@ -540,8 +547,8 @@
       </section>
 
       <!-- Operations Simulator Modules -->
-      <h3 style="margin-top: 30px; margin-bottom: 15px; font-size: 22px;">🛠️ Practice & Simulation Modules</h3>
-      <section class="grid modes">
+      <h3 id="practiceModulesHeading" style="margin-top: 30px; margin-bottom: 15px; font-size: 22px;">🛠️ Practice & Simulation Modules</h3>
+      <section id="practiceModulesSection" class="grid modes">
         <article class="card">
           <h3>⚡ Study Mode</h3>
           <p>Instant feedback with explanations, exam tips, memory tricks, and command-focused guidance.</p>
@@ -716,7 +723,7 @@
       </div>
 
       <!-- Interactive Subnet Calculator & Cheat Sheet -->
-      <article class="card" style="margin-top: 24px; display: flex; flex-direction: column; gap: 16px;">
+      <article id="vlsmCalcCard" class="card" style="margin-top: 24px; display: flex; flex-direction: column; gap: 16px;">
         <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
           <h3 style="margin-bottom: 0; display: flex; align-items: center; gap: 8px;">🧮 Interactive VLSM Subnet Calculator</h3>
           <span style="font-size: 11px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; padding: 3px 8px; border-radius: 6px; font-weight: 600;">CCNA Exam Reference Tool</span>
@@ -887,6 +894,13 @@
             </div>
             
             <div id="labFeedbackBox" style="font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 6px; display: none;"></div>
+            <div class="mobile-lab-cli-bar">
+              <input id="labManualCliInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type IOS command (or tap a command pill above)..." />
+              <div class="mobile-lab-cli-actions">
+                <button type="button" id="btnLabRunManual" class="primary">Run Command</button>
+                <button type="button" id="btnLabHint" class="secondary">💡 Hint</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -913,7 +927,7 @@
       </section>
       
       <section class="card">
-        <h3>📅 NOC Dynamic Exam Study Planner</h3>
+        <h3 id="studyPlannerHeading">📅 NOC Dynamic Exam Study Planner</h3>
         <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">Set your target exam date to generate a personalized daily training regimen based on your weak domains and readiness level.</p>
         <div style="display: flex; gap: 12px; align-items: center; margin-top: 14px; flex-wrap: wrap;">
           <div>
@@ -1038,6 +1052,10 @@
       <div id="guideChaptersShell" class="lab-shell" style="display: grid; grid-template-columns: 310px 1fr; gap: 20px; align-items: flex-start;">
         <aside class="card" style="padding: 14px; max-height: 82vh; overflow-y: auto; position: sticky; top: 86px;">
           <h3 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #00f2fe; margin: 0 0 10px 0; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">Table of Contents</h3>
+          <div class="mobile-guide-toc-controls">
+            <select id="guideMobileChapterSelect" aria-label="Jump to Chapter"></select>
+            <button type="button" id="btnToggleMobileToc" class="secondary">📑 Show All 48 Chapters</button>
+          </div>
           <div id="guideChapterList" style="display: flex; flex-direction: column; gap: 8px;"></div>
         </aside>
         <article id="guideReaderPanel" class="card" style="padding: 24px; margin-bottom: 0;"></article>
@@ -1127,6 +1145,7 @@
 
         <div style="display: flex; min-height: 70vh; position: relative;">
           <!-- Left Navigator Drawer Panel -->
+          <div id="examNavBackdrop" class="mobile-exam-backdrop" aria-hidden="true"></div>
           <aside id="examNavigator" class="left" style="position: absolute; left: -320px; top: 0; bottom: 0; width: 300px; z-index: 50; transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); box-shadow: 10px 0 20px rgba(0,0,0,0.5); border-radius: 0;">
             <div class="drawer-header" style="padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
               <h4 style="font-size: 13px; text-transform: uppercase; margin-bottom: 0; color: #94a3b8;">Question Navigator</h4>
@@ -1283,7 +1302,7 @@
     </div>
   </div>
 
-  <script type="module" src="assets/js/app.js?v=75"></script>
+  <script type="module" src="assets/js/app.js?v=76"></script>
 <script>
   if ('serviceWorker' in navigator) {
     let refreshing = false;
@@ -1303,6 +1322,113 @@
   }
 </script>
 <!-- Toast Notification Container -->
+<!-- Mobile-Only Dedicated Bottom Navigation & More Sheet (hidden on desktop > 768px) -->
+<nav id="mobileBottomNav" class="mobile-bottom-nav" aria-label="Mobile Primary Navigation">
+  <button type="button" class="mobile-nav-item active" data-mobile-nav="dashboard" aria-label="Dashboard">
+    <svg viewBox="0 0 20 20" stroke-width="1.7" aria-hidden="true"><rect x="2.5" y="2.5" width="6" height="6" rx="1.5"/><rect x="11.5" y="2.5" width="6" height="6" rx="1.5"/><rect x="2.5" y="11.5" width="6" height="6" rx="1.5"/><rect x="11.5" y="11.5" width="6" height="6" rx="1.5"/></svg>
+    <span>Dashboard</span>
+  </button>
+  <button type="button" class="mobile-nav-item" data-mobile-nav="study" aria-label="Study Guide">
+    <svg viewBox="0 0 20 20" stroke-width="1.7" aria-hidden="true"><path d="M3 4.5A2.5 2.5 0 0 1 5.5 2H10v15H5.5A2.5 2.5 0 0 0 3 19.5V4.5zM17 4.5A2.5 2.5 0 0 0 14.5 2H10v15h4.5a2.5 2.5 0 0 1 2.5 2.5V4.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Study</span>
+  </button>
+  <button type="button" class="mobile-nav-item" data-mobile-nav="practice" aria-label="Practice and Exams">
+    <svg viewBox="0 0 20 20" stroke-width="1.7" aria-hidden="true"><path d="M9 2L4 11h5l-1 7 7-10h-5l1-6z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Practice</span>
+  </button>
+  <button type="button" class="mobile-nav-item" data-mobile-nav="labs" aria-label="Virtual Labs">
+    <svg viewBox="0 0 20 20" stroke-width="1.7" aria-hidden="true"><path d="M8 3h4M9 3v5l-4 7a1 1 0 0 0 .9 1.5h8.2a1 1 0 0 0 .9-1.5l-4-7V3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Labs</span>
+  </button>
+  <button type="button" class="mobile-nav-item" data-mobile-nav="more" aria-expanded="false" aria-controls="mobileMoreSheet" aria-label="More Modules">
+    <svg viewBox="0 0 20 20" stroke-width="1.7" aria-hidden="true"><circle cx="4.5" cy="10" r="1.6"/><circle cx="10" cy="10" r="1.6"/><circle cx="15.5" cy="10" r="1.6"/></svg>
+    <span>More</span>
+  </button>
+</nav>
+
+<div id="mobileMoreBackdrop" class="mobile-more-backdrop hidden" aria-hidden="true"></div>
+<aside id="mobileMoreSheet" class="mobile-more-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="mobileMoreSheetTitle">
+  <div class="mobile-more-handle" aria-hidden="true"></div>
+  <div class="mobile-more-header">
+    <div>
+      <h3 id="mobileMoreSheetTitle">NOC Command Modules</h3>
+      <p>Quick access to simulators, calculators, analytics &amp; tools</p>
+    </div>
+    <button type="button" id="btnCloseMobileMore" class="ghost" aria-label="Close More menu">✕</button>
+  </div>
+  <div class="mobile-more-grid">
+    <button type="button" class="mobile-more-card" data-more-action="simulator">
+      <span class="mobile-more-icon">🕸️</span>
+      <div class="mobile-more-text">
+        <strong>Packet Simulator</strong>
+        <span>NOC topology, OSI &amp; CLI</span>
+      </div>
+    </button>
+    <button type="button" class="mobile-more-card" data-more-action="flashcards">
+      <span class="mobile-more-icon">💡</span>
+      <div class="mobile-more-text">
+        <strong>Flashcards</strong>
+        <span>Rapid recall deck</span>
+      </div>
+    </button>
+    <button type="button" class="mobile-more-card" data-more-action="subnet">
+      <span class="mobile-more-icon">🎯</span>
+      <div class="mobile-more-text">
+        <strong>Subnetting Arcade</strong>
+        <span>CIDR &amp; timed drills</span>
+      </div>
+    </button>
+    <button type="button" class="mobile-more-card" data-more-action="vlsm">
+      <span class="mobile-more-icon">🧮</span>
+      <div class="mobile-more-text">
+        <strong>VLSM Calculator</strong>
+        <span>32-bit binary &amp; cheat sheet</span>
+      </div>
+    </button>
+    <button type="button" class="mobile-more-card" data-more-action="analytics">
+      <span class="mobile-more-icon">📊</span>
+      <div class="mobile-more-text">
+        <strong>Readiness Dashboard</strong>
+        <span>Pass probability &amp; domains</span>
+      </div>
+    </button>
+    <button type="button" class="mobile-more-card" data-more-action="planner">
+      <span class="mobile-more-icon">📅</span>
+      <div class="mobile-more-text">
+        <strong>Study Planner</strong>
+        <span>Custom daily exam route</span>
+      </div>
+    </button>
+    <button type="button" class="mobile-more-card" data-more-action="videos">
+      <span class="mobile-more-icon">🎬</span>
+      <div class="mobile-more-text">
+        <strong>Video Library</strong>
+        <span>126 CCNA video lectures</span>
+      </div>
+    </button>
+    <button type="button" class="mobile-more-card" data-more-action="support">
+      <span class="mobile-more-icon">🛠️</span>
+      <div class="mobile-more-text">
+        <strong>Support Desk</strong>
+        <span>NOC incident tickets</span>
+      </div>
+    </button>
+    <button type="button" class="mobile-more-card" data-more-action="account">
+      <span class="mobile-more-icon">👤</span>
+      <div class="mobile-more-text">
+        <strong>Engineer Account</strong>
+        <span>Profile &amp; cloud sync</span>
+      </div>
+    </button>
+    <button type="button" class="mobile-more-card" data-more-action="admin" data-page="admin" style="display:none;">
+      <span class="mobile-more-icon">⚡</span>
+      <div class="mobile-more-text">
+        <strong>Admin Station</strong>
+        <span>Platform telemetry</span>
+      </div>
+    </button>
+  </div>
+</aside>
 <div id="toastContainer" role="status" aria-live="polite" aria-atomic="false"></div>
 </body>
 </html>

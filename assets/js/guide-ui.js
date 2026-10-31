@@ -1,6 +1,6 @@
-import { studyGuide, getChapterById } from "./guide/index.js?v=75";
-import { state, byId, safeHTML, showToast } from "./core.js?v=75";
-import { startChapterSession, ensureBank } from "./quiz-engine.js?v=75";
+import { studyGuide, getChapterById } from "./guide/index.js?v=76";
+import { state, byId, safeHTML, showToast } from "./core.js?v=76";
+import { startChapterSession, ensureBank } from "./quiz-engine.js?v=76";
 
 let currentChapterId = "v1c01";
 let currentVolumeFilter = "all"; // "all" | "1" | "2"
@@ -68,6 +68,16 @@ export function renderChapterSidebar() {
     currentChapterId = filtered[0].id;
   }
 
+  const mobileSelect = byId("guideMobileChapterSelect");
+  if (mobileSelect) {
+    mobileSelect.innerHTML = filtered
+      .map(
+        (ch) =>
+          `<option value="${safeHTML(ch.id)}" ${ch.id === currentChapterId ? "selected" : ""}>Vol ${ch.volume} Ch ${ch.chapter}: ${safeHTML(ch.title)}</option>`
+      )
+      .join("");
+  }
+
   listEl.innerHTML = filtered.map((ch) => {
     const active = ch.id === currentChapterId;
     const stats = getChapterStats(ch.id);
@@ -91,6 +101,11 @@ export function renderChapterSidebar() {
   listEl.querySelectorAll("[data-ch-id]").forEach((btn) => {
     btn.addEventListener("click", () => {
       currentChapterId = btn.dataset.chId;
+      if (window.innerWidth <= 768) {
+        listEl.classList.remove("mobile-toc-expanded");
+        const tocBtn = byId("btnToggleMobileToc");
+        if (tocBtn) tocBtn.textContent = "📑 Show All 48 Chapters";
+      }
       renderChapterSidebar();
       renderChapterDetail();
       const readerEl = byId("guideReaderPanel");
@@ -445,6 +460,25 @@ export function initStudyGuide() {
         updateGuideViewVisibility();
       });
     });
+    const mobileSelect = byId("guideMobileChapterSelect");
+    if (mobileSelect) {
+      mobileSelect.addEventListener("change", () => {
+        currentChapterId = mobileSelect.value;
+        renderChapterSidebar();
+        renderChapterDetail();
+        const readerEl = byId("guideReaderPanel");
+        if (readerEl) readerEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+    const tocBtn = byId("btnToggleMobileToc");
+    if (tocBtn) {
+      tocBtn.addEventListener("click", () => {
+        const listEl = byId("guideChapterList");
+        if (!listEl) return;
+        const expanded = listEl.classList.toggle("mobile-toc-expanded");
+        tocBtn.textContent = expanded ? "📑 Hide Chapter List" : "📑 Show All 48 Chapters";
+      });
+    }
   }
   updateGuideViewVisibility();
 }

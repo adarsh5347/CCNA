@@ -1,4 +1,4 @@
-import { mk } from "../build.js?v=75";
+import { mk } from "../build.js?v=76";
 
 const c19 = mk("IP Connectivity", 25, "v1c19");
 const q19 = [

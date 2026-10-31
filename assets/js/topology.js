@@ -1,5 +1,5 @@
-import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML } from "./core.js?v=75";
-import { bugsData, cliOutputs } from "./cli.js?v=75";
+import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML } from "./core.js?v=76";
+import { bugsData, cliOutputs } from "./cli.js?v=76";
 
 // Global active topology state
 export let activeTopology = 1;
@@ -329,6 +329,10 @@ ${nodeName.toUpperCase()}# write memory
           
           setTimeout(() => {
             renderCLI(nodeName);
+      if (window.innerWidth <= 768) {
+        const cfgPanel = byId("nodeConfigPanel");
+        if (cfgPanel) cfgPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
           }, 2500);
         } else {
           playNetSound("block");
@@ -486,6 +490,10 @@ export function setupNodeConfigInspector() {
       }, 1500);
 
       renderCLI(nodeName);
+      if (window.innerWidth <= 768) {
+        const cfgPanel = byId("nodeConfigPanel");
+        if (cfgPanel) cfgPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
     });
   });
 }

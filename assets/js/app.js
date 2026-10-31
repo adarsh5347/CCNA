@@ -17,12 +17,12 @@ import {
   loadAnalytics,
   persistSession,
   BANK_VERSION
-} from "./core.js?v=75";
+} from "./core.js?v=76";
 
 import { 
   setupAuth, 
   updateHeaderProfile 
-} from "./auth.js?v=75";
+} from "./auth.js?v=76";
 
 import { 
   submitSubnet, 
@@ -34,7 +34,7 @@ import {
   renderSubnetLeaderboard, 
   updateSubnetLeaderboard,
   makeSubnetQuestion
-} from "./subnetting.js?v=75";
+} from "./subnetting.js?v=76";
 
 import { 
   setupTraversalSimulator, 
@@ -47,7 +47,7 @@ import {
   showOsiLayerDetail,
   updateOsiLabels,
   highlightNode
-} from "./topology.js?v=75";
+} from "./topology.js?v=76";
 
 import { 
   setupCanvasConstellation, 
@@ -79,15 +79,15 @@ import {
   markCurrent,
   startSessionTimer,
   startChapterSession
-} from "./quiz-engine.js?v=75";
+} from "./quiz-engine.js?v=76";
 
-import { generateBank, blueprint } from "./data.js?v=75";
-import { labs } from "./labs.js?v=75";
-import { ccnaVideos } from "./videos.js?v=75";
-import { checkPremiumGate, isPremium, showUpgradeModal, initiateCheckout } from "./subscription.js?v=75";
-import { renderAccountPage } from "./account.js?v=75";
-import { renderAdminDashboard, checkAdminStatus, setupAdminGrantForm, isAdmin } from "./admin.js?v=75";
-import { initStudyGuide } from "./guide-ui.js?v=75";
+import { generateBank, blueprint } from "./data.js?v=76";
+import { labs } from "./labs.js?v=76";
+import { ccnaVideos } from "./videos.js?v=76";
+import { checkPremiumGate, isPremium, showUpgradeModal, initiateCheckout } from "./subscription.js?v=76";
+import { renderAccountPage } from "./account.js?v=76";
+import { renderAdminDashboard, checkAdminStatus, setupAdminGrantForm, isAdmin } from "./admin.js?v=76";
+import { initStudyGuide } from "./guide-ui.js?v=76";
 
 // Make sure other legacy files or script tags can find these methods on window
 window.setPage = setPage;
@@ -231,6 +231,12 @@ export function setPage(page, push = true) {
   const targetPage = byId(page);
   if (targetPage) targetPage.classList.add("active");
   document.body.dataset.activePage = page;
+  closeMobileMoreSheet();
+  syncMobileBottomNav(page);
+  if (page !== "engine") {
+    byId("examNavigator")?.classList.remove("active");
+    byId("examNavBackdrop")?.classList.remove("active");
+  }
 
   // Update nav buttons active highlight
   document.querySelectorAll("[data-page]").forEach((btn) => {
@@ -289,6 +295,60 @@ function restoreSession() {
     console.error("Failed to restore session:", e);
   }
   return false;
+}
+
+function syncMobileBottomNav(page, overrideTab = null) {
+  let activeTab = overrideTab;
+  if (!activeTab) {
+    if (page === "home") activeTab = "dashboard";
+    else if (page === "guide") activeTab = "study";
+    else if (page === "engine") activeTab = "practice";
+    else if (page === "labs") activeTab = "labs";
+    else activeTab = "more";
+  }
+  document.querySelectorAll("#mobileBottomNav [data-mobile-nav]").forEach((btn) => {
+    const isMatch = btn.dataset.mobileNav === activeTab;
+    btn.classList.toggle("active", isMatch);
+    if (isMatch) {
+      btn.setAttribute("aria-current", "page");
+    } else {
+      btn.removeAttribute("aria-current");
+    }
+  });
+}
+
+function openMobileMoreSheet() {
+  const sheet = byId("mobileMoreSheet");
+  const backdrop = byId("mobileMoreBackdrop");
+  const moreBtn = document.querySelector('#mobileBottomNav [data-mobile-nav="more"]');
+  const adminBtn = document.querySelector('#mobileMoreSheet [data-more-action="admin"]');
+  if (adminBtn) adminBtn.classList.toggle("admin-visible", isAdmin());
+  if (sheet) {
+    sheet.classList.remove("hidden");
+    sheet.classList.add("active");
+    sheet.setAttribute("aria-hidden", "false");
+  }
+  if (backdrop) {
+    backdrop.classList.remove("hidden");
+    backdrop.classList.add("active");
+  }
+  if (moreBtn) moreBtn.setAttribute("aria-expanded", "true");
+}
+
+function closeMobileMoreSheet() {
+  const sheet = byId("mobileMoreSheet");
+  const backdrop = byId("mobileMoreBackdrop");
+  const moreBtn = document.querySelector('#mobileBottomNav [data-mobile-nav="more"]');
+  if (sheet) {
+    sheet.classList.remove("active");
+    sheet.classList.add("hidden");
+    sheet.setAttribute("aria-hidden", "true");
+  }
+  if (backdrop) {
+    backdrop.classList.remove("active");
+    backdrop.classList.add("hidden");
+  }
+  if (moreBtn) moreBtn.setAttribute("aria-expanded", "false");
 }
 
 function navSetup() {
@@ -473,9 +533,188 @@ function wireEvents() {
   if (sidebarNav && btnToggleNav && btnCloseNav) {
     btnToggleNav.addEventListener("click", () => {
       sidebarNav.classList.add("active");
+      byId("examNavBackdrop")?.classList.add("active");
     });
     btnCloseNav.addEventListener("click", () => {
       sidebarNav.classList.remove("active");
+      byId("examNavBackdrop")?.classList.remove("active");
+    });
+  }
+
+  const examNavBackdrop = byId("examNavBackdrop");
+  if (examNavBackdrop && sidebarNav) {
+    examNavBackdrop.addEventListener("click", () => {
+      sidebarNav.classList.remove("active");
+      examNavBackdrop.classList.remove("active");
+    });
+  }
+  const qNavEl = byId("qNav");
+  if (qNavEl && sidebarNav) {
+    qNavEl.addEventListener("click", (e) => {
+      if (window.innerWidth <= 768 && e.target.closest("button")) {
+        sidebarNav.classList.remove("active");
+        byId("examNavBackdrop")?.classList.remove("active");
+      }
+    });
+  }
+
+  // Mobile 5-Tab Bottom Navigation & More Bottom Sheet
+  document.querySelectorAll("#mobileBottomNav [data-mobile-nav]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      playNetSound("click");
+      const target = btn.dataset.mobileNav;
+      if (target === "dashboard") {
+        closeMobileMoreSheet();
+        setPage("home");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else if (target === "study") {
+        closeMobileMoreSheet();
+        setPage("guide");
+      } else if (target === "practice") {
+        closeMobileMoreSheet();
+        if (state.session && !state.session.submitted) {
+          setPage("engine");
+        } else {
+          setPage("home");
+          syncMobileBottomNav("home", "practice");
+          setTimeout(() => {
+            byId("practiceModulesHeading")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 60);
+        }
+      } else if (target === "labs") {
+        closeMobileMoreSheet();
+        setPage("labs");
+      } else if (target === "more") {
+        const sheet = byId("mobileMoreSheet");
+        if (sheet && sheet.classList.contains("active")) {
+          closeMobileMoreSheet();
+        } else {
+          openMobileMoreSheet();
+        }
+      }
+    });
+  });
+
+  byId("btnCloseMobileMore")?.addEventListener("click", () => {
+    playNetSound("click");
+    closeMobileMoreSheet();
+  });
+  byId("mobileMoreBackdrop")?.addEventListener("click", () => {
+    closeMobileMoreSheet();
+  });
+
+  document.querySelectorAll("#mobileMoreSheet [data-more-action]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      playNetSound("click");
+      const action = btn.dataset.moreAction;
+      closeMobileMoreSheet();
+      if (action === "simulator") {
+        setPage("home");
+        setTimeout(() => byId("simulatorHeading")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+      } else if (action === "flashcards") {
+        setPage("home");
+        setTimeout(() => byId("flashcardBox")?.scrollIntoView({ behavior: "smooth", block: "center" }), 60);
+      } else if (action === "subnet") {
+        setPage("subnet");
+      } else if (action === "vlsm") {
+        setPage("subnet");
+        setTimeout(() => byId("vlsmCalcCard")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+      } else if (action === "analytics") {
+        setPage("analytics");
+      } else if (action === "planner") {
+        setPage("analytics");
+        setTimeout(() => byId("studyPlannerHeading")?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+      } else if (action === "videos") {
+        setPage("videos");
+      } else if (action === "support") {
+        setPage("support");
+      } else if (action === "account") {
+        setPage("account");
+      } else if (action === "admin") {
+        setPage("admin");
+      }
+    });
+  });
+
+  // Mobile Topology Fit View / Pan 1.5x Toolbar
+  const btnTopoZoomFit = byId("btnTopoZoomFit");
+  const btnTopoZoomPan = byId("btnTopoZoomPan");
+  const topoMainEl = document.querySelector(".topology-main");
+  if (btnTopoZoomFit && btnTopoZoomPan && topoMainEl) {
+    btnTopoZoomFit.addEventListener("click", () => {
+      playNetSound("click");
+      topoMainEl.classList.remove("pan-zoom-mode");
+      btnTopoZoomFit.classList.add("active");
+      btnTopoZoomPan.classList.remove("active");
+    });
+    btnTopoZoomPan.addEventListener("click", () => {
+      playNetSound("click");
+      topoMainEl.classList.add("pan-zoom-mode");
+      btnTopoZoomPan.classList.add("active");
+      btnTopoZoomFit.classList.remove("active");
+    });
+  }
+
+  // Mobile Lab Manual CLI Input & Hint Controls
+  const labManualInput = byId("labManualCliInput");
+  const btnLabRunManual = byId("btnLabRunManual");
+  const btnLabHint = byId("btnLabHint");
+  const normalizeLabCmd = (str) =>
+    String(str || "")
+      .trim()
+      .toLowerCase()
+      .replace(/\bgigabitethernet\s*/g, "gi")
+      .replace(/\bfastethernet\s*/g, "fa")
+      .replace(/\binterface\s+/g, "int ")
+      .replace(/\bswitchport\s+/g, "sw ")
+      .replace(/\bno\s+shutdown\b/g, "no shut")
+      .replace(/\s+/g, " ");
+
+  const submitManualLabCmd = () => {
+    if (!labManualInput) return;
+    const raw = labManualInput.value.trim();
+    if (!raw) return;
+    const lab = labs.find((l) => l.id === state.lab.currentLabId) || labs[0];
+    if (!lab || !lab.commands) return;
+    const nextIdx = state.lab.userCommands.length;
+    const expectedObj = lab.commands[nextIdx];
+    let cmdToPass = raw;
+    if (expectedObj && normalizeLabCmd(raw) === normalizeLabCmd(expectedObj.cmd)) {
+      cmdToPass = expectedObj.cmd;
+    }
+    handleLabCommandClick(cmdToPass, lab);
+    labManualInput.value = "";
+  };
+
+  if (btnLabRunManual) {
+    btnLabRunManual.addEventListener("click", submitManualLabCmd);
+  }
+  if (labManualInput) {
+    labManualInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        submitManualLabCmd();
+      }
+    });
+  }
+  if (btnLabHint) {
+    btnLabHint.addEventListener("click", () => {
+      playNetSound("click");
+      const lab = labs.find((l) => l.id === state.lab.currentLabId) || labs[0];
+      if (!lab || !lab.commands) return;
+      const nextIdx = state.lab.userCommands.length;
+      if (nextIdx >= lab.commands.length) {
+        showToast("All lab steps are already completed!", "ok", 2500);
+        return;
+      }
+      const nextStep = lab.commands[nextIdx];
+      const feedback = byId("labFeedbackBox");
+      if (feedback) {
+        feedback.style.display = "block";
+        feedback.style.background = "rgba(0, 242, 254, 0.14)";
+        feedback.style.color = "#e2e8f0";
+        feedback.textContent = `💡 Hint (Step ${nextIdx + 1}/${lab.commands.length}): ${nextStep.desc} → ${nextStep.cmd}`;
+      }
     });
   }
 
@@ -976,7 +1215,7 @@ let _lastHeaderHeight = 0;
 let _headerResizeObserver = null;
 
 function syncHeaderHeight() {
-  if (window.innerWidth > 760) return; // desktop untouched
+  if (window.innerWidth > 768) return; // desktop untouched
   const header = document.querySelector(".exam-header");
   if (!header) return;
   const h = Math.ceil(header.getBoundingClientRect().height);
@@ -987,7 +1226,7 @@ function syncHeaderHeight() {
 }
 
 function watchHeaderHeight() {
-  if (window.innerWidth > 760) return;
+  if (window.innerWidth > 768) return;
   const header = document.querySelector(".exam-header");
   if (!header) return;
   if (_headerResizeObserver) _headerResizeObserver.disconnect();
@@ -1002,7 +1241,7 @@ function watchHeaderHeight() {
 let _scrollCollapseObserver = null;
 
 function setupScrollCollapseHeader() {
-  if (window.innerWidth > 760) return; // desktop untouched
+  if (window.innerWidth > 768) return; // desktop untouched
 
   // Clean up previous observer if navigating between questions
   if (_scrollCollapseObserver) {
