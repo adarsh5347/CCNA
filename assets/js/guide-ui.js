@@ -1,6 +1,6 @@
-import { studyGuide, getChapterById } from "./guide/index.js?v=76";
-import { state, byId, safeHTML, showToast } from "./core.js?v=76";
-import { startChapterSession, ensureBank } from "./quiz-engine.js?v=76";
+import { studyGuide, getChapterById } from "./guide/index.js?v=77";
+import { state, byId, safeHTML, showToast } from "./core.js?v=77";
+import { startChapterSession, ensureBank } from "./quiz-engine.js?v=77";
 
 let currentChapterId = "v1c01";
 let currentVolumeFilter = "all"; // "all" | "1" | "2"

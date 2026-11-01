@@ -3,7 +3,7 @@
  * Shows user's engineer profile and platform full access status.
  */
 
-import { state, byId } from "./core.js?v=76";
+import { state, byId } from "./core.js?v=77";
 
 export function renderAccountPage() {
   renderAccountHeader();

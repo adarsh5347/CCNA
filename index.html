@@ -16,8 +16,8 @@
   <link rel="apple-touch-icon" href="assets/icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" href="assets/css/styles.css?v=76" as="style" />
-  <link rel="stylesheet" href="assets/css/styles.css?v=76" />
+  <link rel="preload" href="assets/css/styles.css?v=77" as="style" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=77" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&display=swap" media="print" onload="this.media='all'" />
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&display=swap" /></noscript>
 </head>
@@ -740,7 +740,7 @@
               <span id="calcCidrVal" style="font-family: var(--font-mono); font-size: 13px; color: #00f2fe; font-weight: bold;">/24</span>
             </div>
             <div style="display: flex; align-items: center; gap: 12px; height: 44px;">
-              <input id="calcCidr" type="range" min="1" max="32" value="24" style="flex: 1; cursor: pointer; accent-color: #00f2fe;" />
+              <input id="calcCidr" type="range" min="0" max="32" value="24" style="flex: 1; cursor: pointer; accent-color: #00f2fe;" />
             </div>
           </div>
         </div>
@@ -979,7 +979,7 @@
               <div id="videoProgressPercentageBar" style="width: 0%; height: 100%; background: var(--accent-color); transition: width 0.3s;"></div>
             </div>
             <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
-              <span id="videoProgressLabel">0/0 Watched</span>
+              <span id="videoProgressLabel">0/126 Watched</span>
               <span id="videoProgressPercentage">0%</span>
             </div>
           </div>
@@ -1090,6 +1090,7 @@
           <h3>Open Incident Ticket</h3>
           <p>Describe the issue or ask a technical question. The incident tracking system will capture the details.</p>
           <form id="supportForm" onsubmit="return false;">
+            <input id="supportWebsite" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;" />
             <div class="row row-compact" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0;">
               <label>Your Name
                 <input id="supportName" type="text" placeholder="John Doe" required />
@@ -1129,7 +1130,7 @@
           
           <!-- Progress & Question Counter -->
           <div style="display: flex; align-items: center; gap: 12px; flex: 1; justify-content: center; max-width: 400px; margin: 0 20px;">
-            <strong id="qCounter" style="font-size: 12px; white-space: nowrap; color: var(--text-main);">Q 1 / 100</strong>
+            <strong id="qCounter" style="font-size: 12px; white-space: nowrap; color: var(--text-main);">Q 1 / 120</strong>
             <div class="progress" style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; flex: 1; overflow: hidden; border: 1px solid var(--border-color); margin: 0;">
               <div id="progressFill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #00f2fe, #4facfe); transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);"></div>
             </div>
@@ -1302,7 +1303,7 @@
     </div>
   </div>
 
-  <script type="module" src="assets/js/app.js?v=76"></script>
+  <script type="module" src="assets/js/app.js?v=77"></script>
 <script>
   if ('serviceWorker' in navigator) {
     let refreshing = false;

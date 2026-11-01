@@ -1,8 +1,18 @@
-import { state, byId, playNetSound, gainXP, safeSetStorage, saveAnalytics, pick, rand } from "./core.js?v=76";
+import { state, byId, playNetSound, gainXP, safeSetStorage, saveAnalytics, pick, rand, safeHTML } from "./core.js?v=77";
 
 // IP Address Conversion Helpers
 export function ipToNum(ip) {
-  return ip.split(".").reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+  if (typeof ip !== "string") return null;
+  const parts = ip.trim().split(".");
+  if (parts.length !== 4) return null;
+  let acc = 0;
+  for (const part of parts) {
+    if (!/^(0|[1-9]\d{0,2})$/.test(part)) return null;
+    const n = Number(part);
+    if (n < 0 || n > 255) return null;
+    acc = ((acc << 8) + n) >>> 0;
+  }
+  return acc;
 }
 
 export function numToIp(num) {
@@ -27,7 +37,10 @@ export function getSubnetMask(prefix) {
 
 export function getSubnetDetails(ipStr, prefix) {
   const ipNum = ipToNum(ipStr);
-  const maskNum = (prefix === 0 ? 0 : (prefix === 32 ? 0xffffffff : (0xffffffff << (32 - prefix)))) >>> 0;
+
+
+  if (ipNum === null || !Number.isInteger(prefix) || prefix < 0 || prefix > 32) return null;
+  const maskNum = (prefix === 0 ? 0 : (prefix === 32 ? 0xFFFFFFFF : (0xFFFFFFFF << (32 - prefix)))) >>> 0;
   const wildcardNum = (~maskNum) >>> 0;
   const netNum = (ipNum & maskNum) >>> 0;
   const broadNum = (netNum | wildcardNum) >>> 0;
@@ -176,7 +189,7 @@ export function renderSubnetLeaderboard() {
   
   let html = `<ol style="margin: 0; padding-left: 20px; color: var(--text-muted);">`;
   list.forEach((item) => {
-    html += `<li style="margin-bottom: 4px;"><strong>${item.score} correct</strong> - ${item.date} (${item.mode})</li>`;
+    html += `<li style="margin-bottom: 4px;"><strong>${safeHTML(item.score)} correct</strong> - ${safeHTML(item.date)} (${safeHTML(item.mode)})</li>`;
   });
   html += `</ol>`;
   container.innerHTML = html;
@@ -755,7 +768,7 @@ export function updateSubnetCalculator() {
     }
   }
 
-  if (!isValid) {
+  if (!isValid || !Number.isInteger(cidr) || cidr < 0 || cidr > 32) {
     ipInput.style.borderColor = "var(--color-error)";
     ipInput.style.boxShadow = "0 0 10px rgba(255, 94, 58, 0.25)";
     return;
@@ -765,9 +778,10 @@ export function updateSubnetCalculator() {
   ipInput.style.boxShadow = "";
 
   const ipNum = ipToNum(ipStr);
+
   if (ipNum === null) return;
   
-  const maskNum = cidr === 32 ? 0xFFFFFFFF : (~(0xFFFFFFFF >>> cidr)) >>> 0;
+  const maskNum = cidr === 0 ? 0 : (cidr === 32 ? 0xFFFFFFFF : (~(0xFFFFFFFF >>> cidr)) >>> 0);
   const wildcardNum = (~maskNum) >>> 0;
   const netNum = (ipNum & maskNum) >>> 0;
   const broadNum = (netNum | wildcardNum) >>> 0;
@@ -780,8 +794,8 @@ export function updateSubnetCalculator() {
   let hosts = 0;
   let rangeStr = "N/A";
   if (cidr <= 30) {
-    hosts = Math.pow(2, 32 - cidr) - 2;
-    rangeStr = `${numToIp(netNum + 1)} - ${numToIp(broadNum - 1)}`;
+    hosts = cidr === 0 ? 4294967294 : Math.pow(2, 32 - cidr) - 2;
+    rangeStr = `${numToIp((netNum + 1) >>> 0)} - ${numToIp((broadNum - 1) >>> 0)}`;
   } else if (cidr === 31) {
     hosts = 2;
     rangeStr = `${numToIp(netNum)} - ${numToIp(broadNum)}`;

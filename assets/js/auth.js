@@ -1,11 +1,12 @@
-import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgress, mergeProgress } from "./firebase.js?v=76";
-import { state, STORE, authResolve, safeSetStorage, showToast, createDefaultAnalytics, byId, getLevelInfo, migrateBankVersion } from "./core.js?v=76";
-import { loadSubscription, renderSubscriptionBadge, createDefaultSubscription } from "./subscription.js?v=76";
+import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgress, mergeProgress } from "./firebase.js?v=77";
+import { state, STORE, authResolve, safeSetStorage, showToast, createDefaultAnalytics, byId, getLevelInfo, migrateBankVersion } from "./core.js?v=77";
+import { loadSubscription, renderSubscriptionBadge, createDefaultSubscription } from "./subscription.js?v=77";
 
 // We need these UI functions from app.js / global scope
 function refreshUI() {
   if (window.renderHome) window.renderHome();
   if (window.renderAnalytics) window.renderAnalytics();
+  if (window.renderVideos) window.renderVideos();
 }
 
 export function updateHeaderProfile() {
@@ -32,6 +33,7 @@ export function setupAuth() {
   const userProfile = byId("userProfile");
   const userPhoto = byId("userPhoto");
   const userName = byId("userName");
+  let previousUid = null;
 
   if (btnSignIn) {
     btnSignIn.addEventListener("click", async () => {
@@ -67,8 +69,10 @@ export function setupAuth() {
 
   onAuthChange(async (user) => {
     try {
+      const wasSignedIn = Boolean(previousUid);
       state.user = user;
       if (user) {
+        previousUid = user.uid;
         btnSignIn.classList.add("hidden");
         userProfile.classList.remove("hidden");
         userPhoto.src = user.photoURL || "";
@@ -119,6 +123,7 @@ export function setupAuth() {
           merged.attempts = merged.attempts || [];
           merged.domain = merged.domain || {};
           merged.topic = merged.topic || {};
+          merged.chapter = merged.chapter || {};
           merged.totalQ = merged.totalQ || 0;
           merged.correct = merged.correct || 0;
           merged.totalTime = merged.totalTime || 0;
@@ -134,18 +139,18 @@ export function setupAuth() {
 
         state.analytics = migrateBankVersion(merged);
 
-        // Clear guest progress so it isn't merged again on next login
+        // Clear guest progress so it isn't merged again on next login or leaked on logout
         if (didMergeGuest) {
-          safeSetStorage(localStorage, `${STORE}_backup`, guestRaw);
           localStorage.removeItem(STORE);
+          localStorage.removeItem(`${STORE}_backup`);
         }
 
         safeSetStorage(localStorage, userKey, JSON.stringify(state.analytics));
 
         // Save progress and report feedback on failure
         saveUserProgress(user.uid, state.analytics)
-          .then(() => {
-            showToast("Telemetry synced to Cloud", "ok");
+          .then((synced) => {
+            if (synced) showToast("Telemetry synced to Cloud", "ok");
           })
           .catch((err) => {
             console.error("Cloud sync failed on login/merge:", err);
@@ -166,22 +171,34 @@ export function setupAuth() {
         state.subscription = createDefaultSubscription();
         renderSubscriptionBadge();
 
-        console.log("User logged out. Restoring guest progress...");
-        let guestData = localStorage.getItem(STORE);
-        if (!guestData) {
-          guestData = localStorage.getItem(`${STORE}_backup`);
-        }
-
-        let parsedGuest = null;
-        if (guestData) {
+        if (wasSignedIn) {
+          // User explicitly signed out: clear active quiz session and reset in-memory telemetry
+          // so account data never leaks into the logged-out guest view on shared browsers
+          previousUid = null;
+          localStorage.removeItem(`${STORE}_backup`);
+          localStorage.removeItem(STORE);
           try {
-            parsedGuest = JSON.parse(guestData);
-          } catch (e) {
-            console.error("Error parsing guest progress on logout:", e);
+            sessionStorage.removeItem("ccna_session");
+          } catch (e) {}
+          if (state.session) {
+            clearInterval(state.session.timer);
+            state.session = null;
           }
+          state.analytics = createDefaultAnalytics();
+        } else {
+          // Initial boot as unauthenticated guest: restore guest progress if any
+          let guestData = localStorage.getItem(STORE);
+          let parsedGuest = null;
+          if (guestData) {
+            try {
+              parsedGuest = JSON.parse(guestData);
+            } catch (e) {
+              console.error("Error parsing guest progress:", e);
+            }
+          }
+          state.analytics = migrateBankVersion(parsedGuest || createDefaultAnalytics());
         }
 
-        state.analytics = migrateBankVersion(parsedGuest || createDefaultAnalytics());
         state.analytics.missedIds = state.analytics.missedIds || [];
         state.analytics.simPathsRun = state.analytics.simPathsRun || { ospf: false, roas: false };
         state.analytics.watchedVideos = state.analytics.watchedVideos || [];

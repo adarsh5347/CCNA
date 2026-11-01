@@ -1,7 +1,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-import { firebaseConfig } from './config.js?v=76';
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, doc, setDoc, getDoc, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { firebaseConfig } from './config.js?v=77';
 
 let app = null;
 let auth = null;
@@ -81,7 +81,7 @@ export function onAuthChange(callback) {
 }
 
 export async function saveUserProgress(userId, data) {
-  if (!enabled || !db) return;
+  if (!enabled || !db) return false;
   try {
     const userDocRef = doc(db, "users", userId);
     // Overwrite/update the document with the fresh progress state
@@ -89,8 +89,10 @@ export async function saveUserProgress(userId, data) {
       analytics: data,
       updatedAt: new Date().toISOString()
     }, { merge: true });
+    return true;
   } catch (error) {
     console.error("Error saving user progress:", error);
+    throw error;
   }
 }
 
@@ -106,6 +108,18 @@ export async function loadUserProgress(userId) {
     console.error("Error loading user progress:", error);
   }
   return null;
+}
+
+export async function saveSupportTicket(ticket) {
+  if (!enabled || !db) return null;
+  try {
+    const colRef = collection(db, "supportTickets");
+    const docRef = await addDoc(colRef, ticket);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error saving support ticket to Firestore:", error);
+    return null;
+  }
 }
 
 // Function to merge local progress with cloud progress to ensure no data is lost
@@ -196,6 +210,21 @@ export function mergeProgress(local, cloud) {
     };
   });
 
+  // Merge chapter analytics
+  const allChapters = new Set([
+    ...Object.keys(local.chapter || {}),
+    ...Object.keys(cloud.chapter || {})
+  ]);
+  merged.chapter = {};
+  allChapters.forEach(ch => {
+    const l = (local.chapter && local.chapter[ch]) || { total: 0, correct: 0 };
+    const c = (cloud.chapter && cloud.chapter[ch]) || { total: 0, correct: 0 };
+    merged.chapter[ch] = {
+      total: Math.max(l.total, c.total),
+      correct: Math.max(l.correct, c.correct)
+    };
+  });
+
   // Merge attempts lists (sort chronologically and keep last 40)
   const allAttempts = [
     ...(local.attempts || []),
@@ -211,6 +240,8 @@ export function mergeProgress(local, cloud) {
     }
   });
   // Sort by date ascending and slice last 40
+  merged.attempts = uniqueAttempts.sort((a, b) => String(a.at).localeCompare(String(b.at))).slice(-40);
+
   // Merge watched videos progress
   const localWatched = local.watchedVideos || [];
   const cloudWatched = cloud.watchedVideos || [];

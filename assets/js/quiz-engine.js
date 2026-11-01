@@ -1,6 +1,6 @@
-import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML, pick, rand, shuffle, showToast, persistSession } from "./core.js?v=76";
-import { blueprint, generateBank } from "./data.js?v=76";
-import { ccnaVideos } from "./videos.js?v=76";
+import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML, pick, rand, shuffle, showToast, persistSession } from "./core.js?v=77";
+import { blueprint, generateBank } from "./data.js?v=77";
+import { ccnaVideos } from "./videos.js?v=77";
 
 // We need these utility page/navigation functions from app.js / global scope
 function setPage(pageId) {
@@ -284,6 +284,7 @@ export function startChapterSession(chapterId, chapterTitle = "") {
     startedAt: Date.now(),
     qStartAt: Date.now(),
     timeLeft: conf.minutes * 60,
+    deadlineAt: Date.now() + conf.minutes * 60 * 1000,
     timer: null,
     submitted: false
   };
@@ -405,6 +406,7 @@ export function startSession(mode) {
     startedAt: Date.now(),
     qStartAt: Date.now(),
     timeLeft: conf.minutes * 60,
+    deadlineAt: Date.now() + conf.minutes * 60 * 1000,
     timer: null,
     submitted: false
   };
@@ -442,7 +444,12 @@ export function startSessionTimer() {
   let lastDanger = null;
 
   state.session.timer = setInterval(() => {
-    state.session.timeLeft = Math.max(0, state.session.timeLeft - 1);
+    if (typeof state.session.deadlineAt === "number" && state.session.deadlineAt > 0) {
+      state.session.timeLeft = Math.max(0, Math.round((state.session.deadlineAt - Date.now()) / 1000));
+    } else {
+      state.session.timeLeft = Math.max(0, state.session.timeLeft - 1);
+      state.session.deadlineAt = Date.now() + state.session.timeLeft * 1000;
+    }
     
     if (timerEl) {
       timerEl.textContent = toMMSS(state.session.timeLeft);
@@ -1044,7 +1051,7 @@ export function submitSession(force) {
   const weak = Object.entries(domain).map(([k, v]) => ({ k, p: Math.round((v.correct / v.total) * 100) })).sort((a, b) => a.p - b.p).slice(0, 2);
   const strong = Object.entries(domain).map(([k, v]) => ({ k, p: Math.round((v.correct / v.total) * 100) })).sort((a, b) => b.p - a.p).slice(0, 2);
 
-  let html = `<h2>Session Complete: ${s.title}</h2><div class="grid stats">`;
+  let html = `<h2>Session Complete: ${safeHTML(s.title)}</h2><div class="grid stats">`;
   html += `<div class="stat"><div class="k">Score</div><div class="v">${pct}%</div></div>`;
   html += `<div class="stat"><div class="k">Correct</div><div class="v">${correct}/${total}</div></div>`;
   html += `<div class="stat"><div class="k">Readiness</div><div class="v">${readinessLabel(readinessScore())}</div></div>`;
@@ -1057,7 +1064,7 @@ export function submitSession(force) {
     return `
       <div class="domain-item">
         <div class="domain-header">
-          <strong>${d}</strong>
+          <strong>${safeHTML(d)}</strong>
           <span class="pct">${v.correct}/${v.total} (${pct}%)</span>
         </div>
         <div class="progress"><div style="width:${pct}%; background:${color};"></div></div>
@@ -1082,7 +1089,7 @@ export function submitSession(force) {
       }
       const whyVal = x.q.expl?.why || x.q.expl?.text || "";
       const tipVal = x.q.expl?.tip || "";
-      return `<div class="output"><strong>Q${x.i + 1}</strong> ${x.q.topic} | Correct: ${correctVal}<br /><span style="display:block; margin-top:6px; color:#a1b2c8"><strong>Explanation:</strong> ${safeHTML(whyVal)}</span>${tipVal ? `<span style="display:block; margin-top:4px; color:#a1b2c8"><strong>Tip:</strong> ${safeHTML(tipVal)}</span>` : ""}</div>`;
+      return `<div class="output"><strong>Q${x.i + 1}</strong> ${safeHTML(x.q.topic)} | Correct: ${safeHTML(correctVal)}<br /><span style="display:block; margin-top:6px; color:#a1b2c8"><strong>Explanation:</strong> ${safeHTML(whyVal)}</span>${tipVal ? `<span style="display:block; margin-top:4px; color:#a1b2c8"><strong>Tip:</strong> ${safeHTML(tipVal)}</span>` : ""}</div>`;
     }).join("") || "No incorrect answers."}</div>`;
   } else {
     let statusText = "";
@@ -1164,7 +1171,7 @@ export function submitSession(force) {
               const col = score >= 80 ? "#10b981" : score >= 60 ? "#f59e0b" : "#ff5e3a";
               return `
                 <tr style="border-bottom: 1px solid #1e293b;">
-                  <td style="padding: 10px 0;">${name}</td>
+                  <td style="padding: 10px 0;">${safeHTML(name)}</td>
                   <td style="padding: 10px 0; text-align: right; font-weight: bold; color: ${col};">${score}%</td>
                   <td style="padding: 10px 0; text-align: right; color: ${col}; font-weight: 500;">${status}</td>
                 </tr>
@@ -1202,7 +1209,7 @@ export function submitSession(force) {
           
           return `
             <div class="output" style="border-left: 4px solid ${ok ? '#10b981' : '#ff5e3a'}; margin-bottom: 15px; padding: 12px; background: rgba(255,255,255,0.01);">
-              <strong>Q${idx + 1} (${q.topic})</strong> — 
+              <strong>Q${idx + 1} (${safeHTML(q.topic)})</strong> — 
               <span style="font-weight: bold; color: ${ok ? '#10b981' : '#ff5e3a'};">${ok ? 'CORRECT' : 'INCORRECT'}</span>
               <br />
               <div style="margin-top: 6px; font-size: 0.95em;"><strong>Question:</strong> ${safeHTML(q.text)}</div>

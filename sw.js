@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ccna-prep-v76';
+const CACHE_NAME = 'ccna-prep-v77';
 const ASSETS = [
   '/',
   '/index.html',
@@ -55,6 +55,12 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   // Only intercept GET requests from the local origin
   if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
+  // Never cache Firebase Auth handler paths or sensitive admin query routes
+  const reqUrl = new URL(e.request.url);
+  if (reqUrl.pathname.startsWith('/__/auth/') || reqUrl.searchParams.get('page') === 'admin') {
     return;
   }
 

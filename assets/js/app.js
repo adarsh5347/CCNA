@@ -17,12 +17,13 @@ import {
   loadAnalytics,
   persistSession,
   BANK_VERSION
-} from "./core.js?v=76";
+} from "./core.js?v=77";
 
 import { 
   setupAuth, 
   updateHeaderProfile 
-} from "./auth.js?v=76";
+} from "./auth.js?v=77";
+import { saveSupportTicket } from "./firebase.js?v=77";
 
 import { 
   submitSubnet, 
@@ -34,7 +35,7 @@ import {
   renderSubnetLeaderboard, 
   updateSubnetLeaderboard,
   makeSubnetQuestion
-} from "./subnetting.js?v=76";
+} from "./subnetting.js?v=77";
 
 import { 
   setupTraversalSimulator, 
@@ -47,7 +48,7 @@ import {
   showOsiLayerDetail,
   updateOsiLabels,
   highlightNode
-} from "./topology.js?v=76";
+} from "./topology.js?v=77";
 
 import { 
   setupCanvasConstellation, 
@@ -79,15 +80,15 @@ import {
   markCurrent,
   startSessionTimer,
   startChapterSession
-} from "./quiz-engine.js?v=76";
+} from "./quiz-engine.js?v=77";
 
-import { generateBank, blueprint } from "./data.js?v=76";
-import { labs } from "./labs.js?v=76";
-import { ccnaVideos } from "./videos.js?v=76";
-import { checkPremiumGate, isPremium, showUpgradeModal, initiateCheckout } from "./subscription.js?v=76";
-import { renderAccountPage } from "./account.js?v=76";
-import { renderAdminDashboard, checkAdminStatus, setupAdminGrantForm, isAdmin } from "./admin.js?v=76";
-import { initStudyGuide } from "./guide-ui.js?v=76";
+import { generateBank, blueprint } from "./data.js?v=77";
+import { labs } from "./labs.js?v=77";
+import { ccnaVideos } from "./videos.js?v=77";
+import { checkPremiumGate, isPremium, showUpgradeModal, initiateCheckout } from "./subscription.js?v=77";
+import { renderAccountPage } from "./account.js?v=77";
+import { renderAdminDashboard, checkAdminStatus, setupAdminGrantForm, isAdmin } from "./admin.js?v=77";
+import { initStudyGuide } from "./guide-ui.js?v=77";
 
 // Make sure other legacy files or script tags can find these methods on window
 window.setPage = setPage;
@@ -262,7 +263,8 @@ function restoreSession() {
   if (!raw) return false;
   try {
     const saved = JSON.parse(raw);
-    if (saved && saved.bankVersion !== BANK_VERSION) {
+    const currentUid = state.user ? state.user.uid : "guest";
+    if (saved && ((saved.bankVersion !== BANK_VERSION) || (saved.uid && saved.uid !== currentUid))) {
       // Saved against an older question bank: ids/questions no longer match, so drop it.
       sessionStorage.removeItem("ccna_session");
       return false;
@@ -721,15 +723,48 @@ function wireEvents() {
   const btnReset = byId("btnResetProgress");
   if (btnReset) {
     btnReset.addEventListener("click", () => {
-      if (confirm("Are you sure you want to reset all your progress statistics? This action cannot be undone.")) {
+      if (confirm("Are you sure you want to reset all your progress statistics? A local recovery backup will be created before resetting.")) {
+        const key = state.user ? `${STORE}_${state.user.uid}` : STORE;
+        safeSetStorage(localStorage, `${key}_pre_reset_backup`, JSON.stringify({ at: new Date().toISOString(), analytics: state.analytics }));
+        try { sessionStorage.removeItem("ccna_session"); } catch (e) {}
+        if (state.session) {
+          clearInterval(state.session.timer);
+          state.session = null;
+        }
         state.analytics = createDefaultAnalytics();
         saveAnalytics(true);
         renderHome();
         renderAnalytics();
-        showToast("Progress statistics reset successfully.", "info", 4000);
+        renderAchievements();
+        renderVideos();
+        showToast("Progress statistics reset. (Call undoResetProgress() in console or restore backup if needed)", "info", 5000);
       }
     });
   }
+  window.undoResetProgress = function () {
+    const key = state.user ? `${STORE}_${state.user.uid}` : STORE;
+    const raw = localStorage.getItem(`${key}_pre_reset_backup`);
+    if (!raw) {
+      showToast("No pre-reset backup found.", "warn");
+      return false;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.analytics) {
+        state.analytics = parsed.analytics;
+        saveAnalytics(true);
+        renderHome();
+        renderAnalytics();
+        renderAchievements();
+        renderVideos();
+        showToast("Progress statistics restored from backup!", "ok", 4000);
+        return true;
+      }
+    } catch (e) {
+      console.error("Failed to restore pre-reset backup:", e);
+    }
+    return false;
+  };
 
   const onboarding = byId("onboardingModal");
   const dismissBtn = byId("btnOnboardingDismiss");
@@ -758,10 +793,12 @@ function wireEvents() {
         return;
       }
 
-      const targetDate = new Date(targetDateStr);
-      const today = new Date();
-      const diffTime = targetDate - today;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const parts = targetDateStr.split("-").map(Number);
+      const targetDate = parts.length === 3 ? new Date(parts[0], parts[1] - 1, parts[2]) : new Date(targetDateStr);
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const diffTime = targetDate.getTime() - today.getTime();
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
       if (diffDays <= 0) {
         showToast("Target exam date must be in the future!", "warn");
@@ -811,12 +848,13 @@ function wireEvents() {
         planHtml += `
           <div style="margin-top:10px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
             <strong>Domain Focus Recommendations:</strong> Use Spaced Repetition or Smart Adaptive practice filters focusing on your weakest domains: 
-            <span style="color:#f59e0b; font-weight:bold;">${weakDomains.join(", ")}</span>.
+            <span style="color:#f59e0b; font-weight:bold;">${safeHTML(weakDomains.join(", "))}</span>.
           </div>
         `;
       }
 
       outBox.innerHTML = planHtml;
+      safeSetStorage(localStorage, "ccna_study_plan", JSON.stringify({ targetDateStr, dailyHours }));
     });
   }
 }
@@ -1397,22 +1435,92 @@ function setupSupportDesk() {
   const out = byId("supportOut");
   if (!btn || !out) return;
 
-  btn.addEventListener("click", () => {
-    const name = byId("supportName").value.trim();
-    const email = byId("supportEmail").value.trim();
-    const priority = byId("supportPriority").value;
-    const desc = byId("supportDesc").value.trim();
+  let lastSubmitTs = 0;
+  let lastPayloadSig = "";
+  const ALLOWED_PRIORITIES = [
+    "Severity 4 - Low",
+    "Severity 3 - Medium",
+    "Severity 2 - High",
+    "Severity 1 - Critical"
+  ];
+  const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  btn.addEventListener("click", async () => {
+    const honeypot = byId("supportWebsite");
+    if (honeypot && honeypot.value.trim() !== "") {
+      showToast("Submission rejected by automated spam filter.", "error");
+      return;
+    }
+
+    const name = (byId("supportName")?.value || "").trim();
+    const email = (byId("supportEmail")?.value || "").trim();
+    const priority = (byId("supportPriority")?.value || "").trim();
+    const desc = (byId("supportDesc")?.value || "").trim();
 
     if (!name || !email || !desc) {
       showToast("Please fill in all required fields.", "warn");
       return;
     }
+    if (name.length < 2 || name.length > 80) {
+      showToast("Name must be between 2 and 80 characters.", "warn");
+      return;
+    }
+    if (email.length > 120 || !EMAIL_RE.test(email)) {
+      showToast("Please enter a valid contact email address.", "warn");
+      return;
+    }
+    if (!ALLOWED_PRIORITIES.includes(priority)) {
+      showToast("Invalid incident priority selected.", "warn");
+      return;
+    }
+    if (desc.length < 10 || desc.length > 2000) {
+      showToast("Description must be between 10 and 2,000 characters.", "warn");
+      return;
+    }
+
+    const now = Date.now();
+    const storedLastTs = Number(localStorage.getItem("ccna_support_last_ts") || 0);
+    if (now - Math.max(lastSubmitTs, storedLastTs) < 60000) {
+      const waitSec = Math.ceil((60000 - (now - Math.max(lastSubmitTs, storedLastTs))) / 1000);
+      showToast(`Please wait ${waitSec}s before opening another ticket.`, "warn");
+      return;
+    }
+
+    const payloadSig = `${name.toLowerCase()}|${email.toLowerCase()}|${priority}|${desc.toLowerCase()}`;
+    const storedLastSig = localStorage.getItem("ccna_support_last_sig") || "";
+    if (payloadSig === lastPayloadSig || payloadSig === storedLastSig) {
+      showToast("Duplicate incident ticket detected. Your previous ticket is already logged.", "warn");
+      return;
+    }
+
+    lastSubmitTs = now;
+    lastPayloadSig = payloadSig;
+    safeSetStorage(localStorage, "ccna_support_last_ts", String(now));
+    safeSetStorage(localStorage, "ccna_support_last_sig", payloadSig);
+
+    const ticketId = `INC-${Math.floor(100000 + Math.random() * 900000)}`;
+    const ticketPayload = {
+      name,
+      email,
+      priority,
+      desc,
+      createdAt: new Date().toISOString(),
+      uid: state.user ? state.user.uid : null
+    };
+
+    try {
+      const existingTickets = JSON.parse(localStorage.getItem("ccna_support_tickets") || "[]");
+      existingTickets.push({ ticketId, ...ticketPayload });
+      safeSetStorage(localStorage, "ccna_support_tickets", JSON.stringify(existingTickets.slice(-25)));
+    } catch (e) {}
+
+    saveSupportTicket(ticketPayload).catch(() => {});
 
     showToast("Incident ticket successfully logged ✓", "ok", 3000);
-    const safePriority = priority.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const safePriority = safeHTML(priority);
     out.innerHTML = `
       <strong style="color: var(--color-ok);">Incident Logged Successfully!</strong><br />
-      <strong>Ticket ID:</strong> INC-${Math.floor(100000 + Math.random() * 900000)}<br />
+      <strong>Ticket ID:</strong> ${safeHTML(ticketId)}<br />
       <strong>Severity:</strong> ${safePriority}<br />
       <strong>Status:</strong> Assigned to Platform Admin<br />
       <span style="font-size: 12px; color: var(--text-muted);">Your incident has been logged. The admin team will follow up via the email address you provided.</span>
@@ -1464,26 +1572,31 @@ function renderVideos() {
 
   container.innerHTML = filtered.map(v => {
     const isWatched = state.analytics.watchedVideos.includes(v.id);
+    const safeYid = /^[a-zA-Z0-9_-]{11}$/.test(v.youtubeId) ? v.youtubeId : "";
+    const safeTitle = safeHTML(v.title);
+    const safeTopic = safeHTML(v.topic);
+    const safeDesc = safeHTML(v.description);
+    const safeDur = safeHTML(v.duration);
     return `
       <article class="card video-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 16px; border: 1.5px solid ${isWatched ? "rgba(16, 185, 129, 0.3)" : "var(--border-color)"}; background: rgba(13, 19, 36, 0.4); position: relative; transition: border-color 0.2s;">
         <div>
           <div class="video-thumbnail-container" data-video-id="${v.id}" style="position: relative; width: 100%; padding-bottom: 56.25%; background: rgba(0,0,0,0.6); border-radius: 8px; margin-bottom: 12px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; display: flex; align-items: center; justify-content: center;">
-            <img src="https://img.youtube.com/vi/${v.youtubeId}/mqdefault.jpg" alt="${v.title}" loading="lazy" decoding="async" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.75; transition: transform 0.3s;" />
+            <img src="https://img.youtube.com/vi/${safeYid}/mqdefault.jpg" alt="${safeTitle}" loading="lazy" decoding="async" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.75; transition: transform 0.3s;" />
             <div class="play-icon-overlay" style="position: absolute; font-size: 32px; color: var(--accent-color); opacity: 0.85; filter: drop-shadow(0 0 10px rgba(0,242,254,0.5)); transition: transform 0.2s;">▶</div>
-            <span style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.85); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono);">${v.duration}</span>
+            <span style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.85); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono);">${safeDur}</span>
           </div>
 
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-            <span style="font-size: 11px; color: var(--accent-color); font-weight: bold; background: rgba(0, 242, 254, 0.08); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0,242,254,0.15);">${v.topic}</span>
+            <span style="font-size: 11px; color: var(--accent-color); font-weight: bold; background: rgba(0, 242, 254, 0.08); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0,242,254,0.15);">${safeTopic}</span>
             <label style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-muted); cursor: pointer;">
               <input type="checkbox" class="video-watch-checkbox" data-video-id="${v.id}" ${isWatched ? "checked" : ""} style="cursor: pointer;" />
               Watched
             </label>
           </div>
-          <h4 style="margin: 6px 0 8px 0; font-size: 14px; line-height: 1.4; color: #fff;">${v.title}</h4>
-          <p style="margin: 0 0 12px 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">${v.description}</p>
+          <h4 style="margin: 6px 0 8px 0; font-size: 14px; line-height: 1.4; color: #fff;">${safeTitle}</h4>
+          <p style="margin: 0 0 12px 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">${safeDesc}</p>
         </div>
-        <button class="primary btn-watch-video" data-youtube-id="${v.youtubeId}" data-video-title="${v.title}" data-video-id="${v.id}" style="width: 100%; font-size: 12px; padding: 8px;">Watch Lesson</button>
+        <button class="primary btn-watch-video" data-youtube-id="${safeYid}" data-video-title="${safeTitle}" data-video-id="${v.id}" style="width: 100%; font-size: 12px; padding: 8px;">Watch Lesson</button>
       </article>
     `;
   }).join("");
@@ -1547,7 +1660,7 @@ function playVideo(youtubeId, title, vidId) {
   const iframe = byId("videoIFrame");
   const modalTitle = byId("videoModalTitle");
 
-  if (!modal || !iframe) return;
+  if (!modal || !iframe || !/^[a-zA-Z0-9_-]{11}$/.test(youtubeId)) return;
 
   modalTitle.textContent = title;
   iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
@@ -1589,4 +1702,5 @@ window.addEventListener("unhandledrejection", (event) => {
   event.preventDefault();
 });
 
+window.renderVideos = renderVideos;
 init();

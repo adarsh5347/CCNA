@@ -1,5 +1,5 @@
-import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML } from "./core.js?v=76";
-import { bugsData, cliOutputs } from "./cli.js?v=76";
+import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML } from "./core.js?v=77";
+import { bugsData, cliOutputs } from "./cli.js?v=77";
 
 // Global active topology state
 export let activeTopology = 1;
@@ -541,6 +541,11 @@ export function switchTopology(topoNum) {
   }
   document.querySelectorAll(".osi-layer").forEach(el => el.classList.remove("active"));
   highlightNode(null);
+  state.inspectedNode = null;
+  const nodeCfg = byId("nodeConfigContent");
+  if (nodeCfg) {
+    nodeCfg.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">Click on any network device above to inspect its active running configuration, IP/MAC tables, and VLAN status.</span>`;
+  }
   resetTopology2Links();
 
   if (activeTopology === 1) {
@@ -1195,6 +1200,11 @@ export function setupTraversalSimulator() {
       await sleep(1000);
     } finally {
       highlightNode(null);
+  state.inspectedNode = null;
+  const nodeCfg = byId("nodeConfigContent");
+  if (nodeCfg) {
+    nodeCfg.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">Click on any network device above to inspect its active running configuration, IP/MAC tables, and VLAN status.</span>`;
+  }
       btnStart.disabled = false;
     }
   });
@@ -1222,6 +1232,11 @@ export function setupTraversalSimulator() {
     }
     document.querySelectorAll(".osi-layer").forEach(el => el.classList.remove("active"));
     highlightNode(null);
+  state.inspectedNode = null;
+  const nodeCfg = byId("nodeConfigContent");
+  if (nodeCfg) {
+    nodeCfg.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">Click on any network device above to inspect its active running configuration, IP/MAC tables, and VLAN status.</span>`;
+  }
     resetTopology2Links();
   });
 }

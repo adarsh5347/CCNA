@@ -1,4 +1,4 @@
-import { saveUserProgress } from "./firebase.js?v=76";
+import { saveUserProgress } from "./firebase.js?v=77";
 
 export const STORE = "ccna_full_site_v1";
 
@@ -154,8 +154,9 @@ export function saveAnalytics(quiet = false) {
     safeSetStorage(localStorage, key, JSON.stringify(state.analytics));
     if (state.user) {
       saveUserProgress(state.user.uid, state.analytics)
-        .then(() => {
-          if (!quiet) showToast("Telemetry synced to Cloud", "ok");
+        .then((synced) => {
+          if (!quiet) showToast(synced ? "Telemetry synced to Cloud" : "Telemetry saved locally", synced ? "ok" : "info");
+
         })
         .catch(err => {
           console.error("Cloud sync failed:", err);
@@ -276,7 +277,7 @@ export function persistSession() {
     return;
   }
   try {
-    const copy = { ...state.session, bankVersion: BANK_VERSION };
+    const copy = { ...state.session, bankVersion: BANK_VERSION, uid: state.user ? state.user.uid : "guest" };
     delete copy.timer;
     sessionStorage.setItem("ccna_session", JSON.stringify(copy));
   } catch (e) {

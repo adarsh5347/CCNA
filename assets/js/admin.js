@@ -4,8 +4,8 @@
  * Zero subscription dependencies and resilient local/cloud status reporting.
  */
 
-import { state, byId, showToast, playNetSound } from "./core.js?v=76";
-import { isOwnerUser } from "./subscription.js?v=76";
+import { state, byId, showToast, playNetSound, safeHTML } from "./core.js?v=77";
+import { isOwnerUser } from "./subscription.js?v=77";
 
 export function isAdmin() {
   return isOwnerUser(state.user);
@@ -24,7 +24,7 @@ export async function renderAdminDashboard() {
   const statsEl = byId("adminStats");
   const activityEl = byId("adminRecentActivity");
 
-  const totalQuestions = (state.bank && state.bank.length) || 241;
+  const totalQuestions = (state.bank && state.bank.length) || 635;
   const labsCount = 10;
   const videosCount = 126;
   const userXp = state.analytics ? (state.analytics.xp || 0) : 0;
@@ -79,7 +79,7 @@ export async function renderAdminDashboard() {
       <div class="card" style="border:1px solid var(--border-color);padding:20px;margin-top:20px;">
         <h4 style="margin-top:0;color:#00f2fe;font-size:15px;">Station Controls & Utilities</h4>
         <p style="color:var(--text-muted);font-size:12px;margin-bottom:16px;">
-          Active Station: <strong>${currentName}</strong> &nbsp;·&nbsp; UID: <code>${currentUid}</code>
+          Active Station: <strong>${safeHTML(currentName)}</strong> &nbsp;·&nbsp; UID: <code>${safeHTML(currentUid)}</code>
         </p>
         <div style="display:flex;gap:12px;flex-wrap:wrap;">
           <button id="adminBtnForceRefresh" class="secondary" style="font-size:12px;padding:8px 14px;">

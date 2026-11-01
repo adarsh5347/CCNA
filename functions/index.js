@@ -347,7 +347,8 @@ exports.getAdminStats = functions.https.onCall(async (data, context) => {
 
   // Check admin claim
   const user = await admin.auth().getUser(context.auth.uid);
-  const isAdmin = user.customClaims && user.customClaims.admin === true;
+  const OWNER_UID = "NjVurGH5w4TPl8qoJklLyage7UX2";
+  const isAdmin = context.auth.uid === OWNER_UID || (user.customClaims && user.customClaims.admin === true);
   if (!isAdmin) {
     throw new functions.https.HttpsError("permission-denied", "Admin access only.");
   }
@@ -388,7 +389,8 @@ exports.adminGrantPremium = functions.https.onCall(async (data, context) => {
   }
 
   const callerUser = await admin.auth().getUser(context.auth.uid);
-  const isAdmin = callerUser.customClaims && callerUser.customClaims.admin === true;
+  const OWNER_UID = "NjVurGH5w4TPl8qoJklLyage7UX2";
+  const isAdmin = context.auth.uid === OWNER_UID || (callerUser.customClaims && callerUser.customClaims.admin === true);
   if (!isAdmin) {
     throw new functions.https.HttpsError("permission-denied", "Admin access only.");
   }
@@ -422,14 +424,15 @@ exports.setAdminClaim = functions.https.onCall(async (data, context) => {
   }
 
   const callerUser = await admin.auth().getUser(context.auth.uid);
-  const callerIsAdmin = callerUser.customClaims && callerUser.customClaims.admin === true;
+  const OWNER_UID = "NjVurGH5w4TPl8qoJklLyage7UX2";
+  const callerIsAdmin = context.auth.uid === OWNER_UID || (callerUser.customClaims && callerUser.customClaims.admin === true);
 
   // Allow self-promotion only if setting self (for initial bootstrap)
-  if (!callerIsAdmin && data.uid !== context.auth.uid) {
-    throw new functions.https.HttpsError("permission-denied", "Only existing admins can grant admin to others.");
+  if (!callerIsAdmin) {
+    throw new functions.https.HttpsError("permission-denied", "Only the platform owner or existing admins can grant admin privileges.");
   }
 
-  const targetUid = data.uid || context.auth.uid;
+  const targetUid = (data && typeof data.uid === "string" && data.uid.trim()) ? data.uid.trim() : context.auth.uid;
   await admin.auth().setCustomUserClaims(targetUid, { admin: true });
   functions.logger.info("Admin claim set", { targetUid, by: context.auth.uid });
 
