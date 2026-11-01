@@ -80,7 +80,7 @@ import {
   markCurrent,
   startSessionTimer,
   startChapterSession
-} from "./quiz-engine.js?v=77";
+} from "./quiz-engine.js?v=78";
 
 import { generateBank, blueprint } from "./data.js?v=77";
 import { labs } from "./labs.js?v=77";
