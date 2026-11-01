@@ -4,4 +4,4 @@
  * gradual cognitive progression: Easy (recall/identify) -> Medium (apply/configure) -> Hard (troubleshoot/analyze).
  */
 
-export { blueprint, questionBank, generateBank, default } from "./qb/index.js?v=76";
+export { blueprint, questionBank, generateBank, default } from "./qb/index.js?v=78";

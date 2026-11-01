@@ -1,4 +1,4 @@
-import { mk } from "../build.js?v=76";
+import { mk } from "../build.js?v=78";
 
 // ============================================================================
 // v1c01 - Introduction to TCP/IP Networking (15 questions: 4 Easy, 7 Medium, 4 Hard)
@@ -10,9 +10,9 @@ const q01 = [
     "Which protocol data unit (PDU) term specifically describes data encapsulated with a Transport layer header?",
     "Segment",
     [
-      ["Frame, which includes both a Data Link header and a trailing FCS field", "A frame is a Layer 2 (Data Link) PDU that includes both a header and a trailer, not a Layer 4 PDU."],
-      ["Packet, which includes logical source and destination IP host addresses", "A packet is a Layer 3 (Network) PDU created by encapsulating a segment inside an IP header."],
-      ["Bits, which represent raw electrical or optical signals on the medium", "Bits represent the unencapsulated Layer 1 physical transmission stream rather than a Layer 4 PDU."]
+      ["Frame", "A frame is a Layer 2 (Data Link) PDU that includes both a header and a trailer, not a Layer 4 PDU."],
+      ["Packet", "A packet is a Layer 3 (Network) PDU created by encapsulating a segment inside an IP header."],
+      ["Bit stream", "Bits represent the unencapsulated Layer 1 physical transmission stream rather than a Layer 4 PDU."]
     ],
     "In TCP/IP terminology, the Transport layer (Layer 4) encapsulates application data with a TCP or UDP header to form a segment (or L4PDU). The Network layer encapsulates segments into packets (L3PDUs), and the Data Link layer encapsulates packets into frames (L2PDUs).",
     "Remember the PDU order from Layer 4 down to Layer 2: Segment (L4) -> Packet (L3) -> Frame (L2).",
@@ -21,11 +21,11 @@ const q01 = [
   c01.s(
     "OSI/TCP-IP", "Easy",
     "In the original four-layer TCP/IP model defined by RFC 1122, which single layer combines the functions of the five-layer model's Physical and Data Link layers?",
-    "Link",
+    "The RFC 1122 Link layer",
     [
-      ["Internet, which handles logical addressing and path selection across networks", "The Internet layer corresponds to the Network layer (Layer 3), not the combined Layer 1 and Layer 2 functions."],
-      ["Network Interface, which combines the Transport and Network layer headers", "Network Interface is an informal name sometimes used for Layer 1/2, but RFC 1122 specifically names this combined lower layer the Link layer and never includes Transport or Network."],
-      ["Session, which manages dialog control between communicating applications", "Session is Layer 5 of the seven-layer OSI reference model and does not exist in the RFC 1122 TCP/IP model."]
+      ["The RFC 1122 Internet layer", "The Internet layer corresponds to the Network layer (Layer 3), not the combined Layer 1 and Layer 2 functions."],
+      ["The Network Interface layer", "Network Interface is an informal name sometimes used for Layer 1/2, but RFC 1122 specifically names this combined lower layer the Link layer and never includes Transport or Network."],
+      ["The RFC 1122 Session layer", "Session is Layer 5 of the seven-layer OSI reference model and does not exist in the RFC 1122 TCP/IP model."]
     ],
     "The original four-layer TCP/IP architecture defined in RFC 1122 consists of the Application, Transport, Internet, and Link layers. The Link layer encompasses both the Data Link and Physical layers shown in the newer five-layer TCP/IP model.",
     "4-layer TCP/IP = Application, Transport, Internet, Link; 5-layer splits Link into Data Link + Physical.",
@@ -34,11 +34,11 @@ const q01 = [
   c01.s(
     "OSI/TCP-IP", "Easy",
     "Which HTTP status code is returned in an HTTP reply header when a web server cannot locate the file requested by a browser's HTTP GET request?",
-    "404",
+    "HTTP 404 Not Found",
     [
-      ["200, which indicates that the requested resource was successfully returned", "HTTP status code 200 (OK) indicates that the server found the file and is returning it in the response."],
-      ["301, which indicates that the requested resource was permanently relocated", "HTTP status code 301 is a redirection status code rather than the standard Not Found error code."],
-      ["503, which indicates that the server daemon is temporarily overloaded", "HTTP status code 503 indicates a server-side service unavailability rather than a missing requested file."]
+      ["HTTP 200 OK", "HTTP status code 200 (OK) indicates that the server found the file and is returning it in the response."],
+      ["HTTP 301 Redirect", "HTTP status code 301 is a redirection status code rather than the standard Not Found error code."],
+      ["HTTP 503 Service Unavailable", "HTTP status code 503 indicates a server-side service unavailability rather than a missing requested file."]
     ],
     "When an HTTP client sends a GET request for a URI that does not exist on the web server, the server replies with an HTTP header containing status code 404 (Not Found). When the file exists, the server responds with status code 200 (OK) followed by the file contents.",
     "HTTP 200 = OK (success); HTTP 404 = Not Found.",
@@ -47,11 +47,11 @@ const q01 = [
   c01.s(
     "OSI/TCP-IP", "Easy",
     "Which layer of the seven-layer OSI model sits immediately below the Application layer and focuses on data formatting and syntax negotiation?",
-    "Presentation",
+    "The OSI Presentation layer",
     [
-      ["Session, which establishes and terminates dialogs between application processes", "The Session layer is Layer 5 of the OSI model, sitting below the Presentation layer."],
-      ["Transport, which provides end-to-end segmentation and flow control services", "The Transport layer is Layer 4 of the OSI model, sitting below the Session layer."],
-      ["Data Link, which appends physical MAC addresses and frame check sequences", "The Data Link layer is Layer 2 of the OSI model and handles local media framing rather than application data syntax."]
+      ["The OSI Session layer", "The Session layer is Layer 5 of the OSI model, sitting below the Presentation layer."],
+      ["The OSI Transport layer", "The Transport layer is Layer 4 of the OSI model, sitting below the Session layer."],
+      ["The OSI Data Link layer", "The Data Link layer is Layer 2 of the OSI model and handles local media framing rather than application data syntax."]
     ],
     "From top to bottom, the upper three layers of the OSI model are Application (Layer 7), Presentation (Layer 6), and Session (Layer 5). In the TCP/IP model, all three of these OSI layers are combined into the single Application layer.",
     "OSI Layers 7-6-5 (Application, Presentation, Session) all map to the TCP/IP Application layer.",
@@ -60,7 +60,7 @@ const q01 = [
   c01.s(
     "OSI/TCP-IP", "Medium",
     "How do adjacent-layer interaction and same-layer interaction differ within the TCP/IP networking model?",
-    "Adjacent-layer interaction occurs on a single host where a lower layer provides a service to the layer above it, whereas same-layer interaction occurs between matching layers on two different hosts using protocol headers.",
+    "Adjacent-layer interaction occurs vertically on one host as a lower layer serves the upper layer, whereas same-layer interaction occurs between matching layers on two hosts.",
     [
       ["Adjacent-layer interaction occurs between two directly connected routers over a cable, whereas same-layer interaction occurs between two processes inside the same operating system.", "Both routers communicating over a link use same-layer interaction at Layers 1-3; adjacent-layer interaction happens vertically within a single device's protocol stack."],
       ["Adjacent-layer interaction uses protocol trailers to verify frame integrity across a LAN, whereas same-layer interaction strips headers as frames move up the stack.", "Stripping headers up the stack on one device is part of de-encapsulation between adjacent layers, while trailers are only used by Layer 2 same-layer logic."],
@@ -86,7 +86,7 @@ const q01 = [
   c01.s(
     "OSI/TCP-IP", "Medium",
     "When a web server returns a large image file that requires dozens of TCP segments, which segments contain an HTTP reply header?",
-    "Only the first TCP segment contains the HTTP header, while later segments carry raw payload data.",
+    "Only the first TCP segment contains the HTTP reply header, while all subsequent segments carry raw chunks of the image data.",
     [
       ["Every TCP segment must include a duplicate copy of the HTTP 200 OK header so the browser can reassemble the image in order.", "TCP sequence numbers handle segment reassembly, so repeating the HTTP header in every segment is unnecessary and not performed."],
       ["Only the first and last TCP segments contain an HTTP header to mark the start and end boundaries of the application stream.", "HTTP does not place a closing HTTP header in the final segment; it places the header only at the beginning of the response message."],
@@ -99,11 +99,11 @@ const q01 = [
   c01.s(
     "OSI/TCP-IP", "Medium",
     "Which layer of the TCP/IP model is uniquely responsible for adding both a header in front of the payload and a trailer after the payload during encapsulation?",
-    "Data Link",
+    "The TCP/IP Data Link layer",
     [
-      ["Transport, which appends a TCP checksum trailer after the application payload", "The TCP checksum is a field inside the TCP header, not a separate trailer appended to the end of the segment."],
-      ["Network, which appends an IPv4 header checksum trailer at the end of the packet", "The IPv4 checksum is located inside the 20-byte IPv4 header; IP does not use a trailer."],
-      ["Physical, which encapsulates frames inside a preamble header and an FCS trailer", "The Frame Check Sequence (FCS) trailer is a Data Link (Layer 2) structure, whereas the Physical layer transmits the resulting bits."]
+      ["The TCP/IP Transport layer", "The TCP checksum is a field inside the TCP header, not a separate trailer appended to the end of the segment."],
+      ["The TCP/IP Network layer", "The IPv4 checksum is located inside the 20-byte IPv4 header; IP does not use a trailer."],
+      ["The TCP/IP Physical layer", "The Frame Check Sequence (FCS) trailer is a Data Link (Layer 2) structure, whereas the Physical layer transmits the resulting bits."]
     ],
     "During the five-step host encapsulation process, the Application, Transport, and Network layers prepend headers to the data. Only the Data Link layer (Layer 2) encapsulates the packet using both a leading Layer 2 header and a trailing Frame Check Sequence (FCS) trailer.",
     "Layer 2 (Data Link) is the only layer that adds both a header and a trailer.",
@@ -112,11 +112,11 @@ const q01 = [
   c01.s(
     "OSI/TCP-IP", "Medium",
     "When a router forwards an IPv4 packet from an Ethernet LAN interface onto a point-to-point WAN link, which OSI layers does the router actively process to forward the packet?",
-    "Layers 1, 2, and 3",
+    "OSI Layers 1, 2, and 3",
     [
-      ["Layers 1 and 2 only, because routers switch frames based on hardware addresses", "Layer 2 switches process only Layers 1 and 2, whereas routers must inspect the Layer 3 IP header to make forwarding decisions."],
-      ["Layers 1 through 4, because routers must verify the TCP sequence and port numbers", "Standard IP routing examines only up to Layer 3 (the IP packet header) and leaves the Layer 4 segment untouched."],
-      ["Layers 1 through 7, because routers re-encapsulate the application payload on WAN links", "Routers only replace the Layer 2 frame header and trailer when moving a packet between links; Layers 4 through 7 remain unchanged."]
+      ["OSI Layers 1 and 2 only", "Layer 2 switches process only Layers 1 and 2, whereas routers must inspect the Layer 3 IP header to make forwarding decisions."],
+      ["OSI Layers 1, 2, 3, and 4", "Standard IP routing examines only up to Layer 3 (the IP packet header) and leaves the Layer 4 segment untouched."],
+      ["OSI Layers 1 through 7", "Routers only replace the Layer 2 frame header and trailer when moving a packet between links; Layers 4 through 7 remain unchanged."]
     ],
     "A router operates as a Layer 3 device. When forwarding a packet, it receives the bits at Layer 1, checks and removes the incoming Layer 2 frame header and trailer, inspects the Layer 3 IP destination address to choose the outgoing interface, and encapsulates the unaltered IP packet into a new Layer 2 frame for transmission at Layer 1.",
     "Switches process up to Layer 2; routers process up to Layer 3; end hosts process all layers (1-7).",
@@ -169,7 +169,7 @@ const q01 = [
   c01.s(
     "OSI/TCP-IP", "Hard",
     "Host A sends an HTTP request to a web server located on a different IP subnet across one router. How many times is the IP packet encapsulated inside a Data Link frame along the path from Host A to the server?",
-    "Twice: once by Host A for the local LAN and once by the router for the server's LAN",
+    "Twice: once by Host A for the local Ethernet LAN and once by the router for the destination server's LAN",
     [
       ["Once: Host A creates the Ethernet frame and the router forwards that exact frame header unchanged to the server", "Routers strip the incoming Layer 2 header and trailer and create a brand-new Layer 2 frame for the outgoing link."],
       ["Three times: once by Host A, once by the LAN switch, and once by the router before reaching the server", "Layer 2 LAN switches inspect and forward the existing Ethernet frame without stripping or replacing the Data Link header."],
@@ -182,7 +182,7 @@ const q01 = [
   c01.s(
     "OSI/TCP-IP", "Hard",
     "Why is a router's forwarding operation described as 'IP routing' even though the physical interfaces send and receive Data Link frames?",
-    "The router uses the destination address in the Layer 3 IP header to choose the outgoing interface, using Layer 2 framing only to carry the packet across each individual link.",
+    "The router inspects the Layer 3 destination IP address to select the egress link and uses Layer 2 frames only hop by hop.",
     [
       ["The router encapsulates the entire Data Link frame inside an outer IP header before transmitting it across the WAN link.", "Data Link frames encapsulate IP packets (L2 wraps L3), never the other way around during standard IP routing."],
       ["The router translates Ethernet MAC addresses directly into IPv4 addresses by rewriting the Transport layer segment header.", "Routers do not rewrite Transport layer headers or translate MAC addresses into IP addresses; they look up the existing destination IP."],
@@ -195,7 +195,7 @@ const q01 = [
   c01.s(
     "OSI/TCP-IP", "Hard",
     "In OSI reference model terminology, why is the acronym L4PDU equivalent to a TCP/IP segment rather than a packet?",
-    "Layer 4 of the OSI model is the Transport layer, whose protocol data unit is a Transport segment.",
+    "Because Layer 4 of the seven-layer OSI model is the Transport layer, whose protocol data unit is a TCP/IP segment.",
     [
       ["Because the original RFC 1122 TCP/IP model only has four layers, making Layer 4 the topmost Application layer message.", "Even though RFC 1122 has four layers, OSI LxPDU numbering always follows the seven-layer OSI model where Layer 4 is Transport."],
       ["Because an IPv4 packet is classified as an L2PDU whenever it is carried over a point-to-point serial WAN connection.", "An IPv4 packet is always an L3PDU (Network layer PDU) regardless of whether the underlying Layer 2 link is Ethernet or WAN."],
@@ -217,9 +217,9 @@ const q02 = [
     "Which IEEE standard and informal name correspond to Gigabit Ethernet operating over four pairs of Category 5e (or higher) unshielded twisted-pair copper cabling?",
     "1000BASE-T (IEEE 802.3ab)",
     [
-      ["1000BASE-LX (IEEE 802.3z), which operates over long-wavelength fiber cabling", "1000BASE-LX (802.3z) is a fiber-optic Gigabit Ethernet standard rather than a four-pair UTP copper standard."],
-      ["100BASE-T (IEEE 802.3u), which operates at 100 Mbps over two wire pairs", "100BASE-T (802.3u) is Fast Ethernet (100 Mbps) over two pairs, not Gigabit Ethernet (1000 Mbps) over four pairs."],
-      ["10GBASE-T (IEEE 802.3an), which operates at 10 Gbps over twisted-pair copper", "10GBASE-T (802.3an) is 10-Gigabit Ethernet rather than 1-Gigabit Ethernet."]
+      ["1000BASE-LX (IEEE 802.3z)", "1000BASE-LX (802.3z) is a fiber-optic Gigabit Ethernet standard rather than a four-pair UTP copper standard."],
+      ["100BASE-TX (IEEE 802.3u)", "100BASE-T (802.3u) is Fast Ethernet (100 Mbps) over two pairs, not Gigabit Ethernet (1000 Mbps) over four pairs."],
+      ["10GBASE-T (IEEE 802.3an)", "10GBASE-T (802.3an) is 10-Gigabit Ethernet rather than 1-Gigabit Ethernet."]
     ],
     "IEEE 802.3ab defines 1000BASE-T, which transmits at 1000 Mbps (1 Gbps) up to 100 meters using all four wire pairs (8 wires) in UTP cabling. By contrast, 802.3u defines 100BASE-T (Fast Ethernet), 802.3z defines 1000BASE-LX over fiber, and 802.3an defines 10GBASE-T.",
     "802.3 = 10BASE-T, 802.3u = 100BASE-T, 802.3z = 1000BASE-LX (fiber), 802.3ab = 1000BASE-T (copper), 802.3an = 10GBASE-T.",
@@ -230,9 +230,9 @@ const q02 = [
     "What is the maximum supported cable length for standard IEEE 10BASE-T, 100BASE-T, 1000BASE-T, and 10GBASE-T copper UTP Ethernet links?",
     "100 meters",
     [
-      ["400 meters, matching the distance limit of short-range multimode fiber", "400 meters is the maximum distance for 10GBASE-S multimode fiber, not copper UTP cabling."],
-      ["500 meters, provided Category 6a shielded cabling is installed end to end", "Copper Ethernet standards cap segment length at 100 meters regardless of UTP category; 500m is typical for multimode fiber."],
-      ["5000 meters, which is the standard reach for long-wavelength campus links", "5000 meters (5 km) is the maximum distance for 1000BASE-LX fiber, not copper twisted-pair links."]
+      ["400 meters", "400 meters is the maximum distance for 10GBASE-S multimode fiber, not copper UTP cabling."],
+      ["500 meters", "Copper Ethernet standards cap segment length at 100 meters regardless of UTP category; 500m is typical for multimode fiber."],
+      ["5000 meters", "5000 meters (5 km) is the maximum distance for 1000BASE-LX fiber, not copper twisted-pair links."]
     ],
     "All common IEEE copper twisted-pair Ethernet standards—including 10BASE-T, 100BASE-T, 1000BASE-T, and 10GBASE-T—specify a maximum cable segment length of 100 meters due to signal attenuation over copper wires.",
     "Copper UTP Ethernet max distance is always 100 meters across 10M, 100M, 1G, and 10G standards.",
@@ -256,9 +256,9 @@ const q02 = [
     "Which hexadecimal value in the 2-byte IEEE 802.3 Ethernet Type (EtherType) field identifies that the encapsulated Data payload is an IPv4 packet?",
     "0x0800",
     [
-      ["0x86DD, which identifies an encapsulated IPv6 packet header", "0x86DD is the hexadecimal EtherType value for IPv6, whereas IPv4 uses 0x0800."],
-      ["0x8100, which identifies an IEEE 802.1Q VLAN trunking tag", "0x8100 indicates an 802.1Q VLAN tag header rather than a standard IPv4 payload."],
-      ["0xFFFF, which identifies a Layer 2 Ethernet broadcast frame", "FFFF.FFFF.FFFF is the 6-byte destination MAC broadcast address, not a 2-byte EtherType value."]
+      ["0x86DD", "0x86DD is the hexadecimal EtherType value for IPv6, whereas IPv4 uses 0x0800."],
+      ["0x8100", "0x8100 indicates an 802.1Q VLAN tag header rather than a standard IPv4 payload."],
+      ["0xFFFF", "FFFF.FFFF.FFFF is the 6-byte destination MAC broadcast address, not a 2-byte EtherType value."]
     ],
     "The 2-byte Ethernet Type (EtherType) field tells the receiving device which Layer 3 protocol is encapsulated inside the frame's data field. The IEEE assigns 0x0800 (decimal 2048) to IPv4 and 0x86DD to IPv6.",
     "EtherType 0x0800 = IPv4; EtherType 0x86DD = IPv6.",
@@ -267,7 +267,7 @@ const q02 = [
   c02.s(
     "Cabling", "Medium",
     "Whydo UTP Ethernet cables twist the two insulated copper wires within each pair around each other?",
-    "Twisting the wire pairs cancels out electromagnetic interference (EMI) and reduces crosstalk.",
+    "Twisting the copper wire pairs cancels out electromagnetic interference (EMI) and reduces crosstalk on the cable.",
     [
       ["Twisting increases the physical cross-sectional area of the copper conductor so signals travel beyond 500 meters.", "Twisting does not change the wire gauge or extend copper UTP beyond its 100-meter maximum distance."],
       ["Twisting separates full-duplex transmit signals from half-duplex collision signals on the same physical conductor.", "10BASE-T and 100BASE-T use separate wire pairs for transmit and receive rather than relying on twisting to separate directions."],
@@ -293,7 +293,7 @@ const q02 = [
   c02.s(
     "Cabling", "Medium",
     "How do multimode fiber (MMF) and single-mode fiber (SMF) compare regarding light source, core diameter, and maximum transmission distance?",
-    "MMF uses an LED transmitter to send multiple light angles into a wider core over shorter distances, whereas SMF uses a laser transmitter into a narrower core roughly one-fifth the diameter for much longer distances.",
+    "MMF uses an LED transmitter in a wider core for shorter distances, whereas SMF uses a laser in a much narrower core for distances up to tens of km.",
     [
       ["MMF uses a laser transmitter in a narrow core for distances up to 40 km, whereas SMF uses an LED transmitter in a wide core for distances up to 500 meters.", "This reverses the two fiber types: SMF uses a laser and narrow core for up to 40 km, while MMF uses an LED and wider core for ~300-500 meters."],
       ["Both MMF and SMF transmit bidirectional laser light over a single glass strand, eliminating the need for separate transmit and receive fibers.", "Standard Ethernet fiber links require two fiber cables (one connect Tx to Rx in each direction) for both MMF and SMF."],
@@ -306,7 +306,7 @@ const q02 = [
   c02.s(
     "Ethernet", "Medium",
     " ignoring optional 802.1Q VLAN tags, what are the minimum and maximum sizes of the IEEE 802.3 Data and Pad field, and what is the resulting minimum total frame size from Destination MAC through FCS?",
-    "Data field: 46 to 1500 bytes; minimum total frame size: 64 bytes",
+    "Data field: 46 to 1500 bytes; minimum total frame size: 64 bytes including headers and FCS",
     [
       ["Data field: 64 to 1518 bytes; minimum total frame size: 72 bytes including Preamble and SFD", "64 to 1518 bytes is the total frame size (18 bytes of L2 header/trailer + 46 to 1500 bytes of data), not the Data field size alone."],
       ["Data field: 20 to 1480 bytes; minimum total frame size: 46 bytes excluding the 4-byte FCS", "20 bytes is the minimum IPv4 header size, not the minimum Ethernet Data field size (which pads anything under 46 bytes up to 46 bytes)."],
@@ -319,7 +319,7 @@ const q02 = [
   c02.s(
     "Ethernet", "Medium",
     "What action does a receiving Ethernet switch or host take when a frame fails the Frame Check Sequence (FCS) mathematical check in the Ethernet trailer?",
-    "It discards the corrupted frame immediately and does not perform Layer 2 error recovery.",
+    "It silently discards the corrupted frame immediately and does not attempt any Layer 2 retransmission or recovery.",
     [
       ["It sends a Layer 2 Negative Acknowledgment (NAK) frame back to the source MAC address to request retransmission.", "Ethernet is an unreliable, connectionless Layer 2 protocol and never sends Layer 2 ACKs or NAKs."],
       ["It uses the 4-byte FCS formula to flip the corrupted bits back to their original values before forwarding the frame.", "The Ethernet FCS is an error-detection mechanism only, not a forward error-correction mechanism."],
@@ -378,7 +378,7 @@ const q02 = [
   c02.s(
     "Cabling", "Hard",
     "Why does a 1000BASE-T crossover cable require crossing four wire pairs whereas a 100BASE-T crossover cable requires crossing only two wire pairs?",
-    "1000BASE-T transmits and receives on all four wire pairs, requiring all four pairs to be crossed.",
+    "1000BASE-T transmits and receives signals simultaneously on all four wire pairs, requiring all four copper pairs to be crossed.",
     [
       ["1000BASE-T reserves pins 4,5 and 7,8 exclusively for out-of-band Auto-MDIX clock synchronization signals between the two NICs.", "1000BASE-T uses all four pairs (pins 1,2, 3,6, 4,5, and 7,8) to carry data simultaneously in both directions, not for out-of-band clocking."],
       ["100BASE-T uses pins 4,5 and 7,8 for Power over Ethernet only, whereas 1000BASE-T uses those pairs as unidirectional backup links.", "In 1000BASE-T, all four pairs are active simultaneously for bidirectional data transmission, not kept as idle backup pairs."],
@@ -391,7 +391,7 @@ const q02 = [
   c02.s(
     "Ethernet", "Hard",
     "A host sends a frame to destination MAC address 0100.5E0A.0101 on an Ethernet LAN. How is this destination MAC address classified, and what purpose does it serve?",
-    "It is an Ethernet multicast MAC address that delivers frames to devices subscribed to that group.",
+    "It is an Ethernet multicast MAC address that delivers frames to the subset of hosts subscribed to that multicast group.",
     [
       ["It is an Ethernet broadcast MAC address that forces every NIC on the subnet to pass the encapsulated packet up to Layer 3.", "The Ethernet broadcast MAC address is FFFF.FFFF.FFFF (all binary 1s), not 0100.5Exx.xxxx."],
       ["It is a burned-in unicast MAC address assigned by the IEEE to a single Cisco router interface as its default gateway MAC.", "Addresses beginning with 0100.5E have the multicast bit set in the first byte and represent IPv4 multicast MACs, never burned-in unicast MACs."],
@@ -404,11 +404,11 @@ const q02 = [
   c02.s(
     "Cabling", "Hard",
     "When installing a fiber-optic Ethernet link between two switches using SFP+ transceivers, how must the two strands of the duplex fiber cable be connected?",
-    "The Transmit (Tx) port on each SFP+ transceiver must connect to the remote SFP+ Receive (Rx) port.",
+    "The Transmit (Tx) port on each SFP+ transceiver must connect to the Receive (Rx) port on the remote switch's transceiver.",
     [
       ["The Transmit (Tx) port on Switch 1 must connect to the Transmit (Tx) port on Switch 2 so the laser wavelengths synchronize.", "Connecting Tx to Tx and Rx to Rx prevents communication because both lasers shine into each other while neither receiver gets light."],
       ["Only one fiber strand should be connected to the Tx port on both switches while the Rx port is capped as a cold spare.", "Standard fiber Ethernet standards (such as 1000BASE-LX and 10GBASE-S/LR) require two active strands—one transmitting in each direction."],
-      ["Both fiber strands connect to the Tx ports when Auto-MDIX is enabled on the switch, which optically reverses the light path.", "Auto-MDIX works only on copper UTP electrical pinouts; it cannot swap optical laser transmitters and receivers on fiber links."]
+      ["Both fiber strands connect to the Tx ports when Auto-MDIX is enabled on the switch to optically reverse the light path.", "Auto-MDIX works only on copper UTP electrical pinouts; it cannot swap optical laser transmitters and receivers on fiber links."]
     ],
     "Fiber-optic Ethernet cables use two separate glass fiber strands to create a bidirectional link: one strand carries light in one direction and the second strand carries light in the opposite direction. Therefore, the Transmit (Tx) connector on one transceiver must always plug into the Receive (Rx) connector on the distant transceiver.",
     "On dual-strand fiber links, always cross Tx to Rx between the two transceivers (Auto-MDIX only works on copper).",
@@ -424,11 +424,11 @@ const q03 = [
   c03.s(
     "WAN", "Easy",
     "What is the exact transmission speed of a standard T1 leased-line WAN circuit?",
-    "1.544 Mbps",
+    "1.544 Mbps (1544 kbps)",
     [
-      ["2.048 Mbps, which consists of thirty-two 64-kbps digital channels", "2.048 Mbps is the speed of an E1 carrier circuit used outside North America, whereas a T1 runs at 1.544 Mbps."],
-      ["10.0 Mbps, matching the original IEEE 802.3 10BASE-T Ethernet standard", "10 Mbps is the speed of original 10BASE-T Ethernet, not a telco T1 leased line."],
-      ["44.736 Mbps, which aggregates twenty-eight individual leased-line circuits", "44.736 Mbps is the speed of a T3 (DS3) circuit rather than a single T1 line."]
+      ["2.048 Mbps (2048 kbps)", "2.048 Mbps is the speed of an E1 carrier circuit used outside North America, whereas a T1 runs at 1.544 Mbps."],
+      ["10.00 Mbps (10,000 kbps)", "10 Mbps is the speed of original 10BASE-T Ethernet, not a telco T1 leased line."],
+      ["44.736 Mbps (44,736 kbps)", "44.736 Mbps is the speed of a T3 (DS3) circuit rather than a single T1 line."]
     ],
     "A T1 leased line is a classic telco point-to-point serial circuit that provides dedicated full-duplex bandwidth at 1.544 Mbps (1544 kbps) between two sites.",
     "A T1 leased line runs at 1.544 Mbps.",
@@ -437,7 +437,7 @@ const q03 = [
   c03.s(
     "WAN", "Easy",
     "Which field did Cisco add to the standard ISO High-Level Data Link Control (HDLC) frame header to allow a serial leased line to carry multiple Network layer protocols?",
-    "A 2-byte Type field",
+    "A 2-byte Type field to identify the encapsulated Network layer protocol",
     [
       ["A 4-byte Frame Check Sequence (FCS) field at the start of the header", "Standard HDLC already includes an FCS trailer for error detection; Cisco added a 2-byte Type field inside the header."],
       ["A 6-byte Source MAC Address field to identify the sending router interface", "HDLC is a point-to-point serial protocol and uses a 1-byte Address field rather than 6-byte Ethernet MAC addresses."],
@@ -465,9 +465,9 @@ const q03 = [
     "Which protocol uses a Layer 2 broadcast request on the local LAN to discover the hardware MAC address associated with a known IPv4 address?",
     "Address Resolution Protocol (ARP)",
     [
-      ["Domain Name System (DNS), which resolves hostnames into IPv4 addresses", "DNS translates human-readable hostnames into IP addresses using unicast queries to a DNS server, not Layer 2 broadcast MAC lookups."],
-      ["Internet Control Message Protocol (ICMP), which sends Echo Requests to test reachability", "ICMP Echo Request (ping) tests Layer 3 end-to-end connectivity after MAC resolution has already occurred."],
-      ["Dynamic Host Configuration Protocol (DHCP), which leases an IPv4 address to a client", "DHCP assigns an IP address, subnet mask, and default gateway to a booting host rather than resolving a neighbor's MAC address."]
+      ["Domain Name System (DNS) protocol", "DNS translates human-readable hostnames into IP addresses using unicast queries to a DNS server, not Layer 2 broadcast MAC lookups."],
+      ["Internet Control Message Protocol (ICMP)", "ICMP Echo Request (ping) tests Layer 3 end-to-end connectivity after MAC resolution has already occurred."],
+      ["Dynamic Host Configuration Protocol (DHCP)", "DHCP assigns an IP address, subnet mask, and default gateway to a booting host rather than resolving a neighbor's MAC address."]
     ],
     "Address Resolution Protocol (ARP) dynamically learns the Data Link MAC address of a device on the same LAN when its IPv4 address is already known. The sender broadcasts an ARP Request ('who has this IP?') and the target host replies with a unicast ARP Reply containing its MAC address.",
     "ARP Request = Layer 2 broadcast; ARP Reply = Layer 2 unicast.",
@@ -489,7 +489,7 @@ const q03 = [
   c03.s(
     "WAN", "Medium",
     "How does an Ethernet over MPLS (EoMPLS) or E-Line WAN service appear to the two customer routers (CPE) connected at each end of the service?",
-    "It acts like a direct point-to-point Ethernet link so the two routers exchange standard Ethernet frames.",
+    "It acts like a direct point-to-point Layer 2 Ethernet link so the two routers exchange standard IEEE 802.3 Ethernet frames.",
     [
       ["It requires the customer routers to encapsulate packets in Cisco HDLC frames before sending them over the fiber access link.", "Ethernet WAN links use standard IEEE 802.3 Ethernet framing (such as 1000BASE-LX), not serial HDLC framing."],
       ["It forces the two customer routers into different IP subnets separated by the service provider's Layer 3 default gateway.", "An E-Line / EoMPLS WAN emulates a direct Layer 2 Ethernet connection between the two CPE routers, placing their WAN interfaces in the same IP subnet."],
@@ -502,7 +502,7 @@ const q03 = [
   c03.s(
     "IP routing", "Medium",
     "What rules determine how IPv4 subnets are assigned relative to Layer 2 switches and Layer 3 routers?",
-    "Hosts connected through Layer 2 switches share a subnet, while routers separate different subnets.",
+    "Hosts connected directly through Layer 2 switches share the same IPv4 subnet, whereas Layer 3 routers separate different subnets.",
     [
       ["Every Layer 2 switch port creates a separate IP subnet, whereas routers bridge multiple hosts within a single shared subnet.", "This reverses the roles: Layer 2 switches connect devices within the same subnet (per VLAN), while routers separate different IP subnets."],
       ["Point-to-point WAN links between two routers do not require an IP subnet because routers communicate using only Layer 2 HDLC addresses.", "Two routers connected across a point-to-point WAN or Ethernet WAN still share an IP subnet on that link for next-hop routing."],
@@ -515,7 +515,7 @@ const q03 = [
   c03.s(
     "IP routing", "Medium",
     "How does a router initially populate its IP routing table before learning routes from neighboring routers via a dynamic routing protocol?",
-    "It automatically adds a connected route for each subnet configured on an up and working interface.",
+    "It automatically adds a directly connected route for each IP subnet configured on an active, working interface.",
     [
       ["It broadcasts an ARP request out all interfaces and builds a /32 host route for every device that answers.", "ARP builds the Layer 2 ARP cache for local next-hop MAC resolution, not the Layer 3 subnet routes in the IP routing table."],
       ["It queries the configured DNS server to download the enterprise subnet list before enabling its routing protocol process.", "DNS resolves hostnames to IP addresses for applications and plays no role in populating a router's IP routing table."],
@@ -583,7 +583,7 @@ const q03 = [
   c03.s(
     "IP routing", "Hard",
     "PC1 (10.10.1.5/24) sends an IPv4 packet to PC2 (10.10.3.5/24) across two routers: R1 and R2, which are connected by a Cisco HDLC leased line. Why does the frame crossing the link between R1 and R2 contain no Ethernet MAC addresses?",
-    "R1 strips the incoming Ethernet frame and encapsulates the IPv4 packet inside a Cisco HDLC header and trailer, which uses a 1-byte HDLC Address field instead of 6-byte MAC addresses.",
+    "R1 strips the incoming Ethernet header and trailer and encapsulates the IPv4 packet in a point-to-point Cisco HDLC frame.",
     [
       ["R1 leaves the original Ethernet MAC addresses inside the IPv4 header options field while the packet crosses the serial link.", "Ethernet MAC addresses exist only in the Layer 2 Ethernet header, which R1 completely discards before forwarding the packet onto the serial link."],
       ["R1 replaces the 6-byte MAC addresses with 32-bit IPv4 addresses inside the Ethernet frame header when transmitting over a T1 line.", "A T1 leased line running HDLC does not use an Ethernet frame header at all; it uses an HDLC header and trailer."],
@@ -596,11 +596,11 @@ const q03 = [
   c03.s(
     "IP routing", "Hard",
     "Router R1 has three routes in its IPv4 routing table: `172.16.1.0/24` out Gi0/0 ( directly connected), `172.16.2.0/24` via 172.16.4.2 out Se0/0/0, and `172.16.3.0/24` via 172.16.5.2 out Gi0/1. When R1 forwards a packet destined for `172.16.3.99`, which IP address does R1 look up in its ARP table to build the outgoing Ethernet frame?",
-    "172.16.5.2 (the next-hop router's IPv4 address on Gi0/1)",
+    "172.16.5.2 — the next-hop router's IPv4 address on interface Gi0/1",
     [
-      ["172.16.3.99 (the final destination host's IPv4 address in the packet header)", "Because 172.16.3.99 is on a remote LAN beyond the next-hop router, R1 cannot ARP for 172.16.3.99 on Gi0/1; it must ARP for the next-hop router IP 172.16.5.2."],
-      ["172.16.4.2 (the next-hop IPv4 address on the serial WAN link)", "172.16.4.2 is the next hop for subnet 172.16.2.0/24 on a serial link, not for 172.16.3.99."],
-      ["172.16.3.1 (the default gateway IPv4 address of the destination subnet)", "R1 only knows its immediate next-hop router IP (172.16.5.2) on the shared Gi0/1 subnet, not the distant LAN gateway address."]
+      ["172.16.3.99 — the final destination host's IPv4 address in the header", "Because 172.16.3.99 is on a remote LAN beyond the next-hop router, R1 cannot ARP for 172.16.3.99 on Gi0/1; it must ARP for the next-hop router IP 172.16.5.2."],
+      ["172.16.4.2 — the next-hop router's IPv4 address on the serial WAN link", "172.16.4.2 is the next hop for subnet 172.16.2.0/24 on a serial link, not for 172.16.3.99."],
+      ["172.16.3.1 — the default gateway IPv4 address on the target LAN", "R1 only knows its immediate next-hop router IP (172.16.5.2) on the shared Gi0/1 subnet, not the distant LAN gateway address."]
     ],
     "When a router matches a non-connected route whose outgoing interface is a multiaccess Ethernet link (such as Gi0/1), the routing table entry provides both the outgoing interface and the next-hop router's IP address (172.16.5.2). R1 looks up the next-hop IP address 172.16.5.2 in its Gi0/1 ARP table to find the destination MAC address for the new Ethernet frame.",
     "When a router forwards out an Ethernet interface to a next-hop router, it uses ARP to find the next-hop IP's MAC address (while keeping the packet's destination IP unchanged).",
@@ -609,11 +609,11 @@ const q03 = [
   c03.s(
     "IP routing", "Hard",
     "Why does an ARP Request travel across all switches in a LAN whereas the resulting ARP Reply travels only along the path back to the requesting host?",
-    "The ARP Request uses the broadcast destination MAC address `FFFF.FFFF.FFFF`, whereas the ARP Reply uses the requester's unicast MAC address learned from the request.",
+    "The ARP Request is sent to the broadcast MAC `FFFF.FFFF.FFFF`, whereas the ARP Reply is sent to the requester's unicast MAC.",
     [
       ["The ARP Request is encapsulated in a flooded IPv4 packet, whereas the ARP Reply is encapsulated in a TCP unicast segment.", "ARP messages are encapsulated directly inside Layer 2 Ethernet frames (EtherType 0x0806) without using IPv4 or TCP headers."],
       ["LAN switches intercept ARP Replies and convert them from Layer 2 broadcasts into unicast frames using their IP routing tables.", "Layer 2 switches do not modify ARP frames or consult IP routing tables; the target host itself sends the ARP Reply as a unicast frame."],
-      ["The ARP Request uses a multicast MAC address (`0100.5E00.0001`), whereas the ARP Reply uses a point-to-point HDLC address.", "ARP Requests use the Layer 2 broadcast MAC address `FFFF.FFFF.FFFF` rather than a multicast or HDLC address."]
+      ["The ARP Request uses multicast MAC address `0100.5E00.0001`, whereas the ARP Reply uses a point-to-point HDLC address.", "ARP Requests use the Layer 2 broadcast MAC address `FFFF.FFFF.FFFF` rather than a multicast or HDLC address."]
     ],
     "Because the sender of an ARP Request does not yet know the target's MAC address, it sends the ARP Request inside an Ethernet broadcast frame (`FFFF.FFFF.FFFF`), which switches flood to all ports in that LAN/VLAN. The target host reads the sender's IP and MAC from the ARP Request, adds them to its own ARP cache, and sends the ARP Reply directly back to the requester's unicast MAC address.",
     "ARP Request = broadcast (`FFFF.FFFF.FFFF`, flooded by switches); ARP Reply = unicast directly to the sender's MAC.",
@@ -629,11 +629,11 @@ const q04 = [
   c04.s(
     "Switch CLI", "Easy",
     "Which command-line prompt indicates that a user is currently in Privileged EXEC (Enable) mode on a Cisco Catalyst switch named `SW1`?",
-    "SW1#",
+    "The switch displays the CLI prompt SW1#",
     [
-      ["SW1>, which indicates User EXEC mode with limited monitoring privileges", "The `>` prompt indicates User EXEC mode, not Privileged EXEC (Enable) mode."],
-      ["SW1(config)#, which indicates Global Configuration mode for system-wide settings", "The `(config)#` prompt indicates Global Configuration mode, entered from Privileged EXEC mode."],
-      ["SW1(config-if)#, which indicates Interface Configuration submode for port settings", "The `(config-if)#` prompt indicates Interface Configuration mode rather than Privileged EXEC mode."]
+      ["The switch displays the CLI prompt SW1>", "The `>` prompt indicates User EXEC mode, not Privileged EXEC (Enable) mode."],
+      ["The switch displays the CLI prompt SW1(config)#", "The `(config)#` prompt indicates Global Configuration mode, entered from Privileged EXEC mode."],
+      ["The switch displays the CLI prompt SW1(config-if)#", "The `(config-if)#` prompt indicates Interface Configuration mode rather than Privileged EXEC mode."]
     ],
     "Cisco IOS uses `Hostname>` to indicate User EXEC mode and `Hostname#` to indicate Privileged EXEC (Enable) mode. Moving into configuration modes appends parentheses before the `#`, such as `Hostname(config)#`.",
     "User EXEC = `>`; Privileged EXEC = `#`; Global Config = `(config)#`.",
@@ -655,11 +655,11 @@ const q04 = [
   c04.s(
     "Switch CLI", "Easy",
     "Which memory type in a Cisco Catalyst switch stores the active `running-config` file that changes immediately whenever configuration commands are entered?",
-    "RAM (DRAM)",
+    "Volatile RAM (DRAM) memory",
     [
-      ["NVRAM, which retains the initial `startup-config` file across power cycles", "NVRAM stores the `startup-config` file used at boot time, not the volatile `running-config` file."],
-      ["Flash memory, which stores the compressed Cisco IOS operating system image", "Flash stores the Cisco IOS software image (and `vlan.dat`), whereas `running-config` resides in volatile RAM."],
-      ["ROM, which stores the bootstrap program used to initialize hardware on power-up", "ROM stores the low-level bootstrap firmware rather than active configuration files."]
+      ["Nonvolatile NVRAM memory", "NVRAM stores the `startup-config` file used at boot time, not the volatile `running-config` file."],
+      ["Internal Flash storage memory", "Flash stores the Cisco IOS software image (and `vlan.dat`), whereas `running-config` resides in volatile RAM."],
+      ["Read-Only Memory (ROM) chip", "ROM stores the low-level bootstrap firmware rather than active configuration files."]
     ],
     "Cisco switches use four primary memory types: RAM (also called DRAM) holds the working `running-config` and tables and loses its contents when powered off; NVRAM holds the persistent `startup-config`; Flash holds the Cisco IOS image; and ROM holds the bootstrap program.",
     "RAM = `running-config` (volatile); NVRAM = `startup-config` (nonvolatile); Flash = IOS image; ROM = bootstrap.",
@@ -668,11 +668,11 @@ const q04 = [
   c04.s(
     "Switch CLI", "Easy",
     "How many commands does the Cisco IOS CLI command history buffer store by default for the current session?",
-    "10 commands",
+    "10 commands by default",
     [
-      ["5 commands, matching the default five-minute console inactivity timer", "5 minutes is the default `exec-timeout` value, whereas the default command history buffer size is 10 commands."],
-      ["16 commands, matching the sixteen virtual terminal (VTY 0 15) lines", "16 is the number of VTY lines (0 through 15) on a Catalyst switch, not the default history buffer size."],
-      ["256 commands, which is the maximum history buffer size allowed by IOS", "256 is the maximum configurable history size, whereas the default is 10 commands."]
+      ["5 commands by default", "5 minutes is the default `exec-timeout` value, whereas the default command history buffer size is 10 commands."],
+      ["16 commands per session", "16 is the number of VTY lines (0 through 15) on a Catalyst switch, not the default history buffer size."],
+      ["256 commands by default", "256 is the maximum configurable history size, whereas the default is 10 commands."]
     ],
     "By default, Cisco IOS retains the last 10 commands entered in the user's current EXEC session in the history buffer, which can be viewed with `show history` or recalled one at a time using the Up arrow (`Ctrl+P`) and Down arrow (`Ctrl+N`).",
     "Default CLI history buffer size = 10 commands.",
@@ -681,10 +681,10 @@ const q04 = [
   c04.s(
     "Switch CLI", "Medium",
     "While in Global Configuration mode (`SW1(config)#`), an engineer types `show mac address-table` and receives an `% Invalid input detected` error. Why did this command fail?",
-    "`show` commands belong to EXEC mode and require returning to EXEC mode or prefixing `do`.",
+    "`show` commands belong to EXEC mode and cannot run directly in configuration mode without returning to EXEC or using `do`.",
     [
-      ["The command syntax requires a hyphen between `mac` and `address` (`show mac-address-table`) on all modern IOS versions.", "Modern Cisco IOS uses `show mac address-table`; the command failed because it was entered in Global Configuration mode instead of EXEC mode."],
-      ["The `show mac address-table` command can only be executed from Interface Configuration mode (`(config-if)#`) for a specific port.", "`show` commands are executed in User or Privileged EXEC mode, not in Interface Configuration submode."],
+      ["The command syntax requires a hyphen between `mac` and `address` as `show mac-address-table` on all modern IOS versions.", "Modern Cisco IOS uses `show mac address-table`; the command failed because it was entered in Global Configuration mode instead of EXEC mode."],
+      ["The `show mac address-table` command can only be executed from Interface Configuration mode `(config-if)#` for a specific port.", "`show` commands are executed in User or Privileged EXEC mode, not in Interface Configuration submode."],
       ["The switch must have an IPv4 address configured on VLAN 1 before any Layer 2 `show` commands are unlocked in the CLI.", "Layer 2 switches can display their MAC address table in EXEC mode without any IPv4 configuration."]
     ],
     "Each Cisco IOS CLI mode accepts only the commands defined for that mode. `show` commands belong to User EXEC and Privileged EXEC modes, so typing a `show` command directly at the `(config)#` prompt fails unless the user first exits back to EXEC mode (or prepends `do`).",
@@ -694,11 +694,11 @@ const q04 = [
   c04.s(
     "Switch CLI", "Medium",
     "An engineer is currently in Interface Configuration submode (`SW1(config-if)#`) and wants to return immediately to Privileged EXEC mode (`SW1#`) in a single step. Which action accomplishes this?",
-    "Type `end` or press `Ctrl+Z`",
+    "Enter the `end` command or press `Ctrl+Z`",
     [
-      ["Type `exit`, which jumps directly from any submode back to User EXEC mode (`SW1>`)", "From `(config-if)#`, typing `exit` moves up only one level to Global Configuration mode (`(config)#`), not to Privileged EXEC mode."],
-      ["Type `disable`, which closes the configuration session and saves the running configuration", "`disable` is a Privileged EXEC command that moves from Privileged EXEC (`#`) back to User EXEC (`>`), not a configuration exit command."],
-      ["Type `logout`, which exits configuration mode while keeping the console session authenticated", "`logout` (or `exit` from EXEC mode) terminates the entire console or VTY login session rather than returning to `SW1#`."]
+      ["Enter the `exit` command at the submode prompt", "From `(config-if)#`, typing `exit` moves up only one level to Global Configuration mode (`(config)#`), not to Privileged EXEC mode."],
+      ["Enter the `disable` command in submode", "`disable` is a Privileged EXEC command that moves from Privileged EXEC (`#`) back to User EXEC (`>`), not a configuration exit command."],
+      ["Enter the `logout` command at the submode prompt", "`logout` (or `exit` from EXEC mode) terminates the entire console or VTY login session rather than returning to `SW1#`."]
     ],
     "From any configuration submode (such as `(config-if)#`, `(config-line)#`, or `(config-vlan)#`), typing `end` or pressing the `Ctrl+Z` key sequence jumps directly back to Privileged EXEC mode (`#`). By contrast, typing `exit` moves back one configuration level to Global Configuration mode (`(config)#`).",
     "`end` or `Ctrl+Z` = jump straight to Privileged EXEC (`#`); `exit` from a submode = step back one level to `(config)#`.",
@@ -707,7 +707,7 @@ const q04 = [
   c04.s(
     "Switch CLI", "Medium",
     "How does `copy running-config startup-config` differ in behavior from `copy startup-config running-config` on a Cisco IOS device?",
-    "`copy running-config startup-config` completely overwrites the NVRAM startup-config file, whereas `copy startup-config running-config` merges the two configurations in RAM.",
+    "`copy running-config startup-config` overwrites the file in NVRAM, whereas `copy startup-config running-config` merges in RAM.",
     [
       ["Both commands completely overwrite the destination file without rebooting the switch or merging existing lines.", "`copy startup-config running-config` does not overwrite `running-config`; it merges the startup-config commands into the active RAM configuration."],
       ["`copy running-config startup-config` merges changes into NVRAM, whereas `copy startup-config running-config` wipes RAM clean first.", "This is backwards: copying to `startup-config` overwrites the file in NVRAM, while copying to `running-config` performs a merge in RAM."],
@@ -720,7 +720,7 @@ const q04 = [
   c04.s(
     "Switch CLI", "Medium",
     "At the `SW1#` prompt, what is the difference between typing `cl?` (with no space before the question mark) and typing `clear ?` (with a space before the question mark)?",
-    "`cl?` lists all commands in the current mode that begin with the letters `cl`, whereas `clear ?` lists the valid parameters that can follow the `clear` command.",
+    "`cl?` lists all commands in the current mode starting with `cl`, whereas `clear ?` lists the parameters that follow `clear`.",
     [
       ["`cl?` automatically completes the word `clear` on the command line, whereas `clear ?` executes the command with default options.", "The `Tab` key performs command completion, whereas `?` always displays context-sensitive help without executing the command."],
       ["`cl?` searches Global Configuration mode for matching commands, whereas `clear ?` searches only User EXEC mode commands.", "Both help queries inspect only the commands available in the user's current CLI mode (`SW1#`)."],
@@ -733,7 +733,7 @@ const q04 = [
   c04.s(
     "Switch CLI", "Medium",
     "How do the outputs of the `show` command and the `debug` command differ when troubleshooting a Cisco IOS switch?",
-    "`show` displays a static point-in-time snapshot of status variables, whereas `debug` streams live event messages continuously as the switch processes traffic.",
+    "`show` outputs a one-time static status snapshot, whereas `debug` streams live event messages as the switch operates.",
     [
       ["`show` writes diagnostic logs exclusively to NVRAM, whereas `debug` displays output only on an external Syslog server.", "`show` always displays output to the current CLI session, and `debug` sends real-time messages to the console or terminal monitor."],
       ["`show` can be executed from Global Configuration mode, whereas `debug` can be executed from User EXEC mode (`>`).", "Neither statement is true: `show` runs in EXEC modes (`>` or `#`), and `debug` requires Privileged EXEC mode (`#`)."],
@@ -775,14 +775,14 @@ const q04 = [
     "Switch CLI", "Hard",
     "Which Privileged EXEC commands can be used on a Cisco Catalyst switch to erase the initial configuration file stored in NVRAM?",
     [
-      "write erase",
-      "erase startup-config",
-      "erase nvram:"
+      "Execute `write erase` in Privileged EXEC mode",
+      "Execute `erase startup-config` in Privileged EXEC mode",
+      "Execute `erase nvram:` in Privileged EXEC mode"
     ],
     [
-      ["delete running-config, which wipes the active configuration from DRAM immediately", "There is no `delete running-config` command in Cisco IOS, and `running-config` is stored in RAM rather than NVRAM."],
-      ["clear startup-config, which resets NVRAM without requiring confirmation", "Cisco IOS uses `erase startup-config`, `write erase`, or `erase nvram:` rather than `clear startup-config`."],
-      ["delete flash:startup-config, which removes the startup file from Flash memory", "`startup-config` is stored in NVRAM (`nvram:`), whereas Flash (`flash:`) holds the Cisco IOS image and `vlan.dat`."]
+      ["Execute `delete running-config` in Privileged EXEC mode", "There is no `delete running-config` command in Cisco IOS, and `running-config` is stored in RAM rather than NVRAM."],
+      ["Execute `clear startup-config` in Privileged EXEC mode", "Cisco IOS uses `erase startup-config`, `write erase`, or `erase nvram:` rather than `clear startup-config`."],
+      ["Execute `delete flash:startup-config` in Privileged EXEC mode", "`startup-config` is stored in NVRAM (`nvram:`), whereas Flash (`flash:`) holds the Cisco IOS image and `vlan.dat`."]
     ],
     "Cisco IOS provides three equivalent Privileged EXEC commands to erase the NVRAM contents where `startup-config` resides: `write erase`, `erase startup-config`, and `erase nvram:`. Doing so leaves the current `running-config` in RAM untouched until the switch is reloaded.",
     "All three erase NVRAM: `write erase`, `erase startup-config`, and `erase nvram:`.",
@@ -791,7 +791,7 @@ const q04 = [
   c04.s(
     "Switch CLI", "Hard",
     "On a Cisco Catalyst 2960-XR switch that has twenty-four 10/100/1000 Ethernet ports and two 1-Gbps/10-Gbps SFP+ uplink ports, how does Cisco IOS name those ports in the CLI?",
-    "`GigabitEthernet` for the 10/100/1000 ports and `TenGigabitEthernet` for the 1-Gbps/10-Gbps SFP+ ports, based on each port's fastest supported speed",
+    "`GigabitEthernet` for the 10/100/1000 ports and `TenGigabitEthernet` for the SFP+ ports based on maximum port speed",
     [
       ["`FastEthernet` for any port currently negotiating 100 Mbps and `GigabitEthernet` when a 1000BASE-T device is plugged in", "Cisco IOS interface names are fixed in hardware based on the port's maximum supported speed and never change dynamically when link speed changes."],
       ["`Ethernet` for all twenty-six ports because they all comply with the IEEE 802.3 Ethernet family of standards", "Catalyst switches differentiate port types by maximum speed (`FastEthernet`, `GigabitEthernet`, `TenGigabitEthernet`) rather than naming all ports `Ethernet`."],
@@ -804,7 +804,7 @@ const q04 = [
   c04.s(
     "Switch CLI", "Hard",
     "An administrator enters the following sequence of commands on a Catalyst switch:\n`SW1# configure terminal`\n`SW1(config)# hostname EdgeSw`\n`EdgeSw(config)# line console 0`\n`EdgeSw(config-line)# exit`\n`EdgeSw(config)# interface vlan 1`\nWhat CLI prompt is displayed immediately after pressing Enter on `interface vlan 1`, and where is the new hostname currently stored?",
-    "Prompt: `EdgeSw(config-if)#`; the hostname `EdgeSw` is stored only in RAM (`running-config`) until explicitly saved to NVRAM.",
+    "Prompt: `EdgeSw(config-if)#`; the new hostname `EdgeSw` is stored only in RAM `running-config` until explicitly saved to NVRAM.",
     [
       ["Prompt: `SW1(config-if)#`; the hostname change does not take effect in the prompt until `copy running-config startup-config` is run.", "Configuration commands take effect in RAM (`running-config`) immediately upon pressing Enter, updating the prompt to `EdgeSw` right away."],
       ["Prompt: `EdgeSw#`; typing `exit` from `line console 0` returned the user to Privileged EXEC mode where `interface vlan 1` is ignored.", "Typing `exit` from `(config-line)#` steps back one level to Global Configuration mode (`EdgeSw(config)#`), where `interface vlan 1` is valid."],
@@ -838,11 +838,11 @@ const q05 = [
   c05.s(
     "Switching", "Easy",
     "Which address field in an incoming Ethernet frame does a Layer 2 switch examine to decide which egress port(s) should forward the frame?",
-    "Destination MAC address",
+    "Destination MAC address field",
     [
-      ["Source MAC address, which is used to populate and refresh the MAC address table", "The switch inspects the Source MAC address to learn where the sender is located, not to decide where to forward the frame."],
-      ["Destination IPv4 address, which is used by Layer 3 routers to select a next hop", "A Layer 2 switch does not examine the Layer 3 IPv4 destination address when switching Ethernet frames."],
-      ["EtherType field, which identifies the upper-layer protocol encapsulated in the frame", "The 2-byte EtherType field identifies the Layer 3 protocol (such as 0x0800 for IPv4), not the outgoing switch port."]
+      ["Source MAC address field", "The switch inspects the Source MAC address to learn where the sender is located, not to decide where to forward the frame."],
+      ["Destination IPv4 address field", "A Layer 2 switch does not examine the Layer 3 IPv4 destination address when switching Ethernet frames."],
+      ["Ethernet Type (EtherType) field", "The 2-byte EtherType field identifies the Layer 3 protocol (such as 0x0800 for IPv4), not the outgoing switch port."]
     ],
     "A Layer 2 Ethernet switch performs two distinct MAC lookups on every incoming frame: it checks the **Destination MAC address** in its MAC address table to make the forwarding or filtering decision, and it checks the **Source MAC address** to learn or refresh the sender's port entry.",
     "Forwarding decision = Destination MAC address; Learning = Source MAC address.",
@@ -851,11 +851,11 @@ const q05 = [
   c05.s(
     "Switching", "Easy",
     "What is the default inactivity aging time for dynamic entries in a Cisco Catalyst switch's MAC address table?",
-    "300 seconds (5 minutes)",
+    "300 seconds (5 minutes) by default",
     [
-      ["60 seconds (1 minute), matching the default keepalive interval on switch ports", "Dynamic MAC table entries age out after 300 seconds (5 minutes) of inactivity, not 60 seconds."],
-      ["180 seconds (3 minutes), matching the default CDP holdtime timer on Cisco devices", "180 seconds is the default CDP holdtime, whereas the MAC address table default aging timer is 300 seconds."],
-      ["14400 seconds (4 hours), matching the default Cisco IOS ARP cache timeout", "4 hours (14,400 seconds) is the classic Cisco IOS ARP table timeout, whereas the Layer 2 MAC table ages out in 300 seconds."]
+      ["60 seconds (1 minute) by default", "Dynamic MAC table entries age out after 300 seconds (5 minutes) of inactivity, not 60 seconds."],
+      ["180 seconds (3 minutes) by default", "180 seconds is the default CDP holdtime, whereas the MAC address table default aging timer is 300 seconds."],
+      ["14,400 seconds (4 hours) by default", "4 hours (14,400 seconds) is the classic Cisco IOS ARP table timeout, whereas the Layer 2 MAC table ages out in 300 seconds."]
     ],
     "By default, a Cisco Catalyst switch removes a dynamic MAC address table entry if it does not receive any frames with that MAC address as the **source** MAC for 300 seconds (5 minutes). Every time a frame arrives from that source MAC, its inactivity timer resets to 0.",
     "Default dynamic MAC table aging time = 300 seconds (5 minutes); verify with `show mac address-table aging-time`.",
@@ -864,11 +864,11 @@ const q05 = [
   c05.s(
     "Switching", "Easy",
     "What term describes an Ethernet unicast frame whose destination MAC address is not currently listed in the switch's MAC address table?",
-    "Unknown unicast frame",
+    "An unknown unicast Ethernet frame",
     [
-      ["Broadcast frame, because the switch rewrites the destination MAC to FFFF.FFFF.FFFF", "Although the switch floods an unknown unicast frame like a broadcast, the frame's destination MAC remains a unicast address and is called an unknown unicast."],
-      ["Runt frame, because the switch lacked the ARP entry needed to pad the header", "A runt frame is a corrupted physical frame smaller than 64 bytes, unrelated to whether the destination MAC is in the MAC table."],
-      ["Filtered unicast frame, because the switch drops any unicast MAC it has not learned", "Switches never drop a valid frame simply because the destination MAC is unknown; they flood unknown unicasts out all other ports in the VLAN."]
+      ["A Layer 2 broadcast Ethernet frame", "Although the switch floods an unknown unicast frame like a broadcast, the frame's destination MAC remains a unicast address and is called an unknown unicast."],
+      ["A corrupted runt Ethernet frame", "A runt frame is a corrupted physical frame smaller than 64 bytes, unrelated to whether the destination MAC is in the MAC table."],
+      ["A filtered known unicast LAN frame", "Switches never drop a valid frame simply because the destination MAC is unknown; they flood unknown unicasts out all other ports in the VLAN."]
     ],
     "A unicast frame is called a **known unicast** when its destination MAC address is found in the switch's MAC address table, and an **unknown unicast** when its destination MAC address is absent from the table. Switches flood unknown unicast frames out all ports in the same VLAN except the ingress port.",
     "Known unicast = forward out 1 port; Unknown unicast = flood out all ports in the VLAN except the incoming port.",
@@ -879,9 +879,9 @@ const q05 = [
     "Which Privileged EXEC command removes all dynamically learned MAC entries from a Catalyst switch's CAM table immediately?",
     "clear mac address-table dynamic",
     [
-      ["erase mac address-table, which wipes both static and dynamic CAM entries", "Cisco IOS uses `clear mac address-table dynamic`, not `erase mac address-table`."],
-      ["delete flash:mac-table.dat, which deletes the persistent MAC database file", "Dynamic MAC addresses are held in volatile CAM memory, not in a Flash file, and are cleared with `clear mac address-table dynamic`."],
-      ["no mac address-table dynamic, which must be entered in Global Configuration mode", "`clear mac address-table dynamic` is a Privileged EXEC action command, not a Global Configuration `no` command."]
+      ["erase mac address-table all", "Cisco IOS uses `clear mac address-table dynamic`, not `erase mac address-table`."],
+      ["delete flash:mac-address-table.dat", "Dynamic MAC addresses are held in volatile CAM memory, not in a Flash file, and are cleared with `clear mac address-table dynamic`."],
+      ["no mac address-table dynamic", "`clear mac address-table dynamic` is a Privileged EXEC action command, not a Global Configuration `no` command."]
     ],
     "To flush dynamically learned MAC addresses from the switch's Content Addressable Memory (CAM) table in Privileged EXEC mode, use `clear mac address-table dynamic` (optionally filtering by `address`, `interface`, or `vlan`).",
     "Use `clear mac address-table dynamic` in Privileged EXEC (`#`) mode to flush dynamic MAC entries.",
@@ -916,7 +916,7 @@ const q05 = [
   c05.s(
     "Switching", "Medium",
     "If a switch's MAC address table becomes completely full of dynamic entries and a frame arrives from a brand-new source MAC address, how does the switch handle the new MAC address?",
-    "It removes the oldest existing dynamic entry to make room in the table for the new MAC address.",
+    "It removes the oldest existing dynamic entry from the CAM table to make room for the newly learned MAC address.",
     [
       ["It stops learning any new MAC addresses until an existing entry naturally reaches its 300-second aging timer.", "Rather than refusing new entries until 300 seconds elapse, the switch preemptively purges the oldest dynamic entry to learn the new one."],
       ["It clears the entire dynamic MAC address table at once and floods all traffic while rebuilding the table from scratch.", "A full CAM table replaces the oldest dynamic entry rather than flushing the entire table."],
@@ -929,11 +929,11 @@ const q05 = [
   c05na.s(
     "Switch CLI", "Medium",
     "Examine the `show mac address-table` output below. Which command displays ONLY the dynamically learned entries on port FastEthernet 0/1?\nWhat happens if an engineer runs `show mac address-table dynamic` vs `show mac address-table`?",
-    "`show mac address-table dynamic interface fastethernet 0/1` lists only dynamic MACs on Fa0/1.",
+    "`show mac address-table dynamic interface fastethernet 0/1`",
     [
-      ["`show mac address-table interface fastethernet 0/1 dynamic`, because the `dynamic` keyword must always be placed at the very end.", "In Cisco IOS syntax, the `dynamic` keyword comes immediately after `show mac address-table`, before `interface`, `address`, or `vlan`."],
-      ["`show interfaces fastethernet 0/1 mac-table`, because per-port MAC lookups are nested under the `show interfaces` hierarchy.", "There is no `show interfaces ... mac-table` command; per-port MAC lookups use `show mac address-table [dynamic] interface <id>`."],
-      ["`show mac address-table count interface fastethernet 0/1`, which lists every individual MAC address learned on Fa0/1.", "`show mac address-table count` displays only summary numeric counts per VLAN and cannot filter individual MAC addresses by interface."]
+      ["`show mac address-table interface fastethernet 0/1 dynamic all`", "In Cisco IOS syntax, the `dynamic` keyword comes immediately after `show mac address-table`, before `interface`, `address`, or `vlan`."],
+      ["`show interfaces fastethernet 0/1 mac-address-table`", "There is no `show interfaces ... mac-table` command; per-port MAC lookups use `show mac address-table [dynamic] interface <id>`."],
+      ["`show mac address-table count interface fastethernet 0/1`", "`show mac address-table count` displays only summary numeric counts per VLAN and cannot filter individual MAC addresses by interface."]
     ],
     "The command `show mac address-table` includes both preconfigured `STATIC` entries destined for the switch `CPU` and `DYNAMIC` entries learned from LAN traffic. To view only dynamically learned entries on a specific port, use `show mac address-table dynamic interface <interface-id>`.",
     "Syntax order: `show mac address-table [dynamic] [address <mac> | interface <id> | vlan <id>]`.",
@@ -945,11 +945,11 @@ const q05 = [
   c05.s(
     "Switching", "Medium",
     "In the two-switch topology `Host A (0200.AAAA.AAAA) --- [Gi0/1 SW1 Gi0/2] --- [Gi0/2 SW2 Gi0/1] --- Host B (0200.BBBB.BBBB)`, Host A sends a frame to Host B. After the frame reaches Host B, which port does SW2 associate with `0200.AAAA.AAAA` in SW2's MAC address table?",
-    "Gi0/2 (the inter-switch trunk/link port where the frame entered SW2 from SW1)",
+    "Port Gi0/2 — the local inter-switch link port on SW2 where Host A's frame arrived from switch SW1",
     [
-      ["Gi0/1, because Host A is connected to port Gi0/1 on SW1 and switches share port numbers via CDP.", "Each switch builds its own independent MAC table based on its own local ingress port; switches do not copy MAC table port numbers from neighbors."],
-      ["Both Gi0/1 and Gi0/2, because SW2 records the original edge port alongside the local trunk port.", "A MAC address can be associated with only one port per VLAN in a switch's MAC address table—specifically the local port on which the frame arrived."],
-      ["Neither port, because switches only learn MAC addresses from directly attached end hosts, not from frames arriving over inter-switch links.", "Switches learn the source MAC address of every frame arriving on any port, including inter-switch links, mapping all distant hosts to the inter-switch port."]
+      ["Port Gi0/1 — the remote access port number on SW1 advertised to SW2 via CDP neighbor updates", "Each switch builds its own independent MAC table based on its own local ingress port; switches do not copy MAC table port numbers from neighbors."],
+      ["Both Gi0/1 and Gi0/2 — the original edge access port on SW1 plus the local ingress trunk port on SW2", "A MAC address can be associated with only one port per VLAN in a switch's MAC address table—specifically the local port on which the frame arrived."],
+      ["Neither port — switches only record source MAC addresses from directly connected end-host access ports", "Switches learn the source MAC address of every frame arriving on any port, including inter-switch links, mapping all distant hosts to the inter-switch port."]
     ],
     "Switches do not share MAC address tables with each other; each switch independently learns source MAC addresses based on which of its **own** ports received the frame. When Host A's frame travels from SW1 out Gi0/2 into SW2's Gi0/2, SW2 sees source MAC `0200.AAAA.AAAA` arriving on its local port Gi0/2 and records `0200.AAAA.AAAA -> Gi0/2`.",
     "On an inter-switch link, each switch maps all remote hosts' MAC addresses to the local inter-switch port where their frames enter.",
@@ -1028,7 +1028,7 @@ const q05 = [
   c05na.s(
     "Switch CLI", "Hard",
     "Examine the `show interfaces Gi0/1 counters` output below. Given that Gi0/1 is the only port in VLAN 1 connected to a single PC and the switch has received 500 unicast frames and 20 broadcast frames from that PC, why does `UcastPkts` under `In` show 500 while `BcastPkts` shows 20?",
-    "`show interfaces counters` tracks total Layer 2 Unicast (`UcastPkts`), Multicast (`McastPkts`), and Broadcast (`BcastPkts`) frames separately in both the input (`In`) and output (`Out`) directions.",
+    "`show interfaces counters` separately counts incoming (`In`) and outgoing (`Out`) Layer 2 unicast, multicast, and broadcast frames.",
     [
       ["`UcastPkts` counts only unknown unicast frames that failed the CAM lookup, whereas known unicasts are omitted from counters.", "`UcastPkts` counts all valid unicast frames (both known and unknown) entering or leaving the port."],
       ["`BcastPkts` counts ARP Requests that were dropped by port security, whereas valid broadcasts are added to `UcastPkts`.", "`BcastPkts` counts all valid Layer 2 broadcast frames (`FFFF.FFFF.FFFF`), not dropped security violations."],
@@ -1052,11 +1052,11 @@ const q06 = [
   c06.s(
     "Switch CLI", "Easy",
     "Which plane of a network device encompasses traffic sent directly to or from the device itself for administration—such as SSH, Telnet, and SNMP—rather than user traffic being forwarded through the device?",
-    "Management plane",
+    "The device Management plane",
     [
-      ["Data plane, which handles high-speed frame switching and packet forwarding through the box", "The data plane (forwarding plane) handles end-user frames and packets passing through the switch, not administrative sessions to the switch."],
-      ["Control plane, which runs topology protocols like STP, OSPF, and ARP to populate forwarding tables", "The control plane runs dynamic protocols (STP, OSPF, ARP) that feed the data plane's tables, rather than interactive CLI management."],
-      ["Backplane, which provides the physical copper traces connecting line cards inside a chassis", "The backplane is internal switching hardware rather than one of the three logical networking planes (data, control, management)."]
+      ["The high-speed Data plane", "The data plane (forwarding plane) handles end-user frames and packets passing through the switch, not administrative sessions to the switch."],
+      ["The dynamic Control plane", "The control plane runs dynamic protocols (STP, OSPF, ARP) that feed the data plane's tables, rather than interactive CLI management."],
+      ["The chassis switching Backplane", "The backplane is internal switching hardware rather than one of the three logical networking planes (data, control, management)."]
     ],
     "Networking devices divide work across three logical planes: the **data plane** forwards user frames/packets through the device, the **control plane** runs protocols like STP, ARP, and OSPF to build forwarding tables, and the **management plane** handles traffic used by administrators to manage the device itself (SSH, Telnet, console, SNMP, Syslog).",
     "Data plane = forwarding user traffic; Control plane = protocols building tables (STP/OSPF/ARP); Management plane = managing the box (SSH/Telnet/Console).",
@@ -1080,9 +1080,9 @@ const q06 = [
     "Which Global Configuration command prevents a Cisco switch from pausing the CLI for several seconds to broadcast a DNS query whenever an administrator mistypes an EXEC command?",
     "no ip domain-lookup",
     [
-      ["no logging console, which stops status messages from printing to the console line", "`no logging console` disables Syslog messages on the console screen; it does not stop IOS from translating mistyped words via DNS."],
-      ["logging synchronous, which aligns unsolicited log messages with the CLI prompt", "`logging synchronous` prevents log messages from splitting typed commands mid-line, not DNS lookups on typos."],
-      ["exec-timeout 0 0, which disables the console inactivity disconnect timer", "`exec-timeout 0 0` stops the console from logging out due to inactivity rather than disabling DNS lookups."]
+      ["no logging console", "`no logging console` disables Syslog messages on the console screen; it does not stop IOS from translating mistyped words via DNS."],
+      ["no logging synchronous", "`logging synchronous` prevents log messages from splitting typed commands mid-line, not DNS lookups on typos."],
+      ["exec-timeout 0 0", "`exec-timeout 0 0` stops the console from logging out due to inactivity rather than disabling DNS lookups."]
     ],
     "By default, when you type an unrecognized word in EXEC mode, Cisco IOS assumes it is a hostname you want to Telnet to and attempts a DNS lookup (`Translating \"...\"...domain server (255.255.255.255)`). Entering `no ip domain-lookup` in Global Configuration mode disables DNS resolution on the switch and immediately returns an error prompt on typos.",
     "Use `no ip domain-lookup` in lab switches so mistyped EXEC commands don't hang waiting for DNS.",
@@ -1091,7 +1091,7 @@ const q06 = [
   c06.s(
     "Switch CLI", "Easy",
     "Why does a Layer 2 Catalyst switch configure its management IPv4 address under `interface vlan <id>` (an SVI) rather than directly on a physical port like `interface GigabitEthernet 0/1`?",
-    "A Layer 2 switch acts like a single management host attached internally to that VLAN, allowing administrators to reach its IP through any physical port in that VLAN.",
+    "A Layer 2 switch uses an internal SVI so administrators can reach its management IP through any active port in that VLAN.",
     [
       ["Physical GigabitEthernet ports on a Layer 2 switch can only be assigned IPv6 addresses, leaving IPv4 to VLAN interfaces.", "Layer 2 switch ports do not take IPv4 or IPv6 addresses directly; the switch's management IP (IPv4 or IPv6) is configured on a Switched Virtual Interface (SVI)."],
       ["Configuring an IP address on `interface vlan 1` turns the Layer 2 switch into a multi-subnet WAN router for all attached PCs.", "Configuring an SVI on a Layer 2 switch provides only a management IP for the switch itself (SSH/Telnet/ping), not inter-VLAN routing."],
@@ -1104,7 +1104,7 @@ const q06 = [
   c06sec.s(
     "Device security", "Medium",
     "An engineer wants to configure a Catalyst switch so that both console and VTY lines prompt users for BOTH a username and a password stored locally on the switch (with the password hashed in `running-config`). Which configuration sequence accomplishes this?",
-    "Configure `username <name> secret <pass>` globally and `login local` under console and VTY lines.",
+    "Configure `username <name> secret <pass>` in Global Configuration mode and `login local` under both console and VTY lines.",
     [
       ["Configure `password <pass>` and `login` under both `line console 0` and `line vty 0 15` without global `username` commands.", "Line `password` + `login` prompts only for a shared line password (no username) and stores that password in clear text by default."],
       ["Configure `enable secret <pass>` in global configuration mode and `login` under both `line console 0` and `line vty 0 15`.", "`enable secret` protects transition from User EXEC (`>`) to Privileged EXEC (`#`), not initial console/VTY login."],
@@ -1117,11 +1117,11 @@ const q06 = [
   c06sec.s(
     "Device security", "Medium",
     "What prerequisites must be configured on a Cisco Catalyst switch before generating the RSA key pair to enable SSH version 2 server support?",
-    "A non-default `hostname` and an `ip domain-name` must be configured in Global Configuration mode.",
+    "Both a non-default switch `hostname` and an `ip domain-name` must be configured in Global Configuration mode beforehand.",
     [
       ["An SVI with a static IPv4 address and `ip default-gateway` must be in the `up/up` state before `crypto key generate rsa` will run.", "While an IP address is needed to connect via SSH over the network, `crypto key generate rsa` only checks for a hostname and IP domain name."],
       ["Telnet must first be disabled on all VTY lines using `transport input none` before the RSA key generator will unlock.", "`crypto key generate rsa` does not require `transport input` to be changed beforehand."],
-      ["An external AAA server (RADIUS or TACACS+) must be reachable because SSHv2 cannot use local usernames on a Layer 2 switch.", "SSHv2 commonly uses local credentials (`username ... secret` + `login local`) as well as AAA servers."]
+      ["An external RADIUS or TACACS+ AAA server must be reachable because SSHv2 cannot use local usernames on a Layer 2 switch.", "SSHv2 commonly uses local credentials (`username ... secret` + `login local`) as well as AAA servers."]
     ],
     "The `crypto key generate rsa` command names the switch's RSA key pair by combining the switch's configured `hostname` and `ip domain-name` (for example, `SW1.example.com`). Without both a hostname and domain name configured, IOS refuses to generate the RSA keys. For SSHv2, the modulus length must also be at least 768 bits.",
     "SSH RSA key prerequisites: `hostname <name>` + `ip domain-name <domain>` -> `crypto key generate rsa` (>= 768 bits for SSHv2).",
@@ -1130,11 +1130,11 @@ const q06 = [
   c06sec.s(
     "Device security", "Medium",
     "Which VTY line configuration command permits encrypted SSH connections into a switch while blocking unencrypted Telnet connections?",
-    "transport input ssh",
+    "`transport input ssh` under `line vty 0 15`",
     [
-      ["ip ssh version 2, which automatically disables Telnet across all sixteen VTY lines", "`ip ssh version 2` restricts the SSH server to SSHv2 (disabling SSHv1), but it does not disable Telnet on the VTY lines if `transport input` allows Telnet."],
-      ["login local, which forces VTY lines to reject clear-text Telnet TCP port 23 connections", "`login local` specifies how users are authenticated (via local `username` accounts); both Telnet and SSH can use `login local`."],
-      ["transport output ssh, which blocks incoming Telnet packets arriving on VTY 0 15", "`transport output` controls outbound connections initiated *from* the switch CLI, whereas `transport input` controls inbound remote access *to* the switch."]
+      ["`ip ssh version 2` under `line vty 0 15`", "`ip ssh version 2` restricts the SSH server to SSHv2 (disabling SSHv1), but it does not disable Telnet on the VTY lines if `transport input` allows Telnet."],
+      ["`login local` configured under `line vty 0 15`", "`login local` specifies how users are authenticated (via local `username` accounts); both Telnet and SSH can use `login local`."],
+      ["`transport output ssh` under `line vty 0 15`", "`transport output` controls outbound connections initiated *from* the switch CLI, whereas `transport input` controls inbound remote access *to* the switch."]
     ],
     "Under `line vty 0 15`, the `transport input` command controls which remote access protocols are allowed to connect into the switch's VTY lines. `transport input ssh` allows only SSH, `transport input telnet` allows only Telnet, `transport input all` (or `transport input telnet ssh`) allows both, and `transport input none` disables all inbound VTY access.",
     "Under `line vty 0 15`, use `transport input ssh` to allow only SSH and block Telnet.",
@@ -1143,7 +1143,7 @@ const q06 = [
   c06.s(
     "Switch CLI", "Medium",
     "Why does `show running-config` on a Catalyst switch often display VTY lines split into `line vty 0 4` and `line vty 5 15` even after the engineer typed `line vty 0 15`?",
-    "Older Cisco devices had only five VTY lines (`0 4`), so IOS still displays `0 4` and `5 15` as separate sections in `running-config` for backward compatibility.",
+    "Older IOS devices had only five VTY lines (`0 4`), so IOS still lists `0 4` and `5 15` separately for backward compatibility.",
     [
       ["Lines `0 4` are dedicated hardware ports for Telnet, whereas lines `5 15` are reserved exclusively for encrypted SSHv2 sessions.", "All 16 VTY lines (`0 15`) are identical virtual terminal lines that share whatever `transport input` protocols are configured on them."],
       ["Lines `0 4` authenticate against local `username` accounts, whereas lines `5 15` require an external TACACS+ server.", "Entering commands under `line vty 0 15` applies identical authentication settings to both the `0 4` and `5 15` stanzas."],
@@ -1156,11 +1156,11 @@ const q06 = [
   c06.s(
     "Switch CLI", "Medium",
     "While typing a command at the console prompt, an unsolicited `%LINK-3-UPDOWN` Syslog message prints in the middle of the line, splitting the engineer's typed characters. Which command prevents this interruption by holding log messages until a new prompt line is drawn?",
-    "logging synchronous (configured under `line console 0`)",
+    "`logging synchronous` configured under `line console 0`",
     [
-      ["no logging console (configured in Global Configuration mode), which buffers messages until logout", "`no logging console` completely suppresses all console log messages rather than synchronizing them neatly with your typing."],
-      ["exec-timeout 0 0 (configured under `line console 0`), which locks the console output buffer", "`exec-timeout 0 0` disables the 5-minute console inactivity logout timer; it has no effect on Syslog message display."],
-      ["terminal history size 50 (configured in Privileged EXEC mode), which separates logs from commands", "`terminal history size` changes how many past commands are remembered in the current session, not how Syslog messages print."]
+      ["`no logging console` configured in Global Configuration mode", "`no logging console` completely suppresses all console log messages rather than synchronizing them neatly with your typing."],
+      ["`exec-timeout 0 0` configured under `line console 0`", "`exec-timeout 0 0` disables the 5-minute console inactivity logout timer; it has no effect on Syslog message display."],
+      ["`terminal history size 50` configured in Privileged EXEC mode", "`terminal history size` changes how many past commands are remembered in the current session, not how Syslog messages print."]
     ],
     "Configuring `logging synchronous` in Line Configuration mode (`line console 0` or `line vty 0 15`) tells Cisco IOS to wait until command output finishes or, if a log message arrives while you are typing, to print the log message and then automatically redraw your prompt and any characters you had already typed on a fresh line.",
     "`logging synchronous` (line subcommand) keeps unsolicited console log messages from breaking up the command you are typing.",
@@ -1213,7 +1213,7 @@ const q06 = [
   c06.s(
     "Switch CLI", "Hard",
     "Examine the CLI output below from `SW1`. An administrator on a remote subnet (`172.16.50.10`) tries to connect to `10.1.1.200` using both Telnet and SSH. What happens to each connection attempt?",
-    "Neither connection succeeds from `172.16.50.10` because `SW1` has no `ip default-gateway` configured to reply to a remote subnet.",
+    "Neither succeeds because `SW1` is missing `ip default-gateway` to reach a remote subnet.",
     [
       ["SSH succeeds using username `admin`, while Telnet is rejected by `transport input ssh`.", "Although SSH is properly configured for same-subnet clients (`10.1.1.0/24`), the administrator is on a remote subnet (`172.16.50.10`) and `SW1` has no `ip default-gateway`, so return packets cannot be sent."],
       ["Both Telnet and SSH succeed because `Vlan1` is `up/up` with a valid /24 subnet mask.", "An `up/up` SVI with a subnet mask allows communication only within the local `10.1.1.0/24` subnet; replying to `172.16.50.10` requires `ip default-gateway`."],
@@ -1229,7 +1229,7 @@ const q06 = [
   c06.s(
     "Switch CLI", "Hard",
     "What is the difference between configuring `history size 50` under `line console 0` versus entering `terminal history size 50` in Privileged EXEC mode?",
-    "`history size 50` saves the setting in `running-config` for all future sessions on that line, whereas `terminal history size 50` applies only to the current login session and is not saved in `running-config`.",
+    "`history size 50` is saved in `running-config` for that line, whereas `terminal history size 50` applies only to the current login session.",
     [
       ["`history size 50` changes the buffer for VTY lines only, whereas `terminal history size 50` changes the buffer for the physical console port.", "`history size` can be configured under either `line console 0` or `line vty 0 15`, while `terminal history size` applies to whichever session runs it."],
       ["`history size 50` requires a switch reload to take effect, whereas `terminal history size 50` takes effect immediately in NVRAM.", "Neither command requires a reload or writes to NVRAM automatically; `history size` goes into `running-config` while `terminal history size` is temporary for the current session."],
@@ -1242,7 +1242,7 @@ const q06 = [
   c06sec.s(
     "Device security", "Hard",
     "An engineer configures a new Catalyst switch with `hostname SW1`, `ip domain-name corp.local`, `crypto key generate rsa` (1024-bit modulus), and `ip ssh version 2`, then erases `startup-config` and reloads the switch without saving `running-config`. After the reboot, what is the status of the RSA keys?",
-    "The RSA keys still exist on the switch because `crypto key generate rsa` stores them in a hidden location in Flash memory independent of `startup-config`.",
+    "The RSA keys remain intact because `crypto key generate rsa` stores them in a hidden Flash file independent of `startup-config`.",
     [
       ["The RSA keys are gone because they are stored as encrypted lines inside `running-config` and were never copied to `startup-config`.", "RSA keys are not stored inside `running-config` or `startup-config`; they are written directly to a hidden file in Flash memory when generated."],
       ["The RSA keys are gone because `write erase` automatically runs `crypto key zeroize rsa` on all Flash partitions.", "`write erase` clears only NVRAM (`startup-config`); deleting the RSA keys requires explicitly running `crypto key zeroize rsa`."],
@@ -1264,9 +1264,9 @@ const q07 = [
     "Which Global Configuration command allows an engineer to apply the same interface subcommands (such as `shutdown` or `description`) simultaneously to ports FastEthernet 0/11 through FastEthernet 0/20?",
     "interface range fastethernet 0/11 - 20",
     [
-      ["interface group fastethernet 0/11 to 0/20, which creates a permanent port template", "Cisco IOS uses the keyword `interface range` with a hyphen (`-`), not `interface group ... to`."],
-      ["interface multiple fastethernet 0/11 - 0/20, which repeats the module number after the hyphen", "Cisco IOS uses `interface range` (and after the hyphen, only the ending port number `20` is typed, not `multiple`)."],
-      ["channel-group 11-20 mode on, which bundles the ten interfaces into a single configuration prompt", "`channel-group` configures an EtherChannel bundle (up to 8 active ports) from within an existing interface mode, not a multi-port range prompt."]
+      ["interface group fastethernet 0/11 to 0/20", "Cisco IOS uses the keyword `interface range` with a hyphen (`-`), not `interface group ... to`."],
+      ["interface multiple fastethernet 0/11 - 0/20", "Cisco IOS uses `interface range` (and after the hyphen, only the ending port number `20` is typed, not `multiple`)."],
+      ["interface channel-group 11-20 mode on", "`channel-group` configures an EtherChannel bundle (up to 8 active ports) from within an existing interface mode, not a multi-port range prompt."]
     ],
     "The `interface range` Global Configuration command (for example, `interface range FastEthernet 0/11 - 20`) enters `(config-if-range)#` mode. Any interface subcommands entered in this mode are applied to every interface in the specified range and appear under each individual interface in `show running-config`.",
     "Use `interface range <type> <slot>/<first> - <last>` in Global Config mode to configure multiple ports at once.",
@@ -1275,9 +1275,9 @@ const q07 = [
   c07.s(
     "Switch interfaces", "Easy",
     "When viewing `show interfaces status` on a Catalyst switch, how can you tell whether port Gi0/1's speed and duplex were learned via IEEE 802.3u autonegotiation versus configured manually?",
-    "Autonegotiated values use the `a-` prefix (`a-full`, `a-100`), while manual values omit `a-`.",
+    "Autonegotiated values display the `a-` prefix such as `a-full` and `a-100`, whereas manually configured values omit the `a-` prefix.",
     [
-      ["Autonegotiated values are printed in lowercase letters, whereas manually configured values are printed in all uppercase (`FULL` and `100M`).", "`show interfaces status` always uses lowercase (`full` vs `a-full`); the `a-` prefix is what indicates autonegotiation."],
+      ["Autonegotiated values are printed in lowercase letters, whereas manually configured values are printed in uppercase like `FULL` and `100M`.", "`show interfaces status` always uses lowercase (`full` vs `a-full`); the `a-` prefix is what indicates autonegotiation."],
       ["Autonegotiated ports show `connected` in the Status column, whereas manually configured ports show `static` in the Status column.", "The Status column shows `connected`, `notconnect`, `disabled`, or `err-disabled` regardless of whether speed/duplex are manual or automatic."],
       ["Autonegotiated ports display `auto` in the Duplex and Speed columns even after the link comes up and negotiates 1000 Mbps.", "`auto` is displayed only when the port is down (`notconnect` or `disabled`); once `connected`, negotiated values show `a-full`/`a-1000`."]
     ],
@@ -1327,11 +1327,11 @@ const q07 = [
   c07.s(
     "Switch interfaces", "Medium",
     "In a link with a duplex mismatch (Switch SW1 at 100/half and Switch SW2 at 100/full), which interface error counter specifically increments on the half-duplex side (SW1) to reveal the duplex mismatch?",
-    "Late collisions (along with collisions and CRC errors)",
+    "Late collisions — incremented when collisions occur after 64 bytes alongside CRC errors",
     [
-      ["Giants, because full-duplex frames sent by SW2 exceed the 1518-byte half-duplex frame limit.", "Full-duplex and half-duplex Ethernet have the exact same 1518-byte maximum frame size; duplex mismatches do not create giant frames."],
-      ["Administratively down transitions, because SW1 repeatedly shuts the port down using `shutdown`.", "A duplex mismatch leaves both ports in the `connected` (`up/up`) state; it simply degrades performance via collisions and CRC errors."],
-      ["Output drops on SW2, because the full-duplex port pauses transmission whenever SW1 transmits.", "The full-duplex side (SW2) has CSMA/CD disabled and never pauses when SW1 transmits; instead, SW2 sends freely, causing late collisions on SW1."]
+      ["Giants — incremented when full-duplex frames from SW2 exceed the 1518-byte frame limit", "Full-duplex and half-duplex Ethernet have the exact same 1518-byte maximum frame size; duplex mismatches do not create giant frames."],
+      ["Administratively down — incremented when SW1 repeatedly disables the port with `shutdown`", "A duplex mismatch leaves both ports in the `connected` (`up/up`) state; it simply degrades performance via collisions and CRC errors."],
+      ["Output drops on SW2 — incremented when the full-duplex port pauses for SW1 transmissions", "The full-duplex side (SW2) has CSMA/CD disabled and never pauses when SW1 transmits; instead, SW2 sends freely, causing late collisions on SW1."]
     ],
     "In a duplex mismatch, the full-duplex side transmits at any time without listening first, even when the half-duplex side is already halfway through sending a frame. When a collision occurs after the 64th byte of a frame has been transmitted, the half-duplex interface increments its **late collisions** counter—a telltale signature of a duplex mismatch.",
     "Rising **late collisions** (collisions occurring after 64 bytes) on a half-duplex port (`a-half` or `half`) is the classic sign of a duplex mismatch.",
@@ -1340,11 +1340,11 @@ const q07 = [
   c07.s(
     "Switch interfaces", "Medium",
     "A 10/100/1000 switch port with default settings (`speed auto`, `duplex auto`) is connected with a working cable to an old Layer 1 Ethernet hub. Because hubs do not forward or respond to IEEE 802.3u autonegotiation messages and send no idle link pulses before hosts transmit, what speed and duplex does the switch port choose?",
-    "10 Mbps and half duplex (`a-half`, `a-10`)",
+    "10 Mbps and half duplex — displayed as `a-half` and `a-10` in port status",
     [
-      ["100 Mbps and half duplex (`a-half`, `a-100`), matching Fast Ethernet hub defaults", "When a switch cannot sense the speed and receives no autonegotiation messages, IEEE rules require falling back to the **slowest** supported speed (10 Mbps)."],
-      ["1000 Mbps and full duplex (`a-full`, `a-1000`), matching the port's hardware name", "Without autonegotiation or speed sensing, a 10/100/1000 port falls back to its slowest speed (10 Mbps) and half duplex, not 1000/full."],
-      ["The port enters the `err-disabled` state because connecting a shared hub to a Catalyst switch violates STP rules.", "Connecting a single hub cable to a switch port does not trigger `err-disabled`; the port simply negotiates 10 Mbps and half duplex."]
+      ["100 Mbps and half duplex — displayed as `a-half` and `a-100` in port status", "When a switch cannot sense the speed and receives no autonegotiation messages, IEEE rules require falling back to the **slowest** supported speed (10 Mbps)."],
+      ["1000 Mbps and full duplex — displayed as `a-full` and `a-1000` in port status", "Without autonegotiation or speed sensing, a 10/100/1000 port falls back to its slowest speed (10 Mbps) and half duplex, not 1000/full."],
+      ["Error-disabled state — displayed as `err-disabled` in interface status", "Connecting a single hub cable to a switch port does not trigger `err-disabled`; the port simply negotiates 10 Mbps and half duplex."]
     ],
     "LAN hubs do not participate in IEEE 802.3u autonegotiation and do not forward autonegotiation messages between attached devices. When a switch port with `speed auto` and `duplex auto` receives no autonegotiation messages and cannot sense the link speed, it defaults to its **slowest supported speed** (10 Mbps on a 10/100 or 10/100/1000 port) and uses the IEEE duplex rule for 10 Mbps (**half duplex**).",
     "No autonegotiation + cannot sense speed (e.g., connected to a hub) -> slowest speed (10 Mbps) + half duplex (`a-half`, `a-10`).",
@@ -1366,7 +1366,7 @@ const q07 = [
   c07.s(
     "Switch interfaces", "Medium",
     "When troubleshooting fiber-optic cabling connected to a switch port that is stuck in `notconnect` (or suffering severe attenuation), what physical installation error is described by the term **macrobending**?",
-    "Bending a fiber cable tighter than its minimum bend radius so light leaks out into the cladding.",
+    "Bending a fiber-optic cable tighter than its minimum bend radius so light leaks out of the core into the cladding.",
     [
       ["Plugging the two fiber strands into the wrong SFP slots so that Transmit (Tx) connects to Transmit (Tx) instead of Receive (Rx).", "Connecting Tx to Tx and Rx to Rx is a reversed fiber pair (pinout error), not macrobending."],
       ["Inserting a multimode LED SFP transceiver at one end of a link and a single-mode laser SFP transceiver at the other end.", "Mixing multimode and single-mode transceivers is a wavelength/transceiver mismatch rather than macrobending."],
@@ -1406,12 +1406,12 @@ const q07 = [
     "Switch interfaces", "Hard",
     "Examine the CLI output below from `SW1`. Based on the status and counters shown for `Fa0/1` and `Fa0/2`, which conclusions are accurate?",
     [
-      "On `Fa0/1`, both speed and duplex were manually configured (`100` and `full`), whereas `Fa0/2` obtained `a-half` and `a-100` via autonegotiation or fallback.",
-      "`Fa0/2` is experiencing a duplex mismatch with its neighbor, evidenced by its `a-half` setting alongside rising CRC errors and 42 late collisions."
+      "On `Fa0/1`, speed and duplex were manually set to `100` and `full`, while `Fa0/2` got `a-half` and `a-100` via fallback.",
+      "`Fa0/2` has a duplex mismatch with its neighbor, shown by its `a-half` setting, 85 CRC errors, and 42 late collisions."
     ],
     [
       ["`Fa0/1` is connected to a legacy 10BASE-T hub because its speed and duplex values lack the `a-` prefix.", "Omitting the `a-` prefix on `Fa0/1` (`full` and `100`) means speed and duplex were manually configured on `Fa0/1`, not that it is attached to a 10BASE-T hub."],
-      ["`Fa0/2` has a bad copper cable pinout that prevented Layer 1 signaling from synchronizing.", "A wrong cable pinout would keep `Fa0/2` in the `notconnect` state; `Fa0/2` is `connected` at `a-100` and `a-half` with late collisions, indicating a duplex mismatch."],
+      ["`Fa0/2` has an incorrect crossover copper cable pinout that prevented Layer 1 link signaling from synchronizing.", "A wrong cable pinout would keep `Fa0/2` in the `notconnect` state; `Fa0/2` is `connected` at `a-100` and `a-half` with late collisions, indicating a duplex mismatch."],
       ["`Fa0/3` was automatically shut down by port security and requires both `shutdown` and `no shutdown` to clear `err-disabled`.", "`Fa0/3` shows `disabled` (caused by an administrative `shutdown` command), not `err-disabled`; it requires only `no shutdown` to enable."]
     ],
     "In `show interfaces status`, `Fa0/1` displays `full` and `100` (no `a-`), proving its speed and duplex were hardcoded manually. `Fa0/2` displays `a-half` and `a-100` (`connected`) while `show interfaces Fa0/2` shows 85 input errors / 85 CRC errors and 42 late collisions—classic proof that `Fa0/2` fell back to half duplex because the remote peer disabled autonegotiation and hardcoded `100/full`.",
@@ -1424,11 +1424,11 @@ const q07 = [
   c07.s(
     "Switch interfaces", "Hard",
     "In the output of `show interfaces Fa0/2`, the line `85 input errors, 85 CRC, 0 frame, 0 overrun, 0 ignored` appears. How does the `input errors` counter relate to `runts`, `giants`, `CRC`, and `frame` counters?",
-    "`input errors` is a summary counter that totals several specific incoming frame error types, including runts, giants, no buffer, CRC, frame, overrun, and ignored errors.",
+    "`input errors` is an umbrella counter that sums specific incoming error types including runts, giants, CRC, frame, overrun, and ignored.",
     [
       ["`input errors` counts only Physical layer voltage spikes, whereas `CRC` counts Data Link errors separately without adding to `input errors`.", "Every frame that fails the FCS check increments both the `CRC` counter and the umbrella `input errors` counter."],
-      ["`input errors` counts frames dropped by outbound QoS queues when the egress port is congested.", "Outbound congestion drops are counted under output drops/output errors, whereas `input errors` tracks corrupted or malformed incoming frames."],
-      ["`input errors` is incremented only when a frame has an illegal byte alignment (`frame` error), ignoring valid-length CRC failures.", "`frame` errors are just one subset of `input errors`; a standard CRC error (even with legal byte alignment) also increments `input errors`."]
+      ["`input errors` counts frames dropped by outbound QoS hardware queues whenever the switch egress port becomes congested.", "Outbound congestion drops are counted under output drops/output errors, whereas `input errors` tracks corrupted or malformed incoming frames."],
+      ["`input errors` is incremented only when a frame has an illegal byte alignment `frame` error, ignoring valid-length CRC failures.", "`frame` errors are just one subset of `input errors`; a standard CRC error (even with legal byte alignment) also increments `input errors`."]
     ],
     "On Cisco switches, `input errors` is an aggregate (umbrella) counter that sums multiple specific categories of received frame errors—including runts, giants, no buffer, CRC (failed FCS check), frame (illegal byte alignment ending on a partial byte), overrun, and ignored counts.",
     "`input errors` = total sum of incoming error types (runts + giants + CRC + frame + no buffer + overrun + ignored).",
@@ -1437,11 +1437,11 @@ const q07 = [
   c07.s(
     "Switch interfaces", "Hard",
     "An engineer configures `speed 100` and `duplex full` on interface `Gi0/1` of a Catalyst switch, and later decides to return both settings and the port's `description` back to their factory defaults. Which interface subcommands restore those defaults?",
-    "`no speed`, `no duplex`, and `no description`",
+    "`no speed`, `no duplex`, and `no description` on `Gi0/1`",
     [
       ["`speed default`, `duplex default`, and `description none`", "Cisco IOS reverts interface subcommands using the `no` prefix (`no speed`, `no duplex`, `no description`) rather than a `default` or `none` parameter."],
       ["`clear speed`, `clear duplex`, and `clear description`", "`clear` is an EXEC mode command used to reset dynamic tables or counters, not an interface configuration command."],
-      ["`erase interface Gi0/1`, which resets all subcommands under `Gi0/1` in a single line", "There is no `erase interface` command in Cisco IOS; use `no speed`, `no duplex`, and `no description` under `interface Gi0/1`."]
+      ["`erase interface Gi0/1` in Interface Configuration mode", "There is no `erase interface` command in Cisco IOS; use `no speed`, `no duplex`, and `no description` under `interface Gi0/1`."]
     ],
     "In Cisco IOS Interface Configuration mode, prefixing `no` to `speed`, `duplex`, or `description` (`no speed`, `no duplex`, `no description`) removes the manual override and restores the default setting (`speed auto`, `duplex auto`, and an empty description).",
     "Revert interface speed, duplex, or description to defaults with `no speed`, `no duplex`, and `no description`.",
@@ -1496,11 +1496,11 @@ const q08 = [
   c08.s(
     "DTP/VTP", "Easy",
     "Which VTP mode is required on a Catalyst switch if an engineer needs to configure extended-range VLANs (VLAN IDs 1006 through 4094)?",
-    "VTP transparent mode (or VTP off mode)",
+    "VTP transparent mode or VTP off mode",
     [
-      ["VTP server mode, which is the default VTP mode on Cisco Catalyst switches", "Switches in VTP server mode (using VTPv1 or VTPv2) can configure only normal-range VLANs (1 to 1005), not extended-range VLANs (1006 to 4094)."],
-      ["VTP client mode, which downloads extended-range VLANs from the VTP domain server", "Switches in VTP client mode cannot create, modify, or delete any VLANs locally from the CLI."],
-      ["VTP dynamic desirable mode, which negotiates extended VLAN support with neighbor switches", "`dynamic desirable` is a Dynamic Trunking Protocol (DTP) interface mode, not a VLAN Trunking Protocol (VTP) switch mode."]
+      ["Default VTP server operating mode", "Switches in VTP server mode (using VTPv1 or VTPv2) can configure only normal-range VLANs (1 to 1005), not extended-range VLANs (1006 to 4094)."],
+      ["VTP client mode synchronized to a server", "Switches in VTP client mode cannot create, modify, or delete any VLANs locally from the CLI."],
+      ["VTP dynamic desirable negotiation mode", "`dynamic desirable` is a Dynamic Trunking Protocol (DTP) interface mode, not a VLAN Trunking Protocol (VTP) switch mode."]
     ],
     "Catalyst switches running in VTP `server` or `client` mode (in VTPv1/v2) support only normal-range VLANs (1 to 1005). To create or modify extended-range VLANs (1006 to 4094), the switch must first be set to `vtp mode transparent` (or `vtp mode off`).",
     "Extended-range VLANs (1006-4094) require `vtp mode transparent` (or `vtp mode off`).",
@@ -1509,7 +1509,7 @@ const q08 = [
   c08.s(
     "VLANs", "Easy",
     "How do VLANs, Layer 2 broadcast domains, and IPv4 subnets relate to one another in standard enterprise campus LAN design?",
-    "Each VLAN is a separate Layer 2 broadcast domain and maps 1-to-1 to its own unique IPv4 subnet.",
+    "Each VLAN forms a separate Layer 2 broadcast domain and maps one-to-one to its own unique IPv4 subnet across the LAN.",
     [
       ["All VLANs on a single physical switch share one IPv4 subnet and one default gateway, separated only by MAC filtering.", "Hosts in different VLANs cannot communicate at Layer 2 and must be placed in separate IP subnets routed by a Layer 3 device."],
       ["A single VLAN typically spans four or five IPv4 subnets so that Layer 2 switches can route packets between departments.", "Layer 2 switches cannot route between subnets; best practice maps one VLAN to one broadcast domain and one IP subnet."],
@@ -1535,7 +1535,7 @@ const q08 = [
   c08.s(
     "VLANs", "Medium",
     "A desk PC is plugged into a Cisco IP Phone, and the IP Phone is connected by a single UTP patch cable to switch port `Gi0/2`. How is `Gi0/2` configured and how are frames carried across that single cable?",
-    "`Gi0/2` is configured as an access port with both `switchport access vlan <data-id>` and `switchport voice vlan <voice-id>`; PC frames travel untagged while phone voice frames travel with an 802.1Q tag.",
+    "`Gi0/2` is an access port with `switchport access vlan` and `switchport voice vlan`; PC frames are untagged and voice frames use 802.1Q.",
     [
       ["`Gi0/2` is configured with `switchport mode trunk` and `switchport nonegotiate` so the PC's NIC can tag its own data frames.", "A port connected to an IP Phone + PC is configured with `switchport mode access` (plus `switchport voice vlan`), not `switchport mode trunk`, and the PC sends untagged frames."],
       ["`Gi0/2` uses two wire pairs for the PC's VLAN and the other two wire pairs for the phone's VLAN without using any 802.1Q tags.", "Both the PC and the phone share the same physical Ethernet link through the phone's internal 3-port switch; separation is achieved via 802.1Q tagging of the voice VLAN."],
@@ -1548,7 +1548,7 @@ const q08 = [
   c08.s(
     "VLANs", "Medium",
     "An engineer configures `switchport voice vlan 20` on access port `Gi0/2` (which has `switchport access vlan 10`). Which statement is true when verifying `Gi0/2` with `show` commands?",
-    "`Gi0/2` does NOT appear in `show interfaces trunk`, takes part in both VLAN 10 and VLAN 20 in `show vlan brief`, and shows `Voice VLAN: 20` in `show interfaces Gi0/2 switchport`.",
+    "`Gi0/2` is omitted from `show interfaces trunk` and listed under both VLAN 10 and VLAN 20 in `show vlan brief`.",
     [
       ["`Gi0/2` is listed as an `802.1q` trunk in `show interfaces trunk` because it sends 802.1Q-tagged frames for VLAN 20.", "Cisco IOS still treats an access port with a voice VLAN as an access port, so it is NEVER listed in `show interfaces trunk`."],
       ["`Gi0/2` is removed from VLAN 10 in `show vlan brief` and listed only under VLAN 20 once the IP Phone boots.", "`show vlan brief` lists `Gi0/2` under BOTH the data access VLAN (VLAN 10) and the voice VLAN (VLAN 20)."],
@@ -1561,9 +1561,9 @@ const q08 = [
   c08.s(
     "DTP/VTP", "Medium",
     "Two Cisco Catalyst switches are connected on port `Gi0/1`. If both switches are left at their default DTP administrative mode (`switchport mode dynamic auto`), what operational mode results on the link?",
-    "Both ports operate as static access ports because neither `dynamic auto` port initiates trunking.",
+    "Both ports operate as static access ports because neither `dynamic auto` interface actively initiates DTP trunk negotiation.",
     [
-      ["Both ports operate as **802.1Q trunks**, because Cisco switches default to trunking whenever connected to another switch.", "When both ends are `dynamic auto`, neither end actively initiates DTP trunk negotiation, so the link settles into an access port (`static access`)."],
+      ["Both ports operate as **802.1Q trunks** since Cisco switches default to trunking whenever connected to another switch.", "When both ends are `dynamic auto`, neither end actively initiates DTP trunk negotiation, so the link settles into an access port (`static access`)."],
       ["The link stays in the `notconnect` state until at least one side is configured with `switchport trunk encapsulation dot1q`.", "Two `dynamic auto` ports come up (`connected`) and pass traffic in VLAN 1 as access ports without needing manual trunk configuration."],
       ["The switch with the lower Spanning Tree Bridge ID forces the link into a trunk while the higher BID switch becomes an access port.", "DTP does not use Spanning Tree Bridge IDs; `dynamic auto` + `dynamic auto` always results in both sides operating as access ports."]
     ],
@@ -1574,11 +1574,11 @@ const q08 = [
   c08.s(
     "Trunking", "Medium",
     "On a Catalyst switch that supports both ISL and 802.1Q trunking, an engineer enters `switchport mode trunk` on `Gi0/1` and receives the error `Command rejected: An interface whose trunk encapsulation is \"Auto\" can not be configured to \"trunk\" mode`. Which command must be entered first?",
-    "switchport trunk encapsulation dot1q",
+    "`switchport trunk encapsulation dot1q` under `Gi0/1`",
     [
-      ["switchport nonegotiate, which disables DTP before enabling trunk mode", "`switchport nonegotiate` can only be applied *after* the interface is already placed into `switchport mode trunk` or `switchport mode access`."],
-      ["vtp mode transparent, which unlocks 802.1Q tagging on uplink interfaces", "VTP mode controls VLAN database synchronization and extended VLAN creation, not whether a port's trunk encapsulation is set."],
-      ["switchport trunk native vlan 1, which initializes the 802.1Q header format", "Setting the native VLAN does not change the trunk encapsulation type from `negotiate`/`auto` to `dot1q`."]
+      ["`switchport nonegotiate` under interface `Gi0/1`", "`switchport nonegotiate` can only be applied *after* the interface is already placed into `switchport mode trunk` or `switchport mode access`."],
+      ["`vtp mode transparent` in Global Configuration mode", "VTP mode controls VLAN database synchronization and extended VLAN creation, not whether a port's trunk encapsulation is set."],
+      ["`switchport trunk native vlan 1` under interface `Gi0/1`", "Setting the native VLAN does not change the trunk encapsulation type from `negotiate`/`auto` to `dot1q`."]
     ],
     "On switches that support only 802.1Q (such as the Catalyst 2960), `switchport mode trunk` works immediately. However, on multilayer switches that support both ISL and 802.1Q, the default encapsulation is `negotiate` (`Auto`), so you must first specify `switchport trunk encapsulation dot1q` before IOS will accept `switchport mode trunk`.",
     "If `switchport mode trunk` is rejected due to `Auto` encapsulation, run `switchport trunk encapsulation dot1q` first.",
@@ -1616,13 +1616,13 @@ const q08 = [
     "Trunking", "Hard",
     "Examine the `show interfaces trunk` output below from `SW1`. Why does VLAN 10 appear in the first list (`Vlans allowed on trunk`), why is VLAN 20 missing from the second list (`Vlans allowed and active in management domain`), and why is VLAN 30 missing from the third list (`Vlans in spanning tree forwarding state and not pruned`)?",
     [
-      "VLAN 20 is allowed on the trunk (`1,10,20,30`), but VLAN 20 either does not exist in `SW1`'s VLAN database or is administratively shut down (`act/lshut`).",
-      "VLAN 30 exists and is active on `SW1`, but Spanning Tree Protocol (STP) currently has `Gi0/1` in a blocking/discarding state (or VTP pruned) for VLAN 30."
+      "VLAN 20 is permitted by the allowed VLAN list, but it either does not exist in `SW1`'s VLAN database or is shut down.",
+      "VLAN 30 exists and is active on `SW1`, but STP currently has `Gi0/1` in a blocking state or VTP pruned for VLAN 30."
     ],
     [
-      ["VLAN 20 was removed by `switchport trunk allowed vlan remove 20` on `Gi0/1`.", "If VLAN 20 had been removed by `switchport trunk allowed vlan`, it would not appear in the first list (`Vlans allowed on trunk: 1,10,20,30`)."],
-      ["VLAN 30 was deleted from `flash:vlan.dat`, which removes it from the third list while keeping it in the second list.", "A deleted VLAN is removed from the second list (`Vlans allowed and active in management domain`) as well as the third list."],
-      ["VLAN 10 is missing from `show vlan brief` because it is the native VLAN on `Gi0/1`.", "The output shows `Native vlan` is `1`, and VLAN 10 is present in all three trunk lists, meaning it is allowed, active in `show vlan brief`, and STP forwarding."]
+      ["VLAN 20 was manually removed from the trunk using `switchport trunk allowed vlan remove 20` under interface `Gi0/1`.", "If VLAN 20 had been removed by `switchport trunk allowed vlan`, it would not appear in the first list (`Vlans allowed on trunk: 1,10,20,30`)."],
+      ["VLAN 30 was deleted from `flash:vlan.dat` so IOS removes it from the third trunk list while keeping it in the second.", "A deleted VLAN is removed from the second list (`Vlans allowed and active in management domain`) as well as the third list."],
+      ["VLAN 10 is omitted from `show vlan brief` output because it is configured as the untagged native VLAN on port `Gi0/1`.", "The output shows `Native vlan` is `1`, and VLAN 10 is present in all three trunk lists, meaning it is allowed, active in `show vlan brief`, and STP forwarding."]
     ],
     "`show interfaces trunk` builds three progressive VLAN lists: (1) **Vlans allowed on trunk** reflects only the `switchport trunk allowed vlan` command (`1,10,20,30`); (2) **Vlans allowed and active in management domain** keeps only VLANs from list 1 that are currently defined and active (not `shutdown`) on the switch (`1,10,30`—so VLAN 20 is missing or shut down); and (3) **Vlans in spanning tree forwarding state and not pruned** keeps only VLANs from list 2 whose STP port state on `Gi0/1` is currently Forwarding (`1,10`—so VLAN 30 is STP blocking or VTP pruned).",
     "3 lists in `show interfaces trunk`: (1) Allowed by config -> (2) Allowed + exists & not shutdown -> (3) Allowed + active + STP Forwarding & not VTP pruned.",
@@ -1634,7 +1634,7 @@ const q08 = [
   c08.s(
     "Trunking", "Hard",
     "On an 802.1Q trunk between `SW1` and `SW2`, `SW1` has `switchport trunk native vlan 10` configured on its trunk port, while `SW2` has `switchport trunk native vlan 20` configured on its trunk port. What happens when a host in VLAN 10 on `SW1` sends a broadcast frame?",
-    "`SW1` sends the frame untagged across the trunk, and `SW2` receives the untagged frame and floods it into **VLAN 20** (causing traffic to hop between VLANs).",
+    "`SW1` sends the frame untagged over the trunk, and `SW2` receives the untagged frame and floods it into **VLAN 20**.",
     [
       ["`SW1` tags the frame with VLAN ID 10, and `SW2` drops the frame because its native VLAN does not match.", "`SW1` does NOT tag frames in its native VLAN (VLAN 10); it sends them untagged, and `SW2` accepts untagged frames into its own native VLAN (VLAN 20)."],
       ["DTP immediately places both trunk ports into the `err-disabled` state as soon as CDP detects the native VLAN mismatch.", "While CDP logs a `%CDP-4-NATIVE_VLAN_MISMATCH` warning message, neither CDP nor DTP places the port into `err-disabled` for a native VLAN mismatch."],
@@ -1647,10 +1647,10 @@ const q08 = [
   c08.s(
     "VLANs", "Hard",
     "Examine the `show vlan brief` output below. Why does `Fa0/3` NOT appear next to VLAN 1, VLAN 10, or VLAN 20, and what does `act/lshut` mean next to VLAN 20?",
-    "`Fa0/3` is currently operating as a trunk port (which `show vlan brief` omits), and `act/lshut` means VLAN 20 has been administratively shut down locally on this switch.",
+    "`Fa0/3` is operating as a trunk port omitted from `show vlan brief`, and `act/lshut` means VLAN 20 is locally shut down.",
     [
-      ["`Fa0/3` is in the `notconnect` state (which hides ports from `show vlan brief`), and `act/lshut` means all ports in VLAN 20 are unplugged.", "`show vlan brief` still lists access ports that are `notconnect` or `disabled`; it omits only operational **trunk** ports, and `act/lshut` means `shutdown vlan 20` was configured."],
-      ["`Fa0/3` was assigned to an extended-range VLAN, and `act/lshut` means VLAN 20 was pruned by VTP.", "`show vlan brief` displays extended-range VLANs and their access ports too; only trunk ports are omitted from `show vlan brief`."],
+      ["`Fa0/3` is in the `notconnect` state hidden from `show vlan brief`, and `act/lshut` means all ports in VLAN 20 are unplugged.", "`show vlan brief` still lists access ports that are `notconnect` or `disabled`; it omits only operational **trunk** ports, and `act/lshut` means `shutdown vlan 20` was configured."],
+      ["`Fa0/3` was assigned to an extended-range VLAN above 1005, and `act/lshut` means VLAN 20 was automatically pruned by VTP.", "`show vlan brief` displays extended-range VLANs and their access ports too; only trunk ports are omitted from `show vlan brief`."],
       ["`Fa0/3` has `switchport voice vlan 20` configured, and `act/lshut` means the voice VLAN requires CDP to activate.", "Access ports with a voice VLAN DO appear in `show vlan brief` (under both the data and voice VLANs); only trunk ports are hidden."]
     ],
     "`show vlan brief` lists only **access** ports assigned to each VLAN; any interface currently operating as a **trunk** (`trunking` in `show interfaces trunk`) is omitted from `show vlan brief`. Additionally, the status `act/lshut` indicates that VLAN 20 was administratively disabled using `shutdown vlan 20` (global) or `shutdown` inside `(config-vlan)#` mode.",
@@ -1663,7 +1663,7 @@ const q08 = [
   c08.s(
     "VLANs", "Hard",
     "Access ports `Fa0/1` and `Fa0/2` are currently assigned to VLAN 10 on `SW1`. If an administrator deletes VLAN 10 using `no vlan 10` in Global Configuration mode (without reassigning `Fa0/1` and `Fa0/2` to another VLAN), what happens to `Fa0/1` and `Fa0/2`?",
-    "Both ports remain assigned to nonexistent VLAN 10, disappear from `show vlan brief`, and cannot forward traffic until VLAN 10 is recreated or the ports are reassigned to an active VLAN.",
+    "Both ports stay assigned to nonexistent VLAN 10, vanish from `show vlan brief`, and stop forwarding until reassigned to an active VLAN.",
     [
       ["Cisco IOS automatically moves `Fa0/1` and `Fa0/2` back into default VLAN 1 so attached hosts do not lose connectivity.", "Deleting a VLAN with `no vlan 10` does NOT return its access ports to VLAN 1; those ports stay mapped to missing VLAN 10 and become inactive."],
       ["Cisco IOS refuses to execute `no vlan 10` until every access port in VLAN 10 has been manually reconfigured with `no switchport access vlan`.", "IOS allows `no vlan 10` immediately without requiring access ports to be moved first, stranding those ports in an inactive state."],
@@ -1722,11 +1722,11 @@ const q09 = [
   c09.s(
     "STP", "Easy",
     "What port role is assigned to every working interface on the elected STP **root switch**?",
-    "Designated Port (DP), which remains in the Forwarding state",
+    "Designated Port (DP) — remains in the active STP Forwarding port state",
     [
-      ["Root Port (RP), because all ports on the root switch originate Hello BPDUs", "A Root Switch NEVER has a Root Port (RP); every nonroot switch has exactly one RP pointing toward the root, while all ports on the root switch are Designated Ports (DPs)."],
-      ["Alternate Port, which backs up the primary uplink in case a neighbor switch fails", "Alternate Ports exist only on nonroot switches in RSTP to back up a Root Port."],
-      ["Backup Port, which blocks redundant connections to shared Ethernet hubs", "A root switch port only becomes a Backup/non-designated port in the rare case where two ports of the root switch plug into the same shared hub; normally all working ports on the root switch are Designated Ports."]
+      ["Root Port (RP) — originates periodic Hello BPDUs out every root interface", "A Root Switch NEVER has a Root Port (RP); every nonroot switch has exactly one RP pointing toward the root, while all ports on the root switch are Designated Ports (DPs)."],
+      ["Alternate Port (AP) — backs up the primary uplink if a neighbor fails", "Alternate Ports exist only on nonroot switches in RSTP to back up a Root Port."],
+      ["Backup Port (BP) — blocks redundant connections attached to shared hubs", "A root switch port only becomes a Backup/non-designated port in the rare case where two ports of the root switch plug into the same shared hub; normally all working ports on the root switch are Designated Ports."]
     ],
     "Because the root switch advertises a root cost of 0 in its outgoing Hello BPDUs, it always has the lowest advertised root cost on every attached LAN segment. Consequently, every working port on the root switch wins the Designated Port (DP) election on its segment and is placed in the Forwarding state.",
     "Root switch has NO Root Ports—all working ports on the root switch are **Designated Ports (DPs)**.",
@@ -1735,7 +1735,7 @@ const q09 = [
   c09.s(
     "STP", "Medium",
     "Without Spanning Tree Protocol (STP), what three specific problems occur when redundant Layer 2 links create a switching loop?",
-    "Broadcast storms, MAC address table instability (flapping), and multiple copies of the same unicast frame arriving at the destination host",
+    "Broadcast storms, MAC address table flapping, and multiple copies of frames arriving at end hosts",
     [
       ["IPv4 Time-to-Live (TTL) expiration drops, duplicate OSPF router IDs, and automatic VLAN database erasure", "Layer 2 Ethernet frames have no TTL field (unlike Layer 3 IPv4 packets), which is precisely why broadcast storms loop endlessly without STP."],
       ["Late collisions on full-duplex fiber trunks, DHCP pool exhaustion, and SSH RSA key corruption", "Full-duplex links do not experience collisions; Layer 2 loops cause broadcast storms, MAC table flapping, and duplicate frame delivery."],
@@ -1748,10 +1748,10 @@ const q09 = [
   c09.s(
     "STP", "Medium",
     "How do switches elect the Spanning Tree **root switch**, and how are ties broken?",
-    "The switch with the numerically lowest 8-byte Bridge ID (BID) wins: lowest 2-byte priority value first, and if tied, lowest 6-byte system MAC address.",
+    "The switch with the numerically lowest Bridge ID wins: lowest 2-byte priority first, then lowest MAC address.",
     [
       ["The switch with the numerically highest 2-byte priority value wins, and if tied, highest 6-byte MAC address.", "In Spanning Tree Protocol, **lower** is always better (unlike OSPF DR/BDR election): lowest priority wins, then lowest MAC address."],
-      ["The switch with the fastest uplink port speed (lowest port cost) wins, and if tied, lowest VLAN 1 IPv4 address.", "Root switch election inspects only the 8-byte Bridge ID (2-byte priority + 6-byte MAC); port speeds and IP addresses play no role."],
+      ["The switch with the fastest uplink port speed and lowest cost wins, and if tied, lowest management IPv4 address.", "Root switch election inspects only the 8-byte Bridge ID (2-byte priority + 6-byte MAC); port speeds and IP addresses play no role."],
       ["The switch that has been powered on the longest wins so that existing forwarding paths are never pre-empted.", "STP root election is preemptive: any switch advertising a superior (lower) BID immediately takes over as the root switch regardless of uptime."]
     ],
     "Every switch in an STP topology has an 8-byte Bridge ID (BID) consisting of a 2-byte priority field followed by a 6-byte system MAC address. Switches compare BIDs in Hello BPDUs and elect the switch with the **lowest** numerical BID as the root switch—comparing the 2-byte priority first, and if the priorities are equal, choosing the switch with the lowest 6-byte MAC address.",
@@ -1774,7 +1774,7 @@ const q09 = [
   c09.s(
     "STP", "Medium",
     "In Rapid Spanning Tree Protocol (RSTP, 802.1w), what is the difference between an **Alternate port** and a **Backup port**?",
-    "An Alternate port provides an alternate path toward the root switch to replace a failed Root Port (RP), whereas a Backup port backs up a Designated Port (DP) when two ports on the same switch connect to the same shared hub.",
+    "An Alternate port backs up the Root Port via another switch, whereas a Backup port backs up a Designated Port connected to a shared hub.",
     [
       ["An Alternate port forwards user frames on even-numbered VLANs, whereas a Backup port forwards user frames on odd-numbered VLANs.", "Both Alternate and Backup ports are in the **Discarding** state for that VLAN's spanning tree and do not forward user traffic unless the primary port fails."],
       ["An Alternate port backs up a Designated Port on a point-to-point link, whereas a Backup port backs up a Root Port across a WAN.", "This reverses the roles: **Alternate** backs up the **Root Port (RP)**, and **Backup** backs up a **Designated Port (DP)** on a shared medium (hub)."],
@@ -1787,9 +1787,9 @@ const q09 = [
   c09.s(
     "STP", "Medium",
     "What problem do **PortFast** and **BPDU Guard** solve when configured together on access ports connected to end-user PCs?",
-    "PortFast transitions the access port immediately to Forwarding (bypassing Learning/Listening delays), and BPDU Guard places the port into `err-disabled` if someone plugs in a switch that sends BPDUs.",
+    "PortFast puts the port straight into Forwarding, and BPDU Guard places the port into `err-disabled` if any BPDU arrives.",
     [
-      ["PortFast bundles multiple PC links into an EtherChannel, and BPDU Guard encrypts STP Hello messages using SSHv2 keys.", "Bundling links is the job of EtherChannel (not PortFast), and BPDU Guard disables a port upon receiving a BPDU rather than encrypting BPDUs."],
+      ["PortFast bundles multiple PC links into an EtherChannel, and BPDU Guard encrypts STP Hello messages using local SSHv2 keys.", "Bundling links is the job of EtherChannel (not PortFast), and BPDU Guard disables a port upon receiving a BPDU rather than encrypting BPDUs."],
       ["PortFast lowers the port's STP cost to 1 so the PC becomes the Root Port, and BPDU Guard filters out broadcast storms.", "End-user PCs do not participate in STP or become Root Ports; PortFast simply skips transitional delays on edge ports where no switches are attached."],
       ["PortFast disables MAC address learning on the port for 300 seconds, and BPDU Guard blocks untagged native VLAN frames.", "PortFast enables immediate forwarding and MAC learning on edge ports, while BPDU Guard watches for incoming STP BPDUs and err-disables the port."]
     ],
@@ -1843,10 +1843,10 @@ const q09 = [
   c09.s(
     "STP", "Hard",
     "Why does RSTP (802.1w) classify full-duplex inter-switch links as **Point-to-Point** port types and half-duplex links as **Shared** port types?",
-    "On full-duplex Point-to-Point links, RSTP knows only two switches exist on the segment and can negotiate an instant Proposal/Agreement transition to Forwarding without waiting for timers.",
+    "Point-to-Point links connect two switches and handshake to transition into Forwarding without waiting for STP timers.",
     [
       ["Full-duplex Point-to-Point links disable BPDU transmission completely, whereas Shared links send BPDUs every 2 seconds.", "Both Point-to-Point and Shared ports exchange RSTP BPDUs; Point-to-Point links use those BPDUs to handshake and converge within milliseconds."],
-      ["Shared half-duplex links automatically enable PortFast because hubs cannot create Layer 2 loops.", "Hubs can easily create loops (requiring Backup ports), and Shared links must fall back to slower timer-based convergence rather than PortFast."],
+      ["Shared half-duplex links automatically enable PortFast on both ends because Layer 1 hubs cannot create Layer 2 loops.", "Hubs can easily create loops (requiring Backup ports), and Shared links must fall back to slower timer-based convergence rather than PortFast."],
       ["Point-to-Point links use IEEE 2004 long port costs by default, whereas Shared links use 1998 short port costs.", "Both Point-to-Point and Shared links use the switch's configured pathcost method (short by default); the distinction controls RSTP convergence handshakes."]
     ],
     "RSTP achieves sub-second convergence by distinguishing link media types. When a link operates in **full-duplex** mode, RSTP knows it is a direct **Point-to-Point** connection between two devices (not a shared hub) and can actively handshake with the neighbor switch to place a new Designated Port into Forwarding immediately without waiting for Forward Delay timers. Half-duplex ports are assumed to be connected to a hub (**Shared** port type) and must use slower timer-based transitions.",
@@ -1869,7 +1869,7 @@ const q09 = [
   c09.s(
     "STP", "Hard",
     "Why does a switch port transitioning from Blocking to Forwarding in 802.1D STP spend 15 seconds in the **Listening** state and then another 15 seconds in the **Learning** state before forwarding user frames?",
-    "Listening allows temporary loops to subside and ages out stale MAC table entries, while Learning populates the MAC table with updated host locations to prevent excessive unknown-unicast flooding once Forwarding begins.",
+    "Listening lets temporary loops subside and flushes stale MACs, while Learning populates the MAC table before forwarding frames.",
     [
       ["Listening negotiates DTP trunk encapsulation with the neighbor, while Learning downloads the VTP VLAN database.", "DTP and VTP operate independently of STP's 15-second Forward Delay states."],
       ["Listening learns source MAC addresses from incoming frames, while Learning forwards only broadcast ARP frames to test the loop.", "No MAC addresses are learned during **Listening**, and no user frames (not even ARP broadcasts) are forwarded during **Learning**."],
@@ -1889,11 +1889,11 @@ const q10 = [
   c10.s(
     "STP", "Easy",
     "Which Global Configuration command enables Rapid Per-VLAN Spanning Tree Plus (RPVST+) on a Cisco Catalyst switch?",
-    "spanning-tree mode rapid-pvst",
+    "`spanning-tree mode rapid-pvst` in Global Config mode",
     [
-      ["spanning-tree mode rstp, which enables standard IEEE 802.1w per VLAN", "Cisco IOS uses the keyword `rapid-pvst` (`spanning-tree mode rapid-pvst`), not `rstp`."],
-      ["spanning-tree mode pvst, which enables Rapid 802.1w with Cisco extensions", "`spanning-tree mode pvst` enables traditional 802.1D Per-VLAN Spanning Tree Plus (PVST+), not Rapid PVST+."],
-      ["spanning-tree mode mst, which creates a separate 802.1w instance for every VLAN automatically", "`spanning-tree mode mst` enables Multiple Spanning Tree (802.1s), which maps multiple VLANs into a few configurable instances rather than RPVST+."]
+      ["`spanning-tree mode rstp` in Global Configuration mode", "Cisco IOS uses the keyword `rapid-pvst` (`spanning-tree mode rapid-pvst`), not `rstp`."],
+      ["`spanning-tree mode pvst` in Global Configuration mode", "`spanning-tree mode pvst` enables traditional 802.1D Per-VLAN Spanning Tree Plus (PVST+), not Rapid PVST+."],
+      ["`spanning-tree mode mst` in Global Config mode", "`spanning-tree mode mst` enables Multiple Spanning Tree (802.1s), which maps multiple VLANs into a few configurable instances rather than RPVST+."]
     ],
     "Cisco Catalyst switches support three STP modes configured via `spanning-tree mode`: `pvst` (traditional 802.1D PVST+), `rapid-pvst` (Rapid PVST+ based on 802.1w, the default on modern Catalyst switches), and `mst` (Multiple Spanning Tree based on 802.1s).",
     "CLI keywords for `spanning-tree mode`: `pvst` (802.1D), `rapid-pvst` (802.1w RPVST+), `mst` (802.1s MSTP).",
@@ -1915,7 +1915,7 @@ const q10 = [
   c10.s(
     "EtherChannel", "Easy",
     "What is the maximum number of active physical links that can be bundled into a single EtherChannel, and how many additional hot-standby links does LACP support?",
-    "Up to 8 active physical links in a bundle (plus up to 8 hot-standby links when using LACP)",
+    "Up to 8 active physical links in a bundle, with up to 8 additional hot-standby links when using LACP",
     [
       ["Up to 4 active physical links in a bundle, with 4 additional standby links supported by PAgP", "Both PAgP and LACP support up to **8** active links in a bundle, and only LACP supports an extra 8 standby links (16 total)."],
       ["Up to 16 active physical links simultaneously forwarding traffic when using `channel-group <n> mode on`", "An EtherChannel can have at most **8 active** forwarding links at a time; LACP's 9th through 16th links remain in hot-standby mode."],
@@ -1941,7 +1941,7 @@ const q10 = [
   c10.s(
     "STP", "Medium",
     "Switch `SW1` executes `spanning-tree vlan 10 root primary` in Global Configuration mode. How does Cisco IOS determine what base priority value to write into `SW1`'s configuration?",
-    "If the current root switch's base priority is more than 24576, `SW1` sets its base priority to 24576; otherwise, `SW1` sets its base priority to 4096 less than the current root's priority.",
+    "It sets `SW1`'s base priority to `24576` if the current root exceeds `24576`, or `4096` below the current root priority.",
     [
       ["It always sets `SW1`'s base priority to `0` so that no other switch can ever preempt `SW1` as the root switch.", "`root primary` never sets priority to 0; it sets 24576 (or 4096 below the current root if the current root is already at or below 24576, failing if the root is at 0)."],
       ["It sets `SW1`'s base priority to `28672` and dynamically monitors BPDUs to lower the priority if a new switch joins later.", "`28672` is the value set by `spanning-tree vlan 10 root secondary`, and both `root primary` and `root secondary` are one-time configuration macros that do not dynamically adjust later."],
@@ -1954,11 +1954,11 @@ const q10 = [
   c10.s(
     "STP", "Medium",
     "Wait—how does Cisco's **Rapid PVST+ (RPVST+)** differ from standard **IEEE 802.1w RSTP** regarding spanning tree instances and BPDU destination MAC addresses?",
-    "Standard RSTP creates one Common Spanning Tree (CST) using BPDU destination MAC `0180.C200.0000`, whereas RPVST+ creates one tree per VLAN using Cisco multicast MAC `0100.0CCC.CCCD` (tagged with 802.1Q on trunks).",
+    "Standard RSTP runs one common tree with MAC `0180.C200.0000`, while RPVST+ runs one tree per VLAN with MAC `0100.0CCC.CCCD`.",
     [
-      ["Standard RSTP creates one tree per VLAN using 802.1Q tags, whereas RPVST+ groups all VLANs into two instances (odd and even).", "Standard IEEE 802.1w RSTP runs only a single Common Spanning Tree (CST) across all VLANs; Cisco added per-VLAN instances in RPVST+."],
+      ["Standard RSTP creates one tree per VLAN using 802.1Q tags, whereas RPVST+ groups all VLANs into odd and even instances.", "Standard IEEE 802.1w RSTP runs only a single Common Spanning Tree (CST) across all VLANs; Cisco added per-VLAN instances in RPVST+."],
       ["Standard RSTP sends BPDUs to broadcast MAC `FFFF.FFFF.FFFF`, whereas RPVST+ sends BPDUs as unicast frames to the root switch.", "Neither protocol uses broadcast or unicast MACs; IEEE RSTP uses multicast `0180.C200.0000` and Cisco RPVST+ uses multicast `0100.0CCC.CCCD`."],
-      ["Standard RSTP sets the 12-bit System ID Extension to the VLAN ID, whereas RPVST+ sets those 12 bits to all zeros (`000000000000`).", "It is the exact opposite: IEEE RSTP sets the 12-bit System ID Extension to `000000000000`, whereas Cisco RPVST+ places the **VLAN ID** inside the 12-bit System ID Extension."]
+      ["Standard RSTP sets the 12-bit System ID Extension to the VLAN ID, whereas RPVST+ sets those 12 bits to all binary zeros.", "It is the exact opposite: IEEE RSTP sets the 12-bit System ID Extension to `000000000000`, whereas Cisco RPVST+ places the **VLAN ID** inside the 12-bit System ID Extension."]
     ],
     "IEEE 802.1w RSTP defines a single Common Spanning Tree (CST) for the entire bridged network, sends untagged BPDUs to IEEE multicast MAC `0180.C200.0000`, and sets the 12-bit System ID Extension to 0. Cisco's RPVST+ runs an independent RSTP instance **per VLAN**, places the VLAN ID in the 12-bit System ID Extension, adds a VLAN TLV, and sends trunk BPDUs tagged with 802.1Q to Cisco multicast MAC `0100.0CCC.CCCD`.",
     "IEEE RSTP = 1 tree (CST), MAC `0180.C200.0000`, SysID Ext = 0; Cisco RPVST+ = 1 tree per VLAN, MAC `0100.0CCC.CCCD`, SysID Ext = VLAN ID, 802.1Q-tagged BPDUs.",
@@ -1967,11 +1967,11 @@ const q10 = [
   c10.s(
     "EtherChannel", "Medium",
     "Switch `SW1` configures ports Gi0/1 and Gi0/2 with `channel-group 1 mode desirable`, while the neighbor switch `SW2` configures its connected ports Gi0/1 and Gi0/2 with `channel-group 2 mode active`. Will the EtherChannel form, and why?",
-    "No; although using different `channel-group` numbers (`1` vs `2`) is valid because the number is locally significant, `desirable` (PAgP) and `active` (LACP) are incompatible protocols.",
+    "No — `channel-group` numbers are locally significant, but `desirable` (PAgP) and `active` (LACP) are incompatible protocols.",
     [
-      ["No, because both switches must use the exact same `channel-group` number (`1` on both ends) for the PortChannel interfaces to bundle.", "The `channel-group` number is **locally significant** to each switch (`Po1` on `SW1` can happily connect to `Po2` on `SW2`); the failure here is mixing PAgP (`desirable`) with LACP (`active`)."],
-      ["Yes, because both `desirable` and `active` initiate negotiation and automatically fall back to manual `mode on`.", "PAgP (`desirable`) and LACP (`active`) are completely separate protocols that do not interoperate or fall back to `mode on`."],
-      ["Yes, because Cisco switches prioritize LACP (`active`) whenever a neighbor sends PAgP (`desirable`) frames.", "A switch port configured with `mode desirable` runs only PAgP and ignores LACP frames from an `active` neighbor, leaving the ports unbundled."]
+      ["No — both switches must configure the exact same `channel-group` number `1` on both ends for the PortChannel interfaces to bundle.", "The `channel-group` number is **locally significant** to each switch (`Po1` on `SW1` can happily connect to `Po2` on `SW2`); the failure here is mixing PAgP (`desirable`) with LACP (`active`)."],
+      ["Yes — both `desirable` and `active` actively initiate negotiation and automatically fall back to static `mode on`.", "PAgP (`desirable`) and LACP (`active`) are completely separate protocols that do not interoperate or fall back to `mode on`."],
+      ["Yes — Cisco Catalyst switches automatically prioritize LACP `active` whenever a neighbor sends PAgP `desirable` frames.", "A switch port configured with `mode desirable` runs only PAgP and ignores LACP frames from an `active` neighbor, leaving the ports unbundled."]
     ],
     "The `channel-group` number (which creates `interface Port-channel <n>`) is **locally significant** only to that switch, so `SW1` using group `1` and `SW2` using group `2` is completely valid. However, `mode desirable` uses Cisco proprietary **PAgP** whereas `mode active` uses IEEE **LACP**—because the two ends are running different negotiation protocols, the EtherChannel will not form.",
     "`channel-group <n>` number is locally significant (can differ between switches), but the mode protocol must match (`active`/`passive` LACP, `desirable`/`auto` PAgP, or `on`/`on`).",
@@ -1980,7 +1980,7 @@ const q10 = [
   c10.s(
     "EtherChannel", "Medium",
     "Why does EtherChannel load distribution hash header fields (such as `src-dst-ip` or `src-dst-mac`) to keep all frames of a single application flow on the same physical link instead of sending packets round-robin across all links in the bundle?",
-    "Sending packets from the same TCP/UDP flow across different physical links can cause packets to arrive out of order, degrading application and TCP performance.",
+    "Sending packets of a single TCP/UDP flow over different links can deliver packets out of order and degrade performance.",
     [
       ["Spanning Tree Protocol blocks all links in an EtherChannel except one unless flow hashing is enabled.", "STP treats the entire PortChannel interface (`Po1`) as a single logical link regardless of the load-balancing algorithm."],
       ["Round-robin forwarding violates IEEE 802.1Q rules by stripping the VLAN tag from every second frame.", "Load distribution operates below 802.1Q tagging and does not strip VLAN tags."],
@@ -2035,14 +2035,14 @@ const q10 = [
     "STP", "Hard",
     "Examine the `show spanning-tree vlan 10` output below from `SW2`. Which three facts can be determined directly from this output?",
     [
-      "`SW2` is NOT the root switch for VLAN 10; the root switch has base priority `24576` (`24586 - 10`) and MAC `0200.0001.0001`.",
-      "`SW2`'s local Bridge ID priority is `32778` (default base priority `32768` plus System ID Extension `10`), and its Root Port is `Gi0/1`.",
-      "The neighbor switch connected to `Gi0/1` advertised a root cost of `0` inside its Hello BPDU, because `Gi0/1`'s local port cost is `4` and `SW2`'s total Root ID `Cost` is `4`."
+      "`SW2` is not the root switch for VLAN 10; the root switch has base priority `24576` and MAC address `0200.0001.0001`.",
+      "`SW2`'s local Bridge ID priority is `32778` from base `32768` plus VLAN `10`, and its elected Root Port is `Gi0/1`.",
+      "The neighbor on `Gi0/1` advertised a root cost of `0` since `Gi0/1`'s port cost is `4` and `SW2`'s total Root Cost is `4`."
     ],
     [
       ["`SW2` is the root switch for VLAN 10 because `Gi0/2` is listed as a Designated (`Desg`) port in the `FWD` state.", "If `SW2` were the root switch, the `Root ID` section would state `This bridge is the root`, and `SW2` would have no `Root` port (`Gi0/1`)."],
       ["Interface `Gi0/3` is currently in the 802.1D `Listening` state waiting 15 seconds to become a second Root Port.", "The top line shows `Spanning tree enabled protocol rstp` (RPVST+), where `Altn BLK` means `Gi0/3` is an RSTP **Alternate** port in the **Discarding** state."],
-      ["The port priority of `Gi0/1` was manually changed to `1` using `spanning-tree port-priority 1`.", "`128.1` shows the default port priority of `128` combined with internal port number `1` (and port-priority can only be set in increments of 16)."]
+      ["The STP port priority of interface `Gi0/1` was manually changed to `1` using the `spanning-tree port-priority 1` command.", "`128.1` shows the default port priority of `128` combined with internal port number `1` (and port-priority can only be set in increments of 16)."]
     ],
     "In `show spanning-tree vlan 10`, the **Root ID** block describes the elected root switch (`Priority 24586` = base `24576` + sys-id-ext `10`, MAC `0200.0001.0001`, total Root Path `Cost 4`, via Root Port `Gi0/1`), while the **Bridge ID** block describes `SW2` itself (`Priority 32778` = base `32768` + sys-id-ext `10`, MAC `0200.0002.0002`). Because `Gi0/1` has a local port cost of `4` and `SW2`'s total root path cost is also `4`, `Gi0/1` must be connected directly to the root switch (which advertised cost `0`).",
     "In `show spanning-tree`: **Root ID** = the Root Switch (and *my* total cost/RP to reach it); **Bridge ID** = *this* local switch.",
@@ -2054,7 +2054,7 @@ const q10 = [
   c10.s(
     "EtherChannel", "Hard",
     "Examine the `show etherchannel summary` and `show spanning-tree vlan 1` output below from `SW1`. When physical ports `Gi0/1` and `Gi0/2` are bundled into `Port-channel 1` (`Po1`), how does Spanning Tree Protocol treat the bundle?",
-    "STP removes `Gi0/1` and `Gi0/2` as individual STP ports and treats `Po1` as a single logical interface with a lower STP port cost (`3`), forwarding across both links without blocking either one.",
+    "STP treats `Po1` as a single logical interface with lower port cost `3` and forwards traffic across both links without blocking.",
     [
       ["STP places `Gi0/1` into Forwarding and `Gi0/2` into Alternating/Discarding inside `Po1` to prevent a Layer 2 loop between the two wires.", "EtherChannel prevents Layer 2 loops across parallel links specifically by hiding the individual physical wires from STP so both links forward simultaneously."],
       ["STP adds the individual port costs of `Gi0/1` (4) and `Gi0/2` (4) together, giving `Po1` a higher STP cost of `8`.", "Bundling two 1-Gbps links increases bandwidth to 2 Gbps, which *lowers* the STP port cost of `Po1` (from 4 down to 3), never raising it to 8."],
@@ -2070,7 +2070,7 @@ const q10 = [
   c10.s(
     "EtherChannel", "Hard",
     "Switch `SW1` and Switch `SW2` have two 1-Gbps cables connecting `Gi0/1`-to-`Gi0/1` and `Gi0/2`-to-`Gi0/2`. On `SW1`, the administrator configures `channel-group 1 mode on` on both `Gi0/1` and `Gi0/2`, but forgets to configure `channel-group` on `SW2` (leaving `SW2`'s `Gi0/1` and `Gi0/2` as two independent switch ports). Why is this a dangerous misconfiguration?",
-    "`SW1` bundles both ports into `Po1` without negotiating and load-balances frames across both wires, while `SW2` treats them as separate ports, causing Layer 2 loops and MAC table flapping.",
+    "`SW1` bundles both ports unconditionally while `SW2` keeps them separate, causing Layer 2 loops and MAC table flapping.",
     [
       ["`SW1` automatically detects that `SW2` is not sending LACP frames and places `Po1` into the `suspended (s)` state.", "Because `SW1` was configured with `mode on`, it disables both PAgP and LACP negotiation and blindly forces `Po1` up (`SU`) without checking the neighbor."],
       ["`SW2` automatically adopts `channel-group 1 mode on` via CDP advertisements so the bundle forms safely anyway.", "CDP never configures EtherChannel bundles; without PAgP or LACP configured on both switches, `SW2` treats `Gi0/1` and `Gi0/2` as separate links."],
@@ -2083,10 +2083,10 @@ const q10 = [
   c10.s(
     "STP", "Hard",
     "Switch `SW1` (the root switch) is connected directly to `SW2` by two separate parallel GigabitEthernet links: `SW1 Gi0/1` connects to `SW2 Gi0/1`, and `SW1 Gi0/2` connects to `SW2 Gi0/2` (no EtherChannel is configured). Currently `SW2 Gi0/1` is `SW2`'s Root Port (`FWD`) and `SW2 Gi0/2` is `Altn BLK`. An engineer wants `SW2` to prefer `Gi0/2` as its Root Port specifically for **VLAN 20** (while keeping `Gi0/1` for VLAN 10) by changing **port priority** rather than port cost. Where must the `spanning-tree vlan 20 port-priority 64` command be configured?",
-    "On upstream switch `SW1`'s interface `Gi0/2`, because a nonroot switch breaks Root Port ties using the **neighbor's** advertised port priority inside incoming BPDUs",
+    "On upstream switch `SW1`'s interface `Gi0/2` since `SW2` breaks Root Port ties using the neighbor's advertised port priority",
     [
-      ["On downstream switch `SW2`'s interface `Gi0/2`, because `SW2` compares its own local port priorities when breaking Root Port ties", "In STP Root Port tiebreakers (cost -> neighbor BID -> neighbor port priority -> neighbor port number), `SW2` compares the **upstream neighbor's (`SW1`'s)** port priority sent in the BPDU, not `SW2`'s own local port priority."],
-      ["Under `interface vlan 20` on `SW2`, because per-VLAN port priority is configured on the Switched Virtual Interface (SVI)", "STP port-priority is configured on the physical switch port (`interface Gi0/2`), not on the Layer 3 management SVI (`interface vlan 20`)."],
+      ["On downstream switch `SW2`'s interface `Gi0/2` since `SW2` compares its own local port priorities when breaking Root Port ties", "In STP Root Port tiebreakers (cost -> neighbor BID -> neighbor port priority -> neighbor port number), `SW2` compares the **upstream neighbor's (`SW1`'s)** port priority sent in the BPDU, not `SW2`'s own local port priority."],
+      ["Under `interface vlan 20` on `SW2` since per-VLAN port priority is configured on the local Switched Virtual Interface", "STP port-priority is configured on the physical switch port (`interface Gi0/2`), not on the Layer 3 management SVI (`interface vlan 20`)."],
       ["In Global Configuration mode on `SW2` using `spanning-tree vlan 20 priority 64` to lower the switch priority", "Global `spanning-tree vlan 20 priority` requires increments of 4096 and changes the whole switch's Bridge ID, not which parallel port becomes the Root Port."]
     ],
     "On `SW2`, both `Gi0/1` and `Gi0/2` tie on root path cost (4) and tie on neighbor BID (both connect to `SW1`). According to the STP Root Port tiebreaker rules, `SW2` breaks the tie by examining the **neighbor's port priority** advertised inside the BPDUs arriving from `SW1` (default `128.1` vs `128.2`). Therefore, to influence `SW2` via port-priority, you must lower the port priority on **upstream switch `SW1`'s `Gi0/2`** (`spanning-tree vlan 20 port-priority 64`), whereas to influence `SW2` locally on `SW2` itself, you would lower `SW2`'s local **port cost** (`spanning-tree vlan 20 cost 2` on `SW2 Gi0/2`).",

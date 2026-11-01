@@ -1,4 +1,4 @@
-import { mk } from "../build.js?v=76";
+import { mk } from "../build.js?v=78";
 
 const c19 = mk("IP Connectivity", 25, "v1c19");
 const q19 = [
@@ -48,9 +48,9 @@ const q19 = [
     "OSPF",
     "Easy",
     "Even when a network is completely stable and no topology changes occur, how often does an OSPF router reflood each LSA it originated and increment its sequence number?",
-    "Every 30 minutes",
+    "Every 30 minutes when the LSA refresh expires",
     [
-      ["Every 10 seconds on broadcast links", "Ten seconds is the default OSPF Hello interval on broadcast and point-to-point links, not the periodic LSA reflood timer."],
+      ["Every 10 seconds when the Hello timer fires", "Ten seconds is the default OSPF Hello interval on broadcast and point-to-point links, not the periodic LSA reflood timer."],
       ["Every 40 seconds when the Dead timer expires", "Forty seconds is the default Dead interval on broadcast links, after which a silent neighbor is declared down."],
       ["Every 60 minutes when the MaxAge timer expires", "Sixty minutes (3600 seconds) is the LSA MaxAge limit; OSPF refreshes LSAs halfway through at 30 minutes to prevent expiration."]
     ],
@@ -76,11 +76,11 @@ const q19 = [
     "OSPF",
     "Medium",
     "Six OSPF routers share an Ethernet segment where one DR and one BDR have been elected. How many total full OSPF adjacencies (Full state relationships) exist on this segment?",
-    "9",
+    "9 Full adjacencies",
     [
-      ["15", "Fifteen is the total number of neighbor pairs using the n(n-1)/2 mesh formula, which would occur only without a DR/BDR election."],
-      ["6", "Six is only the number of routers on the segment; each of the four DROthers forms two adjacencies (one with DR, one with BDR) plus the DR-BDR adjacency."],
-      ["12", "Twelve overcounts the adjacencies; with 4 DROthers, there are 4 adjacencies to the DR, 4 to the BDR, and 1 between the DR and BDR."]
+      ["15 Full adjacencies", "Fifteen is the total number of neighbor pairs using the n(n-1)/2 mesh formula, which would occur only without a DR/BDR election."],
+      ["6 Full adjacencies", "Six is only the number of routers on the segment; each of the four DROthers forms two adjacencies (one with DR, one with BDR) plus the DR-BDR adjacency."],
+      ["12 Full adjacencies", "Twelve overcounts the adjacencies; with 4 DROthers, there are 4 adjacencies to the DR, 4 to the BDR, and 1 between the DR and BDR."]
     ],
     "With 6 routers on an Ethernet LAN, 1 is the DR, 1 is the BDR, and 4 are DROthers. Each of the 4 DROthers forms a Full adjacency with the DR (4 adjacencies) and a Full adjacency with the BDR (4 adjacencies), and the DR and BDR form 1 Full adjacency with each other, totaling 4 + 4 + 1 = 9 Full adjacencies instead of 6×5/2 = 15.",
     "For N routers on a broadcast LAN (N >= 2), total Full adjacencies = 2(N - 2) + 1 = 2N - 3.",
@@ -118,11 +118,11 @@ const q19 = [
     "OSPF",
     "Medium",
     "R1 has path R1 -> R2 -> R3 -> Subnet X (10.1.1.0/24). On R1, outgoing G0/0 costs 10. On R2, incoming G0/0 costs 50 and outgoing G0/1 costs 20. On R3, incoming G0/1 costs 50 and outgoing G0/2 (connected to Subnet X) costs 5. What total OSPF cost does R1 calculate for 10.1.1.0/24?",
-    "35",
+    "Total OSPF cost of 35",
     [
-      ["135", "135 includes both incoming and outgoing interface costs (10 + 50 + 20 + 50 + 5), but OSPF sums only outgoing interface costs in the forwarding direction."],
-      ["105", "105 sums the incoming interface costs on R2 and R3 plus R3's LAN cost (50 + 50 + 5), which reverses the direction OSPF uses to compute metric."],
-      ["30", "30 omits R3's outgoing interface G0/2 cost of 5 where Subnet X is connected (10 + 20 = 30), which must be included in the forward path."]
+      ["Total OSPF cost of 135", "135 includes both incoming and outgoing interface costs (10 + 50 + 20 + 50 + 5), but OSPF sums only outgoing interface costs in the forwarding direction."],
+      ["Total OSPF cost of 105", "105 sums the incoming interface costs on R2 and R3 plus R3's LAN cost (50 + 50 + 5), which reverses the direction OSPF uses to compute metric."],
+      ["Total OSPF cost of 30", "30 omits R3's outgoing interface G0/2 cost of 5 where Subnet X is connected (10 + 20 = 30), which must be included in the forward path."]
     ],
     "An OSPF router calculates the metric of a path by summing the OSPF interface costs of all outgoing interfaces along the route from the local router to the destination subnet. Moving from R1 to Subnet X, packets exit R1's G0/0 (cost 10), R2's G0/1 (cost 20), and R3's G0/2 onto Subnet X (cost 5), for a total cost of 10 + 20 + 5 = 35.",
     "Always trace from the calculating router to the destination subnet and add ONLY the outgoing (exit) interface cost at each router, including the final router's LAN interface.",
@@ -193,7 +193,7 @@ const q19 = [
     "OSPF",
     "Hard",
     "Examine the `show ip ospf database` output from router R1. What can be concluded about the OSPF network topology inside Area 0?",
-    "Area 0 contains four OSPF routers, one multiaccess subnet with a DR at interface 10.1.1.4, and two interarea subnets advertised by ABR 1.1.1.1.",
+    "Area 0 has four routers, one transit subnet with DR 10.1.1.4, and two interarea routes advertised by ABR 1.1.1.1.",
     [
       ["Area 0 contains four ABRs, four broadcast segments with DRs, and two external routes redistributed from EIGRP.", "Only router 1.1.1.1 is advertising Summary Net Link States (Type 3 LSAs), and there is only one Net Link States (Type 2 LSA) entry."],
       ["Router 4.4.4.4 is an Area Border Router that is summarizing two /24 subnets from Area 1 into Backbone Area 0.", "Under Summary Net Link States, the ADV Router column lists 1.1.1.1 as the ABR originating both Type 3 LSAs, whereas 4.4.4.4 is the DR on 10.1.1.4."],
@@ -214,11 +214,11 @@ const q20 = [
     "OSPF",
     "Easy",
     "A router has no configured `router-id` command, Loopback0 is 10.99.1.1/32 (administratively down), Loopback1 is 10.5.1.1/32 (up/up), G0/0 is 192.168.50.1/24 (up/up), and G0/1 is 192.168.100.1/24 (up/up). Which OSPF Router ID does the process choose when starting?",
-    "10.5.1.1",
+    "Router ID 10.5.1.1 from Loopback1",
     [
-      ["10.99.1.1", "Loopback0 is administratively down; OSPF only considers loopback interfaces whose interface status is currently up."],
-      ["192.168.100.1", "Although 192.168.100.1 is numerically higher than 10.5.1.1, OSPF always prefers an up loopback interface over any non-loopback physical interface."],
-      ["192.168.50.1", "Physical interfaces are evaluated only when no active loopback interface with an IPv4 address exists on the router."]
+      ["Router ID 10.99.1.1 from Loopback0", "Loopback0 is administratively down; OSPF only considers loopback interfaces whose interface status is currently up."],
+      ["Router ID 192.168.100.1 from G0/1", "Although 192.168.100.1 is numerically higher than 10.5.1.1, OSPF always prefers an up loopback interface over any non-loopback physical interface."],
+      ["Router ID 192.168.50.1 from G0/0", "Physical interfaces are evaluated only when no active loopback interface with an IPv4 address exists on the router."]
     ],
     "When selecting its 32-bit OSPF Router ID, Cisco IOS checks three sources in strict priority order: (1) an explicitly configured `router-id` under `router ospf`, (2) the highest IPv4 address among all loopback interfaces that are currently in an `up` state, and (3) the highest IPv4 address among all non-loopback interfaces in an `up` state. Because Loopback1 (10.5.1.1) is up, it wins over Loopback0 (down) and over higher physical interface IPs.",
     "OSPF RID precedence: 1. `router-id` command -> 2. Highest UP loopback IP -> 3. Highest UP physical interface IP.",
@@ -228,11 +228,11 @@ const q20 = [
     "OSPF",
     "Easy",
     "Using the default Cisco IOS OSPF reference bandwidth of 100 Mbps, what OSPF interface cost is assigned automatically to a 10-Gbps TenGigabitEthernet interface?",
-    "1",
+    "OSPF cost of 1",
     [
-      ["10", "A cost of 10 is assigned to a 10-Mbps Ethernet interface (100 Mbps / 10 Mbps = 10), not a 10-Gbps interface."],
-      ["100", "A cost of 100 would require a 1-Mbps interface bandwidth unless the reference bandwidth was manually increased to 1,000,000 Mbps."],
-      ["0", "OSPF interface cost is an integer from 1 to 65,535; any fractional result below 1 is rounded up to a minimum cost of 1."]
+      ["OSPF cost of 10", "A cost of 10 is assigned to a 10-Mbps Ethernet interface (100 Mbps / 10 Mbps = 10), not a 10-Gbps interface."],
+      ["OSPF cost of 100", "A cost of 100 would require a 1-Mbps interface bandwidth unless the reference bandwidth was manually increased to 1,000,000 Mbps."],
+      ["OSPF cost of 0", "OSPF interface cost is an integer from 1 to 65,535; any fractional result below 1 is rounded up to a minimum cost of 1."]
     ],
     "Cisco IOS calculates the default OSPF cost using the formula `Reference_Bandwidth / Interface_Bandwidth`, where the default reference bandwidth is 100 Mbps. Because OSPF cost must be a positive integer between 1 and 65,535, FastEthernet (100 Mbps), GigabitEthernet (1 Gbps), TenGigabitEthernet (10 Gbps), and faster ports all default to a cost of 1 until `auto-cost reference-bandwidth` is increased.",
     "By default (ref-bw = 100 Mbps), FastEthernet, GigabitEthernet, and 10GigE all tie at cost = 1!",
@@ -246,7 +246,7 @@ const q20 = [
     [
       ["ip route 0.0.0.0 0.0.0.0 null0", "Configuring a static route to Null0 creates a local discard route in the routing table but does not instruct OSPF to flood a default LSA without `default-information originate`."],
       ["network 0.0.0.0 255.255.255.255 area 0", "The `network 0.0.0.0 255.255.255.255 area 0` command enables OSPF on all local interfaces in Area 0; it does not advertise a 0.0.0.0/0 default route."],
-      ["redistribute default-route metric 1", "Cisco IOS OSPF does not have a `redistribute default-route` syntax; default route origination requires `default-information originate`."]
+      ["redistribute default-route", "Cisco IOS OSPF does not have a `redistribute default-route` syntax; default route origination requires `default-information originate`."]
     ],
     "Configuring `default-information originate` under `router ospf` causes the router to inject a default route (`0.0.0.0/0`, shown as `O*E2` with default metric 1 in other routers' tables) into the OSPF domain, provided the router currently has a default route in its own routing table. Adding the `always` keyword advertises `0.0.0.0/0` unconditionally even if no local default route exists.",
     "Use `default-information originate` (conditional on having a local 0.0.0.0/0 route) or `default-information originate always` (unconditional).",
@@ -256,7 +256,7 @@ const q20 = [
     "OSPF",
     "Easy",
     "What is the immediate effect of configuring `passive-interface GigabitEthernet0/2` under the OSPF routing process?",
-    "OSPF stops sending and processing Hello packets on Gi0/2, so no neighbors form there, but the subnet on Gi0/2 is still advertised in LSAs.",
+    "OSPF stops sending and processing Hellos on Gi0/2 so no neighbors form, while still advertising Gi0/2's subnet in LSAs.",
     [
       ["OSPF completely removes Gi0/2 from the routing process and stops advertising the connected subnet to other OSPF routers.", "A passive interface remains enabled for OSPF and continues to have its connected subnet advertised in the router's Type 1 LSA."],
       ["OSPF places Gi0/2 into an administrative shutdown state at Layer 1 and Layer 2 until `no passive-interface` is issued.", "The `passive-interface` subcommand affects only OSPF Hello processing and neighbor formation; normal data traffic continues to pass."],
@@ -312,11 +312,11 @@ const q20 = [
     "OSPF",
     "Medium",
     "A campus network contains 40-Gbps uplinks, 10-Gbps distribution links, 1-Gbps access links, and 100-Mbps legacy links. What is the minimum value (in Mbps) that should be configured with `auto-cost reference-bandwidth` on every OSPF router so all four link speeds receive distinct default OSPF costs?",
-    "40000",
+    "auto-cost reference-bandwidth 40000",
     [
-      ["40", "The `auto-cost reference-bandwidth` command takes its parameter in megabits per second (Mbps), so 40 sets a 40-Mbps reference bandwidth, not 40 Gbps."],
-      ["1000", "A reference bandwidth of 1000 Mbps (1 Gbps) gives 1-Gbps, 10-Gbps, and 40-Gbps interfaces the exact same minimum OSPF cost of 1."],
-      ["10000", "A reference bandwidth of 10000 Mbps (10 Gbps) still causes both 10-Gbps and 40-Gbps interfaces to tie with an OSPF cost of 1."]
+      ["auto-cost reference-bandwidth 40", "The `auto-cost reference-bandwidth` command takes its parameter in megabits per second (Mbps), so 40 sets a 40-Mbps reference bandwidth, not 40 Gbps."],
+      ["auto-cost reference-bandwidth 1000", "A reference bandwidth of 1000 Mbps (1 Gbps) gives 1-Gbps, 10-Gbps, and 40-Gbps interfaces the exact same minimum OSPF cost of 1."],
+      ["auto-cost reference-bandwidth 10000", "A reference bandwidth of 10000 Mbps (10 Gbps) still causes both 10-Gbps and 40-Gbps interfaces to tie with an OSPF cost of 1."]
     ],
     "The `auto-cost reference-bandwidth <mbps>` command specifies the reference bandwidth in megabits per second (Mbps). To differentiate 40-Gbps (40,000 Mbps) interfaces from 10-Gbps (10,000 Mbps) interfaces, the reference bandwidth must be set to at least `40000` (giving costs of 1 for 40G, 4 for 10G, 40 for 1G, and 400 for 100M) consistently across all OSPF routers.",
     "Remember that `auto-cost reference-bandwidth` is configured in Mbps: 1 Gbps = 1000, 10 Gbps = 10000, 40 Gbps = 40000, 100 Gbps = 100000.",
@@ -340,7 +340,7 @@ const q20 = [
     "OSPF",
     "Medium",
     "An OSPF router is already running with Router ID 192.168.1.1 and has active neighbors. You configure `router-id 10.0.0.1` under `router ospf 1`. When does the new Router ID actually take effect?",
-    "Only after you run `clear ip ospf process` (and confirm) or reload the router",
+    "Only after you restart the OSPF process with `clear ip ospf process` or reload the router itself",
     [
       ["Immediately upon pressing Enter, causing the router to send a Gratuitous Hello with the new RID", "OSPF locks in its Router ID when the process initializes; changing `router-id` does not take effect until the OSPF process restarts."],
       ["Automatically at the next 30-minute periodic LSA refresh cycle without dropping any neighbors", "Waiting 30 minutes does not change the active RID; Cisco IOS prints a message instructing you to reload or run `clear ip ospf process`."],
@@ -371,7 +371,7 @@ const q20 = [
     "OSPF",
     "Hard",
     "Examine the output of `show ip protocols` on R1. Which statement accurately explains how OSPF was enabled on R1's interfaces and which interfaces send OSPF Hello packets?",
-    "OSPF was enabled using interface-mode `ip ospf 1 area 0` commands on Gi0/0, Gi0/1, and Loopback0, and only Gi0/0 sends Hello packets.",
+    "OSPF was enabled via interface `ip ospf 1 area 0` on Gi0/0, Gi0/1, and Lo0, and only Gi0/0 sends Hello packets.",
     [
       ["OSPF was enabled using `network 0.0.0.0 255.255.255.255 area 0`, and both Gi0/0 and Gi0/1 send OSPF Hello packets.", "The `Routing for Networks:` section is empty and `Routing on Interfaces Configured Explicitly` lists the interfaces, proving `ip ospf` interface commands were used; also Gi0/1 is listed under Passive Interface(s)."],
       ["OSPF is advertising only Gi0/0 into Area 0 because Gi0/1 and Loopback0 are listed under Passive Interface(s).", "Passive interfaces do not send Hellos, but their connected subnets are still advertised in OSPF LSAs for Area 0."],
@@ -465,7 +465,7 @@ const q21 = [
     "OSPF",
     "Easy",
     "In the output of `show ip ospf neighbor`, R1 lists neighbor 2.2.2.2 with State `FULL/ -` on interface GigabitEthernet0/0. What does the hyphen (`-`) after the slash indicate?",
-    "GigabitEthernet0/0 is using an OSPF network type (such as point-to-point) that does not use a DR or BDR.",
+    "GigabitEthernet0/0 is using a point-to-point OSPF network type that does not elect a DR or BDR at all.",
     [
       ["Neighbor 2.2.2.2 has `ip ospf priority 0` configured and is therefore operating as a DROther router.", "A neighbor acting as a DROther on a broadcast network displays `FULL/DROTHER` or `2WAY/DROTHER`, never `FULL/ -`."],
       ["The two routers have mismatched OSPF network types and are unable to elect a Designated Router.", "If one side were broadcast and waiting for a DR, the broadcast side would show `FULL/DR` or `FULL/BDR`, while `-` specifically means no DR/BDR concept on the local link."],
@@ -479,7 +479,7 @@ const q21 = [
     "OSPF",
     "Medium",
     "Four routers on an Ethernet LAN boot simultaneously with default OSPF priority 1: R1 (RID 10.1.1.1), R2 (RID 10.1.1.2), R3 (RID 10.1.1.3), and R4 (RID 10.1.1.4). After the election completes, R5 boots onto the same LAN with `ip ospf priority 255` and RID 10.1.1.5. Subsequently, R4 fails. What are the DR and BDR roles immediately after R4 fails?",
-    "R3 becomes the DR, and R5 becomes the BDR.",
+    "Existing BDR R3 is promoted to DR, and priority-255 DROther R5 is elected as the new BDR.",
     [
       ["R5 preempts immediately upon booting to become the DR, and R3 remains the BDR when R4 fails.", "OSPF DR/BDR elections are non-preemptive; when R5 joins an already-elected segment, it becomes a DROther regardless of its priority 255."],
       ["R5 jumps directly from DROther to DR when R4 fails because R5 has priority 255, and R3 stays BDR.", "When the current DR fails, OSPF always promotes the existing BDR (R3) to DR first, and then holds an election among DROthers for the vacant BDR role."],
@@ -493,7 +493,7 @@ const q21 = [
     "OSPF",
     "Medium",
     "Examine the `show ip ospf interface brief` output on R1. Which statement accurately describes R1's OSPF interfaces?",
-    "On Gi0/0, R1 is a DROther with 3 adjacent (Full) neighbors out of 5 total neighbors; on Gi0/1, R1 uses point-to-point mode with 1 Full neighbor.",
+    "On Gi0/0, R1 is a DROther with 2 Full out of 5 neighbors; on Gi0/1, R1 is point-to-point with 1 neighbor.",
     [
       ["On Gi0/0, R1 has formed Full adjacencies with all 5 neighbors and 3 of them are Backup Designated Routers.", "In the `Nbrs F/C` column, `2/5` means 2 neighbors are in the Full state (the DR and BDR) out of 5 discovered neighbors total."],
       ["On Gi0/0, R1's neighbor is a DROther, and on Gi0/1, R1's neighbor is a point-to-point router.", "In `show ip ospf interface brief`, the `State` column shows the LOCAL router's role on that interface (`DROTH`, `DR`, `BDR`, `P2P`), not the neighbor's role."],
@@ -524,7 +524,7 @@ const q21 = [
     "OSPF",
     "Medium",
     "R1 has `ip mtu 1500` on Gi0/0, while directly connected neighbor R2 has `ip mtu 1400` on Gi0/0. All other OSPF parameters match. What symptom occurs when OSPF starts between R1 and R2?",
-    "The routers exchange Hellos, but the adjacency fails in ExStart/Exchange and no OSPF routes are learned.",
+    "The routers exchange Hellos, but database negotiation fails in ExStart/Exchange and no OSPF routes are installed.",
     [
       ["The routers do not appear in `show ip ospf neighbor` at all because Hello packets are dropped when IP MTU values differ.", "Small Hello packets pass easily over both 1400-byte and 1500-byte MTUs, so the neighbors appear in `show ip ospf neighbor` before failing in ExStart."],
       ["The routers reach the FULL state and exchange their LSDBs, but SPF refuses to calculate routes across the link.", "Reaching FULL state with zero routes installed is the symptom of a broadcast/point-to-point network type mismatch, whereas an MTU mismatch prevents reaching FULL."],
@@ -538,11 +538,11 @@ const q21 = [
     "OSPF",
     "Medium",
     "Which parameter does NOT need to match between two directly connected routers on an Ethernet link for them to become OSPF neighbors and successfully install OSPF routes?",
-    "OSPF process ID and OSPF interface cost",
+    "Local OSPF process ID and OSPF interface cost",
     [
       ["OSPF Hello interval and OSPF Dead interval", "Both the Hello interval and Dead interval carried in Hello packets must match exactly between two routers or they will never become neighbors."],
       ["OSPF Area ID and primary IPv4 subnet/mask", "Connected interfaces must belong to the exact same OSPF Area ID and share the same primary IPv4 subnet and mask to form a neighbor relationship."],
-      ["Unique OSPF Router IDs and matching authentication settings", "Duplicate Router IDs or mismatched OSPF authentication keys prevent two routers from forming an OSPF neighbor relationship."]
+      ["Unique OSPF Router IDs and authentication settings", "Duplicate Router IDs or mismatched OSPF authentication keys prevent two routers from forming an OSPF neighbor relationship."]
     ],
     "The OSPF process ID (`router ospf <process-id>`) is strictly locally significant to each router, and OSPF interface cost (`ip ospf cost`) and priority (`ip ospf priority`, as long as at least one router on a broadcast link has priority > 0) can differ between neighbors without preventing adjacency formation or route calculation.",
     "Locally significant / allowed to differ between OSPF neighbors: Process ID, Interface Cost, and Interface Priority.",
@@ -552,7 +552,7 @@ const q21 = [
     "OSPF",
     "Hard",
     "Two routers, R1 and R2, are connected via interface Gi0/1 in Area 0 with matching IP subnet 10.1.12.0/30 and matching 10/40 timers. However, `show ip ospf neighbor` is completely empty on both routers, and R1's console periodically displays `%OSPF-4-DUP_RTRID_NBR: OSPF detected duplicate router-id 10.0.0.1 from 10.1.12.2 on interface GigabitEthernet0/1`. How do you fix this issue?",
-    "Configure a unique `router-id` under `router ospf` on one of the routers and run `clear ip ospf process`.",
+    "Configure a unique `router-id` under `router ospf` on one of the two routers and execute `clear ip ospf process`.",
     [
       ["Configure `ip ospf network point-to-point` on Gi0/1 on both routers so they stop comparing Router IDs for DR election.", "Every OSPF router in a domain must have a unique 32-bit Router ID regardless of whether the link is point-to-point or broadcast."],
       ["Change the OSPF process ID on R2 from `router ospf 1` to `router ospf 2` so the two processes no longer collide.", "The OSPF process ID is locally significant and is not carried in OSPF packets; changing the process ID does not change a router's 32-bit OSPF Router ID."],
@@ -583,11 +583,11 @@ const q21 = [
     "OSPF",
     "Hard",
     "Examine the output from R1 and R2 below. Both routers are up/up on Gi0/0 and can ping each other, and `show ip ospf neighbor` shows they are FULL neighbors. Why is R1's OSPF routing table missing R2's Loopback0 subnet (10.2.2.2/32)?",
-    "R1's Gi0/0 is using the BROADCAST network type (`FULL/DR`) while R2's Gi0/0 is using POINT_TO_POINT (`FULL/ -`), causing an SPF topology mismatch.",
+    "R1's Gi0/0 uses the BROADCAST network type (`FULL/DR`) while R2's Gi0/0 uses POINT_TO_POINT (`FULL/ -`) mode.",
     [
-      ["R1 and R2 have different OSPF process IDs (`PID 1` vs `PID 2`), which prevents SPF from importing LSAs.", "Both outputs show `PID 1`, and even if the process IDs differed, OSPF process IDs are locally significant."],
-      ["R2's Loopback0 interface has an OSPF cost of 1, which creates an equal-cost metric loop with Gi0/0.", "Having a cost of 1 on a loopback interface is normal and simply adds 1 to the cumulative path cost."],
-      ["R2 is configured as a DROther with `ip ospf priority 0`, so it refuses to send Type 1 LSAs to R1.", "R1's output shows R2's role as `DR` (`FULL/DR`), whereas R2's output shows `State P2P` and `FULL/ -`, proving a network type mismatch."]
+      ["R1 and R2 use different OSPF process IDs, `PID 1` versus `PID 2`, and therefore prevent SPF from importing any LSAs.", "Both outputs show `PID 1`, and even if the process IDs differed, OSPF process IDs are locally significant."],
+      ["R2's Loopback0 interface has an OSPF cost of 1 and creates an equal-cost routing metric loop with Gi0/0.", "Having a cost of 1 on a loopback interface is normal and simply adds 1 to the cumulative path cost."],
+      ["R2 is configured as a DROther router with `ip ospf priority 0` and refuses to advertise its Type 1 LSAs to R1.", "R1's output shows R2's role as `DR` (`FULL/DR`), whereas R2's output shows `State P2P` and `FULL/ -`, proving a network type mismatch."]
     ],
     "Looking closely at `show ip ospf neighbor` and `show ip ospf interface brief`, R1's Gi0/0 is in `State BDR` and sees R2 as `FULL/DR` (meaning R1 is using `broadcast` mode), while R2's Gi0/0 is in `State P2P` and sees R1 as `FULL/ -` (meaning R2 is using `point-to-point` mode). Because both modes use 10/40 timers, the adjacency reaches `FULL`, but SPF cannot reconcile a broadcast network with a point-to-point network and installs zero OSPF routes.",
     "Spot the mismatch in CLI output: one router shows `FULL/DR` or `State BDR/DR`, while the other shows `FULL/ -` or `State P2P`!",
@@ -661,7 +661,7 @@ const q22 = [
     "IPv6",
     "Easy",
     "Which enterprise migration strategy runs both IPv4 and IPv6 simultaneously on all routers, switches, and end hosts so devices can communicate using either protocol during the transition?",
-    "Dual stack",
+    "Dual-stack IPv4/IPv6 operation",
     [
       ["NAT64 stateless translation", "NAT64 translates headers between IPv6-only and IPv4-only nodes rather than running both protocol stacks natively on all devices."],
       ["GRE IPv6-over-IPv4 tunneling", "Tunneling encapsulates IPv6 packets inside IPv4 headers across an IPv4-only transit network rather than running both stacks natively everywhere."],
@@ -678,8 +678,8 @@ const q22 = [
     "OSPFv3, EIGRP for IPv6, RIPng, and MP-BGP4",
     [
       ["OSPFv2, EIGRPv4, RIPv2, and IS-ISv4 for IPv4", "OSPFv2, RIPv2, and IGRP support only IPv4 addressing and cannot carry 128-bit IPv6 prefixes."],
-      ["CDP, LLDP, STP, and VTPv3", "CDP, LLDP, STP, and VTP are Layer 2 discovery and switching protocols, not IPv6 routing protocols."],
-      ["ICMPv6, NDP, SLAAC, and DAD", "ICMPv6, NDP, SLAAC, and DAD are local control and address-assignment mechanisms, not dynamic routing protocols that flood prefixes across routers."]
+      ["CDP, LLDP, RSTP, and VTPv3 for Layer 2", "CDP, LLDP, STP, and VTP are Layer 2 discovery and switching protocols, not IPv6 routing protocols."],
+      ["ICMPv6, NDP, SLAAC, and DAD for local links", "ICMPv6, NDP, SLAAC, and DAD are local control and address-assignment mechanisms, not dynamic routing protocols that flood prefixes across routers."]
     ],
     "Because IPv6 increases the address size to 128 bits and changes packet headers, interior and exterior routing protocols required protocol updates to advertise IPv6 prefixes and next-hop addresses: OSPF version 3 (OSPFv3), EIGRP for IPv6, RIP next generation (RIPng), and Multiprotocol BGP-4 (MP-BGP4).",
     "Know the IPv6 routing protocol counterparts: OSPFv2 -> OSPFv3; RIPv2 -> RIPng; BGP-4 -> MP-BGP4.",
@@ -906,11 +906,11 @@ const q23 = [
     "IPv6",
     "Medium",
     "A small branch office is assigned a `/56` Global Routing Prefix (`2001:db8:1234:ab00::/56`) by its ISP and uses standard `/64` prefixes for all LANs. How many `/64` subnets can be created from this `/56` block?",
-    "256 subnets (using the 8-bit Subnet ID field in the last two hex digits of the fourth quartet)",
+    "256 subnets using the 8 subnet bits in the fourth quartet",
     [
-      ["65,536 subnets (using all 16 bits of the fourth quartet)", "65,536 `/64` subnets require a `/48` Global Routing Prefix; a `/56` leaves only 64 − 56 = 8 bits for subnetting."],
-      ["16 subnets (using the last single hex digit of the fourth quartet)", "16 `/64` subnets correspond to a `/60` Global Routing Prefix (64 − 60 = 4 bits = 16 subnets)."],
-      ["8 subnets (because 64 minus 56 equals 8)", "8 is the number of bits (`S = 8`) in the Subnet ID field; the number of resulting subnets is `2^S = 2^8 = 256`."]
+      ["65,536 subnets using all 16 subnet bits in the fourth quartet", "65,536 `/64` subnets require a `/48` Global Routing Prefix; a `/56` leaves only 64 − 56 = 8 bits for subnetting."],
+      ["16 subnets using the last 4 subnet bits in the fourth quartet", "16 `/64` subnets correspond to a `/60` Global Routing Prefix (64 − 60 = 4 bits = 16 subnets)."],
+      ["8 subnets using the 8-bit difference between /56 and /64", "8 is the number of bits (`S = 8`) in the Subnet ID field; the number of resulting subnets is `2^S = 2^8 = 256`."]
     ],
     "When an organization receives a `/56` Global Routing Prefix and subnets to `/64`, the Subnet ID field is `64 − 56 = 8` bits long (the last 2 hex digits of the fourth quartet, from `00` to `ff`). That 8-bit Subnet ID supports `2^8 = 256` `/64` subnets (`2001:db8:1234:ab00::/64` through `2001:db8:1234:abff::/64`).",
     "Number of `/64` subnets = `2^(64 - Global_Routing_Prefix_Length)`. For `/56`, `2^(64 - 56) = 2^8 = 256`.",
@@ -920,7 +920,7 @@ const q23 = [
     "IPv6",
     "Medium",
     "Why does RFC 4193 require organizations to generate a pseudo-random 40-bit (10-hex-digit) Global ID when creating a Unique Local Address (`FDxx:xxxx:xxxx::/48`) rather than simply using `FD00:0000:0000::/48` or `FD00:0001:0001::/48`?",
-    "To make address prefix collisions statistically improbable if two companies merge or interconnect their private networks later",
+    "To prevent private prefix collisions if two companies later merge or interconnect their networks",
     [
       ["To encrypt the IPv6 source and destination addresses inside the 40-byte IPv6 header using IPsec", "The 40-bit Global ID in a ULA is a plaintext routing prefix, not an encryption key or IPsec security parameter."],
       ["To allow ISP border routers on the public Internet to aggregate ULA routes into a single BGP summary", "Unique Local Addresses (`FD00::/8`) are private addresses and are never advertised or routed across the public Internet."],
@@ -934,7 +934,7 @@ const q23 = [
     "IPv6",
     "Medium",
     "Within the `/64` subnet `2001:db8:10:20::/64`, what is the special significance of the exact address `2001:db8:10:20:0000:0000:0000:0000` (`2001:db8:10:20::`)?",
-    "It is the reserved Subnet Router Anycast address (all-zero Interface ID) and should not be assigned as a regular unicast host address.",
+    "It is the reserved Subnet Router Anycast address with an all-zero Interface ID for routers on that subnet.",
     [
       ["It is the IPv6 subnet broadcast address used to send frames to all hosts on the `2001:db8:10:20::/64` link.", "IPv6 completely eliminates broadcast addresses; `FF02::1` is the link-local all-nodes multicast address instead."],
       ["It is the solicited-node multicast address used by Neighbor Discovery Protocol for Duplicate Address Detection.", "Solicited-node multicast addresses always begin with `FF02::1:FF` followed by the last 6 hex digits of a unicast address."],
@@ -962,7 +962,7 @@ const q23 = [
     "IPv6",
     "Hard",
     "Examine the Global Unicast Address allocation hierarchy from IANA down to an end user's LAN subnet. Which sequence represents a typical prefix-length delegation chain from largest block to smallest?",
-    "IANA assigns `/12` to an RIR -> RIR assigns `/32` to an ISP -> ISP assigns `/48` to a site -> Site assigns `/64` per subnet",
+    "IANA assigns `/12` to an RIR -> RIR assigns `/32` to an ISP -> ISP assigns `/48` to a customer -> Customer assigns `/64` to each subnet",
     [
       ["IANA assigns `/48` to an RIR -> RIR assigns `/64` to an ISP -> ISP assigns `/96` to a customer -> Customer assigns `/128` to each VLAN", "A `/128` is a single host address and `/48` is a single enterprise site allocation, not an entire Regional Internet Registry block."],
       ["IANA assigns `/8` to an enterprise -> Enterprise assigns `/24` to an ISP -> ISP assigns `/48` to a branch -> Branch assigns `/64` to each host", "Enterprises receive their Global Routing Prefix from an ISP or RIR (typically `/48`), not a `/8` directly from IANA."],
@@ -1085,8 +1085,8 @@ const q24 = [
     "ipv6 address autoconfig",
     [
       ["ipv6 address dhcp", "`ipv6 address dhcp` tells the interface to request its IPv6 address from a stateful DHCPv6 server rather than using SLAAC."],
-      ["ipv6 enable", "`ipv6 enable` creates only a Link-Local Address (`FE80::...`) and does not configure the interface to generate a GUA via SLAAC."],
-      ["ipv6 address dhcp-slaac", "`eui-64` is a keyword appended after a manually typed `/64` prefix (`ipv6 address <prefix>/64 eui-64`), not a standalone SLAAC command."]
+      ["ipv6 enable autoconfig", "`ipv6 enable` creates only a Link-Local Address (`FE80::...`) and does not configure the interface to generate a GUA via SLAAC."],
+      ["ipv6 address slaac eui-64", "`eui-64` is a keyword appended after a manually typed `/64` prefix (`ipv6 address <prefix>/64 eui-64`), not a standalone SLAAC command."]
     ],
     "Entering `ipv6 address autoconfig` under an interface instructs the Cisco IOS router to listen for ICMPv6 Router Advertisement (RA) messages on that link, learn the advertised `/64` prefix, and automatically form a Global Unicast Address using SLAAC (in addition to its automatic Link-Local Address).",
     "Distinguish dynamic router interface commands: `ipv6 address autoconfig` = SLAAC (via RAs); `ipv6 address dhcp` = stateful DHCPv6 client.",
@@ -1152,7 +1152,7 @@ const q24 = [
     "IPv6",
     "Medium",
     "In an IPv6 multicast address `FF0s:...`, what do the fourth hexadecimal digit `2` (`FF02::`) and `8` (`FF08::`) indicate about the packet's forwarding scope?",
-    "`FF02::` is link-local scope (never forwarded off the local subnet), and `FF08::` is organization-local scope.",
+    "`FF02::` indicates link-local scope, and `FF08::` indicates organization-local scope.",
     [
       ["`FF02::` is global Internet scope, and `FF08::` is interface-local loopback scope.", "Interface-local scope is `FF01::` and global scope is `FF0E::`; `FF02::` is strictly link-local."],
       ["`FF02::` is reserved for OSPFv2 routers, and `FF08::` is reserved for EIGRPv6 routers.", "The fourth hex digit represents multicast scope, whereas the trailing digits (`::5`, `::6`, `::A`) identify the specific protocol group."],
@@ -1167,12 +1167,12 @@ const q24 = [
     "Hard",
     "On router R1, an engineer enters the following commands on GigabitEthernet0/1 (which has burned-in MAC `0011.2233.4455`): `ipv6 address 2001:db8:1:1::9999/64 eui-64` and `ipv6 address fd00:1:1:1::1/64`. Which two statements accurately describe the resulting IPv6 configuration on Gi0/1?",
     [
-      "Both the `2001:db8:1:1::/64` GUA and the `fd00:1:1:1::1/64` ULA remain active simultaneously on Gi0/1, along with a single Link-Local Address.",
-      "In `show running-config`, Cisco IOS normalizes the first command to `ipv6 address 2001:db8:1:1::/64 eui-64` and assigns address `2001:db8:1:1:211:22ff:fe33:4455`."
+      "Both the `2001:db8:1:1::/64` GUA and `fd00:1:1:1::1/64` ULA stay active together on Gi0/1 while sharing one Link-Local Address.",
+      "IOS normalizes the first command to `ipv6 address 2001:db8:1:1::/64 eui-64` and assigns the GUA `2001:db8:1:1:211:22ff:fe33:4455`."
     ],
     [
       ["Entering `ipv6 address fd00:1:1:1::1/64` overwrites the `2001:db8:1:1::/64` address unless the `secondary` keyword is appended.", "Unlike IPv4 (which overwrites the primary IP unless `secondary` is used), IPv6 interfaces natively support multiple unicast addresses on the same interface without any `secondary` keyword."],
-      ["Gi0/1 generates two separate Link-Local Addresses—one derived from the GUA and a second derived from the ULA.", "An IPv6 interface maintains only one Link-Local Address (`FE80::211:22FF:FE33:4455`), shared across all GUAs and ULAs on that port."],
+      ["Gi0/1 generates two separate EUI-64 Link-Local Addresses on the port—one derived from the GUA and another derived from the ULA.", "An IPv6 interface maintains only one Link-Local Address (`FE80::211:22FF:FE33:4455`), shared across all GUAs and ULAs on that port."],
       ["Cisco IOS rejects `ipv6 address 2001:db8:1:1::9999/64 eui-64` with a syntax error because host bits (`::9999`) were typed with `eui-64`.", "Cisco IOS accepts the command, zeroes out the host bits (`::9999` -> `::`), saves `ipv6 address 2001:db8:1:1::/64 eui-64` in running-config, and computes the EUI-64 Interface ID."]
     ],
     "IPv6 interfaces routinely hold multiple unicast addresses (such as a GUA and a ULA, or multiple GUAs) at the same time while sharing a single Link-Local Address. Furthermore, if you accidentally type non-zero bits in the last 64 bits when using the `eui-64` keyword, Cisco IOS automatically strips those host bits, stores the clean `/64` prefix in `running-config`, and calculates the EUI-64 Interface ID from the interface MAC.",
@@ -1228,7 +1228,7 @@ const q24 = [
     "IPv6",
     "Hard",
     "Router R1 has `ipv6 unicast-routing` enabled, and Serial0/0/0 (which has no burned-in MAC address of its own) is configured with `ipv6 enable`. How does Cisco IOS generate the Link-Local Address for Serial0/0/0?",
-    "IOS borrows the MAC address of the lowest-numbered LAN interface on the router and runs the EUI-64 process to build Serial0/0/0's Link-Local Address.",
+    "IOS borrows the MAC address of the router's lowest-numbered LAN interface and uses EUI-64 to build the LLA.",
     [
       ["IOS refuses to enable IPv6 on Serial0/0/0 until a manual `ipv6 address FE80::x link-local` command is entered.", "Serial interfaces support automatic Link-Local Address generation without requiring a manual `link-local` address command."],
       ["IOS generates a random 64-bit privacy extension Interface ID that changes every time Serial0/0/0 flaps.", "Cisco IOS routers do not use temporary RFC 4941 privacy addresses on serial interfaces; they derive EUI-64 from the router's lowest interface MAC."],
@@ -1247,7 +1247,7 @@ const q25 = [
     "IPv6 routing",
     "Easy",
     "Which ICMPv6 Neighbor Discovery Protocol (NDP) message do IPv6 hosts send to FF02::2 upon bootup to locate local IPv6 default routers and learn the /64 prefix for SLAAC?",
-    "Router Solicitation (ICMPv6 Type 133)",
+    "Router Solicitation (ICMPv6 Type 133) multicast by hosts to all routers on the link",
     [
       ["Router Advertisement (ICMPv6 Type 134) sent periodically by hosts to all local nodes", "Router Advertisements (Type 134) are sent by IPv6 routers to FF02::1, not by hosts searching for a router."],
       ["Neighbor Solicitation (ICMPv6 Type 135) sent to the all-DHCP-servers multicast group", "Neighbor Solicitation (Type 135) resolves known neighbor IPv6 addresses to MACs and runs DAD, rather than discovering routers."],
@@ -1261,7 +1261,7 @@ const q25 = [
     "IPv6 routing",
     "Easy",
     "What route code appears in the output of `show ipv6 route` on a Cisco router to represent the /128 host route for the router's own Global Unicast Address configured on an up/up interface?",
-    "L (Local /128 host route)",
+    "L (Local /128 host route for the interface address)",
     [
       ["C (Connected /64 subnet route for the attached link)", "Code C identifies the connected subnet prefix (such as /64), whereas L identifies the router's own exact /128 interface IPv6 address."],
       ["S (Static host route manually entered by an engineer)", "Code S indicates a manually configured `ipv6 route` entry, whereas IOS automatically installs L routes for local interface addresses."],
@@ -1277,9 +1277,9 @@ const q25 = [
     "Which command syntax configures a default static IPv6 route on Router R1 forwarding all unmatched IPv6 traffic out Serial0/0/0?",
     "ipv6 route ::/0 Serial0/0/0",
     [
-      ["ip route ::/0 ::/0 Serial0/0/0", "`ip route` is the IPv4 static route command and does not accept IPv6 prefix `::/0`."],
+      ["ip route ::/0 Serial0/0/0", "`ip route` is the IPv4 static route command and does not accept IPv6 prefix `::/0`."],
       ["ipv6 route 0.0.0.0/0 Serial0/0/0", "`0.0.0.0/0` is the IPv4 default prefix; the IPv6 default route prefix is written `::/0`."],
-      ["ipv6 default-gateway ::/0 Serial0/0/0", "There is no `ipv6 default-gateway` command for routing transit IPv6 packets; routers use `ipv6 route ::/0`."]
+      ["ipv6 default-gateway Serial0/0/0", "There is no `ipv6 default-gateway` command for routing transit IPv6 packets; routers use `ipv6 route ::/0`."]
     ],
     "In IPv6, the all-zeros default prefix and zero prefix length are represented as `::/0`. Therefore, `ipv6 route ::/0 <exit-interface | next-hop-ipv6>` configures a default static IPv6 route.",
     "IPv4 default static route = `ip route 0.0.0.0 0.0.0.0 ...`; IPv6 default static route = `ipv6 route ::/0 ...`.",
@@ -1289,7 +1289,7 @@ const q25 = [
     "IPv6 routing",
     "Medium",
     "An engineer configures a static IPv6 route using a neighbor's Link-Local Address as the next-hop: `ipv6 route 2001:db8:1:2::/64 FE80::2`. Why does Cisco IOS reject this command as incomplete?",
-    "Because Link-Local Addresses (`FE80::/10`) can exist on every interface, the command must also specify the local outgoing interface BEFORE the Link-Local next-hop address.",
+    "Link-Local Addresses (`FE80::/10`) are link-scoped, so the command must specify the local outgoing interface before `FE80::2`.",
     [
       ["Cisco IOS does not support using Link-Local Addresses as next-hop addresses in static IPv6 routes under any circumstances.", "Cisco IOS fully supports Link-Local next-hop addresses as long as the local outgoing interface is also specified (making it a fully specified static route)."],
       ["A static route using a Link-Local next-hop requires appending the keyword `unicast-local` at the end of the `ipv6 route` command.", "There is no `unicast-local` keyword; IOS requires the local egress interface name/number between the destination prefix and the Link-Local next-hop."],
@@ -1317,7 +1317,7 @@ const q25 = [
     "IPv6 routing",
     "Medium",
     "How does an IPv6 host perform Duplicate Address Detection (DAD) before assigning a newly configured or SLAAC-generated unicast IPv6 address to its interface?",
-    "It sends an ICMPv6 Neighbor Solicitation (NS) querying its own tentative IPv6 address; if no Neighbor Advertisement (NA) reply arrives, the address is unique.",
+    "It sends an ICMPv6 Neighbor Solicitation for its tentative address and claims it if no Neighbor Advertisement replies.",
     [
       ["It sends an ICMPv6 Echo Request (ping) to `FF02::1` using its tentative address as the source IP and waits 5 seconds.", "DAD uses an ICMPv6 Neighbor Solicitation (NS) with an unspecified `::` source IP sent to the tentative address's Solicited-Node multicast, not a ping to `FF02::1`."],
       ["It queries the local router's Neighbor Discovery cache via UDP port 546 to ask whether the address is already registered.", "UDP port 546/547 is used by DHCPv6, whereas DAD operates via serverless link-local ICMPv6 Neighbor Solicitation messages."],
@@ -1332,8 +1332,8 @@ const q25 = [
     "Medium",
     "An engineer wants to configure a floating static IPv6 route on R1 that serves as a backup to an OSPFv3 route (default AD 110) for prefix `2001:db8:99::/64` via next-hop `2001:db8:1:12::2`. Which statements are true about this configuration?",
     [
-      "The command `ipv6 route 2001:db8:1:99::/64 2001:db8:1:12::2 130` (with an administrative distance > 110) configures the floating static route.",
-      "The floating static route stays out of `show ipv6 route` while the OSPFv3 route is active and is automatically installed if the OSPFv3 route fails."
+      "The command `ipv6 route 2001:db8:1:99::/64 2001:db8:1:12::2 130` sets an AD above 110 to create the floating static route.",
+      "The floating static route stays out of `show ipv6 route` while OSPFv3 is active and installs only if the OSPFv3 route fails."
     ],
     [
       ["The administrative distance parameter on `ipv6 route` must be set to a value between 2 and 109 so it is lower than OSPFv3's AD of 110.", "Setting AD lower than 110 would make the static route beat OSPFv3 immediately instead of acting as a backup floating static route."],
@@ -1348,7 +1348,7 @@ const q25 = [
     "IPv6 routing",
     "Hard",
     "In the output of `show ipv6 neighbors` on a Cisco router, an entry for neighbor `2001:db8:1:1::50` shows state `REACH` and another entry for `2001:db8:1:1::51` shows state `STALE`. What is the difference between these two NDP neighbor states?",
-    "`REACH` means the neighbor was recently confirmed reachable within the reachable timer; `STALE` means the timer expired without traffic confirmation, though the cached MAC can still be used.",
+    "`REACH` means reachability was recently confirmed, whereas `STALE` means the timer expired but the cached MAC remains usable.",
     [
       ["`REACH` indicates a statically configured neighbor MAC, whereas `STALE` indicates a duplicate IPv6 address blocked by DAD.", "Both `REACH` and `STALE` are normal dynamic NDP neighbor cache states; neither indicates a DAD conflict."],
       ["`STALE` means the neighbor failed to respond to three consecutive NS probes and all packets to that host are dropped.", "When an entry is `STALE`, the router still forwards packets using the cached MAC while transitioning through `DELAY`/`PROBE` to verify reachability."],
@@ -1362,7 +1362,7 @@ const q25 = [
     "IPv6 routing",
     "Hard",
     "Router R1 has GigabitEthernet0/0 (`2001:db8:1:1::1/64`) connected to a multi-access Ethernet switch with 50 IPv6 hosts. Why is configuring a static route pointing only to the multi-access outgoing interface (`ipv6 route 2001:db8:2:2::/64 GigabitEthernet0/0`) discouraged on Ethernet links?",
-    "It forces R1 to perform ICMPv6 Neighbor Discovery for every individual destination IPv6 host in `2001:db8:2:2::/64` as if those hosts were directly attached to Gi0/0, relying on Proxy ND.",
+    "It forces R1 to run ICMPv6 Neighbor Discovery on Gi0/0 for every destination in `2001:db8:2:2::/64` via Proxy ND on the link.",
     [
       ["Cisco IOS automatically shuts down any Ethernet interface referenced in a static IPv6 route that lacks a next-hop address.", "IOS accepts the command without shutting down the interface, though it warns or relies on neighbor discovery per destination IP."],
       ["Ethernet interfaces only support OSPFv3 dynamic routing in IPv6 and drop packets matched by static routes.", "Ethernet interfaces fully support static IPv6 routes when configured with a next-hop IPv6 address (`ipv6 route <prefix> <next-hop-ip>`)."],
@@ -1376,10 +1376,10 @@ const q25 = [
     "IPv6 routing",
     "Hard",
     "An engineer configures `ipv6 route 2001:db8:10::/64 2001:db8:1:12::2` on R1, and `show running-config` shows the command, yet the route does NOT appear in `show ipv6 route`. Assuming no dynamic routing protocol is running, what is the most likely cause?",
-    "R1 has no active route in its IPv6 routing table to reach the next-hop address `2001:db8:1:12::2` (or the local interface for that subnet is down).",
+    "R1 has no active route to reach the next-hop address `2001:db8:1:12::2` because the egress interface is down or unrouted.",
     [
-      ["The engineer forgot to add the `permanent` keyword, which is required for all IPv6 static routes to enter the routing table.", "The `permanent` keyword is optional and not required; IOS installs any static route whose next-hop IPv6 address is reachable via an up/up interface."],
-      ["IPv6 static routes are only displayed in `show ip route` and never appear in `show ipv6 route`.", "IPv4 and IPv6 use separate routing tables; `show ipv6 route` is the exact command that displays IPv6 static (`S`) routes."],
+      ["The engineer omitted the `permanent` keyword that is required for all IPv6 static routes to enter the active routing table.", "The `permanent` keyword is optional and not required; IOS installs any static route whose next-hop IPv6 address is reachable via an up/up interface."],
+      ["IPv6 static routes are only displayed inside `show ip route static` and never appear inside `show ipv6 route` output.", "IPv4 and IPv6 use separate routing tables; `show ipv6 route` is the exact command that displays IPv6 static (`S`) routes."],
       ["Static IPv6 routes require configuring `ipv6 ospf 1 area 0` on the egress interface before IOS activates the static route.", "Static routes operate independently of OSPFv3; however, `ipv6 unicast-routing` must be enabled and the next-hop must be resolvable."]
     ],
     "Before Cisco IOS installs a static IPv6 route (`S`) into `show ipv6 route`, two conditions must be met: (1) `ipv6 unicast-routing` must be enabled globally, and (2) the local outgoing interface must be `up/up` (or the specified next-hop IPv6 address must be resolvable through an active route in the IPv6 routing table).",
@@ -1408,10 +1408,10 @@ const q26 = [
     "Wireless",
     "Easy",
     "Which three channels in the 2.4-GHz ISM frequency band (out of channels 1 through 11 in North America) are completely non-overlapping?",
-    "Channels 1, 6, and 11",
+    "Channels 1, 6, and 11, each five numbers apart",
     [
       ["Channels 1, 5, and 9, spaced four channel numbers apart", "Adjacent 2.4-GHz channels are spaced only 5 MHz apart while each channel is 22 MHz wide, so channels 1, 5, and 9 overlap slightly in 802.11b/g/n."],
-      ["Channels 2, 7, and 11, leaving guard bands at both edges", "Channel 7 (2.442 GHz) overlaps with Channel 11 (2.462 GHz) because their centers are only 20 MHz apart; only 1, 6, and 11 have full 25-MHz separation."],
+      ["Channels 2, 7, and 11, with guard bands at the edges", "Channel 7 (2.442 GHz) overlaps with Channel 11 (2.462 GHz) because their centers are only 20 MHz apart; only 1, 6, and 11 have full 25-MHz separation."],
       ["Channels 36, 40, and 44 in the lower UNII-1 band", "Channels 36, 40, and 44 are non-overlapping channels in the 5-GHz UNII-1 band, not the 2.4-GHz band."]
     ],
     "In the 2.4-GHz band, each channel center is separated by only 5 MHz (Channel 1 = 2.412 GHz, Channel 6 = 2.437 GHz, Channel 11 = 2.462 GHz), while an 802.11 signal occupies 20–22 MHz of bandwidth. Consequently, channels must be at least 5 channel numbers (25 MHz) apart to avoid overlapping—leaving only Channels 1, 6, and 11 as non-overlapping in a 11-channel regulatory domain.",
@@ -1422,7 +1422,7 @@ const q26 = [
     "Wireless",
     "Easy",
     "Why do 802.11 wireless LANs use CSMA/CA (Carrier Sense Multiple Access with Collision Avoidance) and explicit Layer 2 Acknowledgments instead of Ethernet's CSMA/CD?",
-    "Because wireless radios operate in half-duplex mode and cannot transmit and listen simultaneously on the same channel to detect collisions.",
+    "Because wireless radios are half-duplex and cannot transmit and listen on one channel to detect collisions.",
     [
       ["Because 802.11 frames do not contain a Frame Check Sequence (FCS) trailer to verify bit integrity.", "802.11 frames DO include a 4-byte FCS trailer; they require explicit Layer 2 ACKs because RF interference and hidden nodes cause high frame loss that the sender cannot sense while transmitting."],
       ["Because wireless Access Points forward frames at Layer 3 using IP routing tables rather than Layer 2 MAC addresses.", "Access Points are Layer 2 bridges translating between 802.11 wireless frames and 802.3 Ethernet frames."],
@@ -1436,7 +1436,7 @@ const q26 = [
     "Wireless",
     "Medium",
     "How do the Basic Service Set Identifier (BSSID) and Service Set Identifier (SSID) differ in an IEEE 802.11 wireless LAN?",
-    "The SSID is the human-readable WLAN name (up to 32 characters), whereas the BSSID is the 48-bit hardware MAC address of the specific AP radio serving that cell.",
+    "The SSID is the human-readable WLAN name, whereas the BSSID is the 48-bit MAC address of the serving AP radio.",
     [
       ["The BSSID is the human-readable network name broadcasted in beacons, whereas the SSID is the AP's IPv4 management address.", "This reverses the terms: SSID is the human-readable text name of the WLAN, and BSSID is the Layer 2 radio MAC address of the AP."],
       ["All Access Points in an Extended Service Set (ESS) must use the exact same BSSID MAC address so clients can roam.", "In an ESS, all APs share the same human-readable SSID, but each AP radio MUST have its own unique BSSID MAC address."],
@@ -1494,7 +1494,7 @@ const q26 = [
     "Wireless",
     "Hard",
     "What happens when an engineer bonds two adjacent 20-MHz channels into a 40-MHz channel (or four into an 80-MHz channel) in 802.11n/ac/ax?",
-    "Peak data throughput roughly doubles per spatial stream, but the number of independent non-overlapping channels decreases and the noise floor increases by 3 dB.",
+    "Peak throughput roughly doubles per spatial stream, but the number of non-overlapping channels decreases and noise rises 3 dB.",
     [
       ["The RF cell coverage range doubles while the number of non-overlapping channels remains unchanged.", "Doubling channel width actually slightly reduces effective SNR range (adding ~3 dB of thermal noise) and cuts the number of non-overlapping channels in half."],
       ["Channel bonding is restricted exclusively to the 2.4-GHz band because 5-GHz channels cannot be bonded above 20 MHz.", "The opposite is true: channel bonding (40/80/160 MHz) is heavily used in 5 GHz, whereas bonding in 2.4 GHz is strongly discouraged because only three 20-MHz channels exist."],
@@ -1508,7 +1508,7 @@ const q26 = [
     "Wireless",
     "Hard",
     "As a wireless signal propagates from an AP to a client, it reflects off metal lockers and arrives at the receiver via multiple paths at slightly different times. How do legacy 802.11b systems vs. modern 802.11n/ac/ax MIMO systems react to this phenomenon?",
-    "In legacy 802.11b, multipath causes destructive phase cancellation and fading; in 802.11n/ac/ax, MIMO exploits multipath to carry multiple spatial streams.",
+    "Legacy 802.11b suffers destructive phase cancellation and fading; 802.11n/ac/ax MIMO exploits multipath for spatial streams.",
     [
       ["Both legacy 802.11b and modern MIMO systems drop all reflected signals using a physical polarizing filter on the antenna.", "Reflected RF signals are not blocked by a polarizing filter; MIMO digital signal processors actively combine or separate multipath reflections."],
       ["Legacy 802.11b uses multipath to double throughput, whereas 802.11ac requires strict line-of-sight with zero reflections.", "This is backwards: multipath hurt legacy single-stream 802.11a/b/g systems, whereas 802.11n/ac/ax MIMO uses multipath decorrelation to send parallel spatial streams."],
@@ -1522,11 +1522,11 @@ const q26 = [
     "Wireless",
     "Hard",
     "While a wireless client is transmitting a frame to an AP at +15 dBm, the signal experiences 80 dB of free-space path loss and wall attenuation before reaching the AP antenna. What is the Received Signal Strength Indicator (RSSI) at the AP?",
-    "-65 dBm",
+    "-65 dBm, from +15 dBm minus 80 dB of loss",
     [
-      ["-95 dBm, calculated by adding the transmit power to the negative attenuation value", "Adding +15 dBm and -80 dB yields +15 - 80 = -65 dBm, not -95 dBm."],
-      ["+65 dBm, because RSSI is always expressed as a positive decibel ratio above 1 milliwatt", "Received wireless signals are tiny fractions of a milliwatt (0 dBm = 1 mW), so enterprise Wi-Fi RSSI values are always negative dBm numbers (typically -30 dBm to -85 dBm)."],
-      ["-40 dBm, because every 3 dB of attenuation halves the decibel number directly", "Every 3 dB loss halves the milliwatt power, but in logarithmic dB/dBm math you simply add gains and subtract losses (+15 dBm - 80 dB = -65 dBm)."]
+      ["-95 dBm, from adding transmit power to the loss", "Adding +15 dBm and -80 dB yields +15 - 80 = -65 dBm, not -95 dBm."],
+      ["+65 dBm, as RSSI is always positive above 1 mW", "Received wireless signals are tiny fractions of a milliwatt (0 dBm = 1 mW), so enterprise Wi-Fi RSSI values are always negative dBm numbers (typically -30 dBm to -85 dBm)."],
+      ["-40 dBm, from halving the dB number every 3 dB", "Every 3 dB loss halves the milliwatt power, but in logarithmic dB/dBm math you simply add gains and subtract losses (+15 dBm - 80 dB = -65 dBm)."]
     ],
     "In RF decibel math (`dBm` = decibels relative to 1 milliwatt, where `0 dBm = 1 mW`), antenna gains (`+dBi`) and path/cable losses (`-dB`) are added and subtracted linearly: `+15 dBm` transmit power `- 80 dB` path loss = `-65 dBm` received signal strength (which is a healthy enterprise Wi-Fi signal, better than the typical `-67 dBm` voice design threshold).",
     "Remember: `0 dBm = 1 mW`, and for negative dBm numbers, closer to zero is STRONGER (`-50 dBm` is much stronger than `-80 dBm`)!",
@@ -1540,7 +1540,7 @@ const q27 = [
     "WLAN",
     "Easy",
     "In a Cisco Unified Wireless Network (split-MAC architecture), which protocol encapsulates and tunnels control and data messages between a Lightweight Access Point (LAP) and a Wireless LAN Controller (WLC)?",
-    "CAPWAP (Control and Provisioning of Wireless Access Points)",
+    "CAPWAP, the Control and Provisioning of Wireless APs",
     [
       ["LWAPP over TCP port 22 and UDP port 69", "CAPWAP uses UDP ports 5246 and 5247 (replacing the older Cisco-proprietary LWAPP protocol), not SSH/TFTP ports."],
       ["802.1Q VLAN Trunking Protocol (VTP) over Layer 2 multicast", "Lightweight APs in local mode connect to a single access VLAN and tunnel WLAN traffic inside Layer 3 UDP CAPWAP packets, not VTP frames."],
@@ -1568,7 +1568,7 @@ const q27 = [
     "WLAN",
     "Easy",
     "Which Lightweight AP operational mode is designed for remote branch offices with no local WLC, allowing the AP to switch wireless client traffic locally onto the branch LAN even if the WAN link to the central WLC goes down?",
-    "FlexConnect mode",
+    "FlexConnect mode (local switching at branch sites)",
     [
       ["Local mode (the default CAPWAP AP mode)", "In Local mode, all wireless client data must traverse the CAPWAP tunnel to the WLC; if the WAN link to the WLC fails, the AP stops servicing clients."],
       ["Monitor mode (dedicated IDS/WIPS scanning mode)", "Monitor mode dedicates the AP radios to scanning for rogue APs and security threats without servicing any wireless clients."],
@@ -1614,7 +1614,7 @@ const q27 = [
     "WLAN",
     "Medium",
     "In an Autonomous AP deployment with three WLANs (Employees in VLAN 10, Voice in VLAN 20, and Guests in VLAN 30), how does the Autonomous AP map wireless traffic onto the wired switch?",
-    "Each SSID is mapped to its VLAN on the AP, which connects to the switch over an 802.1Q trunk.",
+    "Each SSID is mapped to its VLAN on the AP, and the AP connects to the switch over an 802.1Q trunk.",
     [
       ["The Autonomous AP encapsulates all three SSIDs inside a single CAPWAP UDP 5247 tunnel to the default gateway router.", "Autonomous APs are standalone devices with no WLC and no CAPWAP tunnels; they bridge each SSID directly to a wired 802.1Q VLAN."],
       ["The Autonomous AP requires three separate physical copper Ethernet cables—one access port per SSID.", "Instead of running separate physical cables per SSID, an Autonomous AP uses subinterfaces bridged to 802.1Q VLANs over a single trunk link."],
@@ -1628,7 +1628,7 @@ const q27 = [
     "WLAN",
     "Medium",
     "How does a Cisco Mobility Express deployment provide centralized WLC management for a small-to-medium site without purchasing a dedicated physical WLC appliance or VM?",
-    "One capable Cisco Access Point runs a virtual WLC software image internally alongside its AP radio functions to manage itself and up to 100 other APs.",
+    "One capable Cisco AP runs a virtual WLC image internally to manage itself and up to 100 other APs.",
     [
       ["Every AP at the site connects directly to Cisco Meraki Cloud over TCP port 443 without any local controller logic.", "Connecting APs to a Cisco cloud dashboard describes the **Cisco Meraki Cloud-Based AP** architecture, whereas **Mobility Express** embeds the WLC function inside a master AP on the local LAN."],
       ["A Catalyst 2960 Layer 2 access switch acts as the CAPWAP controller for up to 500 APs across the WAN.", "Layer 2 Catalyst 2960 switches cannot terminate CAPWAP tunnels; Mobility Express runs the WLC controller process on a master AP."],
@@ -1642,7 +1642,7 @@ const q27 = [
     "WLAN",
     "Hard",
     "A wireless client roams from AP-1 (connected to WLC-1 in Subnet A, VLAN 10) to AP-2 (connected to WLC-2 in Subnet B, VLAN 20), and the client's application requires keeping its original VLAN 10 IPv4 address without interruption. How do WLC-1 and WLC-2 handle this Layer 3 Inter-Controller Roam?",
-    "WLC-2 (the Foreign WLC) forms an Ethernet-over-IP (EoIP) or CAPWAP mobility tunnel back to WLC-1 (the Anchor WLC) so the client's traffic continues to egress on VLAN 10.",
+    "The Foreign WLC-2 builds an EoIP or CAPWAP mobility tunnel to the Anchor WLC-1 so traffic still egresses on VLAN 10.",
     [
       ["WLC-2 forces the client to release its VLAN 10 IP address and run DHCP Discover on VLAN 20 while using NAT to preserve sessions.", "Releasing and changing the client's IP address breaks active TCP/VoIP sessions; Layer 3 roaming uses an Anchor-to-Foreign WLC tunnel to keep the original IP."],
       ["WLC-1 uses OSPF to inject a `/32` host route for the roaming client into the enterprise core pointing to WLC-2.", "Cisco WLCs do not inject per-client `/32` OSPF host routes on roams; they use Foreign-to-Anchor mobility tunneling."],
@@ -1656,11 +1656,11 @@ const q27 = [
     "WLAN",
     "Hard",
     "Which Lightweight AP special-purpose mode disables both the 2.4-GHz and 5-GHz wireless radios completely and instead listens on a wired 802.1Q trunk port to correlate ARP packets with suspected rogue AP MAC addresses?",
-    "Rogue Detector mode",
+    "Rogue Detector mode (wired-side ARP correlation)",
     [
-      ["Monitor mode, which scans all 2.4-GHz and 5-GHz RF channels over the air without transmitting", "Monitor mode uses the AP's wireless radios to listen over the air and connects to an access port; Rogue Detector mode turns off the radios and listens on a wired trunk."],
-      ["SE-Connect (Spectrum Expert Connect) mode, which detects non-802.11 RF interferers like microwaves", "SE-Connect uses the AP's CleanAir spectrum hardware to analyze RF interference over the air, not wired trunk ARP packets."],
-      ["Bridge / Mesh mode, which dedicates the 5-GHz radio to wireless backhaul between buildings", "Bridge/Mesh mode uses the radios to form a wireless bridge between sites rather than monitoring a wired trunk for rogue ARP frames."]
+      ["Monitor mode (over-the-air RF channel scanning)", "Monitor mode uses the AP's wireless radios to listen over the air and connects to an access port; Rogue Detector mode turns off the radios and listens on a wired trunk."],
+      ["SE-Connect mode (non-802.11 interferer detection)", "SE-Connect uses the AP's CleanAir spectrum hardware to analyze RF interference over the air, not wired trunk ARP packets."],
+      ["Bridge / Mesh mode (5-GHz wireless backhaul)", "Bridge/Mesh mode uses the radios to form a wireless bridge between sites rather than monitoring a wired trunk for rogue ARP frames."]
     ],
     "A Lightweight AP placed in **Rogue Detector mode** turns off its wireless radios and connects to a wired **802.1Q trunk port** so it can hear wired ARP broadcasts across all VLANs. By comparing the MAC addresses heard on the wired network against the over-the-air rogue AP MAC addresses reported by Monitor/Local APs, the WLC determines whether a rogue AP is physically plugged into the company's wired LAN!",
     "Don't confuse **Monitor mode** (radios ON listening over the air for rogues/IDS; wired access port) with **Rogue Detector mode** (radios OFF; listens on a wired **trunk** port to see if a rogue AP is plugged into the enterprise LAN).",
@@ -1670,7 +1670,7 @@ const q27 = [
     "WLAN",
     "Hard",
     "Where does a Cisco Embedded Wireless Controller (EWC) or Cloud-Based Meraki AP place the Wireless LAN Controller control plane compared to a traditional centralized WLC deployment?",
-    "An Embedded WLC integrates the controller inside a Catalyst 9000 switch (or 9100 AP), while a Cloud-Based AP moves the management/control plane to Cisco's public cloud over TLS.",
+    "An Embedded WLC runs inside a Catalyst 9000 switch or 9100 AP, while a Cloud-Based AP moves its control plane to the Cisco cloud.",
     [
       ["Both architectures require a physical Cisco 5520/8540 WLC appliance in the data center to terminate all client data tunnels.", "Neither Embedded WLC nor Meraki Cloud APs require a dedicated physical 5520/8540 WLC appliance."],
       ["A Cloud-Based Meraki AP tunnels all local user data traffic through the Internet to the cloud controller before reaching local LAN servers.", "Cloud-managed Meraki APs keep only the management/control plane in the cloud; user data traffic is bridged locally at the AP directly onto the local LAN!"],
@@ -1688,11 +1688,11 @@ const q28 = [
     "Wireless security",
     "Easy",
     "How do WPA2-Personal (PSK) and WPA2-Enterprise (802.1X/EAP) differ in how wireless clients authenticate to the WLAN?",
-    "WPA2-Personal authenticates all devices using a shared passphrase (PSK), whereas WPA2-Enterprise authenticates each user/device individually against a central AAA/RADIUS server using 802.1X/EAP.",
+    "WPA2-Personal authenticates everyone with a shared passphrase, whereas WPA2-Enterprise uses 802.1X/EAP and a RADIUS server.",
     [
-      ["WPA2-Personal uses AES-CCMP encryption, whereas WPA2-Enterprise uses unencrypted cleartext frames after login.", "Both WPA2-Personal and WPA2-Enterprise use strong AES-CCMP encryption for data privacy; they differ in how authentication and key generation are performed."],
-      ["WPA2-Personal requires a Cisco ISE RADIUS server, whereas WPA2-Enterprise stores a single static password on the AP.", "This is backwards: WPA2-Personal uses a static Pre-Shared Key (PSK) on the AP/WLC, while WPA2-Enterprise requires an 802.1X RADIUS server (such as Cisco ISE)."],
-      ["WPA2-Personal operates only on 2.4-GHz channels, whereas WPA2-Enterprise operates only on 5-GHz channels.", "Both WPA2-Personal and WPA2-Enterprise work identically across 2.4-GHz and 5-GHz bands."]
+      ["WPA2-Personal uses AES-CCMP encryption, whereas WPA2-Enterprise sends unencrypted cleartext frames after login completes.", "Both WPA2-Personal and WPA2-Enterprise use strong AES-CCMP encryption for data privacy; they differ in how authentication and key generation are performed."],
+      ["WPA2-Personal requires a Cisco ISE RADIUS server, whereas WPA2-Enterprise stores one static password on every AP.", "This is backwards: WPA2-Personal uses a static Pre-Shared Key (PSK) on the AP/WLC, while WPA2-Enterprise requires an 802.1X RADIUS server (such as Cisco ISE)."],
+      ["WPA2-Personal operates only on 2.4-GHz channels, whereas WPA2-Enterprise operates only on 5-GHz channels in the UNII bands.", "Both WPA2-Personal and WPA2-Enterprise work identically across 2.4-GHz and 5-GHz bands."]
     ],
     "Every Wi-Fi security generation (WPA, WPA2, WPA3) offers two authentication modes: **Personal** mode (also called Pre-Shared Key or PSK, where all clients and the AP/WLC share a single passphrase) and **Enterprise** mode (also called 802.1X mode, where the WLC acts as an authenticator forwarding Extensible Authentication Protocol [EAP] credentials to a central RADIUS server like Cisco ISE).",
     "Personal = Pre-Shared Key (PSK, home/small office); Enterprise = IEEE 802.1X + EAP + RADIUS server (corporate networks).",
@@ -1730,11 +1730,11 @@ const q28 = [
     "Wireless security",
     "Medium",
     "What key security improvement does **WPA3-Personal** introduce to replace the vulnerable 4-way Pre-Shared Key (PSK) handshake of WPA2-Personal?",
-    "Simultaneous Authentication of Equals (SAE), which prevents offline dictionary attacks and provides forward secrecy",
+    "Simultaneous Authentication of Equals (SAE), blocking offline dictionary attacks",
     [
       ["Protected Extensible Authentication Protocol (PEAP) with mandatory Active Directory integration", "PEAP is an 802.1X Enterprise authentication method, whereas SAE is the replacement for PSK in **WPA3-Personal**."],
-      ["Rotating 40-bit WEP keys exchanged via Diffie-Hellman over UDP port 5246", "WPA3 never uses WEP or CAPWAP ports on client links; it uses SAE (Dragonfly key exchange) with 128-bit AES-CCMP."],
-      ["Mandatory MAC address filtering stored in the WLC's local bridge table", "MAC filtering is trivial to spoof and is not part of WPA3; WPA3-Personal uses SAE and mandatory Protected Management Frames (PMF)."]
+      ["Rotating 40-bit WEP keys exchanged via Diffie-Hellman over UDP port 5246 on the WLC", "WPA3 never uses WEP or CAPWAP ports on client links; it uses SAE (Dragonfly key exchange) with 128-bit AES-CCMP."],
+      ["Mandatory MAC address filtering stored in the WLC's local bridge table for each client", "MAC filtering is trivial to spoof and is not part of WPA3; WPA3-Personal uses SAE and mandatory Protected Management Frames (PMF)."]
     ],
     "In WPA2-Personal, an attacker who captures the initial 4-way handshake can run an offline brute-force dictionary attack against the Pre-Shared Key (PSK) and decrypt all captured session traffic. **WPA3-Personal** replaces PSK with **Simultaneous Authentication of Equals (SAE)** (a Diffie-Hellman Dragonfly exchange) so each authentication generates a unique session key with **forward secrecy** and resists offline dictionary cracking.",
     "WPA3-Personal = **SAE** (Simultaneous Authentication of Equals) instead of PSK + mandatory **PMF (802.11w)**!",
@@ -1744,7 +1744,7 @@ const q28 = [
     "Wireless security",
     "Medium",
     "Which IEEE 802.11 security feature—optional in WPA2 and **mandatory in WPA3**—prevents an attacker from disconnecting legitimate wireless clients by forging spoofed Deauthentication or Disassociation frames?",
-    "Protected Management Frames (PMF / IEEE 802.11w)",
+    "Protected Management Frames, also called PMF or 802.11w",
     [
       ["Temporal Key Integrity Protocol (TKIP) Sequence Counter (TSC)", "TKIP Sequence Counters protected data frames against replay in WPA, not unencrypted 802.11 management frames."],
       ["Wi-Fi Protected Setup (WPS) PIN verification", "WPS was a consumer push-button/PIN onboarding feature notorious for brute-force vulnerabilities, not management frame protection."],
@@ -1772,10 +1772,10 @@ const q28 = [
     "Wireless security",
     "Medium",
     "How does **WPA3-Enterprise** enhance cryptographic strength when its optional **192-bit security mode** is enabled for high-security government or financial networks?",
-    "It enforces 256-bit GCMP (Galois/Counter Mode Protocol) encryption, 384-bit HMAC-SHA-384 key derivation, and 384-bit elliptic curve (ECDSA) TLS authentication.",
+    "It enforces 256-bit GCMP encryption, HMAC-SHA-384 key derivation, and ECDSA 384-bit TLS authentication.",
     [
       ["It combines three sequential 64-bit DES keys (3DES) with MD5 message integrity checks on every frame.", "3DES and MD5 are legacy algorithms; WPA3-Enterprise 192-bit mode uses modern Suite-B cryptography (AES-GCMP-256 and SHA-384)."],
-      ["It requires clients to enter three separate Pre-Shared Keys (64 bits each) before joining the SSID.", "WPA3-Enterprise uses 802.1X/EAP-TLS authentication, not Pre-Shared Keys."],
+      ["It requires clients to enter three separate 64-bit Pre-Shared Keys before joining the SSID.", "WPA3-Enterprise uses 802.1X/EAP-TLS authentication, not Pre-Shared Keys."],
       ["It disables encryption at Layer 2 and relies exclusively on an IPsec VPN client running on the endpoint.", "WPA3-Enterprise 192-bit mode provides native Layer 2 802.11 encryption using GCMP-256."]
     ],
     "WPA3-Enterprise uses AES-CCMP-128 by default (with mandatory 802.11w PMF), and offers an optional **192-bit minimum-strength cryptographic suite** aligned with CNSA / Suite B standards—using **GCMP-256** (Galois/Counter Mode Protocol with 256-bit AES keys) for data encryption and **384-bit SHA/ECDH/ECDSA** for key management and EAP-TLS authentication.",
@@ -1787,8 +1787,8 @@ const q28 = [
     "Hard",
     "An enterprise deploys an Open Guest WLAN with WebAuth (captive portal login page) alongside a corporate WPA2-Enterprise WLAN. Which statements accurately compare the Layer 2 wireless security of these two WLANs?",
     [
-      "On a traditional Open + WebAuth WLAN, 802.11 association uses no Layer 2 encryption, so data frames sent over the air after web login are still unencrypted at Layer 2 unless OWE or HTTPS is used.",
-      "On the WPA2-Enterprise WLAN, each client negotiates a unique Pairwise Transient Key (PTK) after 802.1X authentication so other authenticated clients on the same SSID cannot decrypt its unicast frames."
+      "On an Open + WebAuth WLAN, 802.11 association uses no Layer 2 encryption, so data frames after web login stay unencrypted at Layer 2 unless OWE is used.",
+      "On the WPA2-Enterprise WLAN, each client negotiates a unique PTK after 802.1X authentication, so other users on the SSID cannot decrypt its unicast frames."
     ],
     [
       ["Completing a WebAuth captive portal login over HTTPS automatically enables AES-CCMP Layer 2 wireless encryption for all subsequent frames.", "WebAuth is a Layer 3/7 authentication gate on the WLC; if the WLAN has Layer 2 security set to None (Open), 802.11 frames over the air remain unencrypted at Layer 2!"],
@@ -1803,7 +1803,7 @@ const q28 = [
     "Wireless security",
     "Hard",
     "Why was Temporal Key Integrity Protocol (TKIP) introduced in original WPA instead of moving directly from WEP to AES-CCMP, and why is TKIP now disallowed on 802.11n/ac/ax high-throughput rates?",
-    "TKIP was designed as a firmware-upgradeable wrapper around legacy WEP RC4 hardware, whereas AES-CCMP required new crypto coprocessor hardware.",
+    "TKIP was a firmware-upgradeable wrapper around legacy WEP RC4 hardware, whereas AES-CCMP needed new crypto hardware.",
     [
       ["TKIP provided 512-bit encryption that was too CPU-intensive for modern gigabit Wi-Fi 6 Access Points.", "TKIP was actually weaker (128-bit RC4-based) than AES-CCMP and was deprecated by the IEEE due to cryptographic vulnerabilities."],
       ["AES-CCMP could not encrypt broadcast frames, so TKIP was created to encrypt multicast OSPF packets over Wi-Fi.", "AES-CCMP encrypts both unicast (via PTK) and broadcast/multicast (via GTK) frames."],
@@ -1817,7 +1817,7 @@ const q28 = [
     "Wireless security",
     "Hard",
     "What is the purpose of **Opportunistic Wireless Encryption (OWE)**, also marketed as **Wi-Fi Certified Enhanced Open**, introduced alongside WPA3?",
-    "It provides individualized AES wireless encryption on open public/guest networks without requiring users to enter a password, using an unauthenticated Diffie-Hellman key exchange.",
+    "It gives each client individualized AES encryption on open guest networks without a password, via unauthenticated Diffie-Hellman.",
     [
       ["It allows a WPA2-Enterprise network to fall back to static WEP whenever the corporate RADIUS server is unreachable.", "OWE never falls back to WEP; it encrypts open guest networks using Diffie-Hellman and AES."],
       ["It shares a single public Pre-Shared Key printed in the AP's beacon frame so every client derives the same encryption key.", "If all clients derived the same key from a public beacon, anyone could decrypt everyone's traffic; OWE performs a per-client Diffie-Hellman exchange so each client gets its own unique encryption key!"],
@@ -1835,11 +1835,11 @@ const q29 = [
     "WLAN",
     "Easy",
     "On a Cisco Wireless LAN Controller (WLC), which logical interface is used for normal in-band management traffic (such as GUI/HTTPS, SSH, SNMP, and RADIUS communication) and for terminating CAPWAP tunnels?",
-    "Management interface",
+    "Management interface (in-band management and CAPWAP termination)",
     [
-      ["Service-Port interface, which carries CAPWAP tunnels and RADIUS traffic over the main trunk", "The Service-Port is a dedicated out-of-band recovery/management Ethernet port on a separate subnet and CANNOT carry CAPWAP or 802.1Q dynamic VLAN traffic."],
-      ["Virtual interface, which terminates SSH and SNMP sessions for the WLC administrator", "The Virtual interface (typically a fictitious IP like `192.0.2.1`) is used solely for client DHCP relay and WebAuth mobility redirects, not administrator SSH/GUI access."],
-      ["Redundancy Management interface, which maps each WLAN SSID to a wired client VLAN", "Dynamic Interfaces map WLANs to wired client VLANs; the Management interface handles in-band WLC administration and CAPWAP termination."]
+      ["Service-Port interface (carries CAPWAP tunnels and RADIUS traffic)", "The Service-Port is a dedicated out-of-band recovery/management Ethernet port on a separate subnet and CANNOT carry CAPWAP or 802.1Q dynamic VLAN traffic."],
+      ["Virtual interface (terminates SSH and SNMP for the WLC admin)", "The Virtual interface (typically a fictitious IP like `192.0.2.1`) is used solely for client DHCP relay and WebAuth mobility redirects, not administrator SSH/GUI access."],
+      ["Redundancy Management interface (maps each WLAN SSID to a client VLAN)", "Dynamic Interfaces map WLANs to wired client VLANs; the Management interface handles in-band WLC administration and CAPWAP termination."]
     ],
     "A Cisco WLC (AirOS) defines five primary logical interface types: (1) **Management Interface** (used for in-band GUI/SSH/SNMP management, WLC-to-WLC mobility, RADIUS authentication, and terminating CAPWAP tunnels in modern IOS/AirOS), (2) **Redundancy Management**, (3) **Service-Port** (out-of-band management port), (4) **Virtual Interface** (used for client DHCP relay and WebAuth redirect), and (5) **Dynamic Interfaces** (VLAN interfaces mapping WLANs to wired subnets).",
     "Know the 3 most-tested WLC interfaces: **Management** = in-band admin + CAPWAP + RADIUS; **Service-Port** = out-of-band admin; **Dynamic Interface** = maps a WLAN (SSID) to a wired 802.1Q VLAN!",
@@ -1849,11 +1849,11 @@ const q29 = [
     "WLAN",
     "Easy",
     "In the Cisco WLC GUI, what must an administrator create under **Controller > Interfaces** before creating a new Employee WLAN that places wireless clients onto wired VLAN 20?",
-    "A Dynamic Interface configured with VLAN Identifier 20, an IPv4 address/mask in VLAN 20, and VLAN 20's DHCP server IP",
+    "A Dynamic Interface with VLAN ID 20, a VLAN 20 IP address and mask, and a DHCP server IP",
     [
-      ["A new Virtual Interface assigned to VLAN 20 with port security enabled", "A WLC has only one fixed Virtual Interface; each client VLAN requires its own **Dynamic Interface** under Controller > Interfaces."],
-      ["A static route pointing `0.0.0.0/0` to the Lightweight AP's access VLAN", "Mapping an SSID to a wired client VLAN on a WLC is done by creating a Dynamic Interface for that VLAN and binding the WLAN to it."],
-      ["A new Service-Port subinterface tagged with 802.1Q VLAN 20", "The physical Service-Port does not support 802.1Q trunking or client VLANs; Dynamic Interfaces are bound to the WLC's distribution system **Ports** (1, 2, or LAG)."]
+      ["A new Virtual Interface assigned to VLAN 20 with port security and a DHCP relay agent", "A WLC has only one fixed Virtual Interface; each client VLAN requires its own **Dynamic Interface** under Controller > Interfaces."],
+      ["A static route pointing `0.0.0.0/0` to the Lightweight AP's access VLAN on the WLC", "Mapping an SSID to a wired client VLAN on a WLC is done by creating a Dynamic Interface for that VLAN and binding the WLAN to it."],
+      ["A new Service-Port subinterface tagged with 802.1Q VLAN 20 and a DHCP scope", "The physical Service-Port does not support 802.1Q trunking or client VLANs; Dynamic Interfaces are bound to the WLC's distribution system **Ports** (1, 2, or LAG)."]
     ],
     "On a Cisco WLC, each wireless LAN (SSID) is connected to a wired enterprise VLAN by binding the WLAN to a **Dynamic Interface** (created under `Controller > Interfaces`). Each Dynamic Interface specifies its physical Port (or LAG), **VLAN ID** (e.g., 20), **IP Address/Netmask/Gateway** on that subnet, and **Primary/Secondary DHCP Server** IP addresses.",
     "On a Cisco WLC: 1 wired client VLAN = 1 **Dynamic Interface** (with VLAN ID + IP + Gateway + DHCP Server IP); then bind the **WLAN** to that Dynamic Interface!",
@@ -1863,7 +1863,7 @@ const q29 = [
     "WLAN",
     "Easy",
     "When configuring Link Aggregation (LAG) across multiple physical distribution ports on a Cisco WLC connected to a Catalyst switch, how must the WLC and Catalyst switch be configured?",
-    "Enable LAG globally on the WLC (which uses static `mode on` bundling and requires a WLC reboot) and configure an 802.1Q trunk EtherChannel (`channel-group <n> mode on`) on the switch.",
+    "Enable LAG on the WLC, reboot it, and set an 802.1Q trunk with `channel-group <n> mode on`.",
     [
       ["Configure PAgP `mode desirable` on the WLC and `mode auto` on the Catalyst switch ports", "Cisco WLCs (AirOS) do not support Cisco-proprietary PAgP negotiation on their distribution ports; they use unconditional `mode on` LAG."],
       ["Configure each WLC physical port in a separate access VLAN without creating a PortChannel on the switch", "When WLC LAG is enabled, all participating WLC distribution ports bundle into a single logical trunk and MUST connect to an matching 802.1Q trunk PortChannel on the switch."],
@@ -1877,7 +1877,7 @@ const q29 = [
     "WLAN",
     "Medium",
     "In the Cisco WLC GUI (`WLANs > Create New`), an engineer configures a new WLAN with Profile Name `Corp_Emp`, SSID `CorpWiFi`, and ID `2`, and clicks Apply. Why can't wireless clients see or connect to `CorpWiFi` yet?",
-    "Newly created WLANs on a Cisco WLC have their **Status** checkbox unchecked (Disabled) by default and must be explicitly checked (Enabled) on the General tab.",
+    "New WLANs on a WLC have the **Status** checkbox unchecked by default and must be Enabled on the General tab.",
     [
       ["The Profile Name and the SSID must be 100% identical character-for-character or the WLC suppresses beacons.", "Profile Name (internal label for the admin) and SSID (broadcast network name for clients) can be completely different strings."],
       ["A WLC can only broadcast one WLAN SSID per physical distribution port unless LAG is disabled.", "A single WLC distribution port or LAG trunk can carry dozens of WLANs mapped to different Dynamic Interface VLANs."],
@@ -1920,8 +1920,8 @@ const q29 = [
     "Medium",
     "An administrator wants to configure a WLAN on a Cisco WLC to support **WPA3-Personal** security. Which configuration requirements must be met in the WLC GUI under the WLAN's **Security > Layer 2** tab?",
     [
-      "Enable `WPA3 Policy` with `AES` encryption and set Protected Management Frames (**PMF / 802.11w**) to **Required**.",
-      "Under Authentication Key Management, enable **SAE** (Simultaneous Authentication of Equals) and configure the ASCII passphrase."
+      "Enable `WPA3 Policy` with `AES` encryption and set PMF (802.11w) to **Required**.",
+      "Enable **SAE** under Authentication Key Management and configure the ASCII passphrase."
     ],
     [
       ["Enable `TKIP` encryption alongside `WPA3 Policy` and set PMF (802.11w) to `Disabled`.", "WPA3 strictly forbids legacy TKIP and requires AES along with mandatory (`Required`) 802.11w Protected Management Frames (PMF)."],
@@ -1936,9 +1936,9 @@ const q29 = [
     "WLAN",
     "Hard",
     "An engineer connects a Cisco WLC's Port 1 to Catalyst Switch SW1's GigabitEthernet1/0/1. The WLC has a Management interface in VLAN 10 (`10.10.10.5/24`), a Staff Dynamic interface in VLAN 20 (`10.10.20.5/24`), and a Guest Dynamic interface in VLAN 30 (`10.10.30.5/24`). How must SW1's GigabitEthernet1/0/1 interface be configured?",
-    "As an 802.1Q trunk port (`switchport mode trunk`) allowing VLANs 10, 20, and 30 (matching the WLC Management interface's untagged/tagged VLAN setting)",
+    "As an 802.1Q trunk port (`switchport mode trunk`) allowing VLANs 10, 20, and 30 toward the WLC",
     [
-      ["As a Layer 2 access port (`switchport mode access`, `switchport access vlan 10`) since CAPWAP tunnels carry VLANs 20 and 30.", "While the **AP-to-switch** port is an access port, the **WLC-to-switch** port must carry tagged traffic for VLANs 10, 20, and 30 onto the wired network and MUST be an **802.1Q trunk**!"],
+      ["As a Layer 2 access port (`switchport mode access`, `switchport access vlan 10`) since CAPWAP carries VLANs 20 and 30.", "While the **AP-to-switch** port is an access port, the **WLC-to-switch** port must carry tagged traffic for VLANs 10, 20, and 30 onto the wired network and MUST be an **802.1Q trunk**!"],
       ["As a Layer 3 routed port (`no switchport`) with secondary IP addresses in VLANs 10, 20, and 30.", "A WLC bridges each WLAN to its corresponding 802.1Q VLAN tag on the distribution port, requiring a Layer 2 802.1Q trunk on the connected switch."],
       ["As a PortFast-enabled access port with `spanning-tree bpduguard enable` in VLAN 1.", "Configuring the WLC port as an access port in VLAN 1 prevents tagged frames for VLANs 10, 20, and 30 from reaching their respective subnets and default gateways."]
     ],
@@ -1950,7 +1950,7 @@ const q29 = [
     "WLAN",
     "Hard",
     "On the **Advanced** tab of a WLAN configuration in the Cisco WLC GUI, what is the effect of checking **FlexConnect Local Switching** and **FlexConnect Local Auth**?",
-    "APs in FlexConnect mode bridge wireless client traffic for that WLAN directly onto the local branch VLAN instead of tunneling it back to the central WLC over the WAN.",
+    "FlexConnect APs bridge that WLAN's client traffic onto the local branch VLAN instead of tunneling it to the central WLC.",
     [
       ["It converts all Lightweight APs in the enterprise into standalone Autonomous APs and deletes the WLC configuration.", "FlexConnect APs remain centrally managed by the WLC via CAPWAP Control (UDP 5246); only client data for that WLAN is switched locally at the branch."],
       ["It forces all wireless client traffic on that WLAN to be encrypted with DTLS inside the CAPWAP Data tunnel to HQ.", "Enabling FlexConnect Local Switching bypasses the CAPWAP Data tunnel to HQ so branch traffic stays on the local branch LAN."],
@@ -1964,7 +1964,7 @@ const q29 = [
     "WLAN",
     "Hard",
     "An administrator wants to secure administrative access to a Cisco WLC itself so network engineers can manage the WLC ONLY via encrypted HTTPS (GUI) and SSH (CLI), while blocking unencrypted HTTP and Telnet. Where are these settings configured in the WLC GUI?",
-    "Under the **Management** menu (`Management > HTTP-HTTPS` and `Management > Telnet-SSH`)",
+    "Under the **Management** menu, on the HTTP-HTTPS and the Telnet-SSH configuration pages",
     [
       ["Under **WLANs > Security > Layer 3**, by selecting HTTPS and SSH in the Web Policy drop-down", "The `WLANs` menu configures wireless network access for end-user Wi-Fi clients, whereas the **`Management`** menu controls administrative access to the WLC itself!"],
       ["Under **Wireless > 802.11a/n/ac > Network**, by disabling unencrypted management frames", "The `Wireless` menu configures AP radio parameters and 802.11 data rates, not administrative HTTP/HTTPS/Telnet/SSH access to the WLC."],

@@ -1,4 +1,4 @@
-import { mk } from "../build.js?v=76";
+import { mk } from "../build.js?v=78";
 
 // ============================================================================
 // v2c11: Quality of Service (QoS)
@@ -9,11 +9,11 @@ const q11 = [
     "QoS",
     "Easy",
     "Which QoS traffic characteristic measures the variation in one-way delay between consecutive packets belonging to the same application flow?",
-    "Jitter",
+    "Packet jitter",
     [
-      ["Latency", "Latency (or delay) measures the total one-way or round-trip transit time of a packet rather than the variation between consecutive packets."],
-      ["Bandwidth", "Bandwidth measures the link capacity in bits per second rather than timing differences between consecutive packets."],
-      ["Tail drop", "Tail drop is a packet loss condition caused by a full output queue rather than a measure of delay variation."]
+      ["Average latency", "Latency (or delay) measures the total one-way or round-trip transit time of a packet rather than the variation between consecutive packets."],
+      ["Link bandwidth", "Bandwidth measures the link capacity in bits per second rather than timing differences between consecutive packets."],
+      ["Tail drop rate", "Tail drop is a packet loss condition caused by a full output queue rather than a measure of delay variation."]
     ],
     "Jitter is the variation in one-way delay between consecutive packets sent by the same application. If consecutive packets experience one-way delays of 120 ms, 135 ms, and 155 ms, the flow experiences 15 ms and then 20 ms of jitter.",
     "Remember: Delay is how long a packet takes; jitter is how much that delay changes from packet to packet.",
@@ -37,11 +37,11 @@ const q11 = [
     "QoS",
     "Easy",
     "Which QoS marking field consists of 3 bits located inside the IEEE 802.1Q header and is preserved only while frames traverse VLAN trunks?",
-    "Class of Service (CoS)",
+    "IEEE 802.1p Class of Service (CoS)",
     [
       ["Differentiated Services Code Point (DSCP)", "DSCP is a 6-bit field inside the IPv4 ToS byte and IPv6 Traffic Class byte that travels end-to-end with the IP header."],
-      ["IP Precedence (IPP)", "IP Precedence is a legacy 3-bit field inside the IPv4 header rather than the Ethernet 802.1Q trunking header."],
-      ["MPLS Experimental (EXP)", "MPLS EXP is a 3-bit field inside an MPLS label header used across MPLS WAN links rather than 802.1Q trunks."]
+      ["IPv4 Header IP Precedence (IPP)", "IP Precedence is a legacy 3-bit field inside the IPv4 header rather than the Ethernet 802.1Q trunking header."],
+      ["MPLS Label Experimental Bits (EXP)", "MPLS EXP is a 3-bit field inside an MPLS label header used across MPLS WAN links rather than 802.1Q trunks."]
     ],
     "The Class of Service (CoS) field, also called Priority Code Point (PCP) in IEEE 802.1p, occupies 3 bits in the 4-byte 802.1Q tag. Because the 802.1Q header exists only on trunk links, CoS markings do not survive across non-trunked or routed hops.",
     "CoS = 3 bits in 802.1Q (Layer 2 trunk only); DSCP = 6 bits in IPv4/IPv6 (end-to-end Layer 3).",
@@ -69,7 +69,7 @@ const q11 = [
     [
       ["At the desktop PC network interface card, trusting whatever DSCP and CoS values the user operating system sets", "End-user PCs are untrusted because users or applications could mark ordinary traffic as EF (46) to hijack priority queues."],
       ["At the distribution layer router interface, leaving all access layer frames unmarked across the campus trunks", "Best practice places the trust boundary as close to the ingress edge as possible so access and distribution switches can prioritize traffic."],
-      ["At the WAN edge router egress interface, because LAN switches cannot classify or mark Ethernet frames", "LAN switches support hardware QoS classification and marking, and waiting until the WAN edge leaves LAN trunks unprotected."]
+      ["At the WAN edge router egress interface to classify and mark all frames after they cross the campus LAN", "LAN switches support hardware QoS classification and marking, and waiting until the WAN edge leaves LAN trunks unprotected."]
     ],
     "The QoS trust boundary should sit at the first device under IT control. When a Cisco IP Phone is present at the access layer, the switch instructs the phone on how to mark voice traffic and overwrite untrusted markings coming from the attached PC.",
     "No IP Phone = trust boundary at the ingress access switch; With IP Phone = trust boundary at the IP Phone.",
@@ -79,7 +79,7 @@ const q11 = [
     "QoS",
     "Medium",
     "Within the DiffServ Assured Forwarding (AF) model, how does a router treat packets marked with AF21 (decimal 18) compared to packets marked with AF23 (decimal 22)?",
-    "Both enter the same AF2 queue, but AF23 has a higher WRED drop probability than AF21",
+    "Both are placed into the same AF2 class queue, but AF23 is given a higher WRED drop probability than AF21",
     [
       ["AF23 is placed into a higher-priority queue than AF21, while both share the exact same congestion drop probability", "In AFxy notation, X (2) identifies the queue and Y (1 vs 3) identifies the drop preference, not the queue number."],
       ["Both are placed into the same AF class queue (queue 2), but AF21 is dropped more aggressively than AF23", "A lower Y value in AFxy indicates a better (lower) drop probability, so AF21 is protected while AF23 is dropped first."],
@@ -121,7 +121,7 @@ const q11 = [
     "QoS",
     "Medium",
     "An enterprise WAN edge router connects via a 1-Gbps fiber Ethernet access link to a Metro Ethernet service provider that enforces a 200-Mbps Committed Information Rate (CIR). Where should shaping and policing be applied?",
-    "Configure egress shaping to 200 Mbps on the customer router while the ISP polices ingress to 200 Mbps",
+    "Configure egress shaping to 200 Mbps on the enterprise router while the service provider polices ingress to 200 Mbps",
     [
       ["Configure ingress shaping to 200 Mbps on the enterprise router, while the service provider shapes egress traffic to 1 Gbps", "Shaping is an outbound (egress) queuing mechanism, not an inbound mechanism, and the CIR limit is 200 Mbps."],
       ["Configure egress policing to 200 Mbps on the enterprise router so excess packets are held in queues until bandwidth is free", "Policing immediately drops or remarks excess traffic rather than holding packets in queues."],
@@ -231,7 +231,7 @@ const q12 = [
     "FHRP",
     "Medium",
     "Routers R1 (10.1.10.2) and R2 (10.1.10.3) run HSRP on VLAN 10 with virtual IP address 10.1.10.1 and virtual MAC VMAC1. R1 is currently HSRP Active and R2 is HSRP Standby. If R1 loses power, what happens on the LAN switches and end hosts?",
-    "R2 broadcasts a gratuitous ARP sourced from VMAC1 so switches update their MAC tables, while end hosts keep their existing default gateway and ARP entries",
+    "R2 broadcasts a gratuitous ARP from VMAC1 to update switch MAC tables while hosts keep their gateway and ARP cache",
     [
       ["End hosts detect the failure via HSRP hello messages and update their default gateway IP from 10.1.10.2 to 10.1.10.3", "End hosts do not participate in HSRP messages and always point their default gateway to the virtual IP address (10.1.10.1)."],
       ["R2 sends an ICMP Redirect to all hosts instructing them to replace VMAC1 with R2's physical burned-in MAC address", "Both HSRP routers share the virtual MAC address (VMAC1), so the hosts' ARP tables continue mapping 10.1.10.1 to VMAC1."],
@@ -245,7 +245,7 @@ const q12 = [
     "FHRP",
     "Medium",
     "How can a network engineer achieve load balancing across two routers (R1 and R2) using HSRP when a site has two user VLANs (VLAN 10 and VLAN 20)?",
-    "Configure HSRP so R1 is elected Active for VLAN 10 (with R2 Standby) and R2 is elected Active for VLAN 20 (with R1 Standby)",
+    "Configure HSRP so R1 acts as Active with R2 as Standby for VLAN 10, and R2 acts as Active with R1 as Standby for VLAN 20",
     [
       ["Configure a single HSRP group in VLAN 10 so R1 and R2 simultaneously reply to ARP requests with different virtual MAC addresses", "Replying to ARP requests for one virtual IP with multiple virtual MACs in the same group is how GLBP operates, not single-group HSRP."],
       ["Configure half the hosts in VLAN 10 to use R1's physical IP as their gateway and the other half to use R2's physical IP", "Pointing hosts to physical router IPs defeats FHRP automatic failover if either router fails."],
@@ -262,8 +262,8 @@ const q12 = [
     "Management Information Base (MIB)",
     [
       ["Network Management Station (NMS) Console", "The NMS is the central server running SNMP manager software that polls devices and displays alerts to operators."],
-      ["SNMP Trap Receiver", "A Trap Receiver is a process on the NMS that listens for unsolicited notifications rather than the database of variables on the managed device."],
-      ["SNMP Community String", "A community string is a clear-text password used in SNMPv1 and SNMPv2c rather than a database of device variables."]
+      ["SNMP Unsolicited Trap Receiver", "A Trap Receiver is a process on the NMS that listens for unsolicited notifications rather than the database of variables on the managed device."],
+      ["SNMP Security Community String", "A community string is a clear-text password used in SNMPv1 and SNMPv2c rather than a database of device variables."]
     ],
     "Every SNMP agent maintains a Management Information Base (MIB), which organizes thousands of operational, status, and counter variables into a standardized tree hierarchy of Object IDs (OIDs).",
     "Agent = software on the router/switch; MIB = database of OIDs on the device; Manager/NMS = central management server.",
@@ -276,8 +276,8 @@ const q12 = [
     "Trivial File Transfer Protocol (TFTP)",
     [
       ["Authenticated File Transfer Protocol (FTP)", "FTP uses TCP ports 21 and 20, requires authentication, and supports browsing, creating, and removing directories."],
-      ["Secure Copy Protocol (SCP)", "SCP runs over encrypted SSH (TCP port 22) and requires user authentication before transferring files."],
-      ["FTP Secure (FTPS)", "FTPS runs FTP over TLS encryption using TCP (port 21 in explicit mode or ports 990/989 in implicit mode) and authenticates users."]
+      ["Encrypted Secure Copy Protocol (SCP)", "SCP runs over encrypted SSH (TCP port 22) and requires user authentication before transferring files."],
+      ["File Transfer Protocol Secure (FTPS)", "FTPS runs FTP over TLS encryption using TCP (port 21 in explicit mode or ports 990/989 in implicit mode) and authenticates users."]
     ],
     "TFTP (UDP port 69) is intentionally lightweight ('trivial'). It supports only reading (Get) and writing (Put) a specifically named file, includes post-transfer checksum verification, and omits authentication and directory navigation commands.",
     "TFTP = UDP port 69, no authentication, no directory browsing, lightweight.",
@@ -287,7 +287,7 @@ const q12 = [
     "SNMP",
     "Medium",
     "How does an SNMP Inform message (introduced in SNMPv2) differ from an SNMP Trap message?",
-    "Both are agent-to-NMS alerts on UDP 162, but an Inform requires an NMS acknowledgment response",
+    "Both are agent-to-NMS notifications sent over UDP port 162, but an Inform requires an acknowledgment from the NMS",
     [
       ["An Inform message is sent using TCP for reliable delivery, whereas a Trap message is sent using connectionless UDP", "Both SNMP Traps and SNMP Informs use UDP as their transport layer protocol; Informs add reliability at the application layer."],
       ["An Inform message is sent from the NMS to poll the agent, whereas a Trap message is sent from the agent to the NMS", "Both Traps and Informs are agent-initiated notifications sent to the NMS; polling from the NMS uses Get, GetNext, or GetBulk."],
@@ -303,9 +303,9 @@ const q12 = [
     "A router running SNMPv2c is configured with read-only (RO) community string `MonOnly1` and read-write (RW) community string `CfgAdmin2`. Which community string(s) will the router accept to process an incoming SNMP Get Request versus an SNMP Set Request?",
     "Either `MonOnly1` or `CfgAdmin2` for a Get Request, but only `CfgAdmin2` for a Set Request",
     [
-      ["Only `MonOnly1` for a Get Request, and only `CfgAdmin2` for a Set Request", "The read-write (RW) community string permits both reading (Get) and writing (Set) MIB variables, not just writing."],
-      ["Either `MonOnly1` or `CfgAdmin2` for both Get Requests and Set Requests", "The read-only (RO) community string (`MonOnly1`) cannot be used to modify device variables with a Set Request."],
-      ["Neither string in clear text, because SNMPv2c requires hashed passwords and username authentication", "Username authentication with hashed passwords and optional encryption was introduced in SNMPv3; SNMPv2c uses clear-text community strings."]
+      ["Only `MonOnly1` for an incoming Get Request, and only `CfgAdmin2` for an incoming Set Request", "The read-write (RW) community string permits both reading (Get) and writing (Set) MIB variables, not just writing."],
+      ["Either `MonOnly1` or `CfgAdmin2` for both incoming Get Requests and incoming Set Requests", "The read-only (RO) community string (`MonOnly1`) cannot be used to modify device variables with a Set Request."],
+      ["Neither string in clear text since SNMPv2c requires hashed passwords and username authentication", "Username authentication with hashed passwords and optional encryption was introduced in SNMPv3; SNMPv2c uses clear-text community strings."]
     ],
     "In SNMPv1 and SNMPv2c, the read-only (RO) community string permits read operations (Get, GetNext, GetBulk), whereas the read-write (RW) community string permits both read operations (Get) and write operations (Set).",
     "RW community string works for BOTH Get and Set; RO community string works ONLY for Get.",
@@ -347,7 +347,7 @@ const q12 = [
     "SSH/TFTP",
     "Hard",
     "Examine the output of `show flash` and `dir flash0:` on router R4. If an engineer needs to copy a new 60,000,000-byte IOS image into `flash0:` without deleting existing files, what will happen and how do the two command outputs differ?",
-    "The copy fails with only 49,238,016 bytes free; `show flash` shows bytes used while `dir` shows total bytes",
+    "The copy will fail because only 49,238,016 bytes are free; `show flash` reports bytes used whereas `dir flash0:` reports total capacity",
     [
       ["The copy will succeed because 207,249,408 bytes are available; `show flash` reports free bytes in parentheses while `dir flash0:` reports used bytes", "In `show flash`, 207,249,408 is `bytes used`, while only 49,238,016 bytes (~49.2 MB) are available."],
       ["The copy will succeed by automatically overwriting the oldest `.bin` file; both commands report identical summary totals on the last line", "Cisco IOS does not automatically delete existing `.bin` files when space is low, and the two summary lines report different totals (used vs total capacity)."],
@@ -432,7 +432,7 @@ const q13 = [
     "Network architecture",
     "Easy",
     "In a Cisco enterprise campus LAN, why is a two-tier campus topology also referred to as a collapsed core design?",
-    "It merges the distribution and core layers into one collapsed tier without a separate core tier",
+    "It combines the distribution and core layers into a single collapsed tier rather than deploying a separate core tier",
     [
       ["It collapses the access and distribution layers into a single tier so end-user PCs plug directly into core switches", "End-user devices always connect to access switches; a two-tier design keeps the access and distribution tiers while omitting the core tier."],
       ["It replaces all physical switches with a single SOHO wireless router that integrates switching, routing, and firewalling", "An all-in-one wireless router describes a Small Office/Home Office (SOHO) network rather than a two-tier campus LAN."],
@@ -488,7 +488,7 @@ const q13 = [
     "Network architecture",
     "Medium",
     "Why is a standard two-tier or three-tier enterprise campus LAN considered a hybrid topology?",
-    "It combines an access-layer star topology with a partial mesh interconnecting the switch tiers",
+    "It combines a star topology from access switches to endpoints with a partial mesh interconnecting the switch tiers",
     [
       ["It combines a full mesh of links between all access switches with a ring topology between all distribution switches", "Access switches do not connect to each other, and enterprise campus tiers use partial meshes rather than rings."],
       ["It combines coaxial bus segments in the wiring closets with point-to-point serial links between the core switches", "Modern campus LANs use point-to-point twisted-pair and fiber Ethernet links in star and mesh arrangements, not coaxial buses."],
@@ -516,7 +516,7 @@ const q13 = [
     "Network architecture",
     "Medium",
     "How does a PoE-capable switch (PSE) prevent electrical damage to a non-PoE laptop when the laptop is plugged into a PoE switch port?",
-    "It withholds power initially and uses low-power signaling to detect a PD and its required power class",
+    "It keeps power disabled initially and uses low-power autonegotiation signaling to detect a PD and its required PoE power class",
     [
       ["It immediately applies 15.4 watts of AC current and relies on the laptop's internal circuit breaker to trip if PoE is unsupported", "PoE supplies DC power (not AC), and applying full power before detection would damage non-PoE NIC circuitry."],
       ["It waits for the attached device to boot up and send a CDP or LLDP frame requesting initial power before energizing the cable", "A Powered Device (PD) without an external power cord cannot boot or send CDP/LLDP frames until the switch supplies initial PoE power."],
@@ -644,7 +644,7 @@ const q14 = [
     "WAN",
     "Easy",
     "In Metro Ethernet WAN architecture, what do the terms Point of Presence (PoP) and User Network Interface (UNI) describe?",
-    "PoP is the provider facility housing the SP switch, and UNI is the physical/L2 demarcation interface",
+    "PoP is the service provider facility housing the Ethernet switch, and UNI is the customer-to-provider access demarcation",
     [
       ["PoP is the customer wiring closet housing the CPE router, and UNI is the Layer 3 routing protocol run inside the provider core", "The PoP belongs to the service provider rather than the customer, and UNI defines the customer-to-provider access link rather than internal SP routing."],
       ["PoP is the virtual circuit identifier in an 802.1Q tag, and UNI is the encryption key shared between two IPsec VPN peers", "A virtual connection in MetroE is called an Ethernet Virtual Connection (EVC), not a PoP."],
@@ -700,7 +700,7 @@ const q14 = [
     "WAN",
     "Medium",
     "An enterprise connects its headquarters router and 14 branch office routers (15 routers total) to a single Metro Ethernet E-LAN service and configures OSPF on all WAN interfaces. How many IPv4 subnets are used on the WAN, and how many OSPF neighbors does each branch router form?",
-    "1 IPv4 subnet shared across the E-LAN, and each branch router forms 14 OSPF neighbor relationships",
+    "1 IPv4 subnet shared across the E-LAN, and each branch router forms 14 OSPF neighbor relationships with peer sites",
     [
       ["14 IPv4 subnets across the E-LAN, and each branch router forms 1 OSPF neighbor relationship with headquarters", "14 point-to-point subnets with 1 neighbor per branch describes a hub-and-spoke design using 14 separate E-Line EVCs (or an E-Tree), not a single E-LAN."],
       ["15 IPv4 subnets across the E-LAN, and each branch router forms 1 OSPF neighbor relationship with the provider switch", "In a Layer 2 Metro Ethernet service, the service provider switch does not have an IP address in the customer subnet or form OSPF adjacencies."],
@@ -714,7 +714,7 @@ const q14 = [
     "WAN",
     "Medium",
     "An enterprise connects 1 headquarters site and 10 remote branch sites (11 sites total) to an MPLS Layer 3 VPN service using one router per site and OSPF on all WAN links. How many WAN subnets are required, and with which device does each branch Customer Edge (CE) router form an OSPF adjacency?",
-    "At least 11 WAN subnets (one per PE-CE link), with each CE forming 1 OSPF adjacency to its local PE",
+    "At least 11 WAN subnets with one per PE-CE link, and each branch CE router forms 1 OSPF adjacency with its local PE",
     [
       ["1 shared WAN subnet across all 11 sites, and each branch CE router forms 10 OSPF adjacencies directly with the other CE routers", "Sharing 1 subnet and forming direct CE-to-CE adjacencies describes a Layer 2 MetroE E-LAN service, not a Layer 3 MPLS VPN."],
       ["At least 11 WAN subnets, and each branch CE router forms 1 OSPF adjacency directly with the headquarters CE router", "In an MPLS Layer 3 VPN, CE routers peer at Layer 3 with the service provider's PE router on the other end of their access link, never directly with other CE routers."],
@@ -728,7 +728,7 @@ const q14 = [
     "WAN",
     "Medium",
     "How does an MPLS VPN service provider exchange customer OSPF routes between Provider Edge (PE) routers across its core while keeping overlapping private IPv4 subnets (such as 10.0.0.0/8) isolated between different enterprise customers?",
-    "The PE routers redistribute customer OSPF routes into MP-BGP with per-customer VRF route tags",
+    "The PE routers redistribute customer OSPF routes into Multiprotocol BGP (MP-BGP) using separate per-customer routing tables",
     [
       ["The PE routers run a single shared OSPF Area 0 instance across all customers and use NAT to translate overlapping 10.0.0.0/8 subnets", "MPLS VPNs allow customers to use overlapping private IP addresses without NAT by keeping routing tables logically separated."],
       ["The PE routers encapsulate customer OSPF Hello packets inside GRE tunnels so CE routers form direct OSPF adjacencies", "In an MPLS Layer 3 VPN, CE routers peer with PE routers rather than tunneling OSPF hellos through GRE to other CE routers."],
@@ -742,7 +742,7 @@ const q14 = [
     "WAN",
     "Medium",
     "In a residential or small-business Digital Subscriber Line (DSL) Internet connection, what is the function of the DSL Access Multiplexer (DSLAM) located at the telephone company's Central Office (CO)?",
-    "It splits high-frequency digital DSL data signals from low-frequency analog PSTN voice signals",
+    "It splits high-frequency digital DSL data streams toward an ISP router from low-frequency analog voice toward the PSTN",
     [
       ["It converts fiber-optic light pulses from a Metro Ethernet PoP into coaxial CATV television channels inside the customer home", "A DSLAM sits at the telco Central Office (CO) terminating copper telephone local loops, not coaxial CATV cables inside the home."],
       ["It encrypts customer IP packets with a shared session key before forwarding them over a 4G/5G cellular radio tower", "Encrypting packets with a session key is performed by an IPsec VPN device, and cellular towers are used in wireless WANs."],
@@ -756,9 +756,9 @@ const q14 = [
     "WAN",
     "Hard",
     "Central headquarters router R1 connects to three remote branch routers (R2, R3, and R4) using three Metro Ethernet E-Line services multiplexed over a single 10-Gbps physical fiber access link on R1's `GigabitEthernet0/1` interface. Examined on R3, the routing table shows:\n`O 10.1.2.0/24 [110/20] via 10.1.13.1, 02:14:09, GigabitEthernet0/1.13`\nWhy does R3 use 10.1.13.1 as its next-hop IP address to reach R2's LAN subnet (10.1.2.0/24)?",
-    "Each E-Line is a separate point-to-point EVC to R1, so R3 has no direct L2 path to R2 and routes via R1",
+    "Each E-Line is a separate point-to-point EVC to R1, so R3 has no direct Layer 2 path to R2 and routes packets via R1",
     [
-      ["R3 and R2 are in the same WAN subnet (10.1.13.0/24), but OSPF elected R1 (10.1.13.1) as the Designated Router (DR) to relay all packets", "Even when OSPF elects a DR on a shared LAN, next-hop IP addresses point directly to the advertising router on that subnet; here, R2 and R3 are on completely different point-to-point E-Line subnets."],
+      ["R3 and R2 share WAN subnet 10.1.13.0/24, and OSPF elected R1 at 10.1.13.1 as the Designated Router to relay all packets", "Even when OSPF elects a DR on a shared LAN, next-hop IP addresses point directly to the advertising router on that subnet; here, R2 and R3 are on completely different point-to-point E-Line subnets."],
       ["The `.13` subinterface indicates an MPLS label of 13 assigned by the Provider Edge (PE) router at 10.1.13.1", "Metro Ethernet E-Line is a Layer 2 service where `.13` is an 802.1Q VLAN subinterface between customer routers R1 and R3, not an MPLS PE router."],
       ["R2's WAN interface failed, causing R3 to fall back from its direct E-Line with R2 to a backup E-Tree leaf connection through R1", "With three E-Lines terminating at central router R1 (R1-R2, R1-R3, R1-R4), there is no direct E-Line between R2 and R3."]
     ],
@@ -773,10 +773,10 @@ const q14 = [
     "VPN",
     "Hard",
     "Host PC1 (`10.2.2.2`) at a branch office sends a packet to Server S1 (`10.1.1.1`) at headquarters. Branch router BR1 (`64.100.9.9`) and headquarters firewall FW1 (`128.107.1.1`) connect the two sites using an IPsec site-to-site VPN tunnel over the Internet. What are the source and destination IP addresses visible in the outer IP header while the packet traverses the Internet, and what happens to the original IP header?",
-    "The outer IP header has source `64.100.9.9` and destination `128.107.1.1`, while the entire original IP packet (`10.2.2.2` to `10.1.1.1`) is encrypted inside the VPN payload",
+    "The outer IP header has source `64.100.9.9` and destination `128.107.1.1`, and the entire original IP packet is encrypted inside",
     [
       ["The outer IP header has source `10.2.2.2` and destination `10.1.1.1`, while only the TCP/UDP payload is encrypted by IPsec", "Private RFC 1918 addresses (`10.x.x.x`) cannot be routed across the public Internet; the VPN tunnel encapsulates the encrypted packet in a new outer IP header with public tunnel endpoint IPs."],
-      ["The outer IP header has source `64.100.9.9` and destination `10.1.1.1`, because BR1 performs PAT on the source IP before encrypting the data", "In a site-to-site VPN tunnel, the outer destination IP must be the public IP of the remote VPN peer (`128.107.1.1`), not the private server IP."],
+      ["The outer IP header has source `64.100.9.9` and destination `10.1.1.1` after BR1 performs PAT on the source IP prior to encryption", "In a site-to-site VPN tunnel, the outer destination IP must be the public IP of the remote VPN peer (`128.107.1.1`), not the private server IP."],
       ["The outer IP header has source `10.2.2.2` and destination `128.107.1.1`, and FW1 uses unencrypted GRE headers to hide the payload", "GRE alone performs encapsulation without encryption; IPsec encrypts the entire original packet and encapsulates it with public source and destination IPs."]
     ],
     "In an IPsec site-to-site VPN tunnel, the sending VPN gateway (`64.100.9.9`) encrypts the entire original IP packet (including its private `10.2.2.2` source and `10.1.1.1` destination header) using a shared session key, prepends VPN headers, and encapsulates it inside a new outer IP header addressed from `64.100.9.9` to `128.107.1.1`.",
@@ -787,7 +787,7 @@ const q14 = [
     "VPN",
     "Hard",
     "How does a remote user connecting from a coffee shop with the Cisco AnyConnect Secure Mobility Client differ from a user simply opening an HTTPS (`https://`) web application in a standard browser tab?",
-    "AnyConnect uses TLS to create a client VPN tunnel that encrypts all IP traffic from the PC to the enterprise, whereas browser HTTPS encrypts only that single browser session",
+    "AnyConnect uses a TLS VPN tunnel to encrypt all enterprise IP traffic from the PC, whereas HTTPS encrypts only that browser tab",
     [
       ["AnyConnect uses unencrypted GRE tunnels over UDP port 69, whereas browser HTTPS uses IPsec with pre-shared session keys", "Both AnyConnect remote access VPNs and HTTPS web browsing commonly use TLS encryption (typically over TCP port 443), not UDP port 69."],
       ["AnyConnect establishes a permanent hardware site-to-site VPN for everyone in the coffee shop, whereas HTTPS is on-demand for one PC", "AnyConnect is an on-demand software client installed on a single endpoint device to protect only that one device's traffic."],
@@ -802,8 +802,8 @@ const q14 = [
     "Medium",
     "Which two statements accurately describe physical access link options for Metro Ethernet and MPLS VPN WANs?",
     [
-      "Metro Ethernet access links typically use fiber-optic IEEE 802.3 standards such as 1000BASE-LX (5 km), 10GBASE-LR (10 km), or 1000BASE-ZX (100 km) to reach the provider PoP",
-      "MPLS VPNs can use almost any Layer 1/Layer 2 access link technology—including serial TDM, Metro Ethernet, cable, or 4G/5G cellular—because PE routers discard the Layer 2 frame header"
+      "Metro Ethernet access links typically use long-range fiber standards like 1000BASE-LX (5 km), 10GBASE-LR (10 km), or 1000BASE-ZX (100 km)",
+      "MPLS VPNs support almost any Layer 1/Layer 2 access link—such as serial TDM, MetroE, cable, or cellular—since PE routers strip the L2 header"
     ],
     [
       ["Metro Ethernet access links are limited to 100-meter copper UTP cables (1000BASE-T) between the customer site and the service provider PoP", "Because the provider PoP is typically kilometers away from the customer site, MetroE access links use long-distance single-mode fiber Ethernet standards rather than 100m UTP."],
@@ -854,7 +854,7 @@ const q15 = [
     "Virtualization",
     "Easy",
     "In server virtualization, which software layer runs on the physical host server to manage and allocate physical CPU, RAM, storage, and network resources to individual Virtual Machines (VMs)?",
-    "Hypervisor",
+    "Server Hypervisor (VMM)",
     [
       ["Virtual Switch (vSwitch)", "A vSwitch provides Layer 2 Ethernet switching between virtual NICs (vNICs) and physical NICs, but it does not allocate CPU, RAM, or disk storage."],
       ["Cloud Services Catalog", "A cloud services catalog is a self-service web portal where users request cloud resources via APIs rather than the host-level hardware manager."],
@@ -872,7 +872,7 @@ const q15 = [
     [
       ["Infrastructure as a Service (IaaS)", "IaaS provides virtualized computing hardware (vCPU, RAM, storage) and a base OS where the customer must install their own applications and tools."],
       ["Software as a Service (SaaS)", "SaaS provides a complete, ready-to-use end-user application (such as Office 365 Exchange Online or Dropbox) while hiding the OS and hardware."],
-      ["Intercloud Exchange as a Service (IEaaS)", "An intercloud exchange provides private WAN connectivity between enterprises and multiple public cloud providers, not a software development platform."]
+      ["Network as a Service (NaaS)", "An intercloud exchange provides private WAN connectivity between enterprises and multiple public cloud providers, not a software development platform."]
     ],
     "Platform as a Service (PaaS) targets software developers by providing virtual machines preloaded with an operating system plus development platforms, IDEs, and continuous integration tools (such as Google App Engine, Eclipse, and Jenkins).",
     "IaaS = VM + OS (you install apps); PaaS = Development platform/tools for coders; SaaS = Ready-to-use application for end users.",
@@ -882,7 +882,7 @@ const q15 = [
     "Cloud",
     "Easy",
     "In CCNA exam terminology, how do the terms 'on-premises' and 'cloud' map to traditional cloud deployment models?",
-    "On-premises refers to a private cloud (owned and operated internally by one company), whereas cloud refers to a public cloud (sold to external customers)",
+    "On-premises refers to an internal company-owned private cloud, whereas cloud refers to an external public cloud",
     [
       ["On-premises refers to unvirtualized physical desktop PCs only, whereas cloud refers to any server running a hypervisor", "An enterprise can run a fully virtualized data center with self-service catalog automation on-premises as a private cloud."],
       ["On-premises refers to Software as a Service (SaaS), whereas cloud refers to Infrastructure as a Service (IaaS)", "IaaS, PaaS, and SaaS are service models that can be deployed in either a private (on-premises) or public cloud."],
@@ -896,9 +896,9 @@ const q15 = [
     "Virtualization",
     "Easy",
     "In a traditional data center rack layout, how are Top of Rack (ToR) switches and End of Row (EoR) switches connected to provide redundancy for physical host servers?",
-    "Each server connects its two physical NICs to two different ToR switches (acting as access switches), which uplink to EoR switches (acting as distribution switches)",
+    "Each server connects its two physical NICs to two ToR access switches that uplink to redundant EoR distribution switches",
     [
-      ["Each server connects directly to two EoR switches first, which then downlink to ToR switches acting as core routers", "Servers connect to the Top of Rack (ToR) switches in their rack, and the ToR switches uplink to End of Row (EoR) distribution switches."],
+      ["Each server connects directly to two EoR switches first and those switches downlink to ToR switches acting as core routers", "Servers connect to the Top of Rack (ToR) switches in their rack, and the ToR switches uplink to End of Row (EoR) distribution switches."],
       ["Every ToR switch connects only to other ToR switches in a daisy-chain ring without using any distribution layer switches", "ToR switches act as access switches and uplink to EoR distribution switches rather than forming a daisy-chain ring."],
       ["Each server uses a single physical NIC connected to one ToR switch because virtual switches cannot support redundant uplinks", "Virtualized hosts typically have two or more physical NICs cabled to two separate ToR switches for hardware and link redundancy."]
     ],
@@ -924,7 +924,7 @@ const q15 = [
     "Virtualization",
     "Medium",
     "Six Virtual Machines (VMs) run on a single physical host server that has only two physical Ethernet NICs. How do all six VMs communicate on the network and get assigned to different VLANs?",
-    "Each VM has a virtual NIC (vNIC) connected to a software virtual switch (vSwitch) inside the host, which trunks over the two physical NICs to the external LAN switch",
+    "Each VM has a virtual NIC (vNIC) connected to an internal virtual switch (vSwitch) that trunks over the host's two physical NICs",
     [
       ["Four of the VMs must remain powered off at any given time because each running VM requires a dedicated physical Ethernet NIC", "A virtual switch (vSwitch) allows dozens of VMs with vNICs to share two physical NICs simultaneously."],
       ["All six VMs share a single MAC address and IP address on Physical NIC 1 while Physical NIC 2 is reserved for the hypervisor BIOS", "Each VM has its own independent OS, its own vNIC with a unique MAC address, and its own IP address."],
@@ -952,10 +952,10 @@ const q15 = [
     "Cloud",
     "Medium",
     "An enterprise wants to run a Cisco router inside a public cloud provider's IaaS environment so the enterprise can control its own IPsec VPN termination and routing policies in the cloud. Which Cisco product fulfills this role?",
-    "Cisco Cloud Services Router (CSR) 1000V running as a virtual router VM in the cloud",
+    "Cisco Cloud Services Router (CSR) 1000V, deployed as a virtual router VM in the cloud environment",
     [
       ["Cisco Unified Computing System (UCS) B-Series Blade Chassis, installed at the enterprise branch office", "Cisco UCS B-Series is physical blade server hardware for a data center rack, not a virtual router VM running inside a public cloud."],
-      ["Cisco Nexus 1000VE, which is a physical core router appliance shipped to the ISP's Central Office", "The Nexus 1000VE is a software virtual switch (vSwitch) for hypervisors, not a physical WAN router appliance."],
+      ["Cisco Nexus 1000VE, deployed as a physical core router appliance at the ISP's Central Office", "The Nexus 1000VE is a software virtual switch (vSwitch) for hypervisors, not a physical WAN router appliance."],
       ["Cisco AnyConnect Secure Mobility Client, installed on the public cloud provider's Top-of-Rack switch", "AnyConnect is an endpoint remote-access VPN client for user PCs and mobile devices, not a cloud router VM."]
     ],
     "The Cisco Cloud Services Router (CSR) is a virtual router that runs as a VM inside a public or private cloud environment. It allows the enterprise cloud consumer to configure familiar Cisco IOS routing and VPN termination features directly inside the public cloud.",
@@ -966,7 +966,7 @@ const q15 = [
     "Cloud",
     "Hard",
     "An enterprise requires a WAN connection to a public cloud provider that guarantees data privacy, supports end-to-end QoS markings for voice/video, and allows easy migration to a different public cloud provider in the future without ordering new physical WAN circuits. According to the public cloud WAN comparison, which WAN option meets all three requirements?",
-    "Connecting via a permanent private WAN to an Intercloud Exchange",
+    "Connecting the enterprise via a private WAN circuit to a multi-provider Intercloud Exchange",
     [
       ["Connecting directly to the public cloud provider using an MPLS VPN or Metro Ethernet WAN circuit", "Direct MPLS or MetroE circuits provide privacy and QoS, but migrating to a new cloud provider requires ordering and installing new private WAN circuits."],
       ["Connecting to the public cloud provider over the public Internet using an IPsec VPN tunnel", "An Internet VPN provides privacy and easy provider migration, but it cannot provide QoS because it traverses the public Internet."],
@@ -980,7 +980,7 @@ const q15 = [
     "Cloud",
     "Hard",
     "An enterprise with 50 branch offices connected via private WAN links to a central headquarters (where the company's only Internet circuits reside) migrates its internal headquarters Exchange email servers to a public cloud SaaS email service (Office 365). What happens to WAN traffic when a branch user emails a 20-MB attachment to a coworker sitting at the next desk in the same branch office?",
-    "Private WAN usage remains unchanged while central Internet link usage increases, because the 20-MB email travels from the branch over the private WAN to HQ, out HQ's Internet link to the cloud, and back the same way",
+    "Private WAN usage remains unchanged while HQ Internet link usage increases because the 20-MB email hairpins via HQ to the cloud and back",
     [
       ["Private WAN usage drops to zero because the two branch PCs automatically transfer the 20-MB SaaS email directly across their local branch LAN switch", "Email clients send and retrieve messages via the cloud SaaS email servers, not peer-to-peer between desktop PCs."],
       ["Central Internet link usage drops by 50% because moving email servers to the public cloud keeps all internal company emails inside the private MPLS WAN", "Once email moves to a public cloud SaaS provider reached via the Internet, 100% of branch email traffic must traverse the enterprise's Internet circuits."],
@@ -1062,11 +1062,11 @@ const q16 = [
     "SDN",
     "Easy",
     "Which plane of a networking device is responsible for per-packet or per-frame forwarding actions such as matching the MAC address table, matching the IP routing table, performing NAT, and discarding packets filtered by an ACL?",
-    "Data plane (forwarding plane)",
+    "Data or Forwarding Plane",
     [
-      ["Control plane", "The control plane runs protocols like OSPF, STP, and ARP to build and populate the forwarding tables, rather than forwarding individual user packets."],
-      ["Device Management and Telemetry Plane", "The management plane handles device administration and monitoring protocols such as SSH, Telnet, SNMP, and Syslog."],
-      ["Northbound plane", "Northbound refers to the API interface between an SDN controller and external automation applications, not a plane inside a router or switch."]
+      ["Distributed Control Plane", "The control plane runs protocols like OSPF, STP, and ARP to build and populate the forwarding tables, rather than forwarding individual user packets."],
+      ["Device Management Plane", "The management plane handles device administration and monitoring protocols such as SSH, Telnet, SNMP, and Syslog."],
+      ["Northbound Interface Plane", "Northbound refers to the API interface between an SDN controller and external automation applications, not a plane inside a router or switch."]
     ],
     "The data plane (also called the forwarding plane) encompasses every action a router or switch performs on user traffic as it enters, is processed, and exits the device—including table lookups, encapsulation/de-encapsulation, 802.1Q tagging, NAT translation, VPN encryption, and ACL filtering.",
     "Data plane = processes and forwards every user packet; Control plane = builds the tables; Management plane = SSH/Telnet/SNMP/Syslog.",
@@ -1090,7 +1090,7 @@ const q16 = [
     "SDN",
     "Easy",
     "Inside a Cisco LAN switch, why are data plane frame forwarding and table lookups performed by an ASIC and TCAM rather than by the general-purpose CPU and RAM?",
-    "Switches must forward millions of frames per second, and TCAM returns exact table matches to the ASIC in hardware without running a CPU software search loop",
+    "Switches forward millions of frames per second, and TCAM provides instant hardware table lookups for the ASIC",
     [
       ["ASICs and TCAM are used only to store the Cisco IOS `.bin` image and NVRAM `startup-config` when power is removed", "Flash and NVRAM store the IOS image and startup-config; ASICs and TCAM handle high-speed real-time frame forwarding."],
       ["The general-purpose CPU and RAM cannot run control plane protocols like STP or management protocols like SSH", "Cisco IOS runs in the general-purpose CPU and RAM to handle control plane protocols (like STP/OSPF) and management plane protocols (like SSH/SNMP)."],
@@ -1104,7 +1104,7 @@ const q16 = [
     "Controllers",
     "Easy",
     "In a controller-based network architecture, what is the difference between a Southbound Interface (SBI) and a Northbound Interface (NBI)?",
-    "The SBI connects the controller downward to switches/routers, while the NBI connects upward to applications",
+    "The SBI connects the controller downward to network devices, whereas the NBI connects the controller upward to applications",
     [
       ["The SBI connects the controller upward to Python automation scripts, whereas the NBI connects the controller downward to switches via OpenFlow", "This reverses north and south: on architecture diagrams, applications sit above (north of) the controller and network devices sit below (south of) the controller."],
       ["The SBI is the physical RJ-45 console port on a router, whereas the NBI is the fiber-optic SFP uplink port on a switch", "In SDN architecture, NBI and SBI refer to software/protocol interfaces (APIs and protocols) on the controller, not physical cable ports."],
@@ -1132,7 +1132,7 @@ const q16 = [
     "Controllers",
     "Medium",
     "How does Cisco Application Centric Infrastructure (ACI) use Endpoint Groups (EPGs) and policies with its APIC controller to implement intent-based networking in a data center?",
-    "Engineers or cloud software define EPGs (such as Web, App, and DB) and access policies on the APIC, which uses OpFlex to instruct leaf switches how to forward traffic regardless of where VMs move",
+    "Engineers define EPGs and security policies on the APIC, and the APIC uses OpFlex to push forwarding policies to the leaf switches",
     [
       ["Engineers manually configure VLAN IDs, 802.1Q trunks, and extended IP ACLs on each Nexus 9000 switch CLI before the APIC can discover the servers", "ACI replaces manual per-port VLAN, trunk, and ACL CLI configuration with application-centric EPGs and policies defined centrally on the APIC."],
       ["The APIC removes all control plane software from the Nexus switches and uses OpenFlow to program every individual MAC address entry", "OpenFlow is used by the ONF/OpenDaylight model; Cisco ACI uses the OpFlex SBI protocol and retains a partial control plane on the Nexus 9000 switches."],
@@ -1146,7 +1146,7 @@ const q16 = [
     "Controllers",
     "Medium",
     "How do the three SDN examples—OpenFlow (OpenDaylight), Cisco ACI (APIC), and Cisco APIC-EM—differ in the degree to which they centralize the control plane?",
-    "OpenFlow mostly centralizes the control plane, Cisco ACI partially centralizes it (retaining some switch control plane), and APIC-EM centralizes none of it (interacting via the management plane)",
+    "OpenFlow mostly centralizes the control plane, Cisco ACI partially centralizes it, and APIC-EM leaves it distributed on the devices",
     [
       ["All three architectures completely remove the control plane from the switches and program the TCAM directly using OpenFlow", "Only the OpenFlow model mostly centralizes the control plane; ACI keeps partial control plane functions in the switches, and APIC-EM leaves traditional distributed control planes untouched."],
       ["APIC-EM mostly centralizes the control plane, OpenFlow partially centralizes it, and Cisco ACI leaves the control plane 100% distributed", "This reverses the architectures: APIC-EM uses SSH/Telnet/SNMP to manage traditional routers and switches that keep their distributed control planes."],
@@ -1174,7 +1174,7 @@ const q16 = [
     "SDN",
     "Hard",
     "An engineer wants to write a Python script to verify whether a switch port is administratively set to `dynamic auto` and operationally `static access`. How does querying a controller's Northbound REST API compare to running `show interfaces gigabit 0/1 switchport` via SSH on the switch?",
-    "The controller's NBI returns structured model-driven variables (such as JSON converted to a Python dictionary) ready for logic checks, whereas SSH returns unstructured human-readable text that the script must parse",
+    "The controller's NBI returns structured JSON data that converts into Python dictionaries, whereas SSH returns unstructured CLI text to parse",
     [
       ["The controller's NBI returns a raw screenshot image of the CLI output, whereas SSH returns a pre-parsed Python dictionary of key:value pairs", "SSH CLI commands return unstructured multi-line text strings designed for human eyes, whereas controller REST APIs return structured data (JSON/XML)."],
       ["Both methods require the Python script to log into every switch individually via Telnet and run regular expressions against the show output", "With a controller NBI, the script makes a single API call to the controller and receives structured variables without logging into individual switches."],
@@ -1188,7 +1188,7 @@ const q16 = [
     "Controllers",
     "Hard",
     "Why is implementing an application like Path Trace (which maps the exact hop-by-hop forwarding path and ACL decisions between two IP hosts) much simpler using a Cisco controller (APIC-EM or DNA Center) than writing a standalone script against traditional devices?",
-    "A single northbound API call passes the source/destination IPs and ports to the controller, which analyzes its centralized topology and table database and returns the complete end-to-end path",
+    "One northbound API call passes the flow parameters to the controller so it can analyze its centralized topology database and return the path",
     [
       ["The controller sends thousands of live ICMP echo broadcast packets across all VLANs and waits for every switch ASIC to reply with an SNMP Trap", "Path Trace does not flood live broadcasts; the controller calculates the forwarding path by analyzing its collected topology, routing, MAC, and ACL data."],
       ["Traditional devices do not store IP routing tables or MAC address tables locally, so only a controller has access to forwarding information", "Traditional routers and switches do store their own tables locally, but without a controller your script would have to poll every device and reconstruct the path logic itself."],
@@ -1203,13 +1203,13 @@ const q16 = [
     "Medium",
     "Which two statements accurately compare controller-based networking and automation against traditional per-device network management?",
     [
-      "Controller-based networking shifts operations from device-by-device CLI configuration to network-wide policy configuration, producing more consistent device settings and fewer human errors",
+      "Controller-based networking shifts operations from per-device CLI changes to network-wide policy, yielding consistent configs and fewer errors",
       "Centralized collection of operational data at the controller enables modern data analytics and faster project completion compared to manual per-device workflows"
     ],
     [
       ["Traditional networking requires a single centralized control plane server, whereas controller-based networking distributes all control plane logic across isolated switches", "This is backwards: traditional networking uses a distributed control plane on every device, while controller-based networking centralizes control plane or management functions."],
       ["Controller-based networking eliminates the data plane from physical switches so that every Ethernet frame must be routed through the controller's CPU", "Physical switches always retain their high-speed hardware data plane (ASIC and TCAM); the controller is in the control/management path, not the user data plane."],
-      ["Controller-based networking prohibits third-party orchestration or cloud software from interacting with the network", "Northbound APIs on controllers explicitly enable cloud, virtualization, and third-party orchestration software to program the network automatically."]
+      ["Controller-based networking prohibits external cloud orchestration platforms or third-party scripts from interacting with the network via APIs", "Northbound APIs on controllers explicitly enable cloud, virtualization, and third-party orchestration software to program the network automatically."]
     ],
     "Controller-based networking centralizes network visibility and policy control, allowing engineers and applications (via Northbound APIs) to configure the network as a whole rather than typing CLI commands box by box. Through Southbound APIs, the controller pushes consistent, error-free configurations and applies analytics to network-wide operational data.",
     "Controller benefits: Network-wide policy (not per-box CLI), consistent config, fewer errors, faster changes, NBI automation, and centralized analytics.",
@@ -1220,8 +1220,8 @@ const q16 = [
     "Hard",
     "Which two statements accurately describe the OpenDaylight (ODL) controller and Cisco's SDN controller evolution?",
     [
-      "OpenDaylight is an open-source SDN controller project managed by the Linux Foundation that supports multiple southbound interfaces including OpenFlow, NETCONF, BGP-LS, PCEP, and OVSDB",
-      "Cisco transitioned away from its commercial OpenDaylight-based controller (Cisco OSC) toward intent-based networking (IBN) controllers such as APIC (for ACI) and DNA Center (for SDA)"
+      "OpenDaylight is a Linux Foundation open-source SDN controller supporting southbound protocols like OpenFlow, NETCONF, and OVSDB",
+      "Cisco moved from its commercial OpenDaylight controller toward intent-based controllers like APIC for ACI and DNA Center for SDA"
     ],
     [
       ["OpenDaylight is a Cisco-proprietary closed-source controller that supports only Telnet and SNMPv1 as its southbound interfaces", "OpenDaylight is a multi-vendor open-source project under the Linux Foundation that supports modern SBIs like OpenFlow and NETCONF."],
@@ -1271,7 +1271,7 @@ const q17 = [
     "Controllers",
     "Easy",
     "In Cisco Software-Defined Access (SDA), how are the terms 'underlay', 'overlay', and 'fabric' defined?",
-    "The underlay provides L3 IP reachability, the overlay tunnels endpoint traffic via VXLAN, and the fabric combines both",
+    "The underlay provides physical links and L3 IP reachability, the overlay tunnels traffic via VXLAN, and the fabric combines both layers",
     [
       ["The overlay provides physical cabling and IS-IS routing, the underlay uses VXLAN tunnels for endpoints, and the fabric is the DNA Center GUI", "This swaps underlay and overlay: the underlay is the physical/IP foundation, while the overlay is the virtual VXLAN tunneling layer on top."],
       ["The underlay is the Northbound REST API, the overlay is the Southbound SNMP interface, and the fabric is the Cisco Prime server", "Underlay, overlay, and fabric all sit south of the DNA Center controller to deliver user data across the campus."],
@@ -1299,7 +1299,7 @@ const q17 = [
     "Controllers",
     "Easy",
     "In a Cisco SDA campus network, what are the distinct functions of a Fabric Edge Node, a Fabric Border Node, and a Fabric Control Node?",
-    "Edge nodes connect to user endpoints, Border nodes connect the fabric to external networks (like WAN routers or data centers), and Control nodes run the LISP map server",
+    "Edge nodes connect to user endpoints, Border nodes connect to external networks, and Control nodes run the LISP map server",
     [
       ["Edge nodes connect to the WAN, Border nodes connect to desktop PCs and IP phones, and Control nodes terminate IPsec VPNs", "This swaps Edge and Border nodes: Fabric Edge nodes are equivalent to access switches connecting endpoints, while Border nodes connect outside the SDA fabric."],
       ["Edge nodes act as spine switches, Border nodes act as leaf switches, and Control nodes act as Top-of-Rack virtual switches", "Spine, leaf, and ToR vSwitch are data center (ACI) roles rather than campus SDA fabric node roles."],
@@ -1313,11 +1313,11 @@ const q17 = [
     "Controllers",
     "Easy",
     "Which northbound and southbound interfaces are supported by the Cisco DNA Center controller?",
-    "A Northbound REST API and Southbound interfaces (SSH, SNMP, NETCONF, and RESTCONF)",
+    "A Northbound REST API and Southbound SSH, SNMP, NETCONF, and RESTCONF APIs",
     [
       ["A Northbound OpenFlow interface and a Southbound OpFlex interface exclusively", "OpenFlow is used by OpenDaylight and OpFlex is used by Cisco APIC in ACI; DNA Center uses a REST NBI and SSH/Telnet/SNMP/NETCONF/RESTCONF SBIs."],
       ["A Northbound SNMPv2c interface and a Southbound Ansible playbook interface", "SNMP is a southbound protocol from DNA Center to devices, and Ansible is an external configuration management tool, not a DNA Center SBI."],
-      ["A Northbound EIGRP interface and a Southbound TFTP interface", "EIGRP is a routing protocol and TFTP is a file transfer protocol; DNA Center uses REST northbound and SSH/SNMP/NETCONF/RESTCONF southbound."]
+      ["A Northbound EIGRP routing interface and a Southbound TFTP file interface", "EIGRP is a routing protocol and TFTP is a file transfer protocol; DNA Center uses REST northbound and SSH/SNMP/NETCONF/RESTCONF southbound."]
     ],
     "Cisco DNA Center exposes a comprehensive Northbound REST API (and web GUI) for humans and automation scripts, and supports both traditional Southbound protocols (Telnet, SSH, SNMP) for legacy devices and modern Southbound programmatic protocols (NETCONF, RESTCONF) for newer IOS-XE platforms.",
     "DNA Center NBI = REST API; DNA Center SBI = Legacy (Telnet, SSH, SNMP) + Modern (NETCONF, RESTCONF).",
@@ -1327,11 +1327,11 @@ const q17 = [
     "Controllers",
     "Medium",
     "When Cisco DNA Center automatically configures a greenfield (all-new hardware) SDA underlay, why are Spanning Tree Protocol (STP/RSTP) and HSRP no longer needed?",
-    "DNA Center configures a routed access layer where all switches are Layer 3 switches running IS-IS over Layer 3 links and each Fabric Edge node acts as the local default gateway",
+    "DNA Center builds a routed access layer using IS-IS over Layer 3 links with each Edge node as the default gateway",
     [
       ["DNA Center places all switch ports into a single flat Layer 2 VLAN and uses VTP pruning to block broadcast loops", "A greenfield SDA underlay uses Layer 3 routed links between all switches rather than Layer 2 trunks, eliminating Layer 2 loops and STP."],
       ["DNA Center disables all redundant physical links between access and distribution switches so only a single path exists", "SDA keeps redundant physical links between switches and uses the IS-IS routing protocol to route across all links without STP blocking."],
-      ["DNA Center requires every desktop PC to run OSPF and BGP directly with the WAN edge routers", "End-user PCs still use a standard default gateway IP address, which is hosted directly on their connected Fabric Edge node (anycast gateway)."]
+      ["DNA Center requires every connected desktop PC to run OSPF and BGP directly with the campus WAN edge routers", "End-user PCs still use a standard default gateway IP address, which is hosted directly on their connected Fabric Edge node (anycast gateway)."]
     ],
     "In a greenfield SDA deployment, DNA Center configures a routed access layer design: every switch acts as a Layer 3 switch, every inter-switch link is a Layer 3 routed link running the IS-IS routing protocol (eliminating Layer 2 loops and STP/RSTP), and every Fabric Edge switch acts as the default gateway for its attached endpoints (eliminating HSRP between distribution switches).",
     "Greenfield SDA Underlay = Routed Access Layer (L3 switches + L3 links + IS-IS routing = NO STP and NO HSRP!).",
@@ -1341,7 +1341,7 @@ const q17 = [
     "Controllers",
     "Medium",
     "Why does Cisco recommend manually configuring the SDA underlay (rather than letting DNA Center automate the underlay configuration) when deploying SDA on existing switches that are already carrying live production traffic?",
-    "To avoid automated underlay provisioning overwriting the existing production routing configuration",
+    "Because automated underlay provisioning could overwrite existing configurations and disrupt live production network traffic",
     [
       ["Because DNA Center's Southbound interface only supports wireless access points and cannot configure wired Catalyst switches", "DNA Center fully configures wired Catalyst switches in greenfield deployments via its southbound interfaces."],
       ["Because existing switches cannot use VXLAN in hardware and must have their ASICs replaced with software virtual switches", "Existing switches used for SDA must already be on the SDA hardware compatibility list (such as Catalyst 3650/3850/9000 with capable ASICs)."],
@@ -1355,7 +1355,7 @@ const q17 = [
     "Controllers",
     "Medium",
     "How do Cisco SDA and DNA Center use Scalable Groups and Scalable Group Tags (SGTs) to overcome the maintenance problems of traditional IP-based Access Control Lists (ACLs)?",
-    "Users are assigned to Scalable Groups (via DNA Center and Cisco ISE), and security policies are defined in an SGT-to-SGT matrix enforced via SGT fields inside the VXLAN header, independent of IP addresses",
+    "DNA Center and ISE assign users to Scalable Groups and enforce SGT-to-SGT matrix policies via VXLAN headers instead of IPs",
     [
       ["DNA Center automatically converts every user's MAC address into a 500-line numbered standard IPv4 ACL on every router interface", "SDA replaces complex IP-based ACLs with group-based policies using Scalable Group Tags (SGTs) carried in the VXLAN header."],
       ["SGTs are 3-bit QoS markings placed inside the 802.1Q CoS field to prioritize voice packets over FTP file transfers", "3-bit markings in the 802.1Q header are Class of Service (CoS) bits for QoS, whereas SGTs identify security groups in the VXLAN header."],
@@ -1369,7 +1369,7 @@ const q17 = [
     "Controllers",
     "Medium",
     "Which network management capabilities are shared by BOTH traditional management platforms (such as Cisco Prime Infrastructure) AND Cisco DNA Center?",
-    "Device discovery, inventory and topology mapping, converged wired/wireless management, Day 0 Plug-and-Play, Day 1/Day N lifecycle management, and Software Image Management (SWIM)",
+    "Device discovery, topology mapping, wired/wireless management, Day 0/1/N lifecycle provisioning, and SWIM image updates",
     [
       ["Full configuration and operation of Cisco Software-Defined Access (SDA) VXLAN fabrics and Scalable Group Tags", "Only Cisco DNA Center acts as the controller for SDA fabrics; traditional platforms like Cisco Prime Infrastructure do not support SDA."],
       ["Encrypted Traffic Analysis (ETA), Network Time Travel client playback, and Path Trace with hop-by-hop ACL permit/deny analysis", "Encrypted Traffic Analysis, Network Time Travel, Device/Client 360, and ACL-aware Path Trace are advanced capabilities unique to Cisco DNA Center."],
@@ -1383,7 +1383,7 @@ const q17 = [
     "Controllers",
     "Hard",
     "In an SDA campus where the enterprise endpoint address space (overlay) is `10.0.0.0/8` and the SDA underlay address space is `172.16.0.0/16`, Host A (`10.1.1.1`) connected to Fabric Edge SW1 (`RLOC 172.16.1.1`) sends a frame to Host B (`10.1.3.1`) connected to Fabric Edge SW3 (`RLOC 172.16.3.3`). After SW1 queries the LISP map server, what are the destination IP addresses in the inner (original) IP header and the outer VXLAN tunnel IP header as the packet crosses the fabric?",
-    "The inner IP destination is `10.1.3.1` (EID) and the outer VXLAN IP destination is `172.16.3.3` (RLOC)",
+    "The inner original IP header has destination `10.1.3.1` (EID), and the outer VXLAN tunnel IP header has destination `172.16.3.3` (RLOC)",
     [
       ["The inner original IP header has destination `172.16.3.3`, and the outer VXLAN tunnel IP header has destination `10.1.3.1`", "This swaps the inner and outer headers: the underlay routes the outer IP header to SW3's RLOC (`172.16.3.3`), while the inner frame preserves Host B's EID (`10.1.3.1`)."],
       ["Both the inner and outer IP headers use destination `10.1.3.1` because VXLAN encapsulates only the TCP segment without adding an outer IP header", "VXLAN encapsulates the entire original Ethernet frame inside VXLAN, UDP, and a new outer IP header addressed to the egress RLOC."],
@@ -1397,7 +1397,7 @@ const q17 = [
     "Controllers",
     "Hard",
     "Why must Cisco SDA encapsulate the entire original Layer 2 Ethernet frame inside a VXLAN header (performed in the switch ASIC) rather than simply encapsulating the Layer 3 IP packet inside a traditional GRE tunnel?",
-    "Encapsulating the entire data-link frame allows SDA to support both Layer 2 and Layer 3 forwarding across the fabric, while the extensible VXLAN header carries VNIDs and SGTs at line rate in hardware ASICs",
+    "Because VXLAN encapsulates full Layer 2 frames for L2/L3 fabric forwarding and carries VNIDs and SGTs at line rate in switch ASICs",
     [
       ["Because VXLAN encrypts the entire Ethernet frame using a 256-bit IPsec session key, whereas GRE leaves the payload in clear text", "VXLAN is a tunneling encapsulation protocol (not an encryption protocol) that carries VNIDs, SGTs, and the original Layer 2 frame."],
       ["Because traditional switches cannot route IPv4 packets in hardware and must send all Layer 3 packets to the DNA Center appliance over TCP", "Multilayer switches route IPv4 packets in hardware ASICs; VXLAN is chosen to preserve Layer 2 frames and carry SGT/VNID metadata in hardware."],
@@ -1412,12 +1412,12 @@ const q17 = [
     "Medium",
     "Which two features are unique to Cisco DNA Center when compared against traditional campus network management tools like Cisco Prime Infrastructure?",
     [
-      "Encrypted Traffic Analysis (ETA), which uses algorithms to detect security threats hidden inside encrypted traffic flows",
-      "Device 360, Client 360, and Network Time Travel, which provide a 360-degree health view and historical timeline playback of client performance"
+      "Encrypted Traffic Analysis (ETA) to detect malware and security threats hidden inside encrypted network flows",
+      "Device 360, Client 360, and Network Time Travel for full health dashboards and historical client playback"
     ],
     [
-      ["Discovering network devices via SNMP and CDP/LLDP to display a visual topology map in a web browser", "Both Cisco Prime Infrastructure and Cisco DNA Center discover devices and render interactive topology maps."],
-      ["Automating IOS software upgrades across switches using Software Image Management (SWIM)", "Both Cisco Prime Infrastructure and Cisco DNA Center include Software Image Management (SWIM) and Day 0 Plug-and-Play."],
+      ["Discovering network devices via SNMP and CDP/LLDP to render an interactive topology map in the web GUI", "Both Cisco Prime Infrastructure and Cisco DNA Center discover devices and render interactive topology maps."],
+      ["Automating Cisco IOS software image distribution and upgrades using Software Image Management (SWIM)", "Both Cisco Prime Infrastructure and Cisco DNA Center include Software Image Management (SWIM) and Day 0 Plug-and-Play."],
       ["Requiring engineers to type manual CLI access-list commands on every switch port to filter traffic between user groups", "DNA Center eliminates manual per-box ACL typing by using intent-based Scalable Group Tags (SGTs) and policies."]
     ],
     "While DNA Center shares core lifecycle tools (Discovery, Topology, PnP, SWIM) with Cisco Prime Infrastructure, DNA Center uniquely adds SDA fabric control, EasyQoS, Encrypted Traffic Analysis (ETA), Device 360 / Client 360 health dashboards, Network Time Travel historical timelines, and ACL-aware Path Trace.",
@@ -1429,13 +1429,13 @@ const q17 = [
     "Hard",
     "Examine the SDA Scalable Group access policy matrix below:\n- Source Employee -> Dest Employee: N/A | Dest Internet: Permit | Dest Partner: Permit | Dest Guest: Deny\n- Source Guest -> Dest Employee: Deny | Dest Internet: Permit | Dest Partner: Deny | Dest Guest: N/A\nWhich two actions occur when a Guest endpoint tries to send packets to an Employee endpoint versus to the Internet?",
     [
-      "When the Guest endpoint sends its first packet toward the Internet, DNA Center (working with ISE) verifies the SGT policy and directs the edge nodes to forward the traffic over the VXLAN tunnel",
-      "When the Guest endpoint attempts to send a packet to an Employee endpoint, DNA Center sees the Deny policy between the Guest and Employee SGTs and prevents the fabric from delivering the traffic"
+      "When the Guest endpoint sends packets toward the Internet, DNA Center and ISE verify the Permit policy and allow VXLAN forwarding across the fabric",
+      "When the Guest endpoint sends packets to an Employee endpoint, DNA Center enforces the Deny policy between their SGTs and blocks fabric delivery"
     ],
     [
       ["The ingress Fabric Edge switch must first inspect a 200-line IPv4 extended ACL in software to check whether the Guest IP subnet overlaps with the Employee IP subnet", "SDA enforces security based on source and destination Scalable Group Tags (SGTs) rather than IP subnet ranges in legacy ACLs."],
       ["Removing the Guest-to-Partner Deny rule requires auditing and reordering all Employee ACE sequence numbers so Employee-to-Internet traffic is not accidentally blocked", "Unlike traditional ACLs where rule order and overlapping ACEs make deletions risky, each SGT matrix cell is independent and can be changed safely."],
-      ["The Guest endpoint must first establish a CAPWAP tunnel to Cisco Prime Infrastructure to receive its Scalable Group Tag", "DNA Center works with Cisco Identity Services Engine (ISE) to authenticate users and assign SGTs, not Cisco Prime Infrastructure."]
+      ["The Guest endpoint must first establish a CAPWAP tunnel to Cisco Prime Infrastructure before the fabric can assign its Scalable Group Tag", "DNA Center works with Cisco Identity Services Engine (ISE) to authenticate users and assign SGTs, not Cisco Prime Infrastructure."]
     ],
     "In SDA group-based security, DNA Center integrates with Cisco Identity Services Engine (ISE) to map authenticated users/endpoints to Scalable Group Tags (SGTs). Each cell in the source-to-destination SGT matrix is independent—allowing Guest-to-Internet traffic while blocking Guest-to-Employee traffic without relying on IP subnet ACLs or rule ordering.",
     "SGT matrix policies are independent cells (no ACL sequence-number dependencies) enforced via DNA Center + Cisco ISE.",
@@ -1499,7 +1499,7 @@ const q18 = [
     "Each REST request is independent, and the server stores no client session state between API calls",
     [
       ["The REST API cannot use TCP as its transport protocol and must always run over connectionless UDP port 69", "Most REST APIs run over HTTP/HTTPS, which uses stateful TCP at Layer 4; 'stateless' in REST refers to the application/API layer not retaining session history between calls."],
-      ["The REST server is prohibited from returning operational state variables (such as interface up/down status) to the client", "REST APIs routinely return device operational and configuration state variables; stateless means the API exchange itself does not rely on prior API calls."],
+      ["The REST server is prohibited from returning operational interface state variables to a client script", "REST APIs routinely return device operational and configuration state variables; stateless means the API exchange itself does not rely on prior API calls."],
       ["Every REST API response is permanently banned from being cached by the client application", "REST explicitly requires responses to be clearly marked as either cacheable or non-cacheable to improve performance when appropriate."]
     ],
     "One of Roy Fielding's six foundational constraints for REST is stateless operation: the server does not keep client context between requests. Every REST request from a client must contain all the information needed to process it, without relying on stored history from earlier API exchanges.",
@@ -1538,10 +1538,10 @@ const q18 = [
     "REST/JSON",
     "Medium",
     "Examine the following Cisco DNA Center REST API URI:\n`https://dnac.example.com/dna/intent/api/v1/network-device?hostname=cat_9k_1&role=ACCESS`\nHow are the four components of this URI categorized?",
-    "`https` is the protocol, `dnac.example.com` is the hostname/address, `dna/intent/api/v1/network-device` is the path (resource), and `hostname=cat_9k_1&role=ACCESS` is the query (parameters)",
+    "`https` is the protocol, `dnac.example.com` is the host, `dna/intent/api/v1/network-device` is the path, and `hostname=cat_9k_1&role=ACCESS` is the query",
     [
       ["`https://dnac.example.com` is the resource path, `dna/intent/api/v1` is the query parameter, and `network-device?hostname=cat_9k_1` is the HTTP verb", "The HTTP verb (such as GET or POST) sits in the HTTP header outside the URI, and the query parameters begin after the `?` character."],
-      ["`https` is the CRUD action, `dnac.example.com/dna/intent` is the hostname, and `api/v1/network-device?hostname=cat_9k_1&role=ACCESS` is the JSON array", "The hostname ends at the first single slash `/`, the path (resource) runs from the first `/` to the `?`, and the query parameters follow the `?`."],
+      ["`https` is the CRUD action, `dnac.example.com/dna/intent` is the server hostname, and `api/v1/network-device?hostname=cat_9k_1&role=ACCESS` is the JSON array", "The hostname ends at the first single slash `/`, the path (resource) runs from the first `/` to the `?`, and the query parameters follow the `?`."],
       ["`dnac.example.com` is the protocol, `dna/intent/api/v1/network-device` is the server IP address, and `role=ACCESS` is the HTTP return status code", "The HTTP return status code (such as `200 OK`) is returned by the server in the HTTP response message, not sent in the request URI."]
     ],
     "A REST URI consists of: (1) the protocol (`https`) before `://`, (2) the server hostname or IP address (`dnac.example.com`) between `//` and the first `/`, (3) the path (`dna/intent/api/v1/network-device`) after the first `/` that uniquely identifies the API resource, and (4) optional query parameters after the `?` (`hostname=cat_9k_1&role=ACCESS`) that filter or customize the request.",
@@ -1552,7 +1552,7 @@ const q18 = [
     "REST/JSON",
     "Medium",
     "An engineer uses the Postman API development tool to test a REST `GET` request against Cisco DevNet's sandbox DNA Center (`sandboxdnac2.cisco.com`) and receives status code `200 OK`. Beyond testing API calls interactively, what feature of Postman helps speed up writing a Python automation script?",
-    "Postman can automatically generate ready-to-copy code snippets (such as Python code) for the tested REST API call so the engineer can paste it into a script",
+    "Postman can generate ready-to-copy Python code snippets for the tested REST API call to paste in scripts",
     [
       ["Postman acts as an agent on Cisco IOS switches to replace SSH and NETCONF with proprietary Postman tunnels", "Postman is a client-side API development environment tool that runs on the engineer's workstation, not an agent installed on switches."],
       ["Postman automatically converts traditional Layer 2 access switches into Spine-and-Leaf Nexus 9000 hardware", "Postman tests REST API calls and inspects JSON/XML responses; it does not change physical switch hardware."],
@@ -1566,7 +1566,7 @@ const q18 = [
     "REST/JSON",
     "Medium",
     "How do JSON, XML, and YAML compare in terms of syntax and typical use cases in network automation?",
-    "JSON uses `{ }` and `[ ]` (common in REST APIs), XML uses `<tag></tag>` markup (common in REST APIs and web pages), and YAML uses clean indentation and `---` (common in Ansible playbooks)",
+    "JSON uses `{ }` and `[ ]` for REST APIs, XML uses `<tag></tag>` markup, and YAML uses clean indentation for Ansible playbooks",
     [
       ["JSON uses `<tag></tag>` markup, XML uses `[ ]` and `{ }`, and YAML is a binary-only format that cannot be read by humans", "This swaps JSON and XML syntax, and YAML ('YAML Ain't Markup Language') is actually the most human-readable text format of the three."],
       ["JSON is defined by the W3C for web page fonts, XML is defined by RFC 8259 for JavaScript, and YAML is used exclusively by SNMPv1", "JSON is standardized in IETF RFC 8259 (derived from JavaScript), whereas XML is defined by the W3C."],
@@ -1580,7 +1580,7 @@ const q18 = [
     "REST/JSON",
     "Medium",
     "What is the difference between 'beautified' (pretty) JSON and 'minified' (raw) JSON?",
-    "Beautified JSON includes line breaks and indentation for human readability, whereas minified JSON strips unnecessary whitespace for compact storage and network transmission",
+    "Beautified JSON adds line breaks and indentation for humans, whereas minified JSON strips extra whitespace to save bandwidth",
     [
       ["Beautified JSON encloses keys in double quotes, whereas minified JSON removes all double quotes, colons, and curly braces", "Both beautified and minified JSON must strictly follow JSON syntax rules (including curly braces, colons, and double-quoted keys)."],
       ["Beautified JSON is used exclusively for HTTP POST requests, whereas minified JSON is used exclusively for HTTP DELETE requests", "Whitespace formatting does not change the meaning of JSON data or restrict which HTTP verb can carry it."],
@@ -1594,11 +1594,11 @@ const q18 = [
     "REST/JSON",
     "Hard",
     "Examine the JSON data shown in the exhibit. How many total JSON objects, how many total JSON arrays, and how many key:value pairs inside the outer object exist in this snippet?",
-    "3 JSON objects total (1 outer object and 2 nested inner objects), 1 JSON array, and 2 key:value pairs in the outer object",
+    "3 JSON objects total including the outer object, 1 JSON array, and 2 direct key:value pairs in the outer object",
     [
-      ["1 JSON object total, 3 JSON arrays, and 6 key:value pairs in the outer object", "Each matched pair of curly braces `{ }` is a JSON object (there are 3 pairs of `{ }`), and only `" + "vlans" + "` uses square brackets `[ ]` for an array."],
-      ["2 JSON objects total, 2 JSON arrays, and 5 key:value pairs in the outer object", "Counting the outer `{ }` plus the two inner `{ }` blocks yields 3 JSON objects, and the outer object has only 2 direct keys (`\"switch\"` and `\"uplink\"`)."],
-      ["3 JSON objects total, 0 JSON arrays, and 7 key:value pairs in the outer object", "The value `[10, 20, 30]` enclosed in square brackets `[ ]` is a JSON array containing three numeric values."]
+      ["1 JSON object total including the outer object, 3 JSON arrays, and 6 total key:value pairs in the outer object", "Each matched pair of curly braces `{ }` is a JSON object (there are 3 pairs of `{ }`), and only `" + "vlans" + "` uses square brackets `[ ]` for an array."],
+      ["2 JSON objects total including the outer object, 2 JSON arrays, and 5 direct key:value pairs in the outer object", "Counting the outer `{ }` plus the two inner `{ }` blocks yields 3 JSON objects, and the outer object has only 2 direct keys (`\"switch\"` and `\"uplink\"`)."],
+      ["3 JSON objects total including the outer object, 0 JSON arrays, and 7 direct key:value pairs in the outer object", "The value `[10, 20, 30]` enclosed in square brackets `[ ]` is a JSON array containing three numeric values."]
     ],
     "Count the matched curly-brace pairs `{ }`: there is 1 outer object enclosing the entire payload, plus 2 inner objects (the values for keys `\"switch\"` and `\"uplink\"`), totaling 3 JSON objects. The outer object contains 2 key:value pairs (`\"switch\": {...}` and `\"uplink\": {...}`). Inside `\"switch\"`, the key `\"vlans\"` has a JSON array `[10, 20, 30]` enclosed in square brackets `[ ]`.",
     "Count `{ }` pairs for total JSON objects; count `[ ]` pairs for total JSON arrays; count colons `:` at a given level for key:value pairs.",
@@ -1625,11 +1625,11 @@ const q18 = [
     "REST/JSON",
     "Hard",
     "Examine the JSON response from a Cisco DNA Center REST API call shown in the exhibit. Which statement accurately identifies the keys, values, and data types in this JSON structure?",
-    "`\"response\"` is a key whose value is a nested JSON object, `\"ACCESS\"` is a text value for the key `\"role\"`, and `41` is a numeric value for the key `\"interfaceCount\"`",
+    "`\"response\"` is a key with a nested object value, `\"ACCESS\"` is a string value for `\"role\"`, and `41` is a numeric value for `\"interfaceCount\"`",
     [
       ["`\"response\"` is a JSON array, `\"role\"` is a text value for the key `\"ACCESS\"`, and `41` is an invalid syntax error because all JSON values must be in quotes", "In `\"role\": \"ACCESS\"`, the string before the colon (`\"role\"`) is the key and `\"ACCESS\"` is the value; numeric values like `41` do not use quotes in JSON."],
       ["`\"Cisco Catalyst 9300 Switch\"` and `\"10.10.22.66\"` are JSON keys, whereas `\"type\"` and `\"managementIpAddress\"` are their JSON values", "In every `\"key\": \"value\"` pair, the item to the left of the colon is the key and the item to the right of the colon is the value."],
-      ["The snippet contains five separate JSON objects because there are five colons inside the inner curly braces", "There are five key:value pairs inside the inner object (and six colons total), but only two pairs of curly braces `{ }`, meaning two JSON objects total."]
+      ["The snippet contains five separate nested JSON objects because there are five key:value colons inside the inner curly-brace block", "There are five key:value pairs inside the inner object (and six colons total), but only two pairs of curly braces `{ }`, meaning two JSON objects total."]
     ],
     "In JSON, every colon `:` separates a key on the left from its value on the right. Here, the outer object has one key (`\"response\"`) whose value is a second JSON object `{...}`. Inside that inner object, `\"type\"`, `\"role\"`, `\"interfaceCount\"`, and `\"managementIpAddress\"` are keys; `\"ACCESS\"` is a text string value (in double quotes); and `41` is a numeric value (unquoted).",
     "Left of `:` = Key (always in `\" \"`); Right of `:` = Value (`\"text\"`, unquoted number, `[array]`, or `{object}`).",
@@ -1643,14 +1643,14 @@ const q18 = [
     "Medium",
     "Which three attributes are among the six foundational architectural constraints of a RESTful API as defined by Roy Fielding?",
     [
-      "Client/server architecture and stateless operation",
-      "Clear marking of responses as cacheable or uncacheable",
-      "Uniform interface and layered system (plus optional code-on-demand)"
+      "Client/server architecture paired with stateless client-to-server requests",
+      "Explicit marking of API responses as either cacheable or non-cacheable",
+      "Uniform interface and layered system with optional code-on-demand support"
     ],
     [
-      ["Mandatory use of XML tags over SSH transport port 22", "REST does not mandate XML or SSH (in fact, HTTP is not even strictly required by Fielding's definition, though HTTP and JSON are most common)."],
-      ["Stateful per-session sequence tracking maintained in the REST server's API memory across calls", "REST is strictly stateless at the API level; each request stands on its own without server-side session history."],
-      ["Direct binary memory dumps of Java RAM variables into Python client memory without serialization", "REST uses standardized resource representations (such as JSON or XML serialization) rather than raw binary RAM dumps."]
+      ["Mandatory use of XML angle-bracket tags transported over SSH TCP port 22", "REST does not mandate XML or SSH (in fact, HTTP is not even strictly required by Fielding's definition, though HTTP and JSON are most common)."],
+      ["Stateful per-session sequence tracking stored in the REST server memory", "REST is strictly stateless at the API level; each request stands on its own without server-side session history."],
+      ["Direct binary dumps of server RAM variables into client memory over UDP", "REST uses standardized resource representations (such as JSON or XML serialization) rather than raw binary RAM dumps."]
     ],
     "Roy Fielding defined six constraints that make an API RESTful: (1) Client/server architecture, (2) Stateless operation, (3) Cacheable/uncacheable marking of responses, (4) Uniform interface, (5) Layered system, and (6) Code-on-demand (optional).",
     "Memorize the 6 REST attributes: Client/Server, Stateless, Cacheable, Uniform Interface, Layered, Code-on-demand.",
@@ -1696,7 +1696,7 @@ const q19 = [
     "Config management",
     "Easy",
     "In network operations, what does the term 'configuration drift' describe?",
-    "Unintended differences that accumulate over time between a device's config and its intended baseline",
+    "Unintended differences that accumulate over time between a device's running-config and its central baseline config",
     [
       ["The gradual slowing of a router's hardware clock when Network Time Protocol (NTP) servers become unreachable", "Clock skew is managed by NTP; configuration drift refers to device configuration lines diverging from the intended standard."],
       ["The automatic migration of Virtual Machines (VMs) from one physical Cisco UCS blade server to another during maintenance", "Moving VMs between physical hosts is VM live migration managed by a hypervisor, not configuration drift."],
@@ -1710,11 +1710,11 @@ const q19 = [
     "Config management",
     "Easy",
     "Which configuration management tool uses an agentless architecture, connects to Cisco network devices via SSH or NETCONF, and uses a push model driven by Playbooks?",
-    "Ansible",
+    "Ansible Automation",
     [
       ["Puppet Enterprise", "Puppet typically uses a pull model with an on-device or external proxy agent and defines desired state in Manifests."],
-      ["Chef", "Chef uses an agent-based pull model where Chef nodes pull Recipes and Runlists from a Chef server."],
-      ["GitHub", "GitHub (using Git) is a version control repository service for tracking file changes rather than a push/pull device configuration engine."]
+      ["Progress Chef Infra", "Chef uses an agent-based pull model where Chef nodes pull Recipes and Runlists from a Chef server."],
+      ["GitHub Enterprise", "GitHub (using Git) is a version control repository service for tracking file changes rather than a push/pull device configuration engine."]
     ],
     "Ansible uses an agentless architecture (requiring no special agent software on Cisco routers or switches) and a push model. When an engineer runs an Ansible Playbook on the control node, Ansible pushes configuration changes to the target devices using SSH or NETCONF.",
     "Ansible = Agentless + Push model + Playbooks/Inventory/Jinja2/YAML + SSH/NETCONF.",
@@ -1738,7 +1738,7 @@ const q19 = [
     "Config management",
     "Easy",
     "When a network engineering team stores centralized router configuration files in a version control system such as Git (or GitHub), which two problems does version control directly solve?",
-    "It tracks who changed a file and when, and it highlights the exact line-by-line additions (`+`) and removals (`-`) between file versions over time",
+    "It records who changed a file and when, and shows exact line-by-line additions (`+`) and removals (`-`)",
     [
       ["It automatically logs into every branch router via SSH every 5 minutes to overwrite manual CLI changes", "Polling running-configs and overwriting drift is performed by a configuration monitoring/enforcement tool (like Ansible, Puppet, or Chef), not by Git alone."],
       ["It encrypts unencrypted FTP file transfers and converts SNMPv2c community strings into SNMPv3 hashes", "Git is a software version control system for tracking file history, not a network transport encryption or SNMP protocol tool."],
@@ -1752,7 +1752,7 @@ const q19 = [
     "Config management",
     "Medium",
     "What is the difference between 'configuration provisioning' and 'configuration monitoring' (also called configuration enforcement) in an automated configuration management tool?",
-    "Provisioning deploys new configuration changes from centralized files to target devices, whereas monitoring compares each device's live `running-config` against the centralized ideal config to detect or fix drift",
+    "Provisioning pushes intended config changes to devices, whereas monitoring compares live `running-config` files to detect or fix drift",
     [
       ["Provisioning backs up IOS `.bin` images to a TFTP server, whereas monitoring uses SNMP Traps to check power supply fan speeds", "Configuration management tools focus on device configuration state (`running-config` vs ideal config) rather than environmental fan traps."],
       ["Provisioning requires an on-device agent using a pull model, whereas monitoring can only be performed manually by a human typing `show running-config`", "All three tools (Ansible, Puppet, and Chef) can automate both configuration provisioning and configuration monitoring/enforcement."],
@@ -1766,7 +1766,7 @@ const q19 = [
     "Config management",
     "Medium",
     "How do Ansible Playbooks and Puppet Manifests differ in using an 'imperative' (procedural) language versus a 'declarative' language?",
-    "Ansible Playbooks use an imperative approach that specifies the step-by-step tasks and conditional logic to execute, whereas Puppet Manifests use a declarative approach that specifies the desired end-state configuration",
+    "Ansible Playbooks use an imperative approach listing step-by-step tasks, whereas Puppet Manifests declare the desired end-state config",
     [
       ["Ansible Playbooks use a declarative approach where devices decide how to configure themselves, whereas Puppet Manifests list step-by-step SSH CLI commands", "This reverses the two tools: Ansible playbooks list explicit tasks/steps (imperative), whereas Puppet manifests declare the target end state (declarative)."],
       ["Imperative languages require an agent installed on every router, whereas declarative languages work only without agents", "Ansible is imperative and agentless, whereas Puppet is declarative and uses agents (internal or external proxy)."],
@@ -1780,7 +1780,7 @@ const q19 = [
     "Config management",
     "Medium",
     "Many Cisco IOS routers and switches cannot run an internal on-device Puppet agent or Chef client. How does Puppet overcome this limitation to manage those Cisco devices, and how does this compare to Ansible and Chef?",
-    "Puppet can run an external proxy agent on a separate host that configures the Cisco device over SSH (agentless mode), whereas Ansible is natively agentless over SSH/NETCONF and Chef requires an on-device client",
+    "Puppet runs an external proxy agent over SSH, whereas Ansible is natively agentless via SSH/NETCONF and Chef needs a local agent",
     [
       ["Puppet requires replacing the Cisco IOS image with Linux Ubuntu, whereas Chef uses TFTP to push configurations without an agent", "Chef requires an on-device Chef client (limiting its use on Cisco gear), while Puppet supports an external proxy agent over SSH."],
       ["Puppet uses OpenFlow to bypass Cisco IOS completely, whereas Ansible requires installing a Python agent inside every switch's TCAM", "Ansible is completely agentless on network devices (running on a control node over SSH/NETCONF), and Puppet uses HTTP/REST to an internal or external proxy agent."],
@@ -1794,9 +1794,9 @@ const q19 = [
     "Config management",
     "Medium",
     "In Ansible, which two file types and languages are combined to generate standardized configurations for 100 branch routers that share the same role but have unique hostnames, IP addresses, and OSPF router IDs?",
-    "A shared Jinja2 template (`{{variable}}`) paired with per-device YAML variable files (`---`)",
+    "A single shared Jinja2 template using `{{variable}}` syntax and per-device YAML variable files using `---`",
     [
-      ["A single shared template file written in XML (using `<variable>` tags) and per-device variable files written in Java", "Ansible uses the Jinja2 language for configuration templates and YAML for variable files and playbooks, not XML or Java."],
+      ["A single shared template file written in XML with `<variable>` tags and per-device variable files written in Java", "Ansible uses the Jinja2 language for configuration templates and YAML for variable files and playbooks, not XML or Java."],
       ["100 separate Playbook files written in C++ and a single central Manifest file written in Puppet DSL", "Ansible uses YAML Playbooks, Inventory files, Jinja2 Templates, and YAML Variable files; Manifests belong to Puppet."],
       ["A single Runlist file written in Ruby and per-device Cookbook files formatted as minified JSON arrays", "Runlists and Cookbooks (using Ruby DSL) are Chef constructs, not Ansible constructs."]
     ],
@@ -1825,11 +1825,11 @@ const q19 = [
     "Config management",
     "Hard",
     "An enterprise uses centralized configuration files in Git as the 'single source of truth' and provisions changes with an automated tool. At 2:00 a.m., an engineer logs directly into branch router BR22 via SSH and adds a static route to `running-config` and `startup-config`, without updating the central Git repository. What is the risk of this action, and how does the configuration management tool handle it?",
-    "It creates configuration drift; during the next provisioning or configuration enforcement cycle, the tool will detect the discrepancy and either overwrite the manual static route with the central ideal config or alert the team",
+    "It causes configuration drift, and the next enforcement cycle will detect the mismatch and overwrite the manual route or alert the team",
     [
       ["The router's IOS CLI automatically commits and pushes the new static route back into the central GitHub repository with a `+` diff marker", "Cisco IOS `copy running-config startup-config` does not automatically commit changes to an external Git repository."],
       ["The manual change permanently updates the Jinja2 template for all other branch routers, causing every branch router to install BR22's static route", "Logging into one router via SSH only alters that single router's local config; it does not modify central Jinja2 templates."],
-      ["Version control software prevents SSH logins on Cisco routers unless the user authenticates with a Chef Recipe", "Engineers can still log into devices via SSH if they have credentials, which is why configuration monitoring/enforcement is needed to catch drift."]
+      ["Version control software blocks all direct SSH logins on Cisco routers unless the administrator authenticates with a Chef Recipe", "Engineers can still log into devices via SSH if they have credentials, which is why configuration monitoring/enforcement is needed to catch drift."]
     ],
     "When the central repository is the single source of truth, making direct manual CLI changes on a device causes configuration drift. Not only is the change untracked in version control, but the next time the configuration management tool runs provisioning or configuration enforcement, it compares the router's `running-config` against the central ideal file and either overwrites the manual change or flags the drift.",
     "If the central repo is the 'single source of truth,' manual on-box CLI edits cause drift and will be flagged or overwritten by config enforcement!",
@@ -1840,8 +1840,8 @@ const q19 = [
     "Medium",
     "Which two advantages come from separating device configurations into a shared role-based Template file and per-device Variable files?",
     [
-      "It prevents 'snowflakes' (uniquely configured devices) by enforcing one standard configuration structure across all devices sharing a role",
-      "It simplifies deploying a new device in an existing role (by copying and editing a small variable file) and separates template version history from per-device variable changes during troubleshooting"
+      "It prevents unique 'snowflake' configurations by enforcing one standard configuration structure across all devices sharing a role",
+      "It simplifies adding new devices via small variable files and separates template history from per-device edits for troubleshooting"
     ],
     [
       ["It eliminates the need for SSH, NETCONF, or HTTP network connectivity between the configuration server and the managed routers", "Templates and variables generate the intended configuration on the server/control node, which still must be pushed or pulled over the network."],
@@ -1857,14 +1857,14 @@ const q19 = [
     "Hard",
     "Which three capabilities are standard configuration provisioning features provided by automated configuration management tools (such as Ansible, Puppet, and Chef)?",
     [
-      "Selecting a specific subset of devices to configure based on inventory attributes or roles, and scheduling changes to execute unattended during maintenance windows",
-      "Validating whether a proposed configuration change will be accepted before actually applying it, and confirming afterward that the device config matches the intended state",
-      "Detecting whether any configuration command was rejected by a device and automatically reverting (rolling back) the device to its original configuration"
+      "Selecting device subsets by inventory role and scheduling configuration changes to execute unattended in maintenance windows",
+      "Validating whether proposed changes will be accepted before applying them and verifying the final configuration state afterward",
+      "Detecting whether any configuration command was rejected by a device and automatically rolling back to the original configuration"
     ],
     [
-      ["Replacing the physical Ethernet cabling between Top-of-Rack and End-of-Row switches when a link fails", "Configuration management tools automate software configuration provisioning and monitoring; they cannot physically recable racks."],
-      ["Providing a public WAN Intercloud Exchange circuit with guaranteed QoS SLAs between AWS and Microsoft Azure", "Intercloud Exchanges are WAN service provider offerings for cloud connectivity, not device configuration management features."],
-      ["Requiring a human engineer to sit at the console and press Enter after every single IOS configuration line is sent", "Configuration management tools automate logic, error handling, rollback, and `running-config` to `startup-config` saves so changes can run unattended."]
+      ["Replacing damaged physical Ethernet cabling between Top-of-Rack and End-of-Row switches automatically whenever a fiber link fails", "Configuration management tools automate software configuration provisioning and monitoring; they cannot physically recable racks."],
+      ["Providing a dedicated public cloud Intercloud Exchange circuit with guaranteed voice QoS SLAs between AWS and Microsoft Azure", "Intercloud Exchanges are WAN service provider offerings for cloud connectivity, not device configuration management features."],
+      ["Requiring a human engineer to sit at the console port and press Enter manually after every single IOS configuration line is sent", "Configuration management tools automate logic, error handling, rollback, and `running-config` to `startup-config` saves so changes can run unattended."]
     ],
     "Automated configuration provisioning goes far beyond pasting text into a terminal: tools can target subsets of devices by role, dry-run/validate changes beforehand, schedule unattended execution, detect rejected commands, automatically roll back partial changes on failure, verify post-change compliance, and conditionally save `running-config` to `startup-config`.",
     "Provisioning power features: Subset targeting, dry-run validation, scheduled unattended runs, automatic rollback on error, and post-check verification.",

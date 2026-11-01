@@ -1,9 +1,9 @@
-import { blueprintDef } from "./build.js?v=76";
-import v1p1 from "./chapters/v1p1.js?v=76";
-import v1p2 from "./chapters/v1p2.js?v=76";
-import v1p3 from "./chapters/v1p3.js?v=76";
-import v2p1 from "./chapters/v2p1.js?v=76";
-import v2p2 from "./chapters/v2p2.js?v=76";
+import { blueprintDef } from "./build.js?v=78";
+import v1p1 from "./chapters/v1p1.js?v=78";
+import v1p2 from "./chapters/v1p2.js?v=78";
+import v1p3 from "./chapters/v1p3.js?v=78";
+import v2p1 from "./chapters/v2p1.js?v=78";
+import v2p2 from "./chapters/v2p2.js?v=78";
 
 // Concatenate all 48 Official Cert Guide chapters (Vol 1 Ch 1-29, Vol 2 Ch 1-19) in fixed order so ID sequences remain stable.
 const rawBank = [...v1p1, ...v1p2, ...v1p3, ...v2p1, ...v2p2];

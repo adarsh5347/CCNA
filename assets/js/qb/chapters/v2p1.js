@@ -1,4 +1,4 @@
-import { mk } from "../build.js?v=76";
+import { mk } from "../build.js?v=78";
 
 // ============================================================================
 // v2c01: Introduction to TCP/IP Transport and Applications
@@ -10,7 +10,7 @@ const q01 = [
   c01.s("TCP/UDP", "Easy", "What is the standard byte length of a basic UDP header compared to a basic TCP header without options?",
     "UDP uses an 8-byte header, whereas TCP uses a 20-byte header.",
     [
-      ["UDP uses a 12-byte header, whereas TCP uses a 24-byte header.", "Neither 12 bytes nor 24 bytes is the standard base header size for UDP or TCP."],
+      ["UDP uses a 12-byte base header, whereas TCP uses a 24-byte header.", "Neither 12 bytes nor 24 bytes is the standard base header size for UDP or TCP."],
       ["UDP uses a 20-byte header, whereas TCP uses a 32-byte header.", "20 bytes is the base size of a TCP header, not a UDP header."],
       ["UDP uses a 4-byte header, whereas TCP uses a 16-byte header.", "A 4-byte header would only hold source and destination ports without length or checksum fields."]
     ],
@@ -19,11 +19,11 @@ const q01 = [
     []),
 
   c01.s("TCP/UDP", "Easy", "According to RFC 6335 and IANA port assignments, which numerical range defines Ephemeral (Dynamic or Private) ports used temporarily by client applications?",
-    "Ports 49152 to 65535",
+    "Port numbers 49152 to 65535",
     [
-      ["Ports 0 to 1023", "Ports 0 to 1023 are Well-Known (System) ports assigned to standard server applications."],
-      ["Ports 1024 to 49151", "Ports 1024 to 49151 are User (Registered) ports assigned by IANA for specific services."],
-      ["Ports 32768 to 61000", "While some operating systems use subsets of this range, RFC 6335 defines 49152 to 65535 as the dynamic range."]
+      ["Port numbers 0 through 1023", "Ports 0 to 1023 are Well-Known (System) ports assigned to standard server applications."],
+      ["Port numbers 1024 through 49151", "Ports 1024 to 49151 are User (Registered) ports assigned by IANA for specific services."],
+      ["Port numbers 32768 to 61000", "While some operating systems use subsets of this range, RFC 6335 defines 49152 to 65535 as the dynamic range."]
     ],
     "IANA divides transport layer port numbers into three ranges: Well-Known (System) ports from 0 to 1023, User (Registered) ports from 1024 to 49151, and Ephemeral (Dynamic/Private) ports from 49152 to 65535, which client hosts allocate dynamically when initiating connections.",
     "0-1023 = Well-Known; 1024-49151 = Registered; 49152-65535 = Dynamic/Ephemeral.",
@@ -63,7 +63,7 @@ const q01 = [
     []),
 
   c01.s("TCP/UDP", "Medium", "Which combination of parameters uniquely defines a single transport socket on a host?",
-    "An IP address, a transport protocol (TCP or UDP), and a port number",
+    "An IP address, a transport layer protocol (TCP or UDP), and a port number",
     [
       ["A source MAC address, a destination IP address, and an Ethernet Type code", "MAC addresses and EtherTypes operate at Layer 2 and are not part of a Layer 4 socket definition."],
       ["A source IP address, a destination IP address, and an IPv4 Protocol field value", "Those three fields are purely Layer 3 IP header attributes and omit the Layer 4 port number."],
@@ -85,7 +85,7 @@ const q01 = [
     []),
 
   c01.s("TCP/UDP", "Medium", "How does TCP normally terminate an established connection between two endpoints?",
-    "A four-way message exchange using segments with the FIN and ACK flag bits",
+    "A four-way message exchange using TCP segments with the FIN and ACK flag bits",
     [
       ["A three-way message exchange using segments with the SYN and FIN flag bits", "A three-way exchange with SYN and ACK establishes a connection; SYN is not used to close a connection."],
       ["A single unacknowledged segment transmitted with the FIN and URG flag bits set", "TCP requires bidirectional acknowledgment of connection teardown and does not use the Urgent (URG) bit to close sessions."],
@@ -96,10 +96,10 @@ const q01 = [
     []),
 
   c01.s("TCP/UDP", "Hard", "A client sends three 1000-byte TCP segments with Sequence numbers 1000, 2000, and 3000. The second segment (SEQ=2000) is dropped in transit, while the first and third segments arrive intact. How does the server respond, and what happens after the client retransmits the missing segment?",
-    "The server sends ACK 2000 for the missing segment, and after receiving bytes 2000-2999, sends ACK 4000.",
+    "The server sends ACK 2000 to request the missing segment, and after receiving bytes 2000-2999, it returns ACK 4000.",
     [
       ["The server sends ACK 4000 immediately and relies on a negative acknowledgment header option to request bytes 2000-2999.", "Sending ACK 4000 would falsely tell the sender that all bytes through 3999 arrived, preventing retransmission."],
-      ["The server discards the third segment (SEQ=3000), sends ACK 2000, and forces the client to retransmit both segment 2000 and segment 3000.", "The server buffers out-of-order segment 3000-3999 so that once bytes 2000-2999 arrive, it can acknowledge all bytes up to 4000."],
+      ["The server discards the third segment (SEQ=3000), sends ACK 2000, and forces the client to resend segments 2000 and 3000.", "The server buffers out-of-order segment 3000-3999 so that once bytes 2000-2999 arrive, it can acknowledge all bytes up to 4000."],
       ["The server sends ACK 1999 to indicate the last contiguous byte received, and after retransmission sends ACK 2999.", "TCP uses forward acknowledgment (the next expected byte, 2000 and then 4000), not the last byte received."]
     ],
     "When the server receives bytes 1000-1999 and 3000-3999, it sends a forward acknowledgment of 2000 because byte 2000 is the next contiguous byte needed. Once the client resends segment 2000 (bytes 2000-2999), the server already has 3000-3999 buffered and replies with ACK 4000.",
@@ -107,7 +107,7 @@ const q01 = [
     []),
 
   c01.s("TCP/UDP", "Hard", "A server sends a TCP segment to a client with Acknowledgment = 1000 and Window = 3000. The client immediately transmits three 1000-byte segments (SEQ 1000, 2000, and 3000) before any reply arrives from the server. What must the client do next?",
-    "Pause sending additional data segments until it receives a TCP segment from the server that advances the acknowledgment or increases the window.",
+    "Pause sending further data segments until a server reply advances the acknowledgment or increases the window.",
     [
       ["Continue transmitting segments up to 65,535 bytes unless the server sends an explicit TCP Reset (RST) segment.", "The client is strictly bound by the 3000-byte Window granted by the server and cannot exceed 3000 unacknowledged bytes."],
       ["Retransmit the first 1000-byte segment (SEQ 1000) immediately to force the server to open a larger sliding window.", "A sender only retransmits when the retransmission timer expires or duplicate ACKs indicate packet loss, not immediately upon filling the window."],
@@ -125,7 +125,7 @@ const q01 = [
     [
       ["Simple Mail Transfer Protocol (SMTP) on port 25", "SMTP requires guaranteed reliable delivery of email messages and therefore uses TCP port 25."],
       ["Post Office Protocol version 3 (POP3) on port 110", "POP3 requires reliable transfer of mail messages and uses TCP port 110."],
-      ["Secure Shell (SSH) on port 22", "SSH requires a reliable, ordered, connection-oriented session and uses TCP port 22."]
+      ["Secure Shell (SSH) encrypted remote login on port 22", "SSH requires a reliable, ordered, connection-oriented session and uses TCP port 22."]
     ],
     "TFTP (UDP port 69) is designed with a minimal footprint for embedded network devices and implements its own simple acknowledgment logic, while SNMP (UDP port 161) uses UDP for lightweight network management queries. SMTP, POP3, and SSH all rely on TCP.",
     "UDP ports: DHCP (67/68), TFTP (69), SNMP (161), Syslog (514), DNS queries (53).",
@@ -163,33 +163,33 @@ const c02 = mk("Security Fundamentals", 15, "v2c02");
 
 const q02 = [
   c02.s("ACLs", "Easy", "Which two numerical ranges are valid for configuring standard numbered IPv4 access control lists in Cisco IOS?",
-    "1 to 99 and 1300 to 1999",
+    "ACL numbers 1 through 99 and 1300 to 1999",
     [
-      ["100 to 199 and 2000 to 2699", "Ranges 100-199 and 2000-2699 are reserved for extended numbered IPv4 ACLs, not standard ACLs."],
-      ["1 to 199 and 1300 to 2699", "This combines both standard and extended ACL ranges; standard ACLs cannot use 100-199 or 2000-2699."],
-      ["1 to 100 and 1000 to 1999", "Number 100 is an extended ACL, and numbers 1000-1299 are not valid IPv4 standard ACL numbers."]
+      ["ACL numbers 100 to 199 and 2000 to 2699", "Ranges 100-199 and 2000-2699 are reserved for extended numbered IPv4 ACLs, not standard ACLs."],
+      ["ACL numbers 1 through 199 and 1300 to 2699", "This combines both standard and extended ACL ranges; standard ACLs cannot use 100-199 or 2000-2699."],
+      ["ACL numbers 1 through 100 and 1000 to 1999", "Number 100 is an extended ACL, and numbers 1000-1299 are not valid IPv4 standard ACL numbers."]
     ],
     "Standard numbered IPv4 ACLs use numbers 1 through 99 in the original range and 1300 through 1999 in the expanded range. Extended numbered IPv4 ACLs use 100-199 and 2000-2699.",
     "Standard IPv4 ACL numbers = 1-99 and 1300-1999.",
     ["access-list 1 permit any"]),
 
   c02.s("ACLs", "Easy", "Which packet header field can a standard IPv4 ACL examine to determine whether a packet matches an access control entry?",
-    "Source IPv4 address only",
+    "Only the source IPv4 address field in the IPv4 header",
     [
-      ["Destination IPv4 address only", "Standard IPv4 ACLs only inspect the source IPv4 address (except when used with 'access-class out' on VTY lines)."],
-      ["Both Source and Destination IPv4 addresses", "Inspecting both source and destination IPv4 addresses requires an extended IPv4 ACL."],
-      ["Source IPv4 address and Layer 4 TCP/UDP port numbers", "Inspecting TCP or UDP port numbers requires an extended IPv4 ACL."]
+      ["Only the destination IPv4 address field in the IPv4 header", "Standard IPv4 ACLs only inspect the source IPv4 address (except when used with 'access-class out' on VTY lines)."],
+      ["Both the source and destination IPv4 address fields", "Inspecting both source and destination IPv4 addresses requires an extended IPv4 ACL."],
+      ["The source IPv4 address and Layer 4 TCP/UDP port fields", "Inspecting TCP or UDP port numbers requires an extended IPv4 ACL."]
     ],
     "Standard IPv4 ACLs use simple matching logic that compares only the packet's source IPv4 address (or a portion of it using a wildcard mask). Matching destination IP addresses, protocols, or transport ports requires an extended ACL.",
     "Standard ACL = Source IP only; place close to the destination.",
     []),
 
   c02.s("ACLs", "Easy", "Where does Cisco recommend placing a standard IPv4 ACL in a network topology, and why?",
-    "As close to the destination as possible so it does not block traffic to other subnets",
+    "As close as possible to the destination so the ACL does not unintentionally block other valid subnets",
     [
-      ["As close as possible to the source, to conserve network bandwidth by dropping unwanted packets early", "Extended ACLs are placed close to the source; placing a standard ACL near the source blocks that source from reaching all destinations."],
-      ["Inbound on the default gateway interface of the source host, to filter packets before routing occurs", "Inbound on the source host's default gateway is as close to the source as possible, which is the rule for extended ACLs."],
-      ["Only on WAN serial interfaces between core routers, because LAN interfaces do not support outbound ACLs", "Both LAN and WAN interfaces support inbound and outbound IPv4 ACLs."]
+      ["As close as possible to the source to conserve network bandwidth by dropping unwanted packets early", "Extended ACLs are placed close to the source; placing a standard ACL near the source blocks that source from reaching all destinations."],
+      ["Inbound on the default gateway interface of the source host to filter packets before routing occurs", "Inbound on the source host's default gateway is as close to the source as possible, which is the rule for extended ACLs."],
+      ["Exclusively on WAN serial links between core routers since LAN interfaces do not support outbound ACLs", "Both LAN and WAN interfaces support inbound and outbound IPv4 ACLs."]
     ],
     "Because a standard ACL can only match the packet's source IPv4 address, placing it near the source would filter that host's packets toward all destinations. Placing a standard ACL close to the intended destination ensures it only filters traffic heading toward that specific destination.",
     "Standard ACL = near Destination; Extended ACL = near Source.",
@@ -233,7 +233,7 @@ const q02 = [
     [
       ["access-list 21 permit 10.1.1.1 0.0.255.255", "IOS automatically zeroes out any address bits/octets where the wildcard mask has binary 1s (decimal 255)."],
       ["access-list 21 permit host 10.1.1.1", "A wildcard mask of 0.0.255.255 was supplied, so IOS treats it as a /16 range rather than a single host."],
-      ["IOS rejects the command and prints an inconsistent address and mask error message.", "IOS accepts the command without error and silently converts the ignored octets in the address to 0."]
+      ["IOS rejects it with an inconsistent mask error", "IOS accepts the command without error and silently converts the ignored octets in the address to 0."]
     ],
     "When you configure an access-list statement with a wildcard mask, Cisco IOS applies the wildcard mask to the configured address and zeroes out any bit positions that are set to 1 (ignore) in the wildcard mask. Because the last two octets of the wildcard mask are 255.255, IOS stores 10.1.0.0 0.0.255.255.",
     "Any octet with 255 in the wildcard mask gets converted to 0 in the stored ACL address field.",
@@ -255,7 +255,7 @@ const q02 = [
     [
       ["It matches sequence 30 and is denied because 10.1.1.15 is an exact match for host 10.1.1.15.", "ACLs use first-match (top-down) logic, not longest-prefix match like a routing table."],
       ["It matches sequence 20 and is denied because 10.1.1.0/24 is more specific than 10.1.0.0/16.", "Sequence 10 is evaluated before sequence 20 and matches all 10.1.x.x addresses, so sequence 20 is never reached."],
-      ["It is dropped by the implicit deny any at the end of ACL 10.", "10.1.1.15 matches the very first statement (10.1.0.0 0.0.255.255) and is permitted."]
+      ["It is dropped by the implicit deny any statement at the end of ACL 10.", "10.1.1.15 matches the very first statement (10.1.0.0 0.0.255.255) and is permitted."]
     ],
     "Unlike IP routing tables (which use longest-prefix match), Cisco ACLs strictly follow top-down, first-match logic. When a packet from 10.1.1.15 arrives, the router compares it to sequence 10 first (`permit 10.1.0.0 0.0.255.255`), which matches 10.1.0.0 through 10.1.255.255. The router immediately permits the packet and stops searching the ACL.",
     "Routing tables = longest prefix match; ACLs = top-down first match! Always put specific statements before general ones.",
@@ -263,7 +263,7 @@ const q02 = [
     { cli: "R1# show ip access-lists 10\nStandard IP access list 10\n    10 permit 10.1.0.0, wildcard bits 0.0.255.255\n    20 deny   10.1.1.0, wildcard bits 0.0.0.255\n    30 deny   10.1.1.15" }),
 
   c02.s("ACLs", "Hard", "Host A (10.1.1.1/24) is connected to R1 Gi0/0. R1 connects via Serial0/0/0 to R2 Serial0/0/1, and Server S1 (10.2.2.1/24) connects to R2 Gi0/0. An engineer configures 'access-list 5 deny 10.1.1.1' and 'access-list 5 permit any' on R2, and applies 'ip access-group 5 in' on R2 Gi0/0. Why can Host A still reach Server S1?",
-    "Packets from Host A exit R2 Gi0/0 toward Server S1 rather than entering R2 Gi0/0, so the inbound ACL on R2 Gi0/0 only inspects packets sourced from Server S1's LAN.",
+    "Packets from Host A exit R2 Gi0/0 toward S1, whereas the inbound ACL on Gi0/0 only filters traffic from S1.",
     [
       ["Standard ACLs cannot match single host addresses without the 'host' keyword explicitly shown in running-config.", "IOS accepts 'access-list 5 deny 10.1.1.1' (and actually strips the 'host' keyword in standard ACLs)."],
       ["The 'ip access-group 5 in' command only filters TCP traffic and allows ICMP pings to pass through.", "Standard IP ACLs filter all IPv4 packets regardless of upper-layer protocol (TCP, UDP, ICMP)."],
@@ -275,8 +275,8 @@ const q02 = [
 
   c02.m("ACLs", "Medium", "An administrator wants to see how many packets are dropped at the end of ACL 15 and also generate syslog messages whenever a dropped packet occurs. Which two facts explain how to achieve this?",
     [
-      "Configure 'access-list 15 deny any log' at the end of the ACL.",
-      "The default implicit 'deny any' at the end of an ACL does not maintain a match counter in 'show ip access-lists'."
+      "Configure an explicit 'access-list 15 deny any log' statement at the end of the access list.",
+      "The default implicit 'deny any' at the end of an ACL has no match counter in 'show ip access-lists'."
     ],
     [
       ["The 'show ip interface' command displays packet drop counters for each ACL statement.", "'show ip interface' only shows which ACL is applied inbound or outbound; 'show ip access-lists' shows match counters."],
@@ -319,7 +319,7 @@ const q03 = [
   c03.s("ACLs", "Easy", "In an extended IPv4 ACL statement, what are the three mandatory matching fields that must always be specified after the permit or deny action?",
     "Protocol, source IPv4 address/wildcard, and destination IPv4 address/wildcard",
     [
-      ["Source IPv4 address, source TCP/UDP port number, and destination IPv4 address", "TCP/UDP port numbers are optional parameters; the IP protocol keyword is mandatory."],
+      ["Source IPv4 address, source TCP or UDP port number, and destination IPv4 address", "TCP/UDP port numbers are optional parameters; the IP protocol keyword is mandatory."],
       ["Protocol, destination IPv4 address, and destination TCP/UDP port number", "Source IPv4 address is mandatory and comes before the destination IPv4 address; port numbers are optional."],
       ["Inbound interface name, source IPv4 address, and destination IPv4 address", "Interface names are never included inside an access-list statement; ACLs are bound to interfaces with 'ip access-group'."]
     ],
@@ -328,7 +328,7 @@ const q03 = [
     []),
 
   c03.s("ACLs", "Easy", "Where should an extended IPv4 ACL generally be placed in a network topology?",
-    "As close as possible to the source of the traffic being filtered, to prevent unwanted packets from consuming bandwidth across the network",
+    "As close as possible to the traffic source, preventing unwanted packets from wasting network bandwidth",
     [
       ["As close as possible to the destination of the traffic, so other destinations are not accidentally blocked", "Because extended ACLs specify both source and destination IP addresses, placing them near the source does not accidentally block other destinations."],
       ["Only on the central core router's loopback interface, so all transit traffic is inspected in one place", "Loopback interfaces do not transit user traffic; extended ACLs belong on physical/SVI/subinterfaces near the traffic source."],
@@ -372,7 +372,7 @@ const q03 = [
     ["ip access-list standard 24", "show ip access-lists 24", "show running-config"]),
 
   c03.s("ACLs", "Medium", "Why does Cisco recommend disabling an active ACL on an interface with 'no ip access-group' before deleting and recreating or heavily editing that ACL?",
-    "Because as soon as the first line of a recreated ACL is entered, IOS immediately filters live traffic using that incomplete one-line ACL plus the implicit deny any.",
+    "Because once the first line of the new ACL is entered, IOS immediately filters live traffic with that line plus the implicit deny.",
     [
       ["Because Cisco IOS refuses to allow any changes to an ACL that is currently referenced by an 'ip access-group' command.", "IOS allows live editing of active ACLs without error, which is why operational caution is required."],
       ["Because deleting an ACL while 'ip access-group' is configured on an interface causes the interface to enter the err-disabled state.", "Deleting an ACL referenced by 'ip access-group' simply causes IOS to permit all traffic through that interface until a new statement is added."],
@@ -383,7 +383,7 @@ const q03 = [
     ["no ip access-group"]),
 
   c03.s("ACLs", "Hard", "Examine the extended ACL configured on R1. A host at 10.1.1.5 sends a DNS query over UDP port 53 to a DNS server at 10.2.2.10. Which sequence number (or implicit action) processes this packet?",
-    "Sequence 30 permits the packet because 'permit ip' matches all IPv4 packets regardless of whether the transport header is TCP, UDP, or ICMP.",
+    "Sequence 30 permits the packet because 'permit ip' matches all IPv4 traffic, including UDP port 53.",
     [
       ["Sequence 10 denies the packet because it originates from host 10.1.1.5 and targets port 53 (domain).", "Sequence 10 specifies 'tcp', whereas the client's DNS query uses UDP, and all fields in an extended ACE must match."],
       ["Sequence 20 denies the packet because 10.1.1.5 is inside 10.1.1.0/24 and 10.2.2.10 is inside 10.2.2.0/24.", "Sequence 20 only matches UDP packets with destination port 69 (tftp), not UDP port 53."],
@@ -395,7 +395,7 @@ const q03 = [
     { cli: "R1# show ip access-lists WEB-FILTER\nExtended IP access list WEB-FILTER\n    10 deny tcp host 10.1.1.5 host 10.2.2.10 eq domain\n    20 deny udp 10.1.1.0 0.0.0.255 10.2.2.0 0.0.0.255 eq tftp\n    30 permit ip 10.1.1.0 0.0.0.255 any" }),
 
   c03.s("ACLs", "Hard", "Examine the named ACL in the CLI output. An engineer wants to block Telnet traffic from host 172.16.1.50 to 172.16.2.10 without disturbing existing rules. Which configuration sequence accomplishes this?",
-    "Use 'ip access-list extended CORP-IN' and '15 deny tcp host 172.16.1.50 host 172.16.2.10 eq telnet'.",
+    "Enter 'ip access-list extended CORP-IN' and configure '15 deny tcp host 172.16.1.50 host 172.16.2.10 eq 23'.",
     [
       ["Enter 'ip access-list extended CORP-IN' followed by 'deny tcp host 172.16.1.50 host 172.16.2.10 eq telnet'.", "Omitting a sequence number appends the new statement at the end (sequence 40), after sequence 20 has already permitted all TCP traffic from 172.16.1.0/24."],
       ["Enter 'access-list CORP-IN 15 deny tcp host 172.16.1.50 host 172.16.2.10 eq 23' in global configuration mode.", "Named ACLs cannot be edited with the global 'access-list' command; you must enter 'ip access-list extended CORP-IN'."],
@@ -408,13 +408,13 @@ const q03 = [
 
   c03.m("ACLs", "Medium", "An administrator wants to delete only line 20 ('20 deny udp any any eq tftp') from the extended named ACL 'BRANCH-ACL'. Which two commands entered inside 'ip access-list extended BRANCH-ACL' configuration mode will remove only that single statement?",
     [
-      "no 20",
-      "no deny udp any any eq tftp"
+      "Enter 'no 20' inside ACL config mode",
+      "Enter 'no deny udp any any eq tftp' in submode"
     ],
     [
-      ["no ip access-list extended BRANCH-ACL", "Running 'no ip access-list extended BRANCH-ACL' deletes the entire ACL, not just line 20."],
-      ["clear ip access-list BRANCH-ACL 20", "'clear ip access-list counters' resets match statistics; it does not delete configuration lines."],
-      ["delete sequence 20", "Cisco IOS ACL submode uses 'no <sequence-number>', not a 'delete sequence' keyword."]
+      ["Enter 'no ip access-list extended BRANCH-ACL'", "Running 'no ip access-list extended BRANCH-ACL' deletes the entire ACL, not just line 20."],
+      ["Enter 'clear ip access-list BRANCH-ACL 20'", "'clear ip access-list counters' resets match statistics; it does not delete configuration lines."],
+      ["Enter 'delete sequence 20' in ACL submode", "Cisco IOS ACL submode uses 'no <sequence-number>', not a 'delete sequence' keyword."]
     ],
     "Inside named or numbered ACL configuration mode (`config-ext-nacl` or `config-std-nacl`), you can remove an individual ACE either by referencing its sequence number (`no 20`) or by negating the full permit/deny statement (`no deny udp any any eq tftp`).",
     "Inside ACL config mode: delete a single line with 'no <seq#>' or 'no <statement>'.",
@@ -440,7 +440,7 @@ const c04 = mk("Security Fundamentals", 15, "v2c04");
 
 const q04 = [
   c04.s("Threats", "Easy", "In security terminology, which term describes an inherent weakness in a system or design, and which term describes the specific tool or mechanism used to take advantage of that weakness?",
-    "A vulnerability is a flaw, and an exploit is the tool used against that flaw.",
+    "A vulnerability is the weakness, and an exploit is the tool used against that flaw.",
     [
       ["A threat is the weakness, and a mitigation is the tool used against that weakness.", "A threat is the potential for an attacker to use an exploit against a vulnerability, while a mitigation is a countermeasure."],
       ["An exploit is the weakness, and a threat is the tool used against that weakness.", "This reverses exploit and vulnerability; the weakness itself is the vulnerability."],
@@ -451,9 +451,9 @@ const q04 = [
     []),
 
   c04.s("AAA", "Easy", "Within the AAA security framework, what are the distinct roles of Authentication, Authorization, and Accounting?",
-    "Authentication verifies identity, Authorization enforces permissions, and Accounting logs user activity.",
+    "Authentication verifies user identity, Authorization enforces access permissions, and Accounting records session activity logs.",
     [
-      ["Authentication determines what commands a user can run, Authorization verifies the user's password, and Accounting encrypts the session.", "Authentication verifies identity (credentials), whereas Authorization controls permitted actions and privileges."],
+      ["Authentication determines which commands a user can run, Authorization verifies passwords, and Accounting encrypts sessions.", "Authentication verifies identity (credentials), whereas Authorization controls permitted actions and privileges."],
       ["Authentication logs user session timestamps, Authorization verifies digital certificates, and Accounting assigns VLAN memberships.", "Logging session activity is Accounting, and verifying digital certificates is Authentication."],
       ["Authentication encrypts management traffic, Authorization assigns IP addresses via DHCP, and Accounting monitors CPU utilization.", "AAA does not replace DHCP or CPU monitoring; it governs identity verification, access rights, and audit logging."]
     ],
@@ -473,7 +473,7 @@ const q04 = [
     []),
 
   c04.s("Threats", "Medium", "An attacker sends small DNS or NTP requests to multiple public servers while spoofing the victim's IP address as the source IP, causing those servers to flood the victim with massive responses. What type of attack is this?",
-    "An amplification (and reflection) attack",
+    "An amplification and reflection attack",
     [
       ["A man-in-the-middle ARP poisoning attack", "Man-in-the-middle ARP poisoning occurs on a local Layer 2 broadcast domain so an attacker can eavesdrop on or modify traffic."],
       ["A reconnaissance port-scanning attack", "Port scanning probes open TCP/UDP ports to discover running services rather than flooding a victim with amplified responses."],
@@ -484,7 +484,7 @@ const q04 = [
     []),
 
   c04.s("Threats", "Medium", "How does an attacker execute a Layer 2 man-in-the-middle attack on a local subnet using ARP?",
-    "By sending spoofed ARP replies mapping the legitimate target's IP to the attacker's MAC address",
+    "By sending spoofed ARP replies that map the legitimate default gateway IP address to the attacker's MAC address",
     [
       ["By flooding the router with TCP SYN segments containing random source IP addresses until the TCP connection table fills", "Flooding a server with half-open TCP SYN segments is a TCP SYN flood Denial-of-Service (DoS) attack, not a man-in-the-middle attack."],
       ["By querying DNS servers with nslookup, whois, and dig to discover the organization's registered public IP blocks", "Using nslookup, whois, and dig to gather domain information is a reconnaissance attack."],
@@ -495,10 +495,10 @@ const q04 = [
     []),
 
   c04.s("Threats", "Medium", "An attacker compromises a DNS server (or modifies a client's local hosts file) so that when users enter the legitimate URL of their bank, name resolution directs them to a fraudulent server. Which attack has occurred?",
-    "Pharming",
+    "DNS pharming attack",
     [
-      ["Spear phishing", "Spear phishing sends targeted emails containing deceptive links to a specific group of users rather than corrupting DNS resolution."],
-      ["Whaling", "Whaling is a phishing attack specifically aimed at senior executives or high-profile individuals via deceptive messages."],
+      ["Spear phishing attack", "Spear phishing sends targeted emails containing deceptive links to a specific group of users rather than corrupting DNS resolution."],
+      ["Whaling attack", "Whaling is a phishing attack specifically aimed at senior executives or high-profile individuals via deceptive messages."],
       ["Watering hole attack", "A watering hole attack infects a legitimate website frequented by a target group with malware rather than redirecting DNS lookups."]
     ],
     "Unlike phishing—which relies on tricking a user into clicking a disguised link in an email, voice call (vishing), or text message (smishing)—pharming compromises the name resolution infrastructure (such as DNS or a local hosts file) so users typing the real URL are silently redirected to a malicious site.",
@@ -506,7 +506,7 @@ const q04 = [
     []),
 
   c04.s("AAA", "Medium", "Which statement accurately contrasts the TACACS+ and RADIUS protocols used between a Network Access Device (NAD) and a AAA server?",
-    "TACACS+ uses TCP port 49, encrypts the full AAA body, and separates Auth, Authz, and Accounting.",
+    "TACACS+ uses TCP port 49, encrypts the entire packet body, and separates Authentication, Authorization, and Accounting.",
     [
       ["TACACS+ is an open IETF standard, uses UDP ports 1812 and 1813, and combines authentication and authorization into one process.", "Those characteristics describe RADIUS (open standard, UDP 1812/1813, combined authentication/authorization)."],
       ["RADIUS is Cisco-proprietary, uses TCP port 49, and encrypts the entire packet payload between the switch and the AAA server.", "RADIUS is standards-based, uses UDP ports 1812 and 1813, and only encrypts the password attribute rather than the whole packet."],
@@ -519,7 +519,7 @@ const q04 = [
   c04.s("Security architecture", "Hard", "A company implements multifactor authentication requiring an employee to enter a secret PIN on a keypad, insert a USB cryptographic token containing a CA-signed digital certificate, and scan a fingerprint. How are these three credential types categorized?",
     "The PIN is 'something you know', the USB certificate token is 'something you have', and the fingerprint is 'something you are'.",
     [
-      ["The PIN is 'something you have', the USB certificate token is 'something you know', and the fingerprint is 'something you are'.", "A memorized PIN or password is 'something you know', while a possessed token or certificate is 'something you have'."],
+      ["The PIN is 'something you have', the USB certificate token is 'something you know', and the fingerprint scan is 'something you are'.", "A memorized PIN or password is 'something you know', while a possessed token or certificate is 'something you have'."],
       ["Both the PIN and USB certificate token are 'something you know', and the fingerprint is 'something you have'.", "A cryptographic token/certificate is a possessed object ('something you have'), and a fingerprint is a biometric trait ('something you are')."],
       ["The PIN is 'something you know', and both the USB certificate token and fingerprint are 'something you are'.", "Only physical biometric characteristics (fingerprints, iris, voice, face) represent 'something you are'."]
     ],
@@ -528,11 +528,11 @@ const q04 = [
     []),
 
   c04.s("Threats", "Hard", "An attacker sends specially crafted input data to a network service that exceeds the size of the temporary memory space allocated by the application, overwriting adjacent memory locations with executable shellcode. What type of attack is this, and what is its potential impact?",
-    "A buffer overflow attack, which can crash the target or execute arbitrary attacker code",
+    "A buffer overflow attack that overwrites adjacent memory to crash the system or execute arbitrary attacker code",
     [
-      ["A TCP SYN flood attack, which fills the server's half-open connection table until legitimate clients are denied access", "A TCP SYN flood exhausts the TCP state table with incomplete handshakes rather than overwriting memory buffers with oversized data."],
-      ["A dictionary offline attack, which extracts password hashes from RAM so they can be cracked on an external computer", "An offline dictionary attack cracks stolen password hashes against a word list rather than overflowing application memory boundaries."],
-      ["A watering hole attack, which injects a Trojan horse into a third-party website visited by corporate engineers", "A watering hole attack compromises a frequently visited website rather than overflowing an application's memory buffer."]
+      ["A TCP SYN flood attack that fills the server's half-open connection table until legitimate clients are denied access", "A TCP SYN flood exhausts the TCP state table with incomplete handshakes rather than overwriting memory buffers with oversized data."],
+      ["A dictionary offline attack that extracts password hashes from RAM so they can be cracked on an external computer", "An offline dictionary attack cracks stolen password hashes against a word list rather than overflowing application memory boundaries."],
+      ["A watering hole attack that injects a Trojan horse into a third-party website visited by corporate engineers", "A watering hole attack compromises a frequently visited website rather than overflowing an application's memory buffer."]
     ],
     "When an application fails to validate the length of incoming data before writing it into a fixed-size memory buffer, a buffer overflow vulnerability exists. By sending oversized input containing crafted instructions, an attacker can overwrite adjacent memory and either crash the service/OS or force the system to execute the injected malicious code.",
     "Oversized input overwriting adjacent RAM to crash or run injected code = Buffer Overflow.",
@@ -573,11 +573,11 @@ const c05s = mk("IP Services", 10, "v2c05");
 
 const q05 = [
   c05.s("Device security", "Easy", "A switch has both 'enable password oak' and 'enable secret pine' configured in global configuration mode. What password must an administrator enter to access privileged EXEC mode?",
-    "pine",
+    "Only the 'enable secret' password ('pine')",
     [
-      ["oak", "When both 'enable password' and 'enable secret' are configured, IOS always uses 'enable secret' and ignores 'enable password'."],
-      ["oak followed by pine", "IOS only prompts for a single enable password and checks it against the 'enable secret' hash."],
-      ["Either oak or pine will be accepted", "Only the password defined by 'enable secret' is accepted when both commands exist."]
+      ["Only the 'enable password' value ('oak')", "When both 'enable password' and 'enable secret' are configured, IOS always uses 'enable secret' and ignores 'enable password'."],
+      ["First 'oak' followed at the prompt by 'pine'", "IOS only prompts for a single enable password and checks it against the 'enable secret' hash."],
+      ["Either 'oak' or 'pine' is accepted by IOS", "Only the password defined by 'enable secret' is accepted when both commands exist."]
     ],
     "Whenever both `enable password` and `enable secret` are configured on a Cisco IOS device, IOS exclusively uses the more secure `enable secret` password and completely ignores `enable password`.",
     "enable secret always overrides enable password.",
@@ -595,7 +595,7 @@ const q05 = [
     ["enable secret"]),
 
   c05.s("Device security", "Easy", "Why is storing passwords with 'enable secret' or 'username secret' far more secure than encrypting clear-text passwords with 'service password-encryption'?",
-    "Type 7 passwords are easily reversible, whereas 'secret' commands use one-way hashes (Type 5, 8, or 9).",
+    "Type 7 passwords use weak reversible encryption, whereas 'secret' commands use one-way Type 5/8/9 hashes.",
     [
       ["'service password-encryption' only encrypts VTY passwords and leaves 'enable password' in clear text.", "'service password-encryption' encrypts console, VTY, 'enable password', and 'username password' values as Type 7."],
       ["Issuing 'no service password-encryption' immediately converts all Type 7 passwords back into clear text in the running configuration.", "Running 'no service password-encryption' does NOT decrypt existing Type 7 passwords; they stay Type 7 until changed."],
@@ -606,7 +606,7 @@ const q05 = [
     ["service password-encryption", "enable secret", "username secret"]),
 
   c05.s("Device security", "Medium", "An administrator configures 'service password-encryption' on a router, which converts the console password to Type 7. Later, the administrator enters 'no service password-encryption'. What is the immediate effect on the console password in 'show running-config'?",
-    "The existing console password stays encrypted as Type 7 until a new password is set.",
+    "The existing console password stays encrypted as Type 7 until that password is reconfigured.",
     [
       ["The console password immediately reverts to clear text (Type 0) in the running configuration.", "Disabling 'service password-encryption' does not automatically decrypt passwords that were already encrypted."],
       ["The console password is deleted, and console logins are disabled until a new password is set.", "Turning off password encryption never deletes existing passwords or disables login authentication."],
@@ -639,7 +639,7 @@ const q05 = [
     ["access-class 10 in", "access-class 10 out"]),
 
   c05.s("Security architecture", "Medium", "How does a traditional firewall use security zones (Inside, Outside, and DMZ) to protect an enterprise network?",
-    "It allows Inside hosts to initiate connections to the Outside and DMZ, allows Outside hosts to initiate connections only to public servers in the DMZ, and blocks Outside hosts from initiating connections to the Inside.",
+    "It permits Inside-to-Outside/DMZ sessions and Outside-to-DMZ sessions, while blocking Outside-to-Inside traffic.",
     [
       ["It allows Outside hosts to initiate connections to Inside hosts, while blocking Inside hosts from accessing the DMZ.", "Allowing outside Internet hosts to initiate connections to internal enterprise hosts would expose the internal network to attacks."],
       ["It places all internal user workstations inside the DMZ so they can browse the Internet without stateful inspection.", "The DMZ (Demilitarized Zone) holds public-facing servers (such as web or email servers), never internal user workstations."],
@@ -650,18 +650,18 @@ const q05 = [
     []),
 
   c05.s("Security architecture", "Hard", "An attacker runs a port scan against a company's firewall, discovers that TCP port 8443 is open, and tunnels an unauthorized peer-to-peer file-sharing application over TCP port 8443. Which Next-Generation Firewall (NGFW) capability detects and blocks this traffic?",
-    "Application Visibility and Control (AVC), which performs deep packet inspection of application layer data rather than relying on TCP/UDP port numbers",
+    "Application Visibility and Control (AVC) performing deep packet inspection of Layer 7 payload regardless of port",
     [
-      ["Stateful packet inspection, which tracks TCP SYN, SYN-ACK, and ACK flags in the connection table", "A traditional stateful firewall sees a valid TCP handshake on an allowed port (8443) and permits the traffic without knowing the true application."],
-      ["Cisco Talos URL reputation filtering, which blocks HTTP GET requests to low-reputation domain names", "URL filtering inspects web URIs and domain reputations rather than identifying non-web applications disguised on nonstandard ports."],
-      ["Network Address Translation (NAT) overload, which translates internal private IP addresses to an outside global address", "NAT/PAT translates IP addresses and transport port numbers but performs no application identification or security inspection."]
+      ["Stateful packet inspection tracking TCP SYN, SYN-ACK, and ACK flags in the state connection table", "A traditional stateful firewall sees a valid TCP handshake on an allowed port (8443) and permits the traffic without knowing the true application."],
+      ["Cisco Talos URL reputation filtering blocking HTTP GET requests directed to low-reputation Web domains", "URL filtering inspects web URIs and domain reputations rather than identifying non-web applications disguised on nonstandard ports."],
+      ["Network Address Translation (NAT) overload translating internal private IP addresses to an outside global IP address", "NAT/PAT translates IP addresses and transport port numbers but performs no application identification or security inspection."]
     ],
     "Traditional firewalls identify applications primarily by static well-known TCP/UDP ports, which attackers can evade by running applications over nonstandard open ports. A Cisco NGFW uses Application Visibility and Control (AVC) to inspect deep into the Layer 7 payload and headers to identify and filter the actual application regardless of port number.",
     "AVC = Deep Packet Inspection at Layer 7 to identify applications even when using nonstandard ports.",
     []),
 
   c05.s("Security architecture", "Hard", "A security team is overwhelmed by thousands of daily alerts from a traditional Intrusion Prevention System (IPS) for Linux and macOS server exploits on a VLAN that contains only patched Windows 10 client PCs. How does a Cisco Next-Generation IPS (NGIPS) solve this problem?",
-    "Through Contextual Awareness, which gathers host OS, patch level, and running application data to de-emphasize irrelevant signatures and reduce false-positive event logs",
+    "Through Contextual Awareness gathering host OS, patch, and application data to de-emphasize irrelevant alerts",
     [
       ["By disabling the exploit signature database entirely and relying solely on Layer 3 source IP access control lists", "An NGIPS still uses exploit signatures; disabling signatures would eliminate core IPS functionality."],
       ["By placing all switch ports in the VLAN into an err-disabled state whenever any signature is triggered", "NGIPS sits inline to discard or redirect malicious packets; it does not err-disable access switch ports like Port Security."],
@@ -707,10 +707,10 @@ const c06 = mk("Security Fundamentals", 15, "v2c06");
 
 const q06 = [
   c06.s("Port security", "Easy", "What are the default settings on a Cisco Catalyst switch interface immediately after configuring 'switchport mode access' and 'switchport port-security'?",
-    "Maximum MAC addresses = 1, violation mode = shutdown, and sticky MAC learning = disabled",
+    "Maximum MAC addresses = 1, violation mode = shutdown, and sticky learning = disabled",
     [
       ["Maximum MAC addresses = 2, violation mode = restrict, and sticky MAC learning = enabled", "The default maximum is 1 (not 2), the default violation mode is shutdown (not restrict), and sticky learning is disabled by default."],
-      ["Maximum MAC addresses = 1, violation mode = protect, and sticky MAC learning = enabled", "The default violation mode is shutdown (not protect), and sticky learning must be explicitly enabled."],
+      ["Maximum MAC addresses = 1, violation mode = protect, and sticky learning = enabled", "The default violation mode is shutdown (not protect), and sticky learning must be explicitly enabled."],
       ["Maximum MAC addresses = 8, violation mode = shutdown, and sticky MAC learning = disabled", "The default maximum allowed secure MAC address count is 1, not 8."]
     ],
     "Enabling port security with the `switchport port-security` interface subcommand activates three key defaults: a maximum of 1 allowed MAC address, the `shutdown` violation mode, and dynamic learning of that 1 MAC address (without sticky configuration saving).",
@@ -718,7 +718,7 @@ const q06 = [
     ["switchport port-security", "show port-security interface"]),
 
   c06.s("Port security", "Easy", "Why does a Cisco switch reject the 'switchport port-security' command on an interface that is still using its factory default switchport mode?",
-    "Because the interface defaults to dynamic desirable (or dynamic auto) DTP negotiation, and port security requires a static access or static trunk port.",
+    "Because the port defaults to dynamic DTP negotiation, whereas port security requires a static access or trunk port.",
     [
       ["Because port security can only be enabled on routed Layer 3 ports configured with 'no switchport'.", "Port security is a Layer 2 switchport feature and cannot be configured on routed ('no switchport') interfaces."],
       ["Because the administrator must first configure at least one static MAC address before enabling port security.", "Configuring static MAC addresses is optional; port security can dynamically learn secure MAC addresses."],
@@ -740,11 +740,11 @@ const q06 = [
     ["switchport port-security violation restrict"]),
 
   c06.s("Port security", "Medium", "An access port connects to a Cisco IP Phone that has a desktop PC plugged into the phone's access port. If port security is enabled on the switch port, what is the minimum value required in 'switchport port-security maximum <value>'?",
-    "2 secure MAC addresses minimum (one for the Cisco IP Phone and one for the attached PC)",
+    "A minimum of 2 secure MAC addresses to support both the IP Phone and the attached PC",
     [
-      ["1, because the IP phone uses Network Address Translation (NAT) to hide the PC's MAC address", "IP phones bridge Layer 2 frames from the PC over the access VLAN; the switch sees both the phone's MAC and the PC's MAC."],
-      ["8, because Cisco switches require a minimum maximum of 8 whenever a voice VLAN is configured", "There is no requirement to set the maximum to 8 for a single phone and PC."],
-      ["0, which tells port security to allow unlimited MAC addresses on voice-enabled switch ports", "The maximum value must be at least 1; setting at least 2 allows both the phone's MAC address and the attached PC's MAC address."]
+      ["A minimum of 1 secure MAC address since the IP Phone uses NAT to hide the attached PC's MAC", "IP phones bridge Layer 2 frames from the PC over the access VLAN; the switch sees both the phone's MAC and the PC's MAC."],
+      ["A minimum of 8 secure MAC addresses whenever a voice VLAN is enabled on the switch port", "There is no requirement to set the maximum to 8 for a single phone and PC."],
+      ["A minimum of 0 secure MAC addresses to permit unlimited MAC learning on voice ports", "The maximum value must be at least 1; setting at least 2 allows both the phone's MAC address and the attached PC's MAC address."]
     ],
     "When a PC connects through an IP phone to a single switch port, the switch receives frames sourced from both the IP phone's MAC address and the PC's MAC address. Therefore, port security on a voice switchport requires `switchport port-security maximum 2` (or higher).",
     "Voice port with PC behind IP Phone = set 'switchport port-security maximum' to at least 2.",
@@ -762,7 +762,7 @@ const q06 = [
     ["switchport port-security mac-address sticky", "copy running-config startup-config"]),
 
   c06.s("Port security", "Medium", "A switch port has port security enabled and has dynamically learned a host's MAC address (without sticky learning). Which command will display this MAC address entry in the switch's MAC address table?",
-    "show mac address-table secure (or show mac address-table static)",
+    "show mac address-table secure",
     [
       ["show mac address-table dynamic", "Once port security is enabled on an interface, IOS classifies all secure MACs on that port as STATIC entries and omits them from 'show mac address-table dynamic'."],
       ["show mac address-table aging-time", "'show mac address-table aging-time' displays the inactivity timer for dynamic MAC entries, not the secure MAC addresses."],
@@ -776,7 +776,7 @@ const q06 = [
     "Enter interface Fa0/12 configuration mode and issue 'shutdown' followed by 'no shutdown'.",
     [
       ["Enter interface Fa0/12 configuration mode and issue 'no shutdown' only.", "Issuing 'no shutdown' alone does not clear the err-disabled state; you must issue 'shutdown' first and then 'no shutdown'."],
-      ["Issue 'clear port-security all' in privileged EXEC mode.", "'clear port-security' removes dynamic secure MAC addresses from the table, but it does not bring an err-disabled port back up."],
+      ["Enter privileged EXEC mode on the switch and issue 'clear port-security all' only.", "'clear port-security' removes dynamic secure MAC addresses from the table, but it does not bring an err-disabled port back up."],
       ["Enter interface Fa0/12 configuration mode and issue 'no switchport port-security violation shutdown'.", "Changing the violation mode does not recover an interface that has already transitioned to the err-disabled state."]
     ],
     "When a port enters the `err-disabled` state (Port Status: `Secure-shutdown`), it remains disabled until either automatic errdisable recovery triggers (`errdisable recovery cause psecure-violation`) or an engineer manually resets the interface by issuing `shutdown` followed by `no shutdown`.",
@@ -784,7 +784,7 @@ const q06 = [
     ["shutdown", "no shutdown", "errdisable recovery cause psecure-violation"]),
 
   c06.s("Port security", "Hard", "Examine the output of 'show port-security interface fa0/13'. Which statement accurately explains the current state and history of interface FastEthernet0/13?",
-    "The port is operational (up/up) in Restrict mode, has dropped 97 violating frames without shutting down, and the most recent violating frame came from MAC 0200.3333.3333 in VLAN 1.",
+    "The port stays Secure-up in Restrict mode and has dropped 97 violating frames, most recently from MAC 0200.3333.3333.",
     [
       ["The port is currently in the err-disabled state and has been manually reset 97 times by an administrator.", "Port Status is 'Secure-up' and Violation Mode is 'Restrict', meaning the port never enters the err-disabled state."],
       ["The port allows up to 97 concurrent MAC addresses, and 0200.3333.3333 is the currently authorized sticky MAC address.", "Maximum MAC Addresses is 1, Sticky MAC Addresses is 0, and 97 is the Security Violation Count."],
@@ -796,9 +796,9 @@ const q06 = [
     { cli: "SW1# show port-security interface fa0/13\nPort Security              : Enabled\nPort Status                : Secure-up\nViolation Mode             : Restrict\nAging Time                 : 0 mins\nAging Type                 : Absolute\nSecureStatic Address Aging : Disabled\nMaximum MAC Addresses      : 1\nTotal MAC Addresses        : 1\nConfigured MAC Addresses   : 1\nSticky MAC Addresses       : 0\nLast Source Address:Vlan   : 0200.3333.3333:1\nSecurity Violation Count   : 97" }),
 
   c06.s("Port security", "Hard", "An engineer configures a switch port with 'switchport mode access', 'switchport port-security', 'switchport port-security maximum 3', and 'switchport port-security mac-address 0200.1111.1111'. How does this interface behave when frames arrive?",
-    "It allows static MAC 0200.1111.1111 plus 2 dynamic MACs before a 4th MAC triggers a shutdown violation.",
+    "It permits static MAC 0200.1111.1111 plus 2 dynamically learned MAC addresses before a 4th MAC triggers a shutdown violation.",
     [
-      ["It allows only MAC 0200.1111.1111 and triggers a violation if any other MAC address arrives, because static and dynamic learning cannot be mixed.", "Port security allows mixing preconfigured static MACs and dynamically learned MACs up to the configured maximum (3)."],
+      ["It permits only MAC 0200.1111.1111 and triggers a violation if any other MAC arrives since static and dynamic MACs cannot mix.", "Port security allows mixing preconfigured static MACs and dynamically learned MACs up to the configured maximum (3)."],
       ["It allows up to 3 dynamically learned MAC addresses in addition to the 1 static MAC address, for a total of 4 MAC addresses.", "'switchport port-security maximum 3' sets the TOTAL limit of all secure MACs (static + sticky + dynamic) on the port to 3, not 3 plus static."],
       ["It automatically saves the next 2 dynamically learned MAC addresses into the running configuration as sticky MACs.", "Sticky learning is not enabled unless 'switchport port-security mac-address sticky' is explicitly configured."]
     ],
@@ -861,11 +861,11 @@ const q07 = [
     []),
 
   c07n.s("IPv4", "Easy", "On a Windows workstation, which command displays the IPv4 address, subnet mask, default gateway, MAC address, DHCP server address, and DNS server addresses?",
-    "ipconfig /all",
+    "The ipconfig /all command",
     [
-      ["ipconfig", "The basic 'ipconfig' command without '/all' displays only the IP address, subnet mask, and default gateway, omitting DNS and DHCP server addresses."],
-      ["ifconfig /all", "'ifconfig' is used on macOS and Linux (and does not support a '/all' switch), not on Windows."],
-      ["netstat -rn", "'netstat -rn' displays the local host IP routing table, not the DNS servers or DHCP lease details."]
+      ["The basic ipconfig command", "The basic 'ipconfig' command without '/all' displays only the IP address, subnet mask, and default gateway, omitting DNS and DHCP server addresses."],
+      ["The ifconfig /all command", "'ifconfig' is used on macOS and Linux (and does not support a '/all' switch), not on Windows."],
+      ["The netstat -rn command", "'netstat -rn' displays the local host IP routing table, not the DNS servers or DHCP lease details."]
     ],
     "On Windows, `ipconfig` lists only the IPv4 address, subnet mask, and default gateway for each adapter. Adding the `/all` switch (`ipconfig /all`) also reveals the physical MAC address, whether DHCP is enabled, the DHCP server IP, lease timestamps, and the configured DNS server IP addresses.",
     "Windows: 'ipconfig' = IP/Mask/GW; 'ipconfig /all' = adds MAC, DHCP Server, Lease times, and DNS Servers.",
@@ -905,11 +905,11 @@ const q07 = [
     ["ip address dhcp", "show dhcp lease", "show ip default-gateway"]),
 
   c07.s("DHCP", "Hard", "Examine the routing table output on router R1. How was this default route learned, and why does it have an administrative distance of 254?",
-    "R1's Internet-facing interface is configured as a DHCP client ('ip address dhcp'), and IOS automatically installs a static default route using the DHCP-supplied default gateway with AD 254.",
+    "R1's WAN interface uses 'ip address dhcp' and automatically installs a static default route via the DHCP gateway at AD 254.",
     [
-      ["An administrator manually configured 'ip route 0.0.0.0 0.0.0.0 192.0.2.1', which defaults to an administrative distance of 254.", "A manually configured static route ('ip route') has a default administrative distance of 1, not 254."],
-      ["R1 learned the default route dynamically from an ISP router via OSPF default-information originate.", "OSPF routes are marked with code 'O' or 'O*E2' and have an administrative distance of 110, not 'S*' with AD 254."],
-      ["R1 is acting as a DHCP relay agent ('ip helper-address 192.0.2.1'), which automatically creates a floating static route.", "Configuring 'ip helper-address' forwards client DHCP broadcasts; it never installs a default route in the routing table."]
+      ["An administrator manually configured 'ip route 0.0.0.0 0.0.0.0 192.0.2.1' and IOS assigned its default administrative distance of 254.", "A manually configured static route ('ip route') has a default administrative distance of 1, not 254."],
+      ["R1 learned the default route dynamically from the upstream ISP router via OSPF default-information originate.", "OSPF routes are marked with code 'O' or 'O*E2' and have an administrative distance of 110, not 'S*' with AD 254."],
+      ["R1 acts as a DHCP relay agent using 'ip helper-address 192.0.2.1' and automatically installs a floating static route.", "Configuring 'ip helper-address' forwards client DHCP broadcasts; it never installs a default route in the routing table."]
     ],
     "When a Cisco router interface is configured with `ip address dhcp` (common on ISP connections), the router uses the default gateway IP address supplied in the DHCP ACK to install a default static route (`S* 0.0.0.0/0`) in its routing table with a default administrative distance of 254.",
     "Router 'ip address dhcp' turns the DHCP default-gateway option into 'S* 0.0.0.0/0 [254/0]'.",
@@ -917,7 +917,7 @@ const q07 = [
     { cli: "R1# show ip route static\nGateway of last resort is 192.0.2.1 to network 0.0.0.0\nS*    0.0.0.0/0 [254/0] via 192.0.2.1" }),
 
   c07n.s("IPv4", "Hard", "Examine the macOS terminal output. What are the host's IPv4 address and dotted-decimal subnet mask on interface en0, and which additional macOS command is needed to display the DNS server IP addresses?",
-    "IP 172.16.4.2, mask 255.255.255.0, and 'networksetup -getdnsservers Ethernet' shows DNS.",
+    "IPv4 address 172.16.4.2, mask 255.255.255.0, and 'networksetup -getdnsservers Ethernet' shows DNS.",
     [
       ["IPv4 address 172.16.4.255, subnet mask 255.255.0.0, and 'ifconfig /all' displays the DNS servers.", "172.16.4.255 is the broadcast address, 0xffffff00 equals 255.255.255.0 (not 255.255.0.0), and 'ifconfig' has no '/all' option."],
       ["IPv4 address 172.16.4.2, subnet mask 255.255.255.240, and 'ipconfig /all' displays the DNS servers.", "Hexadecimal 0xffffff00 converts to 255.255.255.0 (/24), and 'ipconfig /all' is a Windows command, not macOS."],
@@ -930,8 +930,8 @@ const q07 = [
 
   c07.m("DHCP", "Medium", "Which two conditions must be true about a subnet connected to a router interface for that interface to require the 'ip helper-address' command?",
     [
-      "DHCP client hosts reside in the connected subnet.",
-      "No DHCP server resides locally in that connected subnet."
+      "End-user client hosts that obtain their IPv4 addresses via DHCP reside in the subnet.",
+      "No local DHCP server is attached directly to that same router-connected LAN subnet."
     ],
     [
       ["A centralized DHCP server resides directly inside that connected subnet.", "If the DHCP server is on the same local subnet as the clients, broadcasts reach the server directly without a relay agent."],
@@ -962,7 +962,7 @@ const c08 = mk("Security Fundamentals", 15, "v2c08");
 
 const q08 = [
   c08.s("DHCP snooping/DAI", "Easy", "What is the default DHCP Snooping and Dynamic ARP Inspection trust state on all Cisco switch interfaces, and which ports should be configured as trusted?",
-    "All ports default to untrusted; ports connecting to legitimate DHCP servers, routers (relay agents), and uplink switches should be configured as trusted.",
+    "All ports default to untrusted; ports facing DHCP servers, relay-agent routers, and uplink switches should be trusted.",
     [
       ["All ports default to trusted; access ports connecting to end-user PCs must be manually configured as untrusted.", "Both DHCP Snooping and DAI default all switch interfaces to untrusted so end-user ports are protected by default."],
       ["Trunk ports default to trusted and access ports default to untrusted automatically when DHCP Snooping is enabled.", "IOS sets every port (both access and trunk) to untrusted by default; you must explicitly configure 'ip dhcp snooping trust' on trunks/uplinks."],
@@ -973,7 +973,7 @@ const q08 = [
     ["ip dhcp snooping trust", "ip arp inspection trust"]),
 
   c08.s("DHCP snooping/DAI", "Easy", "How does DHCP Snooping treat a DHCP Offer or DHCP ACK message that arrives on an untrusted switch port?",
-    "It unconditionally discards the message, preventing a rogue (spurious) DHCP server on an access port from leasing addresses or false default gateways.",
+    "It unconditionally discards the message, blocking a rogue DHCP server on an access port from leasing addresses.",
     [
       ["It forwards the message only if the Ethernet source MAC address matches the DHCP chaddr field.", "The source MAC vs. chaddr check applies to client messages (Discover/Request); server messages (Offer/ACK) are ALWAYS dropped on untrusted ports."],
       ["It places the untrusted switch port into the err-disabled state immediately upon receiving a single DHCP Offer.", "Receiving a server message on an untrusted port drops the packet without err-disabling the port (unless the rate limit is exceeded)."],
@@ -984,7 +984,7 @@ const q08 = [
     ["show ip dhcp snooping"]),
 
   c08.s("DHCP snooping/DAI", "Easy", "What are the characteristics of a gratuitous ARP message, and how do attackers abuse it?",
-    "It is an unprompted ARP reply sent to the Ethernet broadcast address; attackers use it to poison the ARP caches of routers and hosts with a spoofed IP-to-MAC mapping.",
+    "It is an unsolicited broadcast ARP reply; attackers use it to poison ARP caches with a spoofed IP-to-MAC mapping.",
     [
       ["It is an ARP request sent to a unicast MAC address; attackers use it to exhaust the DHCP server's address pool.", "A gratuitous ARP is an ARP reply (not request) sent to the broadcast MAC address, and it poisons ARP tables rather than DHCP pools."],
       ["It is an ICMP redirect encapsulated inside an ARP frame; attackers use it to change a host's subnet mask.", "Gratuitous ARP is a pure Layer 2 ARP reply message, not an ICMP packet, and cannot alter a host's subnet mask."],
@@ -995,7 +995,7 @@ const q08 = [
     []),
 
   c08.s("DHCP snooping/DAI", "Medium", "Which two checks does DHCP Snooping perform on client-originated DHCP messages arriving on an untrusted port?",
-    "For Discover/Request messages, it verifies that the Ethernet source MAC matches the DHCP chaddr field; for Release/Decline messages, it verifies that the IP and incoming port match the DHCP Snooping binding table.",
+    "For Discover/Request, the source MAC must match the DHCP chaddr field; for Release/Decline, the IP and port must match the snooping binding table.",
     [
       ["For Discover/Request messages, it checks the source IP against the binding table; for Release/Decline messages, it inserts Option 82 and floods the frame.", "Discover/Request messages have source IP 0.0.0.0 and are not in the binding table yet; they are checked for Ethernet source MAC == chaddr."],
       ["It compares all client DHCP messages against configured ARP ACLs and drops any packet without a static ARP entry.", "ARP ACLs are used by Dynamic ARP Inspection (DAI) for static-IP hosts, not by DHCP Snooping."],
@@ -1006,7 +1006,7 @@ const q08 = [
     ["show ip dhcp snooping binding"]),
 
   c08.s("DHCP snooping/DAI", "Medium", "An administrator configures 'ip dhcp snooping' and 'ip dhcp snooping vlan 11' on a Layer 2 access switch, and sets the uplink trunk as trusted. Suddenly, no PCs in VLAN 11 can obtain an IP address from the router's DHCP server. Which command fixes this issue and why?",
-    "'no ip dhcp snooping information option', because by default the switch inserts Option 82 into client DHCP messages with a zero giaddr, causing the DHCP server or relay agent to drop them.",
+    "'no ip dhcp snooping information option', because the switch inserts Option 82 with a zero giaddr, so the server drops them.",
     [
       ["'ip dhcp snooping trust' on all PC access ports, because untrusted ports drop client DHCP Discover messages by default.", "Trusting PC access ports would disable DHCP Snooping protection; untrusted ports permit valid Discover messages."],
       ["'no ip dhcp snooping verify mac-address', because Windows PCs always use a different MAC in chaddr than in the Ethernet header.", "Normal hosts use the same MAC address in both the Ethernet header and the DHCP chaddr field."],
@@ -1017,9 +1017,9 @@ const q08 = [
     ["no ip dhcp snooping information option", "show ip dhcp snooping"]),
 
   c08.s("DHCP snooping/DAI", "Medium", "How does Dynamic ARP Inspection (DAI) validate an incoming ARP message on an untrusted port by default, and how are hosts with static IP addresses supported?",
-    "DAI validates the ARP sender IP and sender MAC against the DHCP Snooping binding table and ARP ACLs.",
+    "DAI validates the ARP sender IP and sender MAC against the DHCP Snooping binding table and any statically configured ARP ACLs.",
     [
-      ["DAI compares the ARP target IP and target MAC addresses against the switch's Layer 2 MAC address table (`show mac address-table`).", "DAI checks the ARP sender's (origin) IP and MAC against the DHCP Snooping binding table and ARP ACLs, not the target fields or Layer 2 MAC table."],
+      ["DAI compares the ARP target IP and target MAC addresses against the switch's Layer 2 MAC address table.", "DAI checks the ARP sender's (origin) IP and MAC against the DHCP Snooping binding table and ARP ACLs, not the target fields or Layer 2 MAC table."],
       ["DAI sends a unicast ICMP echo request to the ARP origin IP address and waits for a reply before forwarding the ARP frame.", "DAI does not ping hosts; it performs a table lookup in the DHCP Snooping binding database or ARP ACLs."],
       ["DAI compares the Ethernet destination MAC address against the ARP origin hardware address on all trusted and untrusted ports.", "Trusted ports bypass DAI checks completely, and destination MAC validation is an optional check for ARP replies."]
     ],
@@ -1028,7 +1028,7 @@ const q08 = [
     ["ip arp inspection vlan", "show ip arp inspection", "show ip dhcp snooping binding"]),
 
   c08.s("DHCP snooping/DAI", "Medium", "How do the default message rate limits and configuration options compare between DHCP Snooping and Dynamic ARP Inspection (DAI)?",
-    "DHCP Snooping has no rate limit by default (unlimited), whereas DAI defaults to 15 pps on untrusted ports (with a 1-second burst interval) and supports a configurable 'burst interval' parameter.",
+    "DHCP Snooping has no default rate limit, whereas DAI defaults to 15 pps on untrusted ports with a 1-second burst interval.",
     [
       ["Both DHCP Snooping and DAI default to 15 pps on untrusted ports and unlimited on trusted ports.", "DHCP Snooping defaults to unlimited rate on all ports until 'ip dhcp snooping limit rate' is configured."],
       ["DHCP Snooping defaults to 10 pps with a configurable burst interval, whereas DAI has no default rate limit.", "This reverses the two features: DAI has default rate limiting (15 pps) and burst intervals, whereas DHCP Snooping has neither by default."],
@@ -1039,11 +1039,11 @@ const q08 = [
     ["ip dhcp snooping limit rate", "ip arp inspection limit rate", "show ip arp inspection interfaces"]),
 
   c08.s("DHCP snooping/DAI", "Hard", "Examine the CLI output from SW2. Host PC2 connected to Gi1/0/4 is manually configured with static IP address 172.16.2.101 (MAC 0200.2222.2222) and sends an ARP request for the default gateway. What happens and why?",
-    "DAI drops the ARP request and increments 'DHCP Drops' because VLAN 11 has DAI active and Gi1/0/4's binding entry maps 0200.2222.2222 to 172.16.2.102, not 172.16.2.101.",
+    "DAI drops the ARP request and increments 'DHCP Drops' because Gi1/0/4's binding maps 0200.2222.2222 to 172.16.2.102.",
     [
       ["DAI forwards the ARP request because 'Source Mac Validation' and 'IP Address Validation' are both shown as Disabled.", "'Source Mac Validation' and 'IP Address Validation' are optional header checks; DAI's core check against the DHCP Snooping binding table is always active when Operation is Active."],
-      ["DAI drops the ARP request and increments 'ACL Drops' because Static ACL is blank for VLAN 11.", "Because no ARP ACL is configured, the drop is counted under 'DHCP Drops' (mismatch against the DHCP Snooping binding table), not 'ACL Drops'."],
-      ["DHCP Snooping places interface Gi1/0/4 into the err-disabled state because PC2 used a duplicate IP address.", "DHCP Snooping only inspects DHCP messages, not ARP messages, and a single invalid ARP does not err-disable the port."]
+      ["DAI drops the ARP request and increments 'ACL Drops' because the Static ACL column is blank for VLAN 11 here.", "Because no ARP ACL is configured, the drop is counted under 'DHCP Drops' (mismatch against the DHCP Snooping binding table), not 'ACL Drops'."],
+      ["DHCP Snooping places interface Gi1/0/4 into the err-disabled state because PC2 sent an ARP using a duplicate IP address.", "DHCP Snooping only inspects DHCP messages, not ARP messages, and a single invalid ARP does not err-disable the port."]
     ],
     "Even when optional validations (`Source Mac`, `Destination Mac`, `IP Address`) are disabled, DAI always compares the ARP origin MAC and origin IP against the DHCP Snooping binding table on untrusted ports. In the binding table, `02:00:22:22:22:22` on Gi1/0/4 is leased `172.16.2.102`, while `172.16.2.101` belongs to `02:00:11:11:11:11` on Gi1/0/3. DAI drops the spoofed ARP from PC2 and increments `Dropped` and `DHCP Drops`.",
     "DAI always checks Origin IP + Origin MAC against 'show ip dhcp snooping binding'; optional 'ip arp inspection validate' checks are extra.",
@@ -1053,7 +1053,7 @@ const q08 = [
   c08.s("DHCP snooping/DAI", "Hard", "An engineer configures 'ip arp inspection validate src-mac dst-mac' on a switch, and later enters 'ip arp inspection validate ip' in global configuration mode. Which optional DAI validations are now active on the switch?",
     "Only 'ip' validation is active because each 'ip arp inspection validate' command overwrites the prior one.",
     [
-      ["All three optional validations ('src-mac', 'dst-mac', and 'ip') are active because validate commands are cumulative.", "Unlike ACL lines, 'ip arp inspection validate' is a single global command that replaces any previously configured validate options."],
+      ["All three optional validations, src-mac, dst-mac, and ip, are active because validate commands are cumulative.", "Unlike ACL lines, 'ip arp inspection validate' is a single global command that replaces any previously configured validate options."],
       ["Only 'src-mac' and 'dst-mac' remain active because 'ip' must be configured under interface configuration mode.", "'ip arp inspection validate' is a global command, and the latest entry replaces the old one."],
       ["No optional validations are active because all three keywords must always be typed together for the command to take effect.", "You can enable any one, two, or all three keywords, but you must type all desired keywords on a single command line."]
     ],
@@ -1068,7 +1068,7 @@ const q08 = [
     ],
     [
       ["ip arp inspection vlan 20", "Dynamic ARP Inspection (DAI) uses only 'ip arp inspection vlan 20', whereas DHCP Snooping requires both 'ip dhcp snooping' and 'ip dhcp snooping vlan 20'."],
-      ["interface vlan 20 followed by ip dhcp snooping enable", "DHCP Snooping is enabled globally per VLAN, not inside SVI interface configuration mode."],
+      ["ip dhcp snooping enable", "DHCP Snooping is enabled globally per VLAN, not inside SVI interface configuration mode."],
       ["service dhcp snooping", "The global command is 'ip dhcp snooping', not 'service dhcp snooping'."]
     ],
     "To activate DHCP Snooping on a switch, you must configure **both** the global master switch `ip dhcp snooping` and the per-VLAN activation command `ip dhcp snooping vlan <vlan-list>`. Configuring only one of the two leaves DHCP Snooping inactive. (In contrast, DAI requires only `ip arp inspection vlan <vlan-list>` with no separate master enable command.)",
@@ -1118,7 +1118,7 @@ const q09 = [
     ["logging host 172.16.3.9", "logging trap warnings"]),
 
   c09.s("Syslog", "Medium", "An engineer connects to a router via SSH and runs 'debug ip ospf hello', but no debug output appears on the screen even though 'logging monitor debugging' is configured. What command must the engineer run to see the messages in this SSH session?",
-    "terminal monitor (in privileged EXEC mode)",
+    "terminal monitor (entered in privileged EXEC mode)",
     [
       ["logging console debugging (in global configuration mode)", "'logging console' only affects the physical console port, not remote VTY (SSH/Telnet) sessions."],
       ["service sequence-numbers (in global configuration mode)", "'service sequence-numbers' adds sequence numbers to log messages; it does not enable log display on VTY lines."],
@@ -1129,7 +1129,7 @@ const q09 = [
     ["terminal monitor", "logging monitor"]),
 
   c09.s("NTP", "Easy", "In Network Time Protocol (NTP), what does the stratum level indicate, and what happens if a device's stratum reaches 16?",
-    "Stratum indicates how many NTP hops a device is from an authoritative reference clock (lower is better); stratum 16 is considered unsynchronized and unusable.",
+    "Stratum indicates how many NTP hops a device is from a reference clock; stratum 16 means unsynchronized and unusable.",
     [
       ["Stratum indicates the polling interval in seconds; stratum 16 means the device polls its NTP server every 16 seconds.", "Polling interval is measured in seconds (such as 64s) separately from stratum; stratum measures accuracy/distance from the reference clock."],
       ["Stratum indicates the priority of the NTP server where higher numbers (up to 16) are preferred over lower numbers.", "Lower stratum numbers represent more accurate time sources (Stratum 1 is best, connected directly to an atomic/GPS clock)."],
@@ -1140,7 +1140,7 @@ const q09 = [
     ["show ntp status", "show ntp associations"]),
 
   c09.s("NTP", "Medium", "What is the functional difference between configuring 'ntp master 4' and configuring 'ntp server 172.16.2.2' on a Cisco router?",
-    "'ntp master 4' puts the router in NTP server-only mode using its own internal hardware clock (127.127.1.1) at stratum 4, whereas 'ntp server 172.16.2.2' puts the router in client/server mode.",
+    "'ntp master 4' makes the router a server at stratum 4 using its internal clock, whereas 'ntp server 172.16.2.2' makes it a client of that server.",
     [
       ["'ntp master 4' configures the router as a client of four upstream servers, whereas 'ntp server 172.16.2.2' makes the router a Stratum 1 atomic clock.", "'ntp master 4' uses the local internal clock at stratum 4, while 'ntp server' tells the router to synchronize as a client of 172.16.2.2."],
       ["'ntp master 4' synchronizes the router with an external server at 4.4.4.4, whereas 'ntp server 172.16.2.2' disables NTP client mode.", "The number after 'ntp master' is the local clock's stratum level (default 8), not an IP address."],
@@ -1151,7 +1151,7 @@ const q09 = [
     ["ntp master", "ntp server"]),
 
   c09.s("NTP", "Hard", "Examine the 'show ntp status' and 'show ntp associations' outputs from router R1. What is R1's own stratum level, what is the IP address and stratum of R1's upstream NTP server, and what is that server's reference clock?",
-    "R1 is Stratum 4, syncing to Stratum 3 server 172.16.2.2, which syncs to reference clock 172.16.3.3.",
+    "R1 is Stratum 4; it syncs to Stratum 3 server 172.16.2.2, which in turn syncs to the reference clock 172.16.3.3.",
     [
       ["R1 is Stratum 3; its upstream NTP server is 172.16.3.3 (which is Stratum 4); and 172.16.3.3 synchronizes to 172.16.2.2.", "'show ntp status' shows R1's own stratum is 4 and its server ('reference') is 172.16.2.2; in 'show ntp associations', 'st 3' and 'ref clock 172.16.3.3' describe the server 172.16.2.2."],
       ["R1 is Stratum 4; it is synchronized to two NTP servers (172.16.2.2 and 172.16.3.3) simultaneously for load balancing.", "R1 has only one configured association (*~172.16.2.2); 172.16.3.3 is the upstream reference clock used by 172.16.2.2."],
@@ -1163,7 +1163,7 @@ const q09 = [
     { cli: "R1# show ntp status\nClock is synchronized, stratum 4, reference is 172.16.2.2\nnominal freq is 250.0000 Hz, actual freq is 250.0000 Hz, precision is 2**21\n\nR1# show ntp associations\n  address         ref clock       st   when   poll reach  delay  offset   disp\n*~172.16.2.2      172.16.3.3       3     50     64   377  1.223   0.090  4.469\n * sys.peer, # selected, + candidate, - outlyer, x falseticker, ~ configured" }),
 
   c09.s("NTP", "Hard", "An enterprise border router R1 is configured with 'ntp server 198.51.100.1', 'ntp server 198.51.100.2' (both Stratum 1 Internet servers), and 'ntp master 7'. How does R1 behave during normal Internet connectivity versus during an Internet outage?",
-    "Normally R1 syncs to one of the Stratum 1 Internet servers (becoming Stratum 2); if both Internet servers become unreachable, R1 falls back to its internal clock at Stratum 7 so internal clients stay synced.",
+    "Normally R1 syncs to a Stratum 1 Internet server as Stratum 2; if both are unreachable, it falls back to its Stratum 7 clock.",
     [
       ["R1 always uses its local internal clock at Stratum 7 because 'ntp master' overrides any configured 'ntp server' commands.", "NTP always selects the association with the lowest (best) stratum level; Stratum 1 beats the local Stratum 7 clock."],
       ["R1 averages the timestamps of both Stratum 1 servers and the Stratum 7 internal clock resulting in a Stratum 3 clock.", "NTP selects the best stratum source (Stratum 1 -> R1 becomes Stratum 2) and only uses Stratum 7 if the Stratum 1 peers fail."],
@@ -1185,7 +1185,7 @@ const q09 = [
     ["show cdp", "show lldp"]),
 
   c09n.s("CDP/LLDP", "Medium", "Switch SW1 connects to Switch SW2, and SW2 connects to Router R1. You are logged into SW2 and want to view the IOS version and IPv4 management address of R1 ONLY (without displaying details for SW1). Which two commands accomplish this?",
-    "show cdp entry R1 (or show lldp entry R1)",
+    "show cdp entry R1 and show lldp entry R1 on SW2",
     [
       ["show cdp neighbors and show lldp neighbors", "'show cdp neighbors' and 'show lldp neighbors' display a one-line summary per neighbor that omits the IOS version and IP address."],
       ["show cdp neighbors detail and show lldp neighbors detail", "The 'neighbors detail' commands show IOS version and IP addresses for ALL connected neighbors (both SW1 and R1), not just R1."],
@@ -1208,8 +1208,8 @@ const q09 = [
 
   c09.m("Syslog", "Medium", "Which two statements accurately describe how Cisco IOS handles timestamps, sequence numbers, and debug messages in system logging?",
     [
-      "By default, IOS includes timestamps ('service timestamps') and omits sequence numbers ('no service sequence-numbers') on log messages.",
-      "An enabled 'debug' command continues running and consuming CPU even after the administrator logs out, until 'no debug' (or 'undebug all') is issued."
+      "By default, IOS log messages carry timestamps but do not carry sequence numbers.",
+      "An enabled 'debug' command keeps running and using CPU after logout until 'no debug' or 'undebug all' is issued."
     ],
     [
       ["Closing an SSH or console session automatically turns off all active 'debug' commands started during that session.", "Active debugs remain enabled in IOS background processes even after the user logs out, continuing to consume CPU."],
@@ -1263,7 +1263,7 @@ const q10 = [
     ["show ip nat translations"]),
 
   c10.s("NAT", "Easy", "How does Port Address Translation (PAT, or NAT Overload) allow thousands of internal private hosts to share a single public Inside Global IPv4 address simultaneously?",
-    "By translating both the source IPv4 address and the Layer 4 TCP/UDP source port number so each flow has a unique Inside Global IP and port combination",
+    "By translating the source IPv4 address and the Layer 4 source port so each flow gets a unique Inside Global IP and port pair",
     [
       ["By embedding the host's private Ethernet MAC address into the IPv4 Options field of every outbound packet", "Layer 2 MAC addresses are stripped at every router hop and are never placed into IPv4 Options by PAT."],
       ["By assigning each internal host a 10-millisecond time slot to use the single public IPv4 address in round-robin order", "PAT does not time-slice IP addresses; thousands of flows remain active concurrently using unique 16-bit TCP/UDP port numbers."],
@@ -1285,9 +1285,9 @@ const q10 = [
     ["ip nat inside source static 10.1.1.2 200.1.1.2", "ip nat inside", "ip nat outside"]),
 
   c10.s("NAT", "Medium", "An administrator attempts to configure a dynamic NAT pool on a Cisco router with the command 'ip nat pool PUBLIC 200.1.1.1 200.1.1.6 netmask 255.255.255.252', but IOS rejects the command. Why?",
-    "Because with mask 255.255.255.252 (/30), start address 200.1.1.1 (subnet 200.1.1.0/30) and end address 200.1.1.6 (subnet 200.1.1.4/30) do not reside in the same subnet.",
+    "Because with a /30 mask, the start address 200.1.1.1 and end address 200.1.1.6 lie in different subnets.",
     [
-      ["Because 'ip nat pool' requires a wildcard mask (0.0.0.3) instead of a dotted-decimal subnet mask (255.255.255.252).", "Unlike ACLs, 'ip nat pool' uses a standard subnet mask ('netmask 255.255.255.x' or 'prefix-length'), not a wildcard mask."],
+      ["Because 'ip nat pool' requires a wildcard mask such as 0.0.0.3 instead of a dotted-decimal subnet mask.", "Unlike ACLs, 'ip nat pool' uses a standard subnet mask ('netmask 255.255.255.x' or 'prefix-length'), not a wildcard mask."],
       ["Because a dynamic NAT pool must contain at least 8 public IPv4 addresses to be accepted by Cisco IOS.", "A dynamic NAT pool can contain as few as 1 or 2 IPv4 addresses (for example, 200.1.1.1 to 200.1.1.2 with /30)."],
       ["Because the 'overload' keyword must be included at the end of the 'ip nat pool' command.", "The 'overload' keyword is placed at the end of 'ip nat inside source list ...', never on 'ip nat pool'."]
     ],
@@ -1307,7 +1307,7 @@ const q10 = [
     []),
 
   c10.s("NAT", "Hard", "Examine the 'show ip nat statistics' output. Internal users report intermittent failures when trying to browse the Internet. What is the root cause of the issue, and how can it be fixed without acquiring more public IP addresses?",
-    "Dynamic NAT without PAT has allocated all 7 addresses in pool 'fred' (100% allocated, 965 pool misses); adding the 'overload' keyword to 'ip nat inside source list 1 pool fred' enables PAT.",
+    "All 7 pool addresses are allocated; adding 'overload' to 'ip nat inside source list 1 pool fred' enables PAT.",
     [
       ["ACL 1 is blocking 965 packets; changing ACL 1 to 'permit ip any any' will allow all users to reach the Internet.", "The 965 misses appear on the NAT pool line ('allocated 7 (100%), misses 965'), meaning ACL 1 matched the packets, but the pool ran out of IP addresses."],
       ["The inside and outside interfaces are reversed; swapping 'ip nat inside' and 'ip nat outside' will clear the misses.", "Total active translations is 7 and Hits is 45,210, proving that inside/outside interfaces are working for the first 7 hosts."],
@@ -1319,9 +1319,9 @@ const q10 = [
     { cli: "NAT# show ip nat statistics\nTotal active translations: 7 (0 static, 7 dynamic; 0 extended)\nOutside interfaces:\n  Serial0/0/0\nInside interfaces:\n  GigabitEthernet0/0\nHits: 45210  Misses: 972\nExpired translations: 0\nDynamic mappings:\n-- Inside Source\n[id 1] access-list 1 pool fred refcount 7\n pool fred: netmask 255.255.255.240\n    start 200.1.1.1 end 200.1.1.7\n    type generic, total addresses 7, allocated 7 (100%), misses 965" }),
 
   c10.s("NAT", "Hard", "Examine the router configuration. Why are hosts in subnet 10.1.1.0/24 unable to reach the Internet, even though 'ip nat inside', 'ip nat outside', and the 'overload' keyword are all present?",
-    "ACL 1 matches the public IP subnet (200.1.1.0/24) instead of the private Inside Local subnet (10.1.1.0/24) that packets have before NAT translation.",
+    "ACL 1 matches the public subnet 200.1.1.0/24 instead of the private Inside Local subnet 10.1.1.0/24 used before translation.",
     [
-      ["The 'ip nat inside source' command cannot reference an interface ('Serial0/0/0') and must always use an 'ip nat pool'.", "PAT commonly uses 'interface Serial0/0/0 overload' when sharing a single public interface IP address."],
+      ["The 'ip nat inside source' command cannot reference an interface such as Serial0/0/0 and must always use an 'ip nat pool'.", "PAT commonly uses 'interface Serial0/0/0 overload' when sharing a single public interface IP address."],
       ["Interface GigabitEthernet0/0 must be configured with 'ip access-group 1 in' before NAT will evaluate ACL 1.", "Binding the NAT ACL to an interface with 'ip access-group' is not required and would actually filter traffic instead of just selecting it for NAT."],
       ["A standard ACL cannot be used with NAT overload; an extended ACL matching TCP and UDP ports is required.", "Standard ACLs (1-99) are the most common way to match Inside Local source addresses for NAT/PAT."]
     ],
@@ -1332,8 +1332,8 @@ const q10 = [
 
   c10.m("NAT", "Medium", "Which two benefits are provided by Classless Interdomain Routing (CIDR, RFC 4632) to address IPv4 scalability?",
     [
-      "Route aggregation (summarization) of contiguous public IP blocks into a single route to reduce the size of Internet routing tables",
-      "Allocating variable-sized subnet blocks (such as /27 or /28) to customer organizations instead of wasting entire Class A, B, or C networks"
+      "Route aggregation of contiguous public IP blocks into a single route to shrink Internet routing tables",
+      "Allocating variable-sized subnet blocks such as /27 or /28 instead of whole Class A, B, or C networks"
     ],
     [
       ["Allowing multiple organizations to reuse the 10.0.0.0/8 address space internally without coordinating with IANA", "Reusing unregistered internal addresses is Private Addressing (RFC 1918) combined with NAT, not CIDR."],

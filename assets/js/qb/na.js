@@ -1,4 +1,4 @@
-import { mk } from "./build.js?v=76";
+import { mk } from "./build.js?v=78";
 
 // Network Access - 20% of exam -> 48 questions
 const { s, m, d, t } = mk("Network Access", 20);

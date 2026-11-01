@@ -1,4 +1,4 @@
-import { mk } from "../build.js?v=76";
+import { mk } from "../build.js?v=78";
 
 // ============================================================================
 // v1c11: Perspectives on IPv4 Subnetting
@@ -8,7 +8,7 @@ const c11 = mk("Network Fundamentals", 20, "v1c11");
 const q11 = [
   c11.s("Subnetting", "Easy",
     "Why does the formula for usable host IPv4 addresses in a subnet (2^H - 2) subtract two addresses?",
-    "To reserve the subnet ID and the subnet directed broadcast address",
+    "To reserve the lowest subnet ID and highest directed broadcast address",
     [
       ["To reserve one address for the primary router and one for a standby gateway", "Default gateway addresses come out of the usable host range, not the two protocol-reserved numbers."],
       ["To set aside the first and last addresses for local DHCP server operations", "DHCP uses normal usable host addresses; it does not reserve the boundary values of a subnet."],
@@ -86,7 +86,7 @@ const q11 = [
 
   c11.s("Subnetting", "Medium",
     "When an engineer borrows bits to subnet a Class B network, how do the sizes of the network (N), subnet (S), and host (H) parts change compared to the unsubnetted network?",
-    "The network part stays fixed at 16 bits while the host part shrinks by S bits",
+    "The 16-bit network part stays fixed while the host part shrinks by S subnet bits",
     [
       ["The network part shrinks by S bits while the host part remains fixed at 16 bits", "Classful network bits are locked by the address class (16 for Class B) and cannot be borrowed."],
       ["Both the network part and the host part shrink equally to form the subnet field", "Subnet bits are borrowed exclusively from the original host field, never from the network field."],
@@ -114,9 +114,9 @@ const q11 = [
     "Which of the following IPv4 addresses belong to the RFC 1918 private address ranges?",
     ["172.31.250.10", "192.168.0.254"],
     [
-      ["172.32.0.15", "The Class B private range stops at 172.31.255.255; 172.32.0.0/16 is a public network."],
-      ["192.1.168.10", "Class C private networks must begin with 192.168 in the first two octets."],
-      ["11.0.0.1", "Only Class A network 10.0.0.0/8 is private; 11.0.0.0/8 is a public Class A block."]
+      ["172.32.100.15", "The Class B private range stops at 172.31.255.255; 172.32.0.0/16 is a public network."],
+      ["192.1.168.100", "Class C private networks must begin with 192.168 in the first two octets."],
+      ["11.100.250.10", "Only Class A network 10.0.0.0/8 is private; 11.0.0.0/8 is a public Class A block."]
     ],
     "RFC 1918 defines private IPv4 ranges as 10.0.0.0–10.255.255.255, 172.16.0.0–172.31.255.255, and 192.168.0.0–192.168.255.255. Addresses starting with 172.32, 192.1, or 11 fall outside these ranges and are public.",
     "Watch the second octet carefully on 172.x (must be 16 through 31 inclusive) and 192.x (must be 168).",
@@ -138,11 +138,11 @@ const q11 = [
 
   c11.m("Subnetting", "Hard",
     "A network engineer is subdividing Class C network 192.168.50.0 with a single subnet mask so that it supports at least 5 subnets and at least 25 hosts per subnet. Which combinations of network (N), subnet (S), and host (H) bits are valid?",
-    ["N = 24, S = 3, H = 5", "N = 24, S = 3, H = 5 is the only valid combination because S = 2 gives only 4 subnets and H = 4 gives only 14 hosts"],
+    ["N = 24, S = 3, H = 5 — mask /27 or 255.255.255.224", "N = 24, S = 3, H = 5 — 8 subnets and 30 hosts each"],
     [
-      ["N = 24, S = 2, H = 6", "S = 2 provides only 2^2 = 4 subnets, which is less than the required 5 subnets."],
-      ["N = 24, S = 4, H = 4", "H = 4 provides only 2^4 - 2 = 14 usable hosts per subnet, failing the 25-host requirement."],
-      ["N = 16, S = 10, H = 6", "192.168.50.0 is a Class C network with N = 24 network bits, not a Class B network."]
+      ["N = 24, S = 2, H = 6 — 4 subnets and 62 hosts each", "S = 2 provides only 2^2 = 4 subnets, which is less than the required 5 subnets."],
+      ["N = 24, S = 4, H = 4 — 16 subnets and 14 hosts each", "H = 4 provides only 2^4 - 2 = 14 usable hosts per subnet, failing the 25-host requirement."],
+      ["N = 16, S = 10, H = 6 — mask /26 or 255.255.255.192", "192.168.50.0 is a Class C network with N = 24 network bits, not a Class B network."]
     ],
     "For Class C network 192.168.50.0, N = 24, leaving 8 bits to split between S and H. Requiring 5 subnets forces S >= 3 (2^3 = 8), and requiring 25 hosts forces H >= 5 (2^5 - 2 = 30). Since 3 + 5 = 8, N = 24, S = 3, H = 5 is the single workable split.",
     "In Class C, S + H must equal 8; check both 2^S >= subnets and 2^H - 2 >= hosts.",
@@ -209,11 +209,11 @@ const q12 = [
 
   c12.s("IPv4", "Easy",
     "What is the purpose of the Class D IPv4 address range (224.0.0.0 through 239.255.255.255)?",
-    "Multicast communication where one packet is delivered to a group of hosts",
+    "Multicast delivery of a single packet to a joined group of hosts",
     [
-      ["Unicast addressing for small networks of up to 254 hosts each", "Unicast addressing for small networks is the role of Class C (192–223)."],
-      ["Reserved space formerly designated for experimental research use", "Class E (240–255) is the reserved/experimental address range."],
-      ["Loopback and local software testing on the local TCP/IP stack", "Loopback testing uses the reserved 127.0.0.0/8 range (such as 127.0.0.1)."]
+      ["Unicast host addressing for small LANs of up to 254 hosts per site", "Unicast addressing for small networks is the role of Class C (192–223)."],
+      ["Reserved address space designated for experimental or future needs", "Class E (240–255) is the reserved/experimental address range."],
+      ["Loopback and local software testing on the host's TCP/IP stack", "Loopback testing uses the reserved 127.0.0.0/8 range (such as 127.0.0.1)."]
     ],
     "Classes A, B, and C are unicast address classes, whereas Class D (first octet 224–239) is dedicated to IPv4 multicast groups and Class E (240–255) is reserved for future or experimental use.",
     "Class D = Multicast (224-239); Class E = Reserved/Experimental (240-255).",
@@ -222,9 +222,9 @@ const q12 = [
 
   c12.s("IPv4", "Easy",
     "Why are there only 126 valid Class A networks (2^7 - 2) instead of 128?",
-    "Addresses starting with 0 and 127 in the first octet are reserved for special purposes",
+    "First-octet values 0 and 127 are reserved for special default and loopback use",
     [
-      ["Addresses starting with 127 and 128 are assigned to Class B networks instead", "128 is the start of Class B, whose first bit is 1; the 7-bit Class A space runs from 0 to 127."],
+      ["Addresses starting with 127 and 128 in the first octet belong to Class B instead", "128 is the start of Class B, whose first bit is 1; the 7-bit Class A space runs from 0 to 127."],
       ["Two Class A networks are subtracted for the subnet ID and directed broadcast", "The -2 in 2^H - 2 applies to hosts inside a network, whereas 0.0.0.0 and 127.0.0.0 are whole reserved networks."],
       ["IANA permanently retired networks 10.0.0.0 and 126.0.0.0 from the classful table", "Both 10.0.0.0 (private) and 126.0.0.0 (public) are counted among the 126 valid Class A networks."]
     ],
@@ -274,9 +274,9 @@ const q12 = [
 
   c12.m("IPv4", "Medium",
     "Which of the following statements are true regarding the unsubnetted classful network that contains IPv4 address 128.0.5.99?",
-    ["Its classful network ID is 128.0.0.0", "Its default mask is 255.255.0.0"],
+    ["Its unsubnetted classful network address is 128.0.0.0", "Its default classful subnet mask is 255.255.0.0 or /16"],
     [
-      ["It belongs to a Class A network because the second octet is 0", "Class is determined solely by the first octet (128 is Class B), even when the second octet happens to be 0."],
+      ["It belongs to a Class A network since octet two is zero", "Class is determined solely by the first octet (128 is Class B), even when the second octet happens to be 0."],
       ["Its classful network broadcast address is 128.255.255.255", "Because 128.0.0.0 is Class B, the first two octets (128.0) stay fixed, making the broadcast 128.0.255.255."],
       ["It contains 24 host bits in the unsubnetted network", "Class B networks have 16 network bits and 16 host bits, not 24 host bits."]
     ],
@@ -317,7 +317,7 @@ const q12 = [
     [
       ["Network ID 191.0.0.0, last usable 191.255.255.254, broadcast 191.255.255.255", "191 is in the Class B range (128–191), so the second octet (255) is part of the network ID, not a host octet."],
       ["Network ID 191.255.14.0, last usable 191.255.14.254, broadcast 191.255.14.255", "191 is the upper edge of Class B (2 network octets), whereas Class C begins at 192."],
-      ["It is a reserved broadcast address because the second octet is already 255", "A value of 255 in a network octet is completely valid; 191.255.0.0 is the highest-numbered Class B network."]
+      ["It is a reserved directed broadcast address since the second octet is already 255", "A value of 255 in a network octet is completely valid; 191.255.0.0 is the highest-numbered Class B network."]
     ],
     "First octet 191 is the top of the Class B range (128–191), so the first two octets (191.255) form the network part and the last two octets form the host part. Setting the two host octets to 0 gives network ID 191.255.0.0; setting them to 255 gives broadcast 191.255.255.255, and subtracting 1 gives last usable 191.255.255.254.",
     "191.255.0.0 is the highest Class B network ID; its broadcast 191.255.255.255 looks like Class A but is Class B.",
@@ -388,9 +388,9 @@ const q13 = [
     "Which rule must every valid 32-bit binary IPv4 subnet mask follow?",
     "All binary 1s must be contiguous on the left, followed by all binary 0s on the right",
     [
-      ["All binary 0s must be contiguous on the left, followed by all binary 1s on the right", "0s on the left and 1s on the right describes a wildcard mask, not a subnet mask."],
+      ["All binary 0s must be contiguous on the left side, followed by binary 1s on the right", "0s on the left and 1s on the right describes a wildcard mask, not a subnet mask."],
       ["Each of the four octets must contain an even number of binary 1s and binary 0s", "An octet in a valid subnet mask can have anywhere from zero to eight consecutive 1s."],
-      ["Binary 1s and 0s may be interleaved as long as the total number of 1s is at least 8", "Interleaving 1s and 0s is strictly illegal in an IPv4 subnet mask."]
+      ["Binary 1s and 0s may be interleaved as long as the total count of binary 1s is at least 8", "Interleaving 1s and 0s is strictly illegal in an IPv4 subnet mask."]
     ],
     "Because the prefix (network + subnet) part always precedes the host part in an IPv4 address, a binary subnet mask must consist of a single unbroken string of binary 1s starting on the left, followed by an unbroken string of binary 0s on the right.",
     "Valid subnet masks never interleave 1s and 0s: left side = all 1s (prefix), right side = all 0s (host).",
@@ -425,7 +425,7 @@ const q13 = [
 
   c13.s("Subnetting", "Easy",
     "How does the classless view of an IPv4 address differ from the classful view?",
-    "Classless addressing ignores Class A/B/C rules and divides the address into two parts: prefix and host",
+    "Classless addressing ignores Class A/B/C rules and splits the address into prefix and host",
     [
       ["Classless addressing divides the 32-bit address into three parts: network, subnet, and host", "Dividing the address into network, subnet, and host parts is the definition of classful addressing."],
       ["Classless addressing eliminates the subnet mask and relies only on the first octet value", "Classless addressing relies entirely on the subnet mask (prefix length) and ignores first-octet class rules."],
@@ -490,11 +490,11 @@ const q13 = [
 
   c13.s("Subnetting", "Hard",
     "A workstation is configured with IPv4 address 203.0.113.45 and subnet mask 255.255.255.0. When analyzed using classful addressing rules, how many subnet bits (S) exist and what does this indicate?",
-    "0 subnet bits, indicating that the Class C network is unsubnetted and uses its default mask",
+    "0 subnet bits, indicating the Class C network is unsubnetted with default mask",
     [
       ["8 subnet bits, indicating that the network has been divided into 256 subnets", "First octet 203 is Class C (N = 24), so a /24 mask has S = 24 - 24 = 0 subnet bits, not 8."],
       ["16 subnet bits, indicating that the network has been divided into 65,536 subnets", "S = 16 with a /24 mask only occurs when the address is in a Class A network (N = 8)."],
-      ["8 subnet bits, indicating that 8 bits remain for host addressing", "The 8 remaining bits are host bits (H = 8), not subnet bits (S = 0)."]
+      ["8 subnet bits, indicating that 8 bits remain in the fourth octet for hosts", "The 8 remaining bits are host bits (H = 8), not subnet bits (S = 0)."]
     ],
     "First octet 203 is in the Class C range (192–223), so N = 24 network bits. The mask 255.255.255.0 converts to /24 (P = 24). Calculating S = P - N gives 24 - 24 = 0 subnet bits, showing that the Class C network uses its default mask and has not been subnetted.",
     "When P equals N (default mask), S = 0 and the classful network is not subnetted.",
@@ -516,11 +516,11 @@ const q13 = [
 
   c13.s("Subnetting", "Hard",
     "Two subnets in different parts of an enterprise use 10.20.4.0/26 and 192.168.4.0/26. If each classful network uses /26 as its only mask, how do the usable hosts per subnet and total subnets compare between the two networks?",
-    "Both have 62 usable hosts per subnet, but 10.0.0.0 has 2^18 subnets while 192.168.4.0 has 4 subnets",
+    "Both have 62 usable hosts per subnet, while 10.0.0.0 has 2^18 subnets and 192.168.4.0 has 4",
     [
-      ["Both have 62 usable hosts per subnet and both have 4 subnets", "10.0.0.0 is Class A (N = 8), so a /26 mask borrows S = 26 - 8 = 18 subnet bits (2^18 subnets), not 2."],
-      ["10.20.4.0/26 has more usable hosts per subnet because it is in a Class A network", "The number of usable hosts per subnet (2^H - 2) depends only on the mask (/26 -> H = 6 -> 62 hosts), never on the class."],
-      ["Both have 64 usable hosts per subnet, but 10.0.0.0 has 2^16 subnets while 192.168.4.0 has 2 subnets", "With H = 6, usable hosts is 2^6 - 2 = 62 (not 64), and S is 18 for Class A and 2 for Class C."]
+      ["Both networks have 62 usable hosts per subnet and both have a total of 4 /26 subnets", "10.0.0.0 is Class A (N = 8), so a /26 mask borrows S = 26 - 8 = 18 subnet bits (2^18 subnets), not 2."],
+      ["10.20.4.0/26 has many more usable hosts per subnet since 10.0.0.0 is a Class A network block", "The number of usable hosts per subnet (2^H - 2) depends only on the mask (/26 -> H = 6 -> 62 hosts), never on the class."],
+      ["Both have 64 usable hosts per subnet, while 10.0.0.0 has 2^16 subnets and 192.168.4.0 has 2 subnets", "With H = 6, usable hosts is 2^6 - 2 = 62 (not 64), and S is 18 for Class A and 2 for Class C."]
     ],
     "Because both subnets use a /26 mask, both have H = 32 - 26 = 6 host bits and therefore 2^6 - 2 = 62 usable hosts per subnet. However, 10.0.0.0 is Class A (N = 8, so S = 26 - 8 = 18 and 2^18 = 262,144 subnets), whereas 192.168.4.0 is Class C (N = 24, so S = 26 - 24 = 2 and 2^2 = 4 subnets).",
     "Hosts per subnet depends ONLY on the mask (H = 32 - P); subnets in the network depends on both mask and class (S = P - N).",
@@ -594,9 +594,9 @@ const q14 = [
     "When using the decimal method to analyze a difficult mask, how is the 'magic number' calculated in the interesting octet?",
     "256 minus the dotted-decimal mask value in the interesting octet",
     [
-      ["255 minus the dotted-decimal mask value in the interesting octet", "Subtracting from 255 is off by one; subtracting from 256 gives the exact power-of-2 block size."],
-      ["256 minus the IPv4 address value in the interesting octet", "The magic number depends only on the subnet mask octet, never on the IP address octet."],
-      ["32 minus the prefix length (/P) of the subnet mask", "32 - P calculates the total number of host bits (H), not the decimal block increment in the interesting octet."]
+      ["255 minus the dotted-decimal subnet mask value in the interesting octet", "Subtracting from 255 is off by one; subtracting from 256 gives the exact power-of-2 block size."],
+      ["256 minus the host IPv4 address value in the interesting octet", "The magic number depends only on the subnet mask octet, never on the IP address octet."],
+      ["32 minus the total prefix length (/P) of the configured subnet mask", "32 - P calculates the total number of host bits (H), not the decimal block increment in the interesting octet."]
     ],
     "In the interesting octet (the single octet where the DDN mask is neither 255 nor 0), the magic number is calculated as 256 - mask. Adjacent subnet IDs increment by multiples of this magic number in the interesting octet.",
     "Magic number = 256 - mask (in the interesting octet).",
@@ -726,7 +726,7 @@ const q14 = [
     [
       ["8 subnets; first four are 172.16.32.0, 172.16.64.0, 172.16.96.0, and 172.16.128.0", "Counting multiples of the magic number must always start at 0 (the zero subnet 172.16.0.0)."],
       ["4 subnets; first four are 172.16.0.0, 172.16.64.0, 172.16.128.0, and 172.16.192.0", "Multiples of 64 (4 subnets) correspond to a /18 mask (255.255.192.0), not /19 (255.255.224.0)."],
-      ["16 subnets; first four are 172.16.0.0, 172.16.16.0, 172.16.32.0, and 172.16.48.0", "Multiples of 16 (16 subnets) correspond to a /20 mask (255.255.240.0), not /19."]
+      ["16 subnets; first four: 172.16.0.0, 172.16.16.0, 172.16.32.0, and 172.16.48.0", "Multiples of 16 (16 subnets) correspond to a /20 mask (255.255.240.0), not /19."]
     ],
     "For Class B network 172.16.0.0 with mask 255.255.224.0 (/19), S = 19 - 16 = 3 subnet bits, creating 2^3 = 8 subnets. In the third (interesting) octet, the magic number is 256 - 224 = 32, so the subnet IDs increment by 32 starting at 0: 172.16.0.0, 172.16.32.0, 172.16.64.0, 172.16.96.0, 172.16.128.0, 172.16.160.0, 172.16.192.0, and 172.16.224.0.",
     "Always start multiples of the magic number at 0 (the zero subnet is valid and used!).",
@@ -769,9 +769,9 @@ const c15 = mk("IP Connectivity", 25, "v1c15");
 const q15 = [
   c15.s("Router CLI", "Easy",
     "What do the two interface status codes (first column and second column) in `show ip interface brief` represent on a Cisco router?",
-    "Line status (Layer 1 physical status) first, and protocol status (Layer 2 data-link status) second",
+    "Physical line status (Layer 1) first, and protocol state (Layer 2) second",
     [
-      ["Protocol status (Layer 2) first, and line status (Layer 1) second", "The first status code is the physical layer line status, and the second is the data-link protocol status."],
+      ["Protocol status (Layer 2) first, and physical line status (Layer 1) second", "The first status code is the physical layer line status, and the second is the data-link protocol status."],
       ["Administrative state first, and IPv4 routing protocol neighbor state second", "Neither status column reports routing protocol neighbor state; they reflect Layer 1 and Layer 2 operation."],
       ["Duplex negotiation state first, and speed autonegotiation state second", "Duplex and speed are shown in `show interfaces`, not as the two up/down status columns in `show ip interface brief`."]
     ],
@@ -782,11 +782,11 @@ const q15 = [
 
   c15.s("Router CLI", "Easy",
     "Which interface status combination appears when a router interface has the `shutdown` command applied in its configuration?",
-    "administratively down / down",
+    "administratively down / down — interface disabled by shutdown",
     [
-      ["down / down", "A status of down/down means the interface is enabled (`no shutdown`) but has a Layer 1 physical problem."],
-      ["up / down", "A status of up/down means Layer 1 is working but Layer 2 has a data-link configuration mismatch or keepalive failure."],
-      ["administratively down / up", "The protocol status (second code) can never be up when the line status (first code) is down."]
+      ["down / down — interface enabled but physical Layer 1 is down", "A status of down/down means the interface is enabled (`no shutdown`) but has a Layer 1 physical problem."],
+      ["up / down — physical Layer 1 is up but Layer 2 protocol fails", "A status of up/down means Layer 1 is working but Layer 2 has a data-link configuration mismatch or keepalive failure."],
+      ["administratively down / up — Layer 1 disabled while Layer 2 is up", "The protocol status (second code) can never be up when the line status (first code) is down."]
     ],
     "When an interface has `shutdown` configured (which is the default state on most Cisco enterprise router interfaces), its line status is listed as `administratively down` and its protocol status is `down`. Issuing `no shutdown` transitions it out of the administratively down state.",
     "administratively down = `shutdown` command is active on the local interface.",
@@ -795,11 +795,11 @@ const q15 = [
 
   c15.s("Router CLI", "Easy",
     "Which physical port is commonly found on Cisco enterprise routers for out-of-band dial-in access via an external analog modem, but is absent on Cisco Catalyst switches?",
-    "Auxiliary (Aux) port",
+    "RJ-45 Auxiliary (Aux) port",
     [
-      ["RJ-45 Console port", "Both Cisco routers and Cisco Catalyst switches include an RJ-45 console port."],
+      ["RJ-45 Serial Console port", "Both Cisco routers and Cisco Catalyst switches include an RJ-45 console port."],
       ["USB Mini-B Console port", "Many modern Cisco routers and Catalyst switches both provide a USB console port."],
-      ["Small Form-Factor Pluggable (SFP) port", "Both enterprise routers and Catalyst switches commonly include SFP ports for fiber Ethernet uplinks."]
+      ["SFP fiber-optic uplink port", "Both enterprise routers and Catalyst switches commonly include SFP ports for fiber Ethernet uplinks."]
     ],
     "Most Cisco enterprise routers include an Auxiliary (Aux) port configured under `line aux 0` that connects to an external analog modem and telephone line for remote dial-in CLI administration. Cisco Catalyst LAN switches do not have an Aux port.",
     "Routers have `line aux 0` (Auxiliary port) and a power on/off switch; Catalyst switches typically have neither.",
@@ -810,9 +810,9 @@ const q15 = [
     "What is the default `transport input` setting under `line vty` on a typical Cisco router, and how does it affect remote CLI connections?",
     "`transport input none`, which blocks incoming Telnet and SSH connections by default",
     [
-      ["`transport input all`, which permits both Telnet and SSH connections by default", "Catalyst switches often default to allowing Telnet/SSH, whereas modern router IOS defaults to `transport input none`."],
+      ["`transport input all`, which permits both incoming Telnet and SSH sessions by default", "Catalyst switches often default to allowing Telnet/SSH, whereas modern router IOS defaults to `transport input none`."],
       ["`transport input ssh`, which permits only encrypted SSH sessions by default", "SSH requires generating RSA keys, configuring credentials, and explicitly enabling `transport input ssh`."],
-      ["`transport input telnet`, which permits only cleartext Telnet sessions by default", "Router IOS defaults to `transport input none` on vty lines, disallowing Telnet until configured."]
+      ["`transport input telnet`, which permits only cleartext Telnet connections by default", "Router IOS defaults to `transport input none` on vty lines, disallowing Telnet until configured."]
     ],
     "Unlike many Catalyst switches, Cisco router IOS typically defaults to `transport input none` in vty line configuration mode, preventing any incoming Telnet or SSH connections until an administrator configures `transport input ssh`, `transport input telnet`, or `transport input all`.",
     "Router vty default = `transport input none` (no Telnet or SSH allowed until configured).",
@@ -821,7 +821,7 @@ const q15 = [
 
   c15.s("Router CLI", "Medium",
     "A Cisco 4321 Integrated Services Router (ISR) has both an RJ-45 copper port and an SFP fiber cage labeled `Gi0/0`. How can an administrator use these two physical connectors?",
-    "Either the RJ-45 port or the SFP port can be used for interface Gi0/0 at one time, but not both simultaneously",
+    "Either the RJ-45 port or the SFP port can be active for Gi0/0, but never both at once",
     [
       ["Both physical ports can be used at the same time by configuring Gi0/0.1 and Gi0/0.2", "Subinterfaces divide a single physical link into logical VLANs; they do not activate both dual-purpose connectors."],
       ["Both physical ports can be bundled together into a two-link Layer 3 EtherChannel", "Both connectors map to the single logical interface Gi0/0, so only one physical medium can be active."],
@@ -834,11 +834,11 @@ const q15 = [
 
   c15.s("Router CLI", "Medium",
     "Which command displays a brief one- or two-line summary per interface that includes both the interface status codes AND the subnet mask (in prefix `/P` format)?",
-    "show protocols",
+    "`show protocols` in privileged EXEC mode",
     [
-      ["show ip interface brief", "`show ip interface brief` lists the IPv4 address and status codes on one line, but it omits the subnet mask."],
-      ["show interfaces", "`show interfaces` includes the address, `/P` mask, and status, but outputs dozens of lines of statistics per interface."],
-      ["show interfaces status", "`show interfaces status` is a Layer 2 switch command and is not supported on standard Cisco router interfaces."]
+      ["`show ip interface brief` in privileged EXEC", "`show ip interface brief` lists the IPv4 address and status codes on one line, but it omits the subnet mask."],
+      ["`show interfaces` in privileged EXEC mode", "`show interfaces` includes the address, `/P` mask, and status, but outputs dozens of lines of statistics per interface."],
+      ["`show interfaces status` in user EXEC", "`show interfaces status` is a Layer 2 switch command and is not supported on standard Cisco router interfaces."]
     ],
     "`show ip interface brief` shows one line per interface with the IPv4 address and line/protocol status, but it does not display the subnet mask. `show protocols [type number]` outputs just two lines per interface showing both the line/protocol status and `Internet address is X.X.X.X/P`.",
     "`show ip interface brief` = no mask shown; `show protocols` = concise output WITH `/P` mask.",
@@ -847,11 +847,11 @@ const q15 = [
 
   c15.s("Router CLI", "Medium",
     "A point-to-point serial link connects Router R1 and Router R2. R1's Serial0/0/0 interface is configured with `encapsulation ppp`, while R2's Serial0/0/0 interface uses the default serial encapsulation (HDLC). What interface status will `show ip interface brief` display on R1?",
-    "Status: up, Protocol: down",
+    "Status: up, Protocol: down — Layer 1 up, Layer 2 down",
     [
-      ["Status: down, Protocol: down", "Because the physical serial cable and clocking are working, Layer 1 line status is `up`, not `down`."],
-      ["Status: administratively down, Protocol: down", "Neither router interface has the `shutdown` command applied, so line status is not `administratively down`."],
-      ["Status: up, Protocol: up", "With mismatched Layer 2 encapsulations (PPP vs HDLC), data-link keepalives fail and protocol status goes `down`."]
+      ["Status: down, Protocol: down — Layer 1 and Layer 2 down", "Because the physical serial cable and clocking are working, Layer 1 line status is `up`, not `down`."],
+      ["Status: administratively down, Protocol: down — port shut", "Neither router interface has the `shutdown` command applied, so line status is not `administratively down`."],
+      ["Status: up, Protocol: up — both layers operational", "With mismatched Layer 2 encapsulations (PPP vs HDLC), data-link keepalives fail and protocol status goes `down`."]
     ],
     "When Layer 1 cabling and signaling are working properly, the first status code (line status) is `up`. However, when one router uses PPP and the other uses the default HDLC encapsulation on a serial link, Layer 2 fails and the second status code (protocol status) is `down`, resulting in `up/down`.",
     "up/down almost always points to a Layer 2 data-link configuration mismatch (such as PPP vs HDLC).",
@@ -860,11 +860,11 @@ const q15 = [
 
   c15.m("Router CLI", "Medium",
     "Which two características typically distinguish a Small Office/Home Office (SOHO) router installation from an enterprise router installation?",
-    ["SOHO routers usually integrate routing, LAN switching, wireless AP, and firewall functions into a single device", "SOHO routers typically use public broadband Internet (such as cable or DSL) with VPNs for enterprise WAN connectivity"],
+    ["SOHO routers usually integrate routing, LAN switching, wireless AP, and firewall into one unit", "SOHO routers typically use cable or DSL broadband Internet with VPNs for corporate WAN access"],
     [
-      ["SOHO routers require dedicated external CSU/DSUs connected via V.35 serial cables", "Leased-line CSU/DSU serial connections are characteristic of traditional enterprise WANs, not SOHO sites."],
-      ["SOHO routers cannot use UTP Ethernet cables to connect to an external broadband modem", "A SOHO router with an external cable or DSL modem connects its WAN port to the modem using a standard UTP Ethernet cable."],
-      ["SOHO routers use dedicated Core and Distribution Layer 3 switches for inter-VLAN routing", "Dedicated multi-tier Layer 3 switches are used in large enterprise campuses, whereas SOHO uses an all-in-one appliance."]
+      ["SOHO routers require dedicated external CSU/DSU hardware connected via V.35 serial WAN cables", "Leased-line CSU/DSU serial connections are characteristic of traditional enterprise WANs, not SOHO sites."],
+      ["SOHO routers cannot use standard RJ-45 UTP Ethernet cables to connect to an external modem", "A SOHO router with an external cable or DSL modem connects its WAN port to the modem using a standard UTP Ethernet cable."],
+      ["SOHO routers rely on dedicated Core and Distribution Layer 3 switches for inter-VLAN routing", "Dedicated multi-tier Layer 3 switches are used in large enterprise campuses, whereas SOHO uses an all-in-one appliance."]
     ],
     "A SOHO deployment typically consolidates the router, Ethernet switch, wireless access point, and security functions into one multifunction device and connects to corporate headquarters over consumer broadband Internet (cable/DSL/fiber) using VPN tunnels.",
     "SOHO = all-in-one device (router + switch + AP) + broadband Internet/VPN WAN.",
@@ -873,10 +873,10 @@ const q15 = [
 
   c15.s("Router CLI", "Hard",
     "Examine the `show ip interface brief` output from R1. Interface Gi0/0 is cabled to switch port Gi0/1 using a good straight-through UTP cable, and Gi0/0 on R1 has `no shutdown` configured. Which issue on the attached switch could cause the state shown for R1's Gi0/0?",
-    "Switch port Gi0/1 is configured with `shutdown` or forced to `speed 100` while R1 is forced to `speed 1000`",
+    "Switch port Gi0/1 is configured with `shutdown` or has a speed mismatch with Gi0/0",
     [
-      ["Switch port Gi0/1 is assigned to the wrong access VLAN", "An access VLAN mismatch does not bring down the physical layer link; Gi0/0 would still show `up/up`."],
-      ["R1's Gi0/0 interface is missing an `ip address` configuration command", "In `show ip interface brief`, Gi0/0 already has `172.16.1.1` assigned, and even an unaddressed port can reach `up/up`."],
+      ["Switch port Gi0/1 is assigned to the wrong access VLAN in the switch database", "An access VLAN mismatch does not bring down the physical layer link; Gi0/0 would still show `up/up`."],
+      ["R1's Gi0/0 interface is missing an `ip address` command in its configuration", "In `show ip interface brief`, Gi0/0 already has `172.16.1.1` assigned, and even an unaddressed port can reach `up/up`."],
       ["The `shutdown` command is currently active under `interface GigabitEthernet0/0` on R1", "If `shutdown` were configured on R1's Gi0/0, the Status column would read `administratively down`, not `down`."]
     ],
     "R1's Gi0/0 shows `down` (line status) and `down` (protocol status). Because Status is `down` rather than `administratively down`, R1's Gi0/0 has `no shutdown` configured, pointing to a Layer 1 physical problem—such as a bad/missing cable, the neighboring switch being powered off, the switch port being `shutdown`, or a speed mismatch between the ends.",
@@ -889,11 +889,11 @@ const q15 = [
 
   c15.s("Router CLI", "Hard",
     "Examine the output of `show interfaces gigabitethernet 0/1/0` on router R1. Which statement accurately describes this interface's configuration and hardware?",
-    "It is a 1-Gbps copper RJ-45 interface with MAC 0201.a010.0001 and a configured `/24` IPv4 address",
+    "It is a 1-Gbps RJ-45 copper port with active MAC 0201.a010.0001 and a `/24` IP address",
     [
       ["It is currently using its burned-in MAC address `30f7.0d29.8570` as its active source MAC", "The active MAC address is `0201.a010.0001`, which overrides the burned-in address (`bia 30f7.0d29.8570`)."],
-      ["It is operating over a fiber-optic SFP transceiver at 100 Mbps full duplex", "The output explicitly states `Full Duplex, 1Gbps, media type is RJ45`, indicating copper UTP at 1 Gbps."],
-      ["It is a Layer 2 switch port because its encapsulation is listed as `ARPA`", "`Encapsulation ARPA` is the standard Cisco IOS Ethernet frame encapsulation on router interfaces."]
+      ["It is operating over a fiber-optic SFP transceiver module at 100 Mbps and full duplex", "The output explicitly states `Full Duplex, 1Gbps, media type is RJ45`, indicating copper UTP at 1 Gbps."],
+      ["It is operating as a Layer 2 switch port since its frame encapsulation is `ARPA`", "`Encapsulation ARPA` is the standard Cisco IOS Ethernet frame encapsulation on router interfaces."]
     ],
     "In `show interfaces`, `address is 0201.a010.0001 (bia 30f7.0d29.8570)` shows the active MAC address first and the factory burned-in address in parentheses. `Internet address is 172.16.5.1/24` confirms the IPv4 address and mask, and `Full Duplex, 1Gbps, media type is RJ45` confirms 1-Gbps copper operation.",
     "In `show interfaces`, `address is X (bia Y)` means X is currently in use and Y is the factory burned-in MAC.",
@@ -905,7 +905,7 @@ const q15 = [
 
   c15.s("Router CLI", "Hard",
     "An engineer connects to a router's console and configures `ip address 10.1.0.255 255.255.254.0` and `no shutdown` under `interface GigabitEthernet0/0`. How does Cisco IOS respond?",
-    "IOS accepts the command because 10.1.0.255 is a valid usable host address in 10.1.0.0/23",
+    "IOS accepts the command without any error since 10.1.0.255 is a valid host address in 10.1.0.0/23",
     [
       ["IOS rejects the command with a `Bad mask /23 for address 10.1.0.255` error because .255 is a broadcast", "In subnet 10.1.0.0/23 (range 10.1.0.0 to 10.1.1.255), 10.1.1.255 is the broadcast address, while 10.1.0.255 is a valid host."],
       ["IOS accepts the command only if `ip subnet-zero` is explicitly disabled in global configuration mode", "`ip subnet-zero` is enabled by default and governs using the first subnet, not host addresses ending in .255."],
@@ -1005,11 +1005,11 @@ const q16 = [
 
   c16.s("IP routing", "Easy",
     "What is the default timeout (aging timer) for dynamically learned entries in a Cisco router's IPv4 ARP table, and how does an administrator clear dynamic entries manually?",
-    "240 minutes (4 hours); cleared using `clear ip arp`",
+    "240 minutes (4 hours) by default; cleared using `clear ip arp`",
     [
-      ["5 minutes (300 seconds); cleared using `clear mac address-table dynamic`", "300 seconds (5 minutes) is the default aging time for a switch's MAC address table, not the router's ARP cache."],
-      ["60 minutes (1 hour); cleared using `reset arp cache`", "`reset arp cache` is not a valid Cisco IOS command, and the default IOS ARP timeout is 240 minutes."],
-      ["Never times out unless the interface goes down; cleared using `no ip arp`", "Only the router's own local interface ARP entry (marked `-`) never times out; dynamic entries age out after 240 minutes."]
+      ["5 minutes (300 sec); cleared via `clear mac address-table dynamic`", "300 seconds (5 minutes) is the default aging time for a switch's MAC address table, not the router's ARP cache."],
+      ["60 minutes (1 hour) by default; cleared using `reset arp cache`", "`reset arp cache` is not a valid Cisco IOS command, and the default IOS ARP timeout is 240 minutes."],
+      ["Never ages out while interface is up; cleared via `no ip arp`", "Only the router's own local interface ARP entry (marked `-`) never times out; dynamic entries age out after 240 minutes."]
     ],
     "In Cisco IOS, dynamically learned IPv4 ARP cache entries time out after 240 minutes (4 hours) of inactivity (the timer resets to 0 whenever the entry is used). An engineer can remove all dynamic ARP entries or a specific host's entry using `clear ip arp [ip-address]`.",
     "Cisco IOS ARP timeout = 4 hours (240 min); switch MAC table timeout = 5 min (300 sec).",
@@ -1018,9 +1018,9 @@ const q16 = [
 
   c16.s("IP routing", "Medium",
     "When a router forwards an IPv4 packet to a destination host across multiple hops, what happens to the source/destination IPv4 addresses and source/destination MAC addresses at each router hop?",
-    "The source and destination MAC addresses change at every hop, while the source and destination IPv4 addresses stay unchanged",
+    "Source and destination MAC addresses change at every router hop, while both IPv4 addresses remain unchanged",
     [
-      ["Both the MAC addresses and the IPv4 addresses are rewritten at every router hop", "Normal IP routing never rewrites the source or destination IPv4 addresses (unless NAT is configured)."],
+      ["Both the Layer 2 MAC addresses and the Layer 3 IPv4 addresses are rewritten at every single router hop", "Normal IP routing never rewrites the source or destination IPv4 addresses (unless NAT is configured)."],
       ["The source and destination IPv4 addresses change to the next-hop router at each hop, while MAC addresses stay constant", "IPv4 addresses identify the end-to-end sender and receiver; data-link MAC addresses identify the local hop endpoints."],
       ["The destination MAC address changes at each hop, but the source MAC address remains the original sending host's MAC", "Each router puts its own outgoing interface's MAC address as the new source MAC when encapsulating the frame."]
     ],
@@ -1048,7 +1048,7 @@ const q16 = [
     [
       ["ip route 10.10.50.99 255.255.255.0 172.16.4.2", "IOS rejects `10.10.50.99 255.255.255.0` with `%Inconsistent address and mask` because host bits are non-zero."],
       ["ip route 10.10.50.99 0.0.0.0 172.16.4.2", "A mask of `0.0.0.0` has zero prefix bits and is only valid with destination `0.0.0.0` for a default route."],
-      ["ip host-route 10.10.50.99 172.16.4.2", "`ip host-route` is not a valid Cisco IOS command; all IPv4 static routes use `ip route`."]
+      ["ip host-route 10.10.50.99 255.255.255.255 172.16.4.2", "`ip host-route` is not a valid Cisco IOS command; all IPv4 static routes use `ip route`."]
     ],
     "A static host route targets a single IPv4 address by specifying a `/32` subnet mask (`255.255.255.255`) in the `ip route` command: `ip route 10.10.50.99 255.255.255.255 172.16.4.2`. Because `/32` is the longest possible IPv4 prefix length, packets to 10.10.50.99 will prefer this route over any overlapping `/24` or `/16` route.",
     "Host route = `255.255.255.255` (/32); Default route = `0.0.0.0 0.0.0.0` (/0).",
@@ -1115,7 +1115,7 @@ const q16 = [
 
   c16.s("Static routes", "Hard",
     "Router R1 connects to Router R2 over an Ethernet WAN link (`172.16.5.0/24`, where R1 is `.1` and R2 is `.2`). When configuring a static route on R1 for a remote subnet behind R2, why is `ip route 172.16.3.0 255.255.255.0 172.16.5.2` recommended over `ip route 172.16.3.0 255.255.255.0 GigabitEthernet0/1`?",
-    "On multi-access Ethernet links, specifying the next-hop IP identifies the exact neighboring router for ARP resolution",
+    "On multi-access Ethernet links, the next-hop IP identifies the exact neighboring router for ARP requests",
     [
       ["Cisco IOS syntax forbids specifying an Ethernet outgoing interface in an `ip route` command", "IOS syntax permits specifying an Ethernet interface, though it is bad practice because it relies on proxy ARP."],
       ["Specifying the outgoing Ethernet interface sets the administrative distance to 255, disabling the route", "Both outgoing-interface and next-hop static routes have the same default administrative distance of 1."],
@@ -1163,7 +1163,7 @@ const c17 = mk("IP Connectivity", 25, "v1c17");
 const q17 = [
   c17.s("IP routing", "Easy",
     "What is the purpose of configuring Router-on-a-Stick (ROAS) on a Cisco router connected to a Layer 2 switch?",
-    "To route IPv4 packets between multiple VLANs over a single physical 802.1Q trunk link using router subinterfaces",
+    "To route packets between multiple VLANs over one physical 802.1Q trunk using router subinterfaces",
     [
       ["To bundle multiple physical router Ethernet ports into a single high-bandwidth Layer 3 EtherChannel", "Bundling physical links is EtherChannel, whereas ROAS subdivides one physical link into logical VLAN subinterfaces."],
       ["To enable a Layer 2 switch to route packets internally using Switched Virtual Interfaces (SVIs)", "SVIs run inside a Layer 3 multilayer switch, whereas ROAS uses an external router connected via an 802.1Q trunk."],
@@ -1189,11 +1189,11 @@ const q17 = [
 
   c17.s("IP routing", "Easy",
     "Which interface subcommand converts a physical port on a Cisco Layer 3 switch from a Layer 2 switch port into a Layer 3 routed port?",
-    "no switchport",
+    "Configure `no switchport` on the port",
     [
-      ["ip routing", "`ip routing` is a global configuration command that enables IPv4 routing on the switch as a whole."],
-      ["switchport mode routed", "There is no `routed` keyword under `switchport mode`; `no switchport` disables Layer 2 switching on the port."],
-      ["encapsulation dot1q native", "`encapsulation dot1q` is used for 802.1Q trunking on router subinterfaces, not Layer 3 switch routed ports."]
+      ["Configure `ip routing` on the port", "`ip routing` is a global configuration command that enables IPv4 routing on the switch as a whole."],
+      ["Configure `switchport mode routed`", "There is no `routed` keyword under `switchport mode`; `no switchport` disables Layer 2 switching on the port."],
+      ["Configure `encapsulation dot1q native`", "`encapsulation dot1q` is used for 802.1Q trunking on router subinterfaces, not Layer 3 switch routed ports."]
     ],
     "By default, physical ports on a Cisco Catalyst Layer 3 switch operate as Layer 2 switch ports (`switchport`). Issuing `no switchport` in interface configuration mode disables Layer 2 switching on that port and turns it into a Layer 3 routed interface where `ip address` can be configured directly.",
     "`no switchport` turns a Layer 3 switch physical port (or PortChannel) into a router-like Layer 3 port.",
@@ -1205,7 +1205,7 @@ const q17 = [
     "routed",
     [
       ["trunk", "`trunk` appears only when a port operates as a Layer 2 VLAN trunk (`switchport mode trunk`)."],
-      ["1 (the default VLAN)", "Once `no switchport` is applied, the port is removed from all VLANs and no longer shows `1`."],
+      ["vlan 1", "Once `no switchport` is applied, the port is removed from all VLANs and no longer shows `1`."],
       ["unassigned", "`unassigned` appears in the `IP-Address` column of `show ip interface brief`, not the `Vlan` column of `show interfaces status`."]
     ],
     "In `show interfaces status` on a Layer 3 switch, the `Vlan` column displays the access VLAN ID for access ports, `trunk` for Layer 2 trunk ports, and `routed` for physical ports or PortChannels configured with `no switchport`.",
@@ -1245,7 +1245,7 @@ const q17 = [
     [
       ["Configure `ip routing` in global configuration mode without reloading the switch or changing the SDM template", "Until the SDM template is changed and the switch is reloaded, the `ip routing` command is rejected by IOS."],
       ["Configure `no switchport` on `interface vlan 1` and assign an IPv4 default gateway", "SVIs (`interface vlan x`) never use `no switchport`, and `ip default-gateway` is only for Layer 2 management."],
-      ["Configure `encapsulation dot1q` under each SVI (`interface vlan x`) to activate Layer 3 switching", "SVIs do not use `encapsulation dot1q`; they automatically associate with the matching internal VLAN ID."]
+      ["Configure `encapsulation dot1q` under each `interface vlan x` SVI to activate Layer 3 switching", "SVIs do not use `encapsulation dot1q`; they automatically associate with the matching internal VLAN ID."]
     ],
     "On many Catalyst access/multilayer switches, the default Switch Database Management (SDM) template allocates zero ASIC memory for IPv4 routes. You must first change the template (e.g., `sdm prefer lanbase-routing`), `reload` the switch so the new ASIC table sizes take effect, and then issue the global `ip routing` command before configuring SVIs.",
     "Enabling L3 switching: `sdm prefer ...` -> `reload` -> `ip routing` -> `interface vlan <id>`.",
@@ -1258,7 +1258,7 @@ const q17 = [
     [
       ["Configure both `no switchport` and `ip address` on every physical member port in the EtherChannel bundle", "Physical member ports in a Layer 3 EtherChannel have `no ip address`; the IPv4 address belongs only on the PortChannel interface."],
       ["Configure `switchport mode trunk` on the physical ports and `no switchport` with `ip address` on `interface port-channel 12`", "If the physical ports are Layer 2 switchports while the PortChannel is Layer 3 (`no switchport`), IOS will refuse to bundle them."],
-      ["Configure `no switchport` on the physical ports and assign the IPv4 address to an SVI (`interface vlan 12`)", "A Layer 3 EtherChannel is a routed interface (`Port-channel12`), not an SVI (`Vlan12`)."]
+      ["Configure `no switchport` on the physical ports and assign the IPv4 address to SVI `interface vlan 12`", "A Layer 3 EtherChannel is a routed interface (`Port-channel12`), not an SVI (`Vlan12`)."]
     ],
     "For a Layer 3 EtherChannel, all physical member interfaces and the `port-channel` interface itself must be configured as routed ports with `no switchport`. The `ip address` command is configured exclusively on the logical `interface port-channel <number>`, while the physical member interfaces have `no ip address`.",
     "L3 EtherChannel: `no switchport` on physical ports AND PortChannel; `ip address` ONLY on PortChannel.",
@@ -1293,11 +1293,11 @@ const q17 = [
 
   c17.m("IP routing", "Hard",
     "On multilayer switch SW1, `interface Port-channel12` (`no switchport`, `ip address 10.1.12.1 255.255.255.0`) has member ports `Gi1/0/13` and `Gi1/0/14`. Output of `show etherchannel 12 summary` lists `Po12(RU)` with `Gi1/0/13(P)` but `Gi1/0/14` is not bundled. Which two interface settings on `Gi1/0/14` could prevent IOS from bundling it into the Layer 3 EtherChannel?",
-    ["Gi1/0/14 is still configured with the default `switchport` setting instead of `no switchport`", "Gi1/0/14 is configured with a different `speed` or `duplex` setting than Gi1/0/13"],
+    ["Gi1/0/14 is still using the default `switchport` mode instead of `no switchport`", "Gi1/0/14 is configured with a different `speed` or `duplex` setting than Gi1/0/13"],
     [
-      ["Gi1/0/14 has a different interface `description` string than Gi1/0/13", "Interface descriptions are purely informational text and have no effect on EtherChannel bundling."],
-      ["Gi1/0/14 is missing the `ip address 10.1.12.1 255.255.255.0` command", "Member ports of a Layer 3 EtherChannel must NOT have an IP address; the IP address goes only on `Port-channel12`."],
-      ["Gi1/0/14 has a different `spanning-tree cost` than Gi1/0/13", "Spanning Tree Protocol (STP) runs only on Layer 2 ports, not on Layer 3 routed ports (`no switchport`)."]
+      ["Gi1/0/14 is configured with a different interface `description` line than Gi1/0/13", "Interface descriptions are purely informational text and have no effect on EtherChannel bundling."],
+      ["Gi1/0/14 is missing the `ip address 10.1.12.1 255.255.255.0` interface subcommand", "Member ports of a Layer 3 EtherChannel must NOT have an IP address; the IP address goes only on `Port-channel12`."],
+      ["Gi1/0/14 is configured with a different `spanning-tree cost` value than Gi1/0/13", "Spanning Tree Protocol (STP) runs only on Layer 2 ports, not on Layer 3 routed ports (`no switchport`)."]
     ],
     "In `show etherchannel summary`, `Po12(RU)` indicates a Layer 3 (`R`) PortChannel that is in use (`U`), and `(P)` indicates a physical port bundled in the channel. For a physical port to join a Layer 3 EtherChannel, it must be configured with `no switchport` and must match the other member ports' `speed` and `duplex` settings.",
     "L3 EtherChannel consistency checks: `no switchport`, matching `speed`, and matching `duplex` (plus matching `channel-group` mode).",
@@ -1306,11 +1306,11 @@ const q17 = [
 
   c17.s("IP routing", "Hard",
     "Examine the output of `show etherchannel 12 summary` on switch SW1: `12  Po12(RU)  -  Gi1/0/13(P) Gi1/0/14(P)`. What do the flags `RU` next to `Po12`, the `-` under `Protocol`, and the `P` next to the physical ports indicate?",
-    "Po12 is a Layer 3 (`R`) channel currently in use (`U`), configured statically with `mode on` (`-`), with both ports bundled (`P`)",
+    "Po12 is a Layer 3 (`R`) channel in use (`U`), statically set (`-`), with both ports bundled (`P`)",
     [
-      ["Po12 is a Layer 2 (`R`) channel waiting for LACP (`U`), with both ports in passive mode (`P`)", "`R` means Layer 3 (whereas `S` means Layer 2), `U` means in use, `-` means static `mode on`, and `P` means bundled."],
+      ["Po12 is a Layer 2 (`R`) channel waiting for LACP (`U`), with no links (`-`) and passive ports (`P`)", "`R` means Layer 3 (whereas `S` means Layer 2), `U` means in use, `-` means static `mode on`, and `P` means bundled."],
       ["Po12 is a routed (`R`) channel that is unusable (`U`) because no dynamic protocol (`-`) was negotiated", "`U` (uppercase) means 'in use' (working); lowercase `u` means 'unsuitable for bundling', and `-` is normal for `mode on`."],
-      ["Po12 is running RIPv2 (`RU`) over PAgP (`P`) on interfaces Gi1/0/13 and Gi1/0/14", "EtherChannel summary flags describe Layer 2/Layer 3 bundling states, not IP routing protocols like RIP."]
+      ["Po12 is running RIPv2 (`RU`) with default metric (`-`) over PAgP (`P`) on Gi1/0/13 and Gi1/0/14", "EtherChannel summary flags describe Layer 2/Layer 3 bundling states, not IP routing protocols like RIP."]
     ],
     "In `show etherchannel summary`, `R` stands for Layer 3 (routed, as opposed to `S` for Layer 2 switched), `U` stands for 'in use', `-` in the Protocol column means the channel was statically configured using `channel-group 12 mode on` (rather than LACP or PAgP), and `P` means the physical port is actively bundled in the port-channel.",
     "EtherChannel flags: `SU` = Layer 2 in use; `RU` = Layer 3 in use; `P` = bundled; `D` = down; `I` = stand-alone.",
@@ -1353,7 +1353,7 @@ const c18 = mk("IP Connectivity", 25, "v1c18");
 const q18 = [
   c18.s("IP routing", "Easy",
     "Which Layer 3 protocol and specific message types does the `ping` command use to test end-to-end IPv4 connectivity?",
-    "ICMP Echo Request (sent to the target) and ICMP Echo Reply (returned by the target)",
+    "ICMPv4 Echo Requests (sent to the target) and ICMPv4 Echo Reply packets (returned by the target)",
     [
       ["ICMP Time Exceeded (sent to the target) and ICMP Destination Unreachable (returned by the target)", "ICMP Time Exceeded (TTL Exceeded) is triggered by `traceroute` when a router decrements TTL to 0, not by normal `ping`."],
       ["TCP SYN segments on port 7 (sent to the target) and TCP SYN-ACK segments (returned by the target)", "`ping` uses Layer 3 ICMP directly inside an IPv4 packet without any TCP or UDP transport header."],
@@ -1368,7 +1368,7 @@ const q18 = [
     "In Cisco IOS, what are the default packet count, timeout per packet, and output symbols for a successful reply versus a timeout in the `ping` command?",
     "5 packets, 2-second timeout, `!` for a successful reply, and `.` for a timeout",
     [
-      ["4 packets, 5-second timeout, `*` for a successful reply, and `?` for a timeout", "4 packets is the Windows `ping` default, and `*` is used for a timeout in `traceroute`, not a success in `ping`."],
+      ["4 packets, 5-second timeout, `*` for a successful reply, and `?` for a request timeout", "4 packets is the Windows `ping` default, and `*` is used for a timeout in `traceroute`, not a success in `ping`."],
       ["3 packets, 3-second timeout, `!` for a successful reply, and `*` for a timeout", "3 probes with a 3-second timeout and `*` for a timeout are the defaults for Cisco IOS `traceroute`, not `ping`."],
       ["5 packets, 1-second timeout, `.` for a successful reply, and `!` for a timeout", "In Cisco IOS `ping`, `!` indicates a received Echo Reply and `.` indicates that the 2-second timer expired."]
     ],
@@ -1379,11 +1379,11 @@ const q18 = [
 
   c18.s("IP routing", "Easy",
     "When an administrator runs a standard `ping 172.16.2.101` command from router R1's CLI without specifying a source, which source IPv4 address does R1 place in the ICMP Echo Request packets?",
-    "The IPv4 address of R1's outgoing interface chosen by the routing table lookup for 172.16.2.101",
+    "The IPv4 address of R1's exit interface matched by the lookup for 172.16.2.101",
     [
-      ["The IPv4 address of R1's lowest-numbered GigabitEthernet LAN interface", "A standard router ping always uses the outgoing interface's IP address for that route, not an arbitrary LAN port."],
+      ["The primary IPv4 address of R1's lowest-numbered active GigabitEthernet LAN port", "A standard router ping always uses the outgoing interface's IP address for that route, not an arbitrary LAN port."],
       ["The IPv4 address of the host on R1's LAN that reported the connectivity problem", "A router cannot spoof a LAN host's IPv4 address; even extended ping only allows choosing one of the router's own IPs."],
-      ["The reserved loopback address 127.0.0.1", "127.0.0.1 is never used as the source IP of packets transmitted onto an external network link."]
+      ["The reserved local loopback address 127.0.0.1 from R1's internal TCP/IP stack", "127.0.0.1 is never used as the source IP of packets transmitted onto an external network link."]
     ],
     "For a standard `ping <destination>` issued on a Cisco router, the router first looks up the destination in its IPv4 routing table to determine the outgoing interface, and then uses that outgoing interface's IPv4 address as the source IP address of the ICMP Echo Request.",
     "Standard router `ping` source IP = outgoing interface IP; Extended `ping` lets you pick any local router IP as source.",
@@ -1392,11 +1392,11 @@ const q18 = [
 
   c18.s("IP routing", "Easy",
     "How does the `traceroute` command discover the IPv4 addresses of each router along the forward path to a destination?",
-    "By sending probes with incrementing IPv4 Time-to-Live (TTL = 1, 2, 3, ...) so each router decrements TTL to 0 and returns an ICMP TTL Exceeded message",
+    "By sending probes with incrementing TTL values so each hop decrements TTL to 0 and returns ICMP TTL Exceeded",
     [
       ["By sending a single broadcast packet that requires every router in the path to append its IPv4 address to the payload", "Normal `traceroute` does not use broadcast packets or IP record-route options; it relies on incrementing TTL values."],
-      ["By querying the OSPF Link-State Database on each router along the path using SNMP", "`traceroute` tests the live data plane using IP packets with low TTL values, independent of OSPF or SNMP."],
-      ["By sending ARP requests with a TTL of 255 to each subnet along the route", "ARP operates only at Layer 2 within the local broadcast domain and cannot traverse routers."]
+      ["By querying the OSPF Link-State Database on every router along the forwarding path via SNMP get-next requests", "`traceroute` tests the live data plane using IP packets with low TTL values, independent of OSPF or SNMP."],
+      ["By broadcasting Layer 2 ARP requests with a TTL of 255 to each intermediate subnet along the path", "ARP operates only at Layer 2 within the local broadcast domain and cannot traverse routers."]
     ],
     "Every router that forwards an IPv4 packet decrements the IP header's Time To Live (TTL) field by 1; if TTL reaches 0, the router discards the packet and sends an ICMP Time Exceeded (TTL Exceeded) message back to the sender. `traceroute` exploits this by sending a set of probes with TTL=1 (identifying the first router), then TTL=2 (identifying the second router), and so on until the destination host is reached.",
     "`traceroute` sends TTL=1, then TTL=2, then TTL=3... triggering ICMP TTL Exceeded from each hop in sequence.",
@@ -1405,9 +1405,9 @@ const q18 = [
 
   c18.s("IP routing", "Medium",
     "On a workstation, `ping 172.16.2.101` succeeds with 0% packet loss, but `ping fileserver.example.com` (which should resolve to 172.16.2.101) fails with an unknown host error. What does this comparison isolate as the root cause?",
-    "A Domain Name System (DNS) name resolution problem, such as a missing or unreachable DNS server",
+    "A DNS hostname resolution problem, such as a missing or unreachable DNS server",
     [
-      ["A missing default gateway configuration on the workstation", "Because `ping 172.16.2.101` succeeded to a remote subnet, the workstation's default gateway is working properly."],
+      ["A missing or misconfigured default gateway IPv4 address on the workstation", "Because `ping 172.16.2.101` succeeded to a remote subnet, the workstation's default gateway is working properly."],
       ["An incorrect static route on the remote router connected to 172.16.2.0/24", "End-to-end IPv4 routing in both directions is already proven working by the successful ping to `172.16.2.101`."],
       ["An inbound IP access control list (ACL) blocking ICMP Echo Requests on the router", "An ACL blocking ICMP would block `ping 172.16.2.101` as well, whereas IP ping succeeded."]
     ],
@@ -1431,10 +1431,10 @@ const q18 = [
 
   c18.s("IP routing", "Medium",
     "Why is an extended ping from router R1 (`ping 172.16.2.101 source 172.16.1.1`, where `172.16.1.1` is R1's LAN interface on Host A's subnet) a better test of end-to-end routing between Host A (`172.16.1.51`) and remote Host B (`172.16.2.101`) than a standard `ping 172.16.2.101` on R1?",
-    "It forces remote routers to route the ICMP Echo Reply back to Host A's LAN subnet (`172.16.1.0/24`) instead of R1's WAN subnet",
+    "It forces remote routers to route the Echo Reply back to Host A's LAN subnet instead of R1's WAN link",
     [
-      ["It causes R1 to encapsulate the Echo Request using Host A's MAC address and IPv4 address (`172.16.1.51`)", "A router can only source extended pings from one of its own configured interface IP addresses (`172.16.1.1`), not Host A's IP."],
-      ["It bypasses all inbound and outbound IP access control lists (ACLs) on intermediate routers", "Extended ping packets are subject to router ACLs just like any other IPv4 packet."],
+      ["It causes R1 to encapsulate the ICMP Echo Request with Host A's own MAC and IPv4 address `172.16.1.51`", "A router can only source extended pings from one of its own configured interface IP addresses (`172.16.1.1`), not Host A's IP."],
+      ["It bypasses all inbound and outbound IPv4 access control lists on intermediate transit routers", "Extended ping packets are subject to router ACLs just like any other IPv4 packet."],
       ["It tests whether Host A's network interface card and default gateway are configured properly", "Pinging from R1 to Host B never sends traffic to or from Host A itself, so Host A's NIC and gateway are not tested."]
     ],
     "A standard `ping 172.16.2.101` on R1 uses R1's outgoing WAN interface IP (`172.16.4.1`) as the source, so remote router R2 only needs a route back to the WAN link (`172.16.4.0/24`). Sourcing the ping from R1's LAN interface (`172.16.1.1`) forces the Echo Reply to travel all the way back to subnet `172.16.1.0/24`, verifying both the forward route to Host B's subnet and the reverse route to Host A's subnet.",
@@ -1444,11 +1444,11 @@ const q18 = [
 
   c18.s("IP routing", "Medium",
     "When a router decrements an incoming `traceroute` probe's TTL to 0 and generates an ICMP Time Exceeded message back to the sender, which IPv4 address does the router use as the source IP of that ICMP message?",
-    "The IPv4 address of the router interface on which the expired probe packet arrived (the incoming interface toward the sender)",
+    "The IPv4 address of the incoming router interface on which the expired probe arrived",
     [
       ["The IPv4 address of the router's outgoing interface pointing toward the final destination", "Using the incoming interface (facing the sender) is standard so `traceroute` lists the next-hop IP seen by the upstream router."],
-      ["The destination IPv4 address of the original `traceroute` probe packet", "Each router uses its own interface IP address so the sender can identify which router generated the TTL Exceeded message."],
-      ["The all-zeros default route address `0.0.0.0`", "`0.0.0.0` is not a valid unicast router interface address for sourcing ICMP Time Exceeded messages."]
+      ["The final destination IPv4 address carried inside the original `traceroute` probe header", "Each router uses its own interface IP address so the sender can identify which router generated the TTL Exceeded message."],
+      ["The all-zeros default route address `0.0.0.0` from the router's forwarding table", "`0.0.0.0` is not a valid unicast router interface address for sourcing ICMP Time Exceeded messages."]
     ],
     "When a router discards a packet because its TTL reached 0, the router sends an ICMP Time Exceeded (TTL Exceeded) message back to the source host using the IPv4 address of the interface on which the packet arrived (which is also the next-hop IP address that the previous router used to forward the packet).",
     "Each line in `traceroute` shows the IP address of that router's interface facing the source (the inbound interface).",
@@ -1457,7 +1457,7 @@ const q18 = [
 
   c18.s("IP routing", "Hard",
     "How do the probe packets generated by a Cisco IOS router's `traceroute` command differ from those typically generated by a Windows OS `tracert` command, and why does this matter when troubleshooting?",
-    "Cisco IOS `traceroute` sends UDP probes (default port 33434+), whereas Windows `tracert` sends ICMP Echo Requests, so an ACL might block one but allow the other",
+    "IOS `traceroute` sends UDP probes whereas Windows `tracert` sends ICMP Echoes, so ACLs may filter them differently",
     [
       ["Cisco IOS `traceroute` sends TCP SYN probes on port 80, whereas Windows `tracert` sends UDP probes on port 53", "Neither uses TCP port 80 or UDP port 53 by default; IOS uses high-numbered UDP ports and Windows uses ICMP Echo Requests."],
       ["Cisco IOS `traceroute` starts with TTL=255 and counts down, whereas Windows `tracert` starts with TTL=1 and counts up", "Both implementations start with TTL=1 and increment TTL by 1 for each successive set of probes."],
@@ -1470,11 +1470,11 @@ const q18 = [
 
   c18.m("IP routing", "Hard",
     "On router R1, an engineer runs `ping 172.16.2.101 source 172.16.1.1` (where `172.16.1.1` is R1's LAN IP on Host A's subnet `172.16.1.0/24`) and gets `!!!!!` (100% success), yet Host A (`172.16.1.51/24`) still cannot ping `172.16.2.101`. Which two issues are NOT tested by R1's extended ping and could still be the root cause?",
-    ["An IP ACL on a router that denies packets from `172.16.1.51` while permitting packets from `172.16.1.1`", "A port security violation or VLAN misconfiguration on switch SW1 affecting Host A's switch port, or a wrong default gateway on Host A"],
+    ["An IP ACL on a transit router that denies source `172.16.1.51` while permitting `172.16.1.1`", "A VLAN or port-security issue on Host A's switch port on SW1, or a wrong default gateway on Host A"],
     [
       ["A broken physical WAN cable between R1 and R2 causing R1's WAN interface to go `down/down`", "If the WAN link between R1 and R2 were down, R1's extended ping to `172.16.2.101` would have failed."],
-      ["A missing connected route on R2 for Host B's subnet `172.16.2.0/24`", "R1's successful extended ping to `172.16.2.101` already proved R2 has a working route to `172.16.2.0/24`."],
-      ["A missing default gateway setting on remote Host B (`172.16.2.101`)", "Host B successfully returned Echo Replies to `172.16.1.1`, proving Host B's default gateway is working."]
+      ["A missing connected route in R2's routing table for remote Host B's subnet `172.16.2.0/24`", "R1's successful extended ping to `172.16.2.101` already proved R2 has a working route to `172.16.2.0/24`."],
+      ["A missing or incorrect default gateway IPv4 address configured on remote Host B `172.16.2.101`", "Host B successfully returned Echo Replies to `172.16.1.1`, proving Host B's default gateway is working."]
     ],
     "Even an extended ping from R1 (`source 172.16.1.1`) never traverses the LAN between Host A (`172.16.1.51`) and R1, and uses source IP `172.16.1.1` rather than `172.16.1.51`. Therefore, it cannot rule out: (1) Host A's own IP/mask/default-gateway settings, (2) Layer 2 switch issues or port security on Host A's port, (3) an ACL filtering `172.16.1.51` specifically, or (4) a longer-match host/subnet route that diverts `172.16.1.51` differently from `172.16.1.1`.",
     "Extended ping from R1 tests R1<->R2<->Host B (forward and reverse), but NEVER tests Host A<->SW1<->R1 or Host A-specific ACLs!",
@@ -1483,10 +1483,10 @@ const q18 = [
 
   c18.s("IP routing", "Hard",
     "Three routers are connected in a line: R1 (`10.1.12.1/24`) — R2 (`10.1.12.2/24` and `10.1.23.2/24`) — R3 (`10.1.23.3/24`). Because of a routing protocol failure, none of the routers have learned any remote routes, so an engineer's PC on R1's LAN can SSH to R1 (`10.1.1.1`), but cannot SSH directly to R2 or R3. How can the engineer access R3's CLI to fix the routing protocol without leaving their desk?",
-    "SSH into R1, then use the IOS SSH client (`ssh -l admin 10.1.12.2`) from R1 to log into R2, and from R2 run `ssh -l admin 10.1.23.3` to log into R3",
+    "SSH into R1, run `ssh -l admin 10.1.12.2` from R1 to reach R2, and then SSH from R2 to `10.1.23.3`",
     [
       ["Run an extended ping from the PC to `10.1.23.3` to force R1 and R2 to install temporary connected routes", "`ping` tests data-plane reachability; it never installs routes into a router's routing table."],
-      ["Use `ssh -l admin 10.1.23.3` directly from R1's CLI, because IOS SSH bypasses the IPv4 routing table", "An SSH session from R1 to `10.1.23.3` still requires R1 to have a route to `10.1.23.0/24` and R3 to have a route back."],
+      ["Run `ssh -l admin 10.1.23.3` directly from R1's CLI since the IOS SSH client bypasses the route table", "An SSH session from R1 to `10.1.23.3` still requires R1 to have a route to `10.1.23.0/24` and R3 to have a route back."],
       ["Configure `transport input all` on R1's vty lines so R1 automatically proxies SSH sessions to R3", "`transport input all` only controls which protocols can log into R1 itself; it does not route or proxy packets to R3."]
     ],
     "Even when end-to-end routing across the internetwork is completely broken, each router still has connected (`C`) routes for its own directly attached links. By logging into R1 and hopping router-to-router (`R1 -> 10.1.12.2 on R2`, then `R2 -> 10.1.23.3 on R3`) using the IOS `telnet` or `ssh -l <user> <host>` client, each connection stays within a single shared subnet and needs no remote routes.",
@@ -1496,11 +1496,11 @@ const q18 = [
 
   c18.s("IP routing", "Hard",
     "Examine the output of `traceroute 172.16.3.50` executed on Host A (`172.16.1.51/24`, default gateway R1 at `172.16.1.1`). Hop 1 replies from `172.16.1.1` (R1), Hop 2 replies from `172.16.4.2` (R2), and Hop 3 and all subsequent hops time out (`* * *`). Which two routers should the engineer investigate first, and why?",
-    "R2 and R3 (or R1/R2's reverse routes), because packets reached R2 (`172.16.4.2`), so either R2 cannot forward toward `172.16.3.50` or the next hop (R3) lacks a reverse route back to `172.16.1.0/24`",
+    "R2 and R3 — packets reached R2, so either R2 cannot route to `172.16.3.50` or R3 lacks a return route",
     [
-      ["Host A and R1, because a timeout at Hop 3 means Host A's default gateway is unreachable", "Hop 1 (`172.16.1.1`) and Hop 2 (`172.16.4.2`) both replied, proving Host A's default gateway R1 and the R1–R2 link work."],
-      ["Only switch SW1 on Host A's LAN, because `* * *` at Hop 3 indicates a Layer 2 STP loop on the local VLAN", "A local LAN failure would prevent Hop 1 (`172.16.1.1`) from replying at all."],
-      ["Only the DNS server, because `* * *` indicates `traceroute` could not resolve the IPv4 address `172.16.3.50`", "The target `172.16.3.50` was specified as a numeric IPv4 address, and Hops 1 and 2 already responded."]
+      ["Host A and R1 — a probe timeout at Hop 3 indicates that Host A's default gateway R1 is unreachable", "Hop 1 (`172.16.1.1`) and Hop 2 (`172.16.4.2`) both replied, proving Host A's default gateway R1 and the R1–R2 link work."],
+      ["Switch SW1 on Host A's LAN — `* * *` at Hop 3 indicates a Layer 2 Spanning Tree loop on the local VLAN", "A local LAN failure would prevent Hop 1 (`172.16.1.1`) from replying at all."],
+      ["The enterprise DNS server — `* * *` indicates `traceroute` failed to resolve IPv4 address `172.16.3.50`", "The target `172.16.3.50` was specified as a numeric IPv4 address, and Hops 1 and 2 already responded."]
     ],
     "Because Hop 2 (`172.16.4.2`, R2) returned an ICMP TTL Exceeded message to Host A (`172.16.1.51`), we know: (1) the forward path from Host A through R1 to R2 works, and (2) the reverse path from R2 back to `172.16.1.0/24` works. The failure at Hop 3 means either R2's forward route toward `172.16.3.50` (R3) is missing/wrong, an ACL between R2 and R3 is blocking traffic, or R3 is missing a reverse route back to `172.16.1.0/24`.",
     "The last router to reply in `traceroute` has both a working forward path to it AND a working reverse path back to the source!",

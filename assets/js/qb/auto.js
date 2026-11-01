@@ -1,4 +1,4 @@
-import { mk } from "./build.js?v=76";
+import { mk } from "./build.js?v=78";
 
 // Automation and Programmability - 10% of exam -> 24 questions
 const { s, m, d, t } = mk("Automation and Programmability", 10);
