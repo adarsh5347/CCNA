@@ -988,7 +988,8 @@ export function submitSession(force) {
     }
   }
 
-  if (s.mode === "exam" && !force) {
+  const reviewOpen = !byId("reviewArea")?.classList.contains("hidden");
+  if (s.mode === "exam" && !force && !reviewOpen) {
     openReview();
     return;
   }
@@ -1197,7 +1198,7 @@ export function submitSession(force) {
             userAnsText = list.length > 0 ? list.map(v => String.fromCharCode(65 + v)).join(", ") : "No Answer";
             correctAnsText = q.correct.map(v => String.fromCharCode(65 + v)).join(", ");
           } else if (q.type === "single" || q.type === "scenario") {
-            userAnsText = userAns !== undefined ? `${String.fromCharCode(65 + userAns)}. ${q.options[userAns]}` : "No Answer";
+            userAnsText = userAns != null ? `${String.fromCharCode(65 + userAns)}. ${q.options[userAns]}` : "No Answer";
             correctAnsText = `${String.fromCharCode(65 + q.correct[0])}. ${q.options[q.correct[0]]}`;
           } else if (q.type === "matching") {
             userAnsText = userAns ? q.pairs.map((p, i) => `${p[0]}: ${userAns[i] || 'None'}`).join(", ") : "No Answer";
