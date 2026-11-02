@@ -3,6 +3,15 @@ import { blueprint, generateBank } from "./data.js?v=77";
 import { ccnaVideos } from "./videos.js?v=77";
 
 // We need these utility page/navigation functions from app.js / global scope
+// Question bank text uses light markdown (`code` and **bold**); escape first, then render it.
+function md(str) {
+  const s = safeHTML(str);
+  if (typeof s !== "string") return s;
+  return s
+    .replace(/`([^`\n]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+}
+
 function setPage(pageId) {
   if (window.setPage) window.setPage(pageId);
 }
@@ -624,8 +633,8 @@ export function explanationBlock(q, ok) {
     return `
       <section class="block ${ok ? "correct" : "wrong"}">
         <h4>Detailed Explanation</h4>
-        <p>${safeHTML(e.text)}</p>
-        ${e.tip ? `<p><strong>Cisco exam tip:</strong> ${safeHTML(e.tip)}</p>` : ""}
+        <p>${md(e.text)}</p>
+        ${e.tip ? `<p><strong>Cisco exam tip:</strong> ${md(e.tip)}</p>` : ""}
         ${videoBtnHtml}
       </section>
     `;
@@ -635,14 +644,14 @@ export function explanationBlock(q, ok) {
     <section class="block ${ok ? "correct" : "wrong"}">
       <h4>Detailed Explanation</h4>
       <p><strong>Correct answer:</strong> ${safeHTML(e.correct || "")}</p>
-      <p><strong>Why correct:</strong> ${safeHTML(e.why || "")}</p>
+      <p><strong>Why correct:</strong> ${md(e.why || "")}</p>
       <p><strong>Why others are wrong:</strong></p>
       <ul>
-        ${(e.wrong || []).map(w => `<li>${safeHTML(w)}</li>`).join("")}
+        ${(e.wrong || []).map(w => `<li>${md(w)}</li>`).join("")}
       </ul>
-      ${e.tip ? `<p><strong>Cisco exam tip:</strong> ${safeHTML(e.tip)}</p>` : ""}
-      ${e.memory ? `<p><strong>Memory trick:</strong> ${safeHTML(e.memory)}</p>` : ""}
-      ${e.real ? `<p><strong>Real world example:</strong> ${safeHTML(e.real)}</p>` : ""}
+      ${e.tip ? `<p><strong>Cisco exam tip:</strong> ${md(e.tip)}</p>` : ""}
+      ${e.memory ? `<p><strong>Memory trick:</strong> ${md(e.memory)}</p>` : ""}
+      ${e.real ? `<p><strong>Real world example:</strong> ${md(e.real)}</p>` : ""}
       ${e.commands && e.commands.length > 0 ? `<p><strong>Related commands:</strong> ${e.commands.map(x => safeHTML(x)).join(" | ")}</p>` : ""}
       ${videoBtnHtml}
     </section>
@@ -658,7 +667,7 @@ export function renderQuestion() {
   let html = `
     <span class="badge">${safeHTML(q.domain)}</span><span class="badge">${safeHTML(q.topic)}</span>${chBadge}
     ${q.scenario ? `<div class="block"><strong>Scenario:</strong> ${safeHTML(q.scenario)}</div>` : ""}
-    <h3>${safeHTML(q.text)}</h3>
+    <h3>${md(q.text)}</h3>
     <div class="meta">
       <div><strong>Difficulty</strong><br />${safeHTML(q.difficulty)}</div>
       <div><strong>Exam Weight</strong><br />${safeHTML(q.examWeight)}</div>
@@ -671,16 +680,23 @@ export function renderQuestion() {
   `;
 
   const isMulti = q.type === "multi" || (Array.isArray(q.correct) && q.correct.length > 1);
+  // Study/instant-feedback mode: once checked, colour the correct options green and wrong picks red.
+  const revealed = s.feedback[s.idx] != null && Array.isArray(q.correct);
+  const stateClass = (i, picked) => {
+    if (!revealed) return "";
+    if (q.correct.includes(i)) return " correct";
+    return picked ? " wrong" : "";
+  };
 
   if (isMulti) {
     const selected = Array.isArray(s.answers[s.idx]) ? s.answers[s.idx] : [];
     html += `<div class="options-list">` + q.options.map((o, i) => {
       const letter = String.fromCharCode(65 + i);
       const isSelected = selected.includes(i);
-      return `<label class="opt${isSelected ? ' selected' : ''}" data-idx="${i}">
+      return `<label class="opt${isSelected ? ' selected' : ''}${stateClass(i, isSelected)}" data-idx="${i}">
         <input type="checkbox" value="${i}" ${isSelected ? "checked" : ""} aria-label="Option ${letter}">
         <span class="opt-key" aria-hidden="true">${letter}</span>
-        <span>${safeHTML(o)}</span>
+        <span>${md(o)}</span>
       </label>`;
     }).join("") + `</div>`;
   } else if (q.type === "single" || q.type === "scenario") {
@@ -688,10 +704,10 @@ export function renderQuestion() {
     html += `<div class="options-list">` + q.options.map((o, i) => {
       const letter = String.fromCharCode(65 + i);
       const isSelected = v === i;
-      return `<label class="opt${isSelected ? ' selected' : ''}" data-idx="${i}">
-        <input type="radio" name="single" value="${i}" ${isSelected ? "checked" : ""}/ aria-label="Option ${letter}">
+      return `<label class="opt${isSelected ? ' selected' : ''}${stateClass(i, isSelected)}" data-idx="${i}">
+        <input type="radio" name="single" value="${i}" ${isSelected ? "checked" : ""} aria-label="Option ${letter}">
         <span class="opt-key" aria-hidden="true">${letter}</span>
-        <span>${safeHTML(o)}</span>
+        <span>${md(o)}</span>
       </label>`;
     }).join("") + `</div>`;
   } else if (q.type === "matching") {
@@ -1222,11 +1238,11 @@ export function submitSession(force) {
               <strong>Q${idx + 1} (${safeHTML(q.topic)})</strong> — 
               <span style="font-weight: bold; color: ${ok ? '#10b981' : '#ff5e3a'};">${ok ? 'CORRECT' : 'INCORRECT'}</span>
               <br />
-              <div style="margin-top: 6px; font-size: 0.95em;"><strong>Question:</strong> ${safeHTML(q.text)}</div>
+              <div style="margin-top: 6px; font-size: 0.95em;"><strong>Question:</strong> ${md(q.text)}</div>
               <div style="margin-top: 4px; font-size: 0.95em; color: ${ok ? '#10b981' : '#ff5e3a'};"><strong>Your Answer:</strong> ${safeHTML(userAnsText)}</div>
               ${!ok ? `<div style="margin-top: 4px; font-size: 0.95em; color: #10b981;"><strong>Correct Answer:</strong> ${safeHTML(correctAnsText)}</div>` : ""}
               <div style="margin-top: 8px; font-size: 0.95em; color: #a1b2c8; border-top: 1px dotted #334155; padding-top: 6px;">
-                <strong>Explanation:</strong> ${safeHTML(q.expl.why || q.expl.text || "")}
+                <strong>Explanation:</strong> ${md(q.expl.why || q.expl.text || "")}
               </div>
               ${q.expl.tip ? `
               <div style="margin-top: 4px; font-size: 0.95em; color: #a1b2c8;">

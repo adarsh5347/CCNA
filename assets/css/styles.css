@@ -4753,3 +4753,18 @@ select:focus, input:focus, textarea:focus {
     padding: 6px 4px !important;
   }
 }
+
+/* Mobile-only: make the video blueprint filter read as selectable chips with a visible active state */
+@media (max-width: 767px) {
+  .video-filter-btn {
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: 999px !important;
+    padding: 8px 14px !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+  }
+  .video-filter-btn.active {
+    border-color: #00f2fe !important;
+    color: #00f2fe !important;
+    background: rgba(0, 242, 254, 0.12) !important;
+  }
+}
