@@ -743,6 +743,10 @@ export function renderQuestion() {
   if (prevBtn) {
     prevBtn.style.display = "";
     prevBtn.disabled = (s.idx === 0);
+    const pFull = prevBtn.querySelector(".btn-full-text");
+    const pMobile = prevBtn.querySelector(".btn-mobile-text");
+    if (pFull) pFull.textContent = "⬅️ Previous";
+    if (pMobile) pMobile.textContent = "⬅️ Prev";
   }
   if (markBtn) markBtn.style.display = "";
   if (openReviewBtn) openReviewBtn.style.display = "";
@@ -769,6 +773,13 @@ export function renderQuestion() {
   });
 }
 
+function syncSelectedClasses() {
+  byId("questionArea").querySelectorAll("label.opt").forEach((l) => {
+    const inp = l.querySelector("input[type=radio], input[type=checkbox]");
+    if (inp) l.classList.toggle("selected", inp.checked);
+  });
+}
+
 export function wireQuestionInputs() {
   const s = state.session;
   const q = s.questions[s.idx];
@@ -776,6 +787,7 @@ export function wireQuestionInputs() {
   byId("questionArea").querySelectorAll("input[type='radio'][name='single']").forEach((el) => {
     el.addEventListener("change", (e) => {
       s.answers[s.idx] = Number(el.value);
+      syncSelectedClasses();
       instantStudyFeedback(e);
       persistSession();
       renderNavigator();
@@ -785,6 +797,7 @@ export function wireQuestionInputs() {
   byId("questionArea").querySelectorAll("input[type='checkbox']").forEach((el) => {
     el.addEventListener("change", (e) => {
       s.answers[s.idx] = [...byId("questionArea").querySelectorAll("input[type='checkbox']:checked")].map((x) => Number(x.value));
+      syncSelectedClasses();
       persistSession();
       renderNavigator();
     });
@@ -881,7 +894,20 @@ export function nextQuestion() {
   navToQuestion(state.session.idx + 1);
 }
 
+export function closeReview() {
+  const ra = byId("reviewArea");
+  if (ra) ra.classList.add("hidden");
+  const qa = byId("questionArea");
+  if (qa) qa.classList.remove("hidden");
+  renderQuestion();
+}
+
 export function prevQuestion() {
+  const ra = byId("reviewArea");
+  if (ra && !ra.classList.contains("hidden")) {
+    closeReview();
+    return;
+  }
   navToQuestion(state.session.idx - 1);
 }
 
@@ -922,11 +948,7 @@ export function openReview() {
   // Wire "Back to Quiz" button at top of review
   const backBtn = byId("backToQuizFromReview");
   if (backBtn) {
-    backBtn.addEventListener("click", () => {
-      byId("reviewArea").classList.add("hidden");
-      byId("questionArea").classList.remove("hidden");
-      renderQuestion();
-    });
+    backBtn.addEventListener("click", closeReview);
   }
 
   byId("reviewArea").querySelectorAll("[data-jump]").forEach((b) => {
@@ -954,19 +976,6 @@ export function openReview() {
     const mobileText = prevBtn.querySelector(".btn-mobile-text");
     if (fullText) fullText.textContent = "⬅️ Back to Quiz";
     if (mobileText) mobileText.textContent = "⬅️ Back";
-    // Clone to remove old listeners, then re-attach
-    const newPrev = prevBtn.cloneNode(true);
-    prevBtn.parentNode.replaceChild(newPrev, prevBtn);
-    newPrev.addEventListener("click", () => {
-      byId("reviewArea").classList.add("hidden");
-      byId("questionArea").classList.remove("hidden");
-      // Restore original button labels
-      const ft = newPrev.querySelector(".btn-full-text");
-      const mt = newPrev.querySelector(".btn-mobile-text");
-      if (ft) ft.textContent = "⬅️ Previous";
-      if (mt) mt.textContent = "⬅️ Prev";
-      renderQuestion();
-    });
   }
   if (markBtn) markBtn.style.display = "none";
   if (openReviewBtn) openReviewBtn.style.display = "none";

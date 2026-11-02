@@ -80,7 +80,7 @@ import {
   markCurrent,
   startSessionTimer,
   startChapterSession
-} from "./quiz-engine.js?v=79";
+} from "./quiz-engine.js?v=80";
 
 import { generateBank, blueprint } from "./data.js?v=77";
 import { labs } from "./labs.js?v=77";
@@ -121,8 +121,6 @@ function handleEngineKeyDown(e) {
     const opts = document.querySelectorAll(".opt input[type='radio'], .opt input[type='checkbox']");
     if (opts[optIdx]) {
       opts[optIdx].click();
-      const labels = document.querySelectorAll(".opt");
-      labels.forEach((l, i) => l.classList.toggle("selected", i === optIdx));
     }
     return;
   }
