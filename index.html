@@ -27,18 +27,15 @@
     })();
   </script>
   <link rel="apple-touch-icon" href="assets/icon.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
   <link rel="modulepreload" href="assets/js/app.js?v=78" />
   <link rel="modulepreload" href="assets/js/core.js?v=78" />
   <link rel="modulepreload" href="assets/js/quiz-engine.js?v=83" />
   <link rel="modulepreload" href="assets/js/data.js?v=77" />
-  <style id="critical-css">:root{--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);--safe-right:env(safe-area-inset-right,0px);--text:#f8fafc;--muted:#94a3b8;--line:rgba(255,255,255,.1);--brand:#00f2fe;--ok:#10b981;--warn:#f59e0b;--danger:#f43f5e;--bg-dark:#060913;--bg-panel:rgba(13,19,36,.78);--bg-panel-solid:#0d1324;--bg-card:rgba(17,24,39,.68);--border-color:rgba(255,255,255,.08);--text-main:#f8fafc;--text-muted:#94a3b8;--color-ok:#10b981;--color-danger:#f43f5e;--color-warn:#f59e0b;--color-info:#00f2fe;--accent-color:var(--color-info);--bg-elevated:rgba(6,9,19,.55);--surface-2:rgba(255,255,255,.04);--surface-3:rgba(255,255,255,.07);--accent-orange:linear-gradient(135deg,#ff5e3a,#ff9233);--accent-cyan:linear-gradient(135deg,#00f2fe,#4facfe);--font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;--font-sans:"Space Grotesk",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--font-display:"Bebas Neue","Arial Black",Impact,sans-serif;--sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--radius-sm:6px;--radius-md:10px}html[data-theme="light"]{--text:#0f172a;--muted:#475569;--line:rgba(15,23,42,.12);--brand:#0284c7;--bg-dark:#f8fafc;--bg-panel:rgba(255,255,255,.92);--bg-panel-solid:#fff;--bg-card:rgba(255,255,255,.95);--border-color:rgba(15,23,42,.12);--text-main:#0f172a;--text-muted:#475569;--surface-2:rgba(15,23,42,.04);--surface-3:rgba(15,23,42,.08);--bg-elevated:#f1f5f9}*{box-sizing:border-box;margin:0;padding:0}html,body{overflow-x:hidden;max-width:100%;width:100%}body{font-family:var(--font-sans);color:var(--text-main);background:var(--bg-dark);min-height:100vh;line-height:1.6}#netCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}.topbar{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 28px;border-bottom:1px solid var(--border-color);background:var(--bg-panel);backdrop-filter:blur(16px);max-width:100vw;overflow:hidden}.brand{display:flex;align-items:center;gap:12px;flex-shrink:0}.logo-container{width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:12px;padding:3px}.brand h1{font-family:var(--font-display);letter-spacing:2px;font-size:26px;color:var(--text-main)}.brand p{font-size:11px;color:var(--text-muted)}nav,.topbar-utils{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;background:transparent;border:1px solid transparent;color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase}.nav-btn svg{width:17px;height:17px;stroke:currentColor;fill:none}button{border:1px solid var(--border-color);border-radius:10px;background:var(--surface-2);color:var(--text-main);font-family:var(--font-sans);font-size:13px;cursor:pointer;padding:8px 16px;display:inline-flex;align-items:center;justify-content:center;gap:8px}button.primary{background:var(--accent-orange);color:#060913;font-weight:700;border-color:transparent}.container{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:24px}.page{display:none}.page.active{display:block}.hidden,.sr-only,.btn-mobile-text,.mobile-bottom-nav{display:none!important}.hero,.card{border:1px solid var(--border-color);border-radius:16px;background:var(--bg-card);padding:24px;margin-bottom:20px}.grid{display:grid;gap:16px}.stat{padding:16px;border-radius:12px;border:1px solid var(--border-color);background:var(--surface-2)}.stat .k{font-size:11px;text-transform:uppercase;color:var(--text-muted)}.stat .v{font-family:var(--font-display);font-size:28px;color:var(--text-main)}@media(max-width:768px){.btn-full-text,header.topbar nav{display:none!important}.btn-mobile-text{display:inline!important}.mobile-bottom-nav{display:flex!important}}</style>
+  <style id="critical-css">@font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;font-display:optional;src:url(https://fonts.gstatic.com/s/bebasneue/v16/JTUSjIg69CK48gW7PXoo9Wlhyw.woff2) format('woff2')}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 600;font-display:optional;src:url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwg.woff2) format('woff2')}@font-face{font-family:'Space Grotesk';font-style:normal;font-weight:400 700;font-display:optional;src:url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2) format('woff2')}:root{--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);--safe-right:env(safe-area-inset-right,0px);--text:#f8fafc;--muted:#94a3b8;--line:rgba(255,255,255,.1);--brand:#00f2fe;--ok:#10b981;--warn:#f59e0b;--danger:#f43f5e;--bg-dark:#060913;--bg-panel:rgba(13,19,36,.78);--bg-panel-solid:#0d1324;--bg-card:rgba(17,24,39,.68);--border-color:rgba(255,255,255,.08);--text-main:#f8fafc;--text-muted:#94a3b8;--color-ok:#10b981;--color-danger:#f43f5e;--color-warn:#f59e0b;--color-info:#00f2fe;--accent-color:var(--color-info);--bg-elevated:rgba(6,9,19,.55);--surface-2:rgba(255,255,255,.04);--surface-3:rgba(255,255,255,.07);--accent-orange:linear-gradient(135deg,#ff5e3a,#ff9233);--accent-cyan:linear-gradient(135deg,#00f2fe,#4facfe);--font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;--font-sans:"Space Grotesk",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--font-display:"Bebas Neue","Arial Black",Impact,sans-serif;--sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--radius-sm:6px;--radius-md:10px}html[data-theme="light"]{--text:#0f172a;--muted:#475569;--line:rgba(15,23,42,.12);--brand:#0284c7;--bg-dark:#f8fafc;--bg-panel:rgba(255,255,255,.92);--bg-panel-solid:#fff;--bg-card:rgba(255,255,255,.95);--border-color:rgba(15,23,42,.12);--text-main:#0f172a;--text-muted:#475569;--surface-2:rgba(15,23,42,.04);--surface-3:rgba(15,23,42,.08);--bg-elevated:#f1f5f9}*{box-sizing:border-box;margin:0;padding:0}html{scrollbar-gutter:stable}html,body{overflow-x:hidden;max-width:100%;width:100%}body{font-family:var(--font-sans);color:var(--text-main);background:var(--bg-dark);min-height:100vh;line-height:1.6}#netCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}.topbar{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 28px;border-bottom:1px solid var(--border-color);background:var(--bg-panel);backdrop-filter:blur(16px);max-width:100vw;overflow:hidden}.brand{display:flex;align-items:center;gap:12px;flex-shrink:0}.logo-container{width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:12px;padding:3px}.brand h1{font-family:var(--font-display);letter-spacing:2px;font-size:26px;color:var(--text-main)}.brand p{font-size:11px;color:var(--text-muted)}nav,.topbar-utils{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;background:transparent;border:1px solid transparent;color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase}.nav-btn svg{width:17px;height:17px;stroke:currentColor;fill:none}button{border:1px solid var(--border-color);border-radius:10px;background:var(--surface-2);color:var(--text-main);font-family:var(--font-sans);font-size:13px;cursor:pointer;padding:8px 16px;display:inline-flex;align-items:center;justify-content:center;gap:8px}button.primary{background:var(--accent-orange);color:#060913;font-weight:700;border-color:transparent}.container{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:24px}.page{display:none}.page.active{display:block}.hidden,.sr-only,.btn-mobile-text,.mobile-bottom-nav{display:none!important}.hero,.card{border:1px solid var(--border-color);border-radius:16px;background:var(--bg-card);padding:24px;margin-bottom:20px}.grid{display:grid;gap:16px}.stat{padding:16px;border-radius:12px;border:1px solid var(--border-color);background:var(--surface-2)}.stat .k{font-size:11px;text-transform:uppercase;color:var(--text-muted)}.stat .v{font-family:var(--font-display);font-size:28px;color:var(--text-main)}@media(max-width:768px){.btn-full-text,header.topbar nav{display:none!important}.btn-mobile-text{display:inline!important}.mobile-bottom-nav{display:flex!important}}</style>
   <link rel="preload" href="assets/css/styles.css?v=79" as="style" onload="this.onload=null;this.rel='stylesheet'" />
   <noscript><link rel="stylesheet" href="assets/css/styles.css?v=79" /></noscript>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&display=swap" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&display=swap" /></noscript>
 </head>
 <body>
 <noscript>
@@ -122,15 +119,13 @@
       </button>
     </nav>
     <div class="topbar-utils">
-      <button id="btnMuteToggle" class="nav-util-btn ghost" aria-label="Toggle Sound">
-        <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><path d="M11 5l-5 4H3v4h3l5 4V5z" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 8c.8.8 1.2 1.9 1.2 3s-.4 2.2-1.2 3M13 9.5c.4.4.7 1 .7 1.5s-.3 1.1-.7 1.5" stroke-linecap="round"/></svg>
-      </button>
+      <button id="btnMuteToggle" class="nav-util-btn ghost" aria-label="Mute sound effects" title="Mute sound effects" aria-pressed="false">🔊</button>
       <button id="btnToggleContrast" class="nav-util-btn ghost" aria-label="Toggle High Contrast">
         <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 3v14" stroke-linecap="round"/><path d="M10 3a7 7 0 0 1 0 14V3z" fill="currentColor" stroke="none"/></svg>
       </button>
       <button id="btnThemeToggle" class="nav-util-btn ghost" aria-label="Switch to light theme" title="Switch to light theme">☀️</button>
       
-      <span id="headerXPBadge" class="xp-badge" aria-label="Experience level">Lvl 1</span>
+      <span id="headerXPBadge" class="xp-badge" aria-label="Experience level">Lvl 1 (Cadet) - 0 XP</span>
       <span id="headerTimer" class="timer hidden" aria-live="polite">120:00</span>
       <div id="authContainer" class="auth-container">
         <button id="btnSignIn" class="secondary">Sign In</button>
@@ -195,24 +190,24 @@
         </div>
         <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; position: relative; z-index: 2;" />
         <div class="grid stats" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-          <div class="stat skeleton" style="position: relative; overflow: hidden;">
+          <div class="stat" style="position: relative; overflow: hidden;">
             <div class="k">Readiness Score</div>
             <div class="v" id="heroReadiness">0%</div>
             <div class="progress" style="height: 4px; margin-top: 8px;"><div id="heroReadinessBar" style="width: 0%;"></div></div>
           </div>
-          <div class="stat skeleton">
+          <div class="stat">
             <div class="k">Questions Solved</div>
             <div class="v" id="heroQuestions">0</div>
           </div>
-          <div class="stat skeleton">
+          <div class="stat">
             <div class="k">Active Streak</div>
-            <div class="v" id="heroStreak">0 Days</div>
+            <div class="v" id="heroStreak"><span class="streak-badge streak-low" title="Active study streak: 0 days">🔥 0 Days</span></div>
           </div>
-          <div class="stat skeleton">
+          <div class="stat">
             <div class="k">Labs Completed</div>
             <div class="v" id="heroLabs">0 / 10</div>
           </div>
-          <div class="stat skeleton">
+          <div class="stat">
             <div class="k">Quizzes Completed</div>
             <div class="v" id="heroQuizzes">0</div>
           </div>
@@ -596,7 +591,7 @@
               </select>
             </label>
           </div>
-          <div id="domainChecks" class="checks"></div>
+          <div id="domainChecks" class="checks"><label><input class="qdomain" type="checkbox" value="Network Fundamentals" checked /> Network Fundamentals (20%)</label><label><input class="qdomain" type="checkbox" value="Network Access" /> Network Access (20%)</label><label><input class="qdomain" type="checkbox" value="IP Connectivity" /> IP Connectivity (25%)</label><label><input class="qdomain" type="checkbox" value="IP Services" /> IP Services (10%)</label><label><input class="qdomain" type="checkbox" value="Security Fundamentals" /> Security Fundamentals (15%)</label><label><input class="qdomain" type="checkbox" value="Automation and Programmability" /> Automation and Programmability (10%)</label></div>
           <button id="startQuiz" class="primary">Start Section Quiz</button>
         </article>
 
@@ -609,9 +604,8 @@
         <article class="card">
           <h3>🧠 Smart Adaptive Quiz</h3>
           <p>Target your weaknesses. The system automatically finds your two weakest domains and builds a focused custom quiz.</p>
-          <div id="smartQuizInfo" class="quiz-info-text">
-            Analyzing performance history...
-          </div>
+          <div id="smartQuizInfo" class="quiz-info-text"><strong>Current Focus Areas:</strong><br />
+        Cross-domain random fallback (fewer than 2 domains with &ge; 5 attempts)</div>
           <div class="row row-compact">
             <label>Questions
               <select id="smartQuizCount">
@@ -626,9 +620,7 @@
         <article class="card">
           <h3>🔁 Spaced Repetition Quiz</h3>
           <p>Review and master your weak spots. This mode targets only the questions you have previously answered incorrectly.</p>
-          <div id="missedQuizInfo" class="quiz-info-text">
-            You have 0 incorrect questions to review.
-          </div>
+          <div id="missedQuizInfo" class="quiz-info-text"><strong>Status:</strong> Clear!<br />You have 0 incorrect questions to review. Great job!</div>
           <div class="row row-compact">
             <label>Questions
               <select id="missedQuizCount">
@@ -638,14 +630,14 @@
               </select>
             </label>
           </div>
-          <button id="startMissedQuiz" class="primary">Start Review Quiz</button>
+          <button id="startMissedQuiz" class="primary" disabled style="opacity: 0.5; pointer-events: none;">Start Review Quiz</button>
         </article>
       </section>
 
       <section class="grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
         <div class="card" style="margin-bottom: 0;">
           <h3>📊 Question Bank & Distribution</h3>
-          <div id="bankStats" class="grid stats"></div>
+          <div id="bankStats" class="grid stats"><div class="stat"><div class="k">Total Questions</div><div class="v">635</div></div><div class="stat"><div class="k">Blueprint Coverage</div><div class="v">100%</div></div><div class="stat"><div class="k">Easy</div><div class="v">210</div></div><div class="stat"><div class="k">Medium</div><div class="v">252</div></div><div class="stat"><div class="k">Hard</div><div class="v">173</div></div><div class="stat"><div class="k">Question Types</div><div class="v" style="font-size: 16px; line-height: 1.35; overflow-wrap: anywhere;">Single/Multi/Matching/Drag/Scenario</div></div></div>
         </div>
         
         <div class="card" id="flashcardBox" style="display: flex; flex-direction: column; gap: 12px; min-height: 250px; margin-bottom: 0;">
@@ -1372,7 +1364,7 @@
         }).catch(err => {
           console.warn('ServiceWorker registration failed:', err);
         });
-      }, 1500);
+      }, 4000);
     });
   }
 </script>
@@ -1402,7 +1394,7 @@
 </nav>
 
 <div id="mobileMoreBackdrop" class="mobile-more-backdrop hidden" aria-hidden="true"></div>
-<aside id="mobileMoreSheet" class="mobile-more-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="mobileMoreSheetTitle">
+<div id="mobileMoreSheet" class="mobile-more-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="mobileMoreSheetTitle">
   <div class="mobile-more-handle" aria-hidden="true"></div>
   <div class="mobile-more-header">
     <div>
@@ -1483,7 +1475,7 @@
       </div>
     </button>
   </div>
-</aside>
+</div>
 <div id="toastContainer" role="status" aria-live="polite" aria-atomic="false"></div>
 </body>
 </html>

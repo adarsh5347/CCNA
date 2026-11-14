@@ -1482,7 +1482,6 @@ function init() {
   renderHome();
   wireEvents();
   setupAuth();
-  setupCanvasConstellation();
 
   // Admin buttons stay hidden until the signed-in user is confirmed as owner
   checkAdminStatus();
@@ -1506,6 +1505,8 @@ function init() {
 
   // Defer all non-critical page initializations until idle microtask after landing page paint
   const initNonCritical = () => {
+    setupCanvasConstellation();
+    watchHeaderHeight();
     ensureTraversalInit();
     setupSupportDesk();
     ensureVideosInit();
@@ -1523,9 +1524,6 @@ function init() {
   } else {
     setTimeout(initNonCritical, 50);
   }
-
-  // Phase 3: Start watching header height with ResizeObserver
-  watchHeaderHeight();
 
   // Re-sync header height on orientation/resize
   window.addEventListener("resize", syncHeaderHeight, { passive: true });

@@ -32,30 +32,13 @@ async function build() {
   }
   ensureDir(DIST);
 
-  // 1. Copy static root files (and minify sw.js)
-  for (const file of STATIC_ROOT_FILES) {
-    const srcPath = path.join(ROOT, file);
-    if (!fs.existsSync(srcPath)) continue;
-    const destPath = path.join(DIST, file);
-    if (file.endsWith(".js")) {
-      const raw = fs.readFileSync(srcPath, "utf8");
-      const res = await transform(raw, {
-        loader: "js",
-        minify: true,
-        target: "es2020"
-      });
-      fs.writeFileSync(destPath, res.code, "utf8");
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
-  }
-
-  // 2. Process all files in assets/
+  // 1. Process all files in assets/ first so minified CSS is ready for inlining
   const assetsSrcDir = path.join(ROOT, "assets");
   const allAssetFiles = getAllFiles(assetsSrcDir);
 
   let totalRawBytes = 0;
   let totalMinBytes = 0;
+  let minifiedStylesCss = "";
 
   for (const srcFile of allAssetFiles) {
     const relPath = path.relative(ROOT, srcFile);
@@ -76,11 +59,40 @@ async function build() {
       totalRawBytes += rawBytes;
       totalMinBytes += minBytes;
       fs.writeFileSync(destFile, res.code, "utf8");
+      if (relPath.replace(/\\/g, "/") === "assets/css/styles.css") {
+        minifiedStylesCss = res.code.trim();
+      }
       console.log(
         `[minify] ${relPath}: ${(rawBytes / 1024).toFixed(1)} KiB -> ${(minBytes / 1024).toFixed(1)} KiB`
       );
     } else {
       fs.copyFileSync(srcFile, destFile);
+    }
+  }
+
+  // 2. Copy static root files (minifying sw.js and inlining full minified CSS into dist/index.html to prevent render-blocking and CLS)
+  for (const file of STATIC_ROOT_FILES) {
+    const srcPath = path.join(ROOT, file);
+    if (!fs.existsSync(srcPath)) continue;
+    const destPath = path.join(DIST, file);
+    if (file.endsWith(".js")) {
+      const raw = fs.readFileSync(srcPath, "utf8");
+      const res = await transform(raw, {
+        loader: "js",
+        minify: true,
+        target: "es2020"
+      });
+      fs.writeFileSync(destPath, res.code, "utf8");
+    } else if (file === "index.html" && minifiedStylesCss) {
+      let html = fs.readFileSync(srcPath, "utf8");
+      html = html.replace(
+        /<style id="critical-css">[\s\S]*?<\/style>\s*<link rel="preload" href="assets\/css\/styles\.css\?v=\d+" as="style" onload="this\.onload=null;this\.rel='stylesheet'" \/>\s*<noscript><link rel="stylesheet" href="assets\/css\/styles\.css\?v=\d+" \/><\/noscript>/,
+        `<style id="critical-css">${minifiedStylesCss}</style>`
+      );
+      fs.writeFileSync(destPath, html, "utf8");
+      console.log(`[inline-css] dist/index.html: inlined ${(Buffer.byteLength(minifiedStylesCss, "utf8") / 1024).toFixed(1)} KiB minified CSS (0 render-blocking CSS, 0 CLS)`);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
     }
   }
 

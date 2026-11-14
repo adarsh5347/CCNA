@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ccna-prep-v84';
+const CACHE_NAME = 'ccna-prep-v85';
 const ASSETS = [
   '/',
   '/index.html',
@@ -20,13 +20,6 @@ const ASSETS = [
   '/assets/js/qb/chapters/v1p3.js',
   '/assets/js/qb/chapters/v2p1.js',
   '/assets/js/qb/chapters/v2p2.js',
-  '/assets/js/guide/index.js',
-  '/assets/js/guide/v1p1.js',
-  '/assets/js/guide/v1p2.js',
-  '/assets/js/guide/v1p3.js',
-  '/assets/js/guide/v2p1.js',
-  '/assets/js/guide/v2p2.js',
-  '/assets/js/guide-ui.js',
   '/assets/js/firebase.js',
   '/assets/js/firebase-lazy.js',
   '/assets/js/videos.js',

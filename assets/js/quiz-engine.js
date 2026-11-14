@@ -138,11 +138,14 @@ export function calcDomainAccuracy() {
 export function renderStatsCards(targetId, cards) {
   const el = byId(targetId);
   if (el) {
-    el.innerHTML = cards.map((c) => {
+    const nextHtml = cards.map((c) => {
       const strVal = String(c.v ?? "");
       const isLongText = strVal.length > 12;
       return `<div class="stat"><div class="k">${c.k}</div><div class="v"${isLongText ? ' style="font-size: 16px; line-height: 1.35; overflow-wrap: anywhere;"' : ""}>${c.v}</div></div>`;
     }).join("");
+    if (el.innerHTML !== nextHtml) {
+      el.innerHTML = nextHtml;
+    }
   }
 }
 
@@ -254,7 +257,9 @@ export function renderHome() {
   if (heroQuizzes) heroQuizzes.textContent = state.analytics.attempts ? state.analytics.attempts.length : 0;
   if (heroStreak) {
     const streakInfo = getStreakBadgeInfo(getDisplayStreak(state.analytics));
-    heroStreak.innerHTML = streakInfo.html;
+    if (heroStreak.innerHTML !== streakInfo.html) {
+      heroStreak.innerHTML = streakInfo.html;
+    }
   }
   if (heroLabs) heroLabs.textContent = `${state.analytics.labsCompleted || 0} / 10`;
   
@@ -338,7 +343,7 @@ export function renderHome() {
 
 export function renderDomainChecks() {
   const wrap = byId("domainChecks");
-  if (wrap) {
+  if (wrap && wrap.children.length === 0) {
     wrap.innerHTML = blueprint.map((d, i) => `<label><input class="qdomain" type="checkbox" value="${d.name}" ${i === 0 ? "checked" : ""} /> ${d.name} (${d.weight}%)</label>`).join("");
   }
 }
@@ -1989,19 +1994,20 @@ export function setupCanvasConstellation() {
     binaryColumns.push(new BinaryColumn());
   }
 
-  let isNetCanvasVisible = true;
-  const netObserver = new IntersectionObserver(([entry]) => {
-    isNetCanvasVisible = entry.isIntersecting;
-    if (isNetCanvasVisible && !animFrameId) {
-      animFrameId = requestAnimationFrame(animate);
-    }
-  }, { threshold: 0 });
-  netObserver.observe(canvas);
-
   const animate = () => {
-    const isEngine = document.body.getAttribute("data-active-page") === "engine";
-    if (!isNetCanvasVisible || isEngine || document.hidden) {
+    if (document.hidden) {
       animFrameId = null;
+      return;
+    }
+    const isEngine = document.body.getAttribute("data-active-page") === "engine";
+    if (isEngine) {
+      setTimeout(() => {
+        if (!document.hidden) {
+          animFrameId = requestAnimationFrame(animate);
+        } else {
+          animFrameId = null;
+        }
+      }, 500);
       return;
     }
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -2021,7 +2027,7 @@ export function setupCanvasConstellation() {
         }
       }
       setTimeout(() => { 
-        if (isNetCanvasVisible && !document.hidden) {
+        if (!document.hidden) {
           animFrameId = requestAnimationFrame(animate); 
         } else {
           animFrameId = null;
@@ -2095,7 +2101,7 @@ export function setupCanvasConstellation() {
         cancelAnimationFrame(animFrameId);
         animFrameId = null;
       }
-    } else if (!animFrameId && isNetCanvasVisible) {
+    } else if (!animFrameId) {
       animFrameId = requestAnimationFrame(animate);
     }
   });
