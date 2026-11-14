@@ -1,6 +1,12 @@
 {
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build.mjs"
+  },
   "dependencies": {
     "pdf-parse": "^2.4.5"
   },
-  "type": "module"
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
 }

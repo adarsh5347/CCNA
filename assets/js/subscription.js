@@ -4,15 +4,15 @@
  * Subscription paywalls and payment requirements have been completely removed.
  */
 
-import { state, showToast, byId } from "./core.js?v=77";
-import { isFirebaseEnabled, getFirebaseAuth } from "./firebase.js?v=77";
+import { state, showToast, byId } from "./core.js?v=78";
+import { isFirebaseEnabled, getCachedFirebaseAuth } from "./firebase.js?v=78";
 
 export const OWNER_UIDS = ["NjVurGH5w4TPl8qoJklLyage7UX2"];
 
 export function isOwnerUser(user) {
   if (!user || typeof user.uid !== "string" || !OWNER_UIDS.includes(user.uid)) return false;
   if (isFirebaseEnabled()) {
-    const auth = getFirebaseAuth();
+    const auth = getCachedFirebaseAuth();
     const liveUser = auth && auth.currentUser;
     if (!liveUser || liveUser.uid !== user.uid) return false;
   }

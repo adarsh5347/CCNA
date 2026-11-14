@@ -4,8 +4,9 @@
  * Zero subscription dependencies and resilient local/cloud status reporting.
  */
 
-import { state, byId, showToast, playNetSound, safeHTML } from "./core.js?v=77";
-import { isOwnerUser } from "./subscription.js?v=77";
+import { state, byId, showToast, playNetSound, safeHTML } from "./core.js?v=78";
+import { isOwnerUser } from "./subscription.js?v=78";
+import { getDisplayStreak } from "./streak.js?v=78";
 
 export function isAdmin() {
   return isOwnerUser(state.user);
@@ -28,7 +29,8 @@ export async function renderAdminDashboard() {
   const labsCount = 10;
   const videosCount = 126;
   const userXp = state.analytics ? (state.analytics.xp || 0) : 0;
-  const userStreak = state.analytics ? (state.analytics.streak || 0) : 0;
+  const userStreak = getDisplayStreak(state.analytics);
+  const streakUnit = userStreak === 1 ? "Day" : "Days";
   const userLabsCompleted = state.analytics ? (state.analytics.labsCompleted || 0) : 0;
   const isOnline = navigator.onLine;
 
@@ -65,7 +67,7 @@ export async function renderAdminDashboard() {
         </div>
         <div class="stat">
           <div class="k">Active Streak</div>
-          <div class="v" style="color:#f59e0b;">🔥 ${userStreak} Days</div>
+          <div class="v" style="color:#f59e0b;">🔥 ${userStreak} ${streakUnit}</div>
         </div>
       </div>
     `;

@@ -1,4 +1,4 @@
-import { state, byId, playNetSound, gainXP, safeSetStorage, saveAnalytics, pick, rand, safeHTML } from "./core.js?v=77";
+import { state, byId, playNetSound, gainXP, safeSetStorage, saveAnalytics, pick, rand, safeHTML } from "./core.js?v=78";
 
 // IP Address Conversion Helpers
 export function ipToNum(ip) {

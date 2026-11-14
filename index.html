@@ -13,11 +13,30 @@
   <link rel="icon" type="image/svg+xml" href="assets/icon.svg" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#060913" />
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("ccna_theme");
+        var theme = (saved === "light" || saved === "dark")
+          ? saved
+          : (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", theme);
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute("content", theme === "light" ? "#f8fafc" : "#060913");
+      } catch (e) {}
+    })();
+  </script>
   <link rel="apple-touch-icon" href="assets/icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" href="assets/css/styles.css?v=78" as="style" />
-  <link rel="stylesheet" href="assets/css/styles.css?v=78" />
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+  <link rel="modulepreload" href="assets/js/app.js?v=78" />
+  <link rel="modulepreload" href="assets/js/core.js?v=78" />
+  <link rel="modulepreload" href="assets/js/quiz-engine.js?v=83" />
+  <link rel="modulepreload" href="assets/js/data.js?v=77" />
+  <style id="critical-css">:root{--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);--safe-right:env(safe-area-inset-right,0px);--text:#f8fafc;--muted:#94a3b8;--line:rgba(255,255,255,.1);--brand:#00f2fe;--ok:#10b981;--warn:#f59e0b;--danger:#f43f5e;--bg-dark:#060913;--bg-panel:rgba(13,19,36,.78);--bg-panel-solid:#0d1324;--bg-card:rgba(17,24,39,.68);--border-color:rgba(255,255,255,.08);--text-main:#f8fafc;--text-muted:#94a3b8;--color-ok:#10b981;--color-danger:#f43f5e;--color-warn:#f59e0b;--color-info:#00f2fe;--accent-color:var(--color-info);--bg-elevated:rgba(6,9,19,.55);--surface-2:rgba(255,255,255,.04);--surface-3:rgba(255,255,255,.07);--accent-orange:linear-gradient(135deg,#ff5e3a,#ff9233);--accent-cyan:linear-gradient(135deg,#00f2fe,#4facfe);--font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;--font-sans:"Space Grotesk",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--font-display:"Bebas Neue","Arial Black",Impact,sans-serif;--sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--radius-sm:6px;--radius-md:10px}html[data-theme="light"]{--text:#0f172a;--muted:#475569;--line:rgba(15,23,42,.12);--brand:#0284c7;--bg-dark:#f8fafc;--bg-panel:rgba(255,255,255,.92);--bg-panel-solid:#fff;--bg-card:rgba(255,255,255,.95);--border-color:rgba(15,23,42,.12);--text-main:#0f172a;--text-muted:#475569;--surface-2:rgba(15,23,42,.04);--surface-3:rgba(15,23,42,.08);--bg-elevated:#f1f5f9}*{box-sizing:border-box;margin:0;padding:0}html,body{overflow-x:hidden;max-width:100%;width:100%}body{font-family:var(--font-sans);color:var(--text-main);background:var(--bg-dark);min-height:100vh;line-height:1.6}#netCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}.topbar{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 28px;border-bottom:1px solid var(--border-color);background:var(--bg-panel);backdrop-filter:blur(16px);max-width:100vw;overflow:hidden}.brand{display:flex;align-items:center;gap:12px;flex-shrink:0}.logo-container{width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:12px;padding:3px}.brand h1{font-family:var(--font-display);letter-spacing:2px;font-size:26px;color:var(--text-main)}.brand p{font-size:11px;color:var(--text-muted)}nav,.topbar-utils{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 12px;background:transparent;border:1px solid transparent;color:var(--text-muted);font-size:11px;font-weight:600;text-transform:uppercase}.nav-btn svg{width:17px;height:17px;stroke:currentColor;fill:none}button{border:1px solid var(--border-color);border-radius:10px;background:var(--surface-2);color:var(--text-main);font-family:var(--font-sans);font-size:13px;cursor:pointer;padding:8px 16px;display:inline-flex;align-items:center;justify-content:center;gap:8px}button.primary{background:var(--accent-orange);color:#060913;font-weight:700;border-color:transparent}.container{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:24px}.page{display:none}.page.active{display:block}.hidden,.sr-only,.btn-mobile-text,.mobile-bottom-nav{display:none!important}.hero,.card{border:1px solid var(--border-color);border-radius:16px;background:var(--bg-card);padding:24px;margin-bottom:20px}.grid{display:grid;gap:16px}.stat{padding:16px;border-radius:12px;border:1px solid var(--border-color);background:var(--surface-2)}.stat .k{font-size:11px;text-transform:uppercase;color:var(--text-muted)}.stat .v{font-family:var(--font-display);font-size:28px;color:var(--text-main)}@media(max-width:768px){.btn-full-text,header.topbar nav{display:none!important}.btn-mobile-text{display:inline!important}.mobile-bottom-nav{display:flex!important}}</style>
+  <link rel="preload" href="assets/css/styles.css?v=79" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="assets/css/styles.css?v=79" /></noscript>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&display=swap" media="print" onload="this.media='all'" />
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&display=swap" /></noscript>
 </head>
@@ -109,6 +128,7 @@
       <button id="btnToggleContrast" class="nav-util-btn ghost" aria-label="Toggle High Contrast">
         <svg viewBox="0 0 20 20" stroke-width="1.6" aria-hidden="true"><circle cx="10" cy="10" r="7"/><path d="M10 3v14" stroke-linecap="round"/><path d="M10 3a7 7 0 0 1 0 14V3z" fill="currentColor" stroke="none"/></svg>
       </button>
+      <button id="btnThemeToggle" class="nav-util-btn ghost" aria-label="Switch to light theme" title="Switch to light theme">☀️</button>
       
       <span id="headerXPBadge" class="xp-badge" aria-label="Experience level">Lvl 1</span>
       <span id="headerTimer" class="timer hidden" aria-live="polite">120:00</span>
@@ -128,6 +148,7 @@
   <main class="container">
     <!-- HOME PAGE -->
     <section id="home" class="page active">
+      <div id="resumeQuizBanner" class="card resume-banner hidden" role="region" aria-label="Resume unfinished quiz"></div>
       <!-- Premium Hero Dashboard Stats -->
       <article class="card hero-dashboard" style="position: relative; z-index: 1;">
         <!-- Immersive Awwwards-style perspective cyber grid -->
@@ -136,7 +157,7 @@
         <canvas id="heroInteractiveSphere" style="position: absolute; right: 0; top: 0; width: 360px; height: 100%; pointer-events: none; opacity: 0.85; z-index: 0;"></canvas>
 
         <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-          <div style="display: flex; align-items: gap: 24px; flex-wrap: wrap; flex: 1; min-width: 280px;">
+          <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap; flex: 1; min-width: 280px;">
             <div class="hero-graphics" style="width: 100px; height: 100px; position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
               <svg viewBox="0 0 100 100" style="width: 100%; height: 100%;">
                 <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(0, 242, 254, 0.12)" stroke-width="1.5" />
@@ -168,6 +189,7 @@
             <button id="btnLaunchGuide" data-page="guide" class="secondary magnetic-btn" style="padding: 8px 16px; font-size: 13px; border-color: rgba(0, 242, 254, 0.45); color: #00f2fe;">📖 48-Ch Cert Guide</button>
             <button id="btnLaunchExam" class="secondary magnetic-btn" style="padding: 8px 16px; font-size: 13px;">🏆 Take Exam</button>
             <button id="btnLaunchLabs" class="secondary magnetic-btn" style="padding: 8px 16px; font-size: 13px;">🧪 Virtual Labs</button>
+            <button id="btnHomeExportProgress" class="secondary magnetic-btn" style="padding: 8px 16px; font-size: 13px;" aria-label="Download Progress JSON">⬇️ Download Progress</button>
             <button data-page="admin" class="secondary magnetic-btn" style="display:none; padding: 8px 16px; font-size: 13px; color: #ef4444; border-color: rgba(239, 68, 68, 0.4);">⚡ Admin Panel</button>
           </div>
         </div>
@@ -865,7 +887,7 @@
           </div>
 
           <div style="border-top: 1px solid var(--border-color); padding-top: 12px; flex: 1; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;">
-            <h4 style="font-size: 13px; color: #00f2fe; text-transform: uppercase;">Objectives Checklist</h4>
+            <h3 style="font-size: 13px; color: #00f2fe; text-transform: uppercase;">Objectives Checklist</h3>
             <div id="labObjectivesList" style="font-size: 12.5px; line-height: 1.5; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px;"></div>
           </div>
         </aside>
@@ -873,7 +895,7 @@
         <!-- Right Panel: Topology and CLI Console -->
         <div style="display: flex; flex-direction: column; gap: 16px;">
           <div class="card" style="padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 12px; margin-bottom: 0;">
-            <h4 id="labTitle" style="font-size: 16px; color: #fff;">Lab Module</h4>
+            <h3 id="labTitle" style="font-size: 16px; color: var(--text-main);">Lab Module</h3>
             <p id="labScenario" style="font-size: 13px; color: var(--text-muted); margin-bottom: 0;"></p>
             
             <!-- Simulated Lab Topology -->
@@ -882,9 +904,9 @@
 
           <!-- CLI Console / Challenge Interface -->
           <div class="card terminal-box" style="padding: 16px; min-height: 260px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 0;">
-            <h4 id="labConsoleHeader" style="font-size: 13px; color: #10b981; border-bottom: 1px solid rgba(16,185,129,0.15); padding-bottom: 6px; text-transform: uppercase; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+            <h3 id="labConsoleHeader" style="font-size: 13px; color: #10b981; border-bottom: 1px solid rgba(16,185,129,0.15); padding-bottom: 6px; text-transform: uppercase; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
               <span>💻 Cisco IOS Command Console</span>
-            </h4>
+            </h3>
             <div id="labCliOutput" style="font-family: var(--font-mono); font-size: 12.5px; color: #34d399; line-height: 1.45; overflow-y: auto; flex: 1; max-height: 160px; white-space: pre-wrap;"></div>
             
             <!-- Interactive inputs based on mode -->
@@ -913,7 +935,12 @@
         <div class="cyber-grid" aria-hidden="true"></div>
         <h2 class="reveal-text glow-accent" style="position: relative; z-index: 1;">Readiness Dashboard</h2>
         <p style="position: relative; z-index: 1; color: var(--text-muted);">Track pass probability, readiness score, weak domains, and trend across attempts.</p>
-        <button id="btnResetProgress" class="secondary magnetic-btn" style="position: relative; z-index: 2;">⚠️ Reset Progress</button>
+        <div style="position: relative; z-index: 2; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          <button type="button" id="btnExportProgress" class="primary magnetic-btn" aria-label="Download Progress JSON">⬇️ Download Progress</button>
+          <button type="button" id="btnImportProgress" class="secondary magnetic-btn" aria-label="Import Progress JSON">⬆️ Import Progress</button>
+          <input type="file" id="importProgressInput" accept=".json,application/json" class="hidden" aria-label="Import progress JSON file" />
+          <button type="button" id="btnResetProgress" class="secondary magnetic-btn">⚠️ Reset Progress</button>
+        </div>
       </article>
       <div id="analyticsNarrative" class="analytics-narrative hidden"></div>
       <section id="analyticsStats" class="grid stats"></section>
@@ -1022,20 +1049,20 @@
 
       <!-- Search, Filters & Mode Tabs Bar -->
       <section class="card" style="padding: 16px; margin-bottom: 18px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 0;">
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button data-guide-tab="chapters" class="primary" style="padding: 8px 14px; font-size: 12.5px;">📖 48-Chapter Study Guide</button>
             <button data-guide-tab="commands" class="secondary" style="padding: 8px 14px; font-size: 12.5px;">💻 Global IOS Command Explorer</button>
             <button data-guide-tab="glossary" class="secondary" style="padding: 8px 14px; font-size: 12.5px;">🔤 Complete A–Z Glossary</button>
           </div>
-          <div style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1; justify-content: flex-end; min-width: 280px;">
-            <input id="guideSearchInput" type="search" placeholder="🔍 Search 48 chapters, IOS commands, or key terms..." style="flex: 1; min-width: 220px; max-width: 360px; margin: 0; padding: 8px 12px; font-size: 13px;" />
-            <select id="guideVolumeFilter" aria-label="Filter by Volume" style="width: auto; margin: 0; padding: 8px 12px; font-size: 12.5px;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; flex: 1; justify-content: flex-end; min-width: 280px;">
+            <input id="guideSearchInput" type="search" placeholder="🔍 Search 48 chapters, IOS commands, or key terms..." style="flex: 1 1 180px; min-width: 160px; max-width: 250px; margin: 0; padding: 8px 12px; font-size: 12.5px;" />
+            <select id="guideVolumeFilter" aria-label="Filter by Volume" style="width: auto; max-width: 175px; margin: 0; padding: 8px 10px; font-size: 12px;">
               <option value="all">All Volumes (Vol 1 &amp; 2)</option>
               <option value="1">Volume 1 (Ch 1–29)</option>
               <option value="2">Volume 2 (Ch 1–19)</option>
             </select>
-            <select id="guideDomainFilter" aria-label="Filter by Blueprint Domain" style="width: auto; margin: 0; padding: 8px 12px; font-size: 12.5px;">
+            <select id="guideDomainFilter" aria-label="Filter by Blueprint Domain" style="width: auto; max-width: 190px; margin: 0; padding: 8px 10px; font-size: 12px;">
               <option value="all">All 6 Blueprint Domains</option>
               <option value="Network Fundamentals">Network Fundamentals (20%)</option>
               <option value="Network Access">Network Access (20%)</option>
@@ -1124,8 +1151,8 @@
       <div class="exam-shell" style="grid-template-columns: 1fr; border-top: 5px solid #0284c7; background: rgba(13, 19, 36, 0.45); backdrop-filter: blur(20px);">
         <header class="exam-header" style="background: rgba(30, 41, 59, 0.45); backdrop-filter: blur(12px); padding: 12px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; border-radius: 0;">
           <div style="display: flex; align-items: center; gap: 16px;">
-            <button id="btnToggleSidebar" class="ghost" aria-label="Toggle Navigator" style="padding: 8px; border: 1px solid var(--border-color);">☰ <span>Navigator</span></button>
-            <h3 id="modeTitle" style="font-family: var(--font-mono); font-size: 14px; margin-bottom: 0; color: #38bdf8;">Pearson VUE Exam Simulator</h3>
+            <button id="btnToggleSidebar" class="ghost" style="padding: 8px; border: 1px solid var(--border-color);"><span aria-hidden="true">☰</span> <span>Navigator</span></button>
+            <h2 id="modeTitle" style="font-family: var(--font-mono); font-size: 14px; margin-bottom: 0; color: #38bdf8;">Pearson VUE Exam Simulator</h2>
           </div>
           
           <!-- Progress & Question Counter -->
@@ -1138,18 +1165,26 @@
           </div>
 
           <div style="display: flex; align-items: center; gap: 12px;">
-            <span id="timer" class="timer" style="font-family: var(--font-mono); font-size: 15px; font-weight: 700; color: #10b981;">120:00</span>
-            <button id="btnToggleFullScreen" class="ghost" aria-label="Toggle Full Screen" style="padding: 6px 12px; border: 1px solid var(--border-color); font-size: 11px;">Fullscreen</button>
+            <div id="timer" class="timer timer-circular" role="timer" aria-label="Session timer">
+              <svg class="timer-ring" viewBox="0 0 36 36" width="34" height="34" aria-hidden="true">
+                <circle class="timer-ring-bg" cx="18" cy="18" r="15" fill="none" stroke-width="3"></circle>
+                <circle id="timerRingFill" class="timer-ring-fill" cx="18" cy="18" r="15" fill="none" stroke-width="3" stroke-dasharray="94.25" stroke-dashoffset="0"></circle>
+              </svg>
+              <span id="timerValue" class="timer-value">120:00</span>
+              <span id="timerPauseTag" class="timer-pause-tag hidden">PAUSED</span>
+            </div>
+            <div id="timerLiveRegion" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+            <button id="btnToggleFullScreen" class="ghost" style="padding: 6px 12px; border: 1px solid var(--border-color); font-size: 11px;">Fullscreen</button>
             <button id="exitSession" class="ghost" style="padding: 6px 12px; border: 1px solid var(--border-color); font-size: 11px; background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">Exit</button>
           </div>
         </header>
 
-        <div style="display: flex; min-height: 70vh; position: relative;">
+        <div style="display: flex; min-height: 70vh; position: relative; overflow: hidden;">
           <!-- Left Navigator Drawer Panel -->
           <div id="examNavBackdrop" class="mobile-exam-backdrop" aria-hidden="true"></div>
           <aside id="examNavigator" class="left" style="position: absolute; left: -320px; top: 0; bottom: 0; width: 300px; z-index: 50; transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); box-shadow: 10px 0 20px rgba(0,0,0,0.5); border-radius: 0;">
             <div class="drawer-header" style="padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-              <h4 style="font-size: 13px; text-transform: uppercase; margin-bottom: 0; color: #94a3b8;">Question Navigator</h4>
+              <h3 style="font-size: 13px; text-transform: uppercase; margin-bottom: 0; color: #94a3b8;">Question Navigator</h3>
               <button id="btnCloseSidebar" class="ghost" aria-label="Close question navigator" style="padding: 10px 14px; min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center;">✕</button>
             </div>
             <div style="padding: 16px; overflow-y: auto; flex: 1;">
@@ -1166,12 +1201,12 @@
             <div id="resultArea" class="scroll hidden" style="flex: 1; padding: 24px; min-height: auto;"></div>
 
             <footer id="examFooter" class="exam-footer" style="padding: 12px 24px; background: rgba(30, 41, 59, 0.45); backdrop-filter: blur(12px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; border-radius: 0;">
-              <button id="prevQ" class="ghost" aria-label="Previous Question" style="border: 1px solid var(--border-color);"><span class="btn-full-text">⬅️ Previous</span><span class="btn-mobile-text">⬅️ Prev</span></button>
+              <button id="prevQ" class="ghost" style="border: 1px solid var(--border-color);"><span class="btn-full-text">⬅️ Previous</span><span class="btn-mobile-text">⬅️ Prev</span></button>
               <div class="exam-footer-actions" style="display: flex; gap: 8px;">
-                <button id="toggleMark" class="ghost" aria-label="Mark Question For Review" style="border: 1px solid var(--border-color);"><span class="btn-full-text">🚩 Mark For Review</span><span class="btn-mobile-text">🚩 Mark</span></button>
-                <button id="openReview" class="secondary" aria-label="Open Exam Review Screen" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);"><span class="btn-full-text">📋 Review Screen</span><span class="btn-mobile-text">📋 Review</span></button>
-                <button id="saveNext" class="primary" aria-label="Save and Next Question"><span class="btn-full-text">Next ➡️</span><span class="btn-mobile-text">Next ➡️</span></button>
-                <button id="submitSession" class="primary" aria-label="Submit Exam Session" style="background: var(--accent-orange); color: #060913; border: none; display: none;"><span class="btn-full-text">Submit Exam</span><span class="btn-mobile-text">Submit</span></button>
+                <button id="toggleMark" class="ghost" style="border: 1px solid var(--border-color);"><span class="btn-full-text">🚩 Mark For Review</span><span class="btn-mobile-text">🚩 Mark</span></button>
+                <button id="openReview" class="secondary" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);"><span class="btn-full-text">📋 Review Screen</span><span class="btn-mobile-text">📋 Review</span></button>
+                <button id="saveNext" class="primary"><span class="btn-full-text">Next ➡️</span><span class="btn-mobile-text">Next ➡️</span></button>
+                <button id="submitSession" class="primary" style="background: var(--accent-orange); color: #060913; border: none; display: none;"><span class="btn-full-text">Submit Exam</span><span class="btn-mobile-text">Submit</span></button>
               </div>
             </footer>
           </div>
@@ -1183,7 +1218,7 @@
   <!-- Video Lesson Player Modal -->
   <div id="videoModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle" style="position: fixed; inset: 0; background: rgba(3, 5, 12, 0.95); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 16px;">
     <div class="card" style="width: 100%; max-width: 900px; padding: 24px; position: relative; border: 1px solid rgba(0, 242, 254, 0.3); background: #060913; box-shadow: 0 0 35px rgba(0, 242, 254, 0.15); animation: zoomIn 0.3s ease;">
-      <button id="btnCloseVideoModal" class="ghost" style="position: absolute; top: 16px; right: 16px; font-size: 20px; color: #94a3b8; border: none; cursor: pointer; padding: 4px; line-height: 1;">✕</button>
+      <button id="btnCloseVideoModal" class="ghost" aria-label="Close video player" style="position: absolute; top: 16px; right: 16px; font-size: 20px; color: #94a3b8; border: none; cursor: pointer; padding: 4px; line-height: 1;">✕</button>
       <h3 id="videoModalTitle" style="margin-top: 0; margin-bottom: 16px; padding-right: 40px; color: #fff;">Video Lesson</h3>
       <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; background: #000; border: 1px solid var(--border-color);">
         <iframe id="videoIFrame" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -1202,15 +1237,15 @@
 
       <div class="grid stats" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px;text-align:left;">
         <div class="card" style="border:1px solid rgba(0,242,254,0.3);padding:18px;">
-          <h4 style="color:#00f2fe;margin:0 0 6px 0;">✔ Adaptive Quiz Engine</h4>
+          <h3 style="color:#00f2fe;margin:0 0 6px 0;font-size:15px;">✔ Adaptive Quiz Engine</h3>
           <p style="font-size:12px;color:var(--text-muted);margin:0;">635 Official Cert Guide questions across all 48 chapters, full 120-question exam drills, smart spaced repetition.</p>
         </div>
         <div class="card" style="border:1px solid rgba(16,185,129,0.3);padding:18px;">
-          <h4 style="color:#10b981;margin:0 0 6px 0;">✔ 10 Virtual IOS Labs</h4>
+          <h3 style="color:#10b981;margin:0 0 6px 0;font-size:15px;">✔ 10 Virtual IOS Labs</h3>
           <p style="font-size:12px;color:var(--text-muted);margin:0;">All guided labs: VLANs, ROAS, OSPF, ACLs, DHCP, NAT Overload, STP, EtherChannel, WLC, VPN.</p>
         </div>
         <div class="card" style="border:1px solid rgba(245,158,11,0.3);padding:18px;">
-          <h4 style="color:#f59e0b;margin:0 0 6px 0;">✔ 126 Video Lessons</h4>
+          <h3 style="color:#f59e0b;margin:0 0 6px 0;font-size:15px;">✔ 126 Video Lessons</h3>
           <p style="font-size:12px;color:var(--text-muted);margin:0;">Complete structured CCNA syllabus videos with interactive progress tracking.</p>
         </div>
       </div>
@@ -1228,14 +1263,14 @@
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:28px;flex-wrap:wrap;">
         <img id="accountUserPhoto" src="" alt="" style="width:64px;height:64px;border-radius:50%;border:2px solid #00f2fe;display:none;" />
         <div>
-          <h2 id="accountUserName" style="font-family:'Bebas Neue',sans-serif;font-size:28px;margin:0;color:#e2e8f0;">Engineer</h2>
+          <h2 id="accountUserName" style="font-family:'Bebas Neue',sans-serif;font-size:28px;margin:0;color:var(--text-main);">Engineer</h2>
           <p id="accountUserEmail" style="color:var(--text-muted);font-size:13px;margin:0;"></p>
         </div>
       </div>
 
       <div class="card" style="border:1px solid var(--border-color);padding:20px;margin-bottom:20px;">
         <h3 style="margin:0 0 12px 0;font-size:16px;">Current Access Level</h3>
-        <div id="accountPlanLabel" style="font-size:20px;font-weight:700;color:#00f2fe;margin-bottom:8px;">⭐ Full Access (100% Free)</div>
+        <div id="accountPlanLabel" style="font-size:20px;font-weight:700;color:var(--brand);margin-bottom:8px;">⭐ Full Access (100% Free)</div>
         <div id="accountPlanDetails">
           <p style="color:#10b981;font-size:13px;margin:0;">✅ All Features Fully Unlocked — All 10 virtual IOS labs, 120-question exam drills, and 126 video lectures are permanently accessible.</p>
           <p style="color:var(--text-muted);font-size:12px;margin:4px 0 0 0;">Status: Full Unlocked Access · No subscription or payments required.</p>
@@ -1303,22 +1338,41 @@
     </div>
   </div>
 
-  <script type="module" src="assets/js/app.js?v=77"></script>
+  <script>
+    (function () {
+      try {
+        var p = new URLSearchParams(window.location.search).get("page");
+        if (p && p !== "home" && p !== "admin") {
+          var target = document.getElementById(p);
+          var home = document.getElementById("home");
+          if (target && target.classList.contains("page")) {
+            if (home) home.classList.remove("active");
+            target.classList.add("active");
+            document.body.dataset.activePage = p;
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <script type="module" src="assets/js/app.js?v=78"></script>
 <script>
   if ('serviceWorker' in navigator) {
+    const hadController = Boolean(navigator.serviceWorker.controller);
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!refreshing) {
+      if (hadController && !refreshing) {
         refreshing = true;
         window.location.reload();
       }
     });
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').then(reg => {
-        reg.update();
-      }).catch(err => {
-        console.error('ServiceWorker registration failed: ', err);
-      });
+      setTimeout(() => {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+          if (hadController) reg.update();
+        }).catch(err => {
+          console.warn('ServiceWorker registration failed:', err);
+        });
+      }, 1500);
     });
   }
 </script>

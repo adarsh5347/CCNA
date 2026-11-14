@@ -1,4 +1,4 @@
-import { saveUserProgress } from "./firebase.js?v=77";
+import { saveUserProgress } from "./firebase.js?v=78";
 
 export const STORE = "ccna_full_site_v1";
 
@@ -114,11 +114,12 @@ export function createDefaultAnalytics() {
 }
 
 export function validateAnalyticsSchema(data) {
-  if (!data || typeof data !== 'object') return false;
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
   const requiredNums = ['totalQ', 'correct', 'xp', 'studyMin', 'totalTime', 'labsCompleted', 'subnetMaxStreak', 'streak'];
   for (const key of requiredNums) {
-    if (typeof data[key] !== 'number' || isNaN(data[key])) return false;
+    if (typeof data[key] !== 'number' || !Number.isFinite(data[key]) || data[key] < 0) return false;
   }
+  if (data.lastAttemptDate != null && typeof data.lastAttemptDate !== 'string') return false;
   if (!data.simPathsRun || typeof data.simPathsRun !== 'object') return false;
   if (!Array.isArray(data.missedIds)) return false;
   if (data.completedLabIds && !Array.isArray(data.completedLabIds)) return false;
@@ -137,7 +138,8 @@ export function loadAnalytics() {
     const key = (typeof state !== 'undefined' && state && state.user) ? `${STORE}_${state.user.uid}` : STORE;
     const raw = localStorage.getItem(key);
     if (!raw) return base;
-    return migrateBankVersion({ ...base, ...JSON.parse(raw), bankVersion: JSON.parse(raw).bankVersion });
+    const parsed = JSON.parse(raw);
+    return migrateBankVersion({ ...base, ...parsed, bankVersion: parsed.bankVersion });
   } catch {
     return base;
   }
@@ -156,7 +158,6 @@ export function saveAnalytics(quiet = false) {
       saveUserProgress(state.user.uid, state.analytics)
         .then((synced) => {
           if (!quiet) showToast(synced ? "Telemetry synced to Cloud" : "Telemetry saved locally", synced ? "ok" : "info");
-
         })
         .catch(err => {
           console.error("Cloud sync failed:", err);
@@ -269,17 +270,92 @@ export function gainXP(amount) {
   }
 }
 
+export function getSavedSessionStorageKey() {
+  const uid = (typeof state !== "undefined" && state && state.user) ? state.user.uid : "guest";
+  return `ccna_saved_session_${uid}`;
+}
+
+export function clearSavedSessionStorage() {
+  try { sessionStorage.removeItem("ccna_session"); } catch (e) {}
+  try { localStorage.removeItem(getSavedSessionStorageKey()); } catch (e) {}
+}
+
+export function normalizeRestoredSession(saved) {
+  if (!saved || typeof saved !== "object") return null;
+  const currentUid = state.user ? state.user.uid : "guest";
+  if (saved.bankVersion !== BANK_VERSION || (saved.uid && saved.uid !== currentUid)) {
+    return null;
+  }
+  if (saved.submitted || !Array.isArray(saved.questions) || saved.questions.length === 0) {
+    return null;
+  }
+  if (saved.answers && !Array.isArray(saved.answers)) {
+    const arr = new Array(saved.questions.length).fill(null);
+    Object.keys(saved.answers).forEach((key) => {
+      const idx = Number(key);
+      if (!isNaN(idx) && idx >= 0 && idx < arr.length) {
+        arr[idx] = saved.answers[key];
+      }
+    });
+    saved.answers = arr;
+  } else if (!Array.isArray(saved.answers)) {
+    saved.answers = new Array(saved.questions.length).fill(null);
+  }
+  saved.idx = Math.max(0, Math.min(saved.questions.length - 1, Number(saved.idx) || 0));
+  saved.flagged = saved.flagged && typeof saved.flagged === "object" ? saved.flagged : {};
+  saved.revealed = saved.revealed && typeof saved.revealed === "object" ? saved.revealed : {};
+  saved.feedback = saved.feedback && typeof saved.feedback === "object" ? saved.feedback : {};
+  saved.statsApplied = saved.statsApplied && typeof saved.statsApplied === "object" ? saved.statsApplied : {};
+  saved.timerPaused = Boolean(saved.timerPaused);
+  if (!saved.totalDurationSec) {
+    saved.totalDurationSec = (Number(saved.minutes) || Math.ceil((Number(saved.timeLeft) || 60) / 60)) * 60;
+  }
+  if (saved.timerPaused) {
+    saved.timeLeft = Math.max(1, Number(saved.timeLeft) || saved.totalDurationSec);
+    saved.deadlineAt = Date.now() + saved.timeLeft * 1000;
+  } else if (typeof saved.deadlineAt === "number" && saved.deadlineAt > 0) {
+    saved.timeLeft = Math.max(0, Math.round((saved.deadlineAt - Date.now()) / 1000));
+  } else {
+    saved.timeLeft = Math.max(0, Number(saved.timeLeft) || saved.totalDurationSec);
+    saved.deadlineAt = Date.now() + saved.timeLeft * 1000;
+  }
+  return saved;
+}
+
+export function getSavedUnfinishedSession() {
+  if (state.session && !state.session.submitted) {
+    return state.session;
+  }
+  for (const raw of [
+    (() => { try { return sessionStorage.getItem("ccna_session"); } catch { return null; } })(),
+    (() => { try { return localStorage.getItem(getSavedSessionStorageKey()); } catch { return null; } })()
+  ]) {
+    if (!raw) continue;
+    try {
+      const normalized = normalizeRestoredSession(JSON.parse(raw));
+      if (normalized) return normalized;
+    } catch {}
+  }
+  return null;
+}
+
 export function persistSession() {
   if (!state || !state.session || state.session.submitted) {
-    try {
-      sessionStorage.removeItem("ccna_session");
-    } catch (e) {}
+    clearSavedSessionStorage();
     return;
   }
   try {
     const copy = { ...state.session, bankVersion: BANK_VERSION, uid: state.user ? state.user.uid : "guest" };
     delete copy.timer;
-    sessionStorage.setItem("ccna_session", JSON.stringify(copy));
+    const serialized = JSON.stringify(copy);
+    try {
+      sessionStorage.setItem("ccna_session", serialized);
+    } catch (e) {}
+    try {
+      localStorage.setItem(getSavedSessionStorageKey(), serialized);
+    } catch (e) {
+      // Fallback: keep lightweight copy without duplicating if quota exceeded
+    }
   } catch (e) {
     console.error("Session persistence failed:", e);
   }

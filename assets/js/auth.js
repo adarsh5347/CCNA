@@ -1,6 +1,7 @@
-import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgress, mergeProgress } from "./firebase.js?v=77";
-import { state, STORE, authResolve, safeSetStorage, showToast, createDefaultAnalytics, byId, getLevelInfo, migrateBankVersion } from "./core.js?v=77";
-import { loadSubscription, renderSubscriptionBadge, createDefaultSubscription } from "./subscription.js?v=77";
+import { loginWithGoogle, logout, onAuthChange, saveUserProgress, loadUserProgress, mergeProgress } from "./firebase.js?v=78";
+import { state, STORE, authResolve, safeSetStorage, showToast, createDefaultAnalytics, byId, getLevelInfo, migrateBankVersion, clearSavedSessionStorage } from "./core.js?v=78";
+import { loadSubscription, renderSubscriptionBadge, createDefaultSubscription } from "./subscription.js?v=78";
+import { normalizeDateStr } from "./streak.js?v=78";
 
 // We need these UI functions from app.js / global scope
 function refreshUI() {
@@ -70,6 +71,7 @@ export function setupAuth() {
   onAuthChange(async (user) => {
     try {
       const wasSignedIn = Boolean(previousUid);
+      const signedOutUid = previousUid;
       state.user = user;
       if (user) {
         previousUid = user.uid;
@@ -129,8 +131,8 @@ export function setupAuth() {
           merged.totalTime = merged.totalTime || 0;
           merged.studyMin = merged.studyMin || 0;
           merged.xp = merged.xp || 0;
-          merged.streak = merged.streak || 0;
-          merged.lastAttemptDate = merged.lastAttemptDate || null;
+          merged.streak = Math.max(0, Number(merged.streak) || 0);
+          merged.lastAttemptDate = normalizeDateStr(merged.lastAttemptDate) || null;
           merged.ach = merged.ach || {};
           merged.missedIds = merged.missedIds || [];
           merged.simPathsRun = merged.simPathsRun || { ospf: false, roas: false };
@@ -177,9 +179,10 @@ export function setupAuth() {
           previousUid = null;
           localStorage.removeItem(`${STORE}_backup`);
           localStorage.removeItem(STORE);
-          try {
-            sessionStorage.removeItem("ccna_session");
-          } catch (e) {}
+          if (signedOutUid) {
+            try { localStorage.removeItem(`ccna_saved_session_${signedOutUid}`); } catch (e) {}
+          }
+          clearSavedSessionStorage();
           if (state.session) {
             clearInterval(state.session.timer);
             state.session = null;
@@ -196,7 +199,11 @@ export function setupAuth() {
               console.error("Error parsing guest progress:", e);
             }
           }
-          state.analytics = migrateBankVersion(parsedGuest || createDefaultAnalytics());
+          const base = createDefaultAnalytics();
+          state.analytics = migrateBankVersion(parsedGuest ? { ...base, ...parsedGuest, bankVersion: parsedGuest.bankVersion } : base);
+          if (state.analytics.lastAttemptDate) {
+            state.analytics.lastAttemptDate = normalizeDateStr(state.analytics.lastAttemptDate);
+          }
         }
 
         state.analytics.missedIds = state.analytics.missedIds || [];

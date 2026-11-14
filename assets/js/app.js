@@ -16,14 +16,16 @@ import {
   createDefaultAnalytics, 
   loadAnalytics,
   persistSession,
-  BANK_VERSION
-} from "./core.js?v=77";
+  BANK_VERSION,
+  getSavedUnfinishedSession,
+  clearSavedSessionStorage
+} from "./core.js?v=78";
 
 import { 
   setupAuth, 
   updateHeaderProfile 
-} from "./auth.js?v=77";
-import { saveSupportTicket } from "./firebase.js?v=77";
+} from "./auth.js?v=78";
+import { saveSupportTicket } from "./firebase.js?v=78";
 
 import { 
   submitSubnet, 
@@ -35,7 +37,7 @@ import {
   renderSubnetLeaderboard, 
   updateSubnetLeaderboard,
   makeSubnetQuestion
-} from "./subnetting.js?v=77";
+} from "./subnetting.js?v=78";
 
 import { 
   setupTraversalSimulator, 
@@ -48,7 +50,7 @@ import {
   showOsiLayerDetail,
   updateOsiLabels,
   highlightNode
-} from "./topology.js?v=77";
+} from "./topology.js?v=78";
 
 import { 
   setupCanvasConstellation, 
@@ -79,16 +81,32 @@ import {
   toMMSS,
   markCurrent,
   startSessionTimer,
-  startChapterSession
-} from "./quiz-engine.js?v=81";
+  stopSessionTimer,
+  toggleTimerPause,
+  startChapterSession,
+  resumeSavedSession,
+  discardSavedSession,
+  renderResumeQuizBanner,
+  exportAnalyticsProgress,
+  importAnalyticsFromFile
+} from "./quiz-engine.js?v=83";
 
 import { generateBank, blueprint } from "./data.js?v=77";
 import { labs } from "./labs.js?v=77";
 import { ccnaVideos } from "./videos.js?v=77";
-import { checkPremiumGate, isPremium, showUpgradeModal, initiateCheckout } from "./subscription.js?v=77";
-import { renderAccountPage } from "./account.js?v=77";
-import { renderAdminDashboard, checkAdminStatus, setupAdminGrantForm, isAdmin } from "./admin.js?v=77";
-import { initStudyGuide } from "./guide-ui.js?v=77";
+import { checkPremiumGate, isPremium, showUpgradeModal, initiateCheckout } from "./subscription.js?v=78";
+import { renderAccountPage } from "./account.js?v=78";
+import { renderAdminDashboard, checkAdminStatus, setupAdminGrantForm, isAdmin } from "./admin.js?v=78";
+
+let _guideUiPromise = null;
+function ensureStudyGuideInit() {
+  if (!_guideUiPromise) {
+    _guideUiPromise = import("./guide-ui.js?v=84");
+  }
+  return _guideUiPromise
+    .then((m) => m.initStudyGuide())
+    .catch((err) => console.warn("Study guide load failed:", err));
+}
 
 // Make sure other legacy files or script tags can find these methods on window
 window.setPage = setPage;
@@ -100,15 +118,79 @@ window.showOsiLayerDetail = showOsiLayerDetail;
 window.updateOsiLabels = updateOsiLabels;
 window.showUpgradeModal = showUpgradeModal;
 window.initiateCheckout = initiateCheckout;
+window.toggleTimerPause = toggleTimerPause;
+window.exportAnalyticsProgress = exportAnalyticsProgress;
+window.importAnalyticsFromFile = importAnalyticsFromFile;
 // Exposed for cross-module call from quiz-engine.js after renderQuestion
 window.setupScrollCollapseHeader = setupScrollCollapseHeader;
 window.syncHeaderHeight = syncHeaderHeight;
+
+/* ─── Theme Management (Dark / Light) ──────────────────────────────────────── */
+const THEME_STORAGE_KEY = "ccna_theme";
+
+export function getEffectiveTheme() {
+  try {
+    const saved = localStorage.getItem(THEME_STORAGE_KEY);
+    if (saved === "light" || saved === "dark") return saved;
+  } catch {}
+  if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) {
+    return "light";
+  }
+  return "dark";
+}
+
+export function applyTheme(theme, persist = false) {
+  const resolved = theme === "light" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", resolved);
+  if (document.body) {
+    document.body.setAttribute("data-theme", resolved);
+  }
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) {
+    metaTheme.setAttribute("content", resolved === "light" ? "#f8fafc" : "#060913");
+  }
+  if (persist) {
+    safeSetStorage(localStorage, THEME_STORAGE_KEY, resolved);
+  }
+  updateThemeButton(resolved);
+}
+
+function updateThemeButton(currentTheme = getEffectiveTheme()) {
+  const btn = byId("btnThemeToggle");
+  if (!btn) return;
+  const isLight = currentTheme === "light";
+  btn.textContent = isLight ? "🌙" : "☀️";
+  const label = isLight ? "Switch to dark theme" : "Switch to light theme";
+  btn.setAttribute("title", label);
+  btn.setAttribute("aria-label", label);
+  btn.setAttribute("aria-pressed", isLight ? "true" : "false");
+}
+
+export function toggleTheme() {
+  const next = getEffectiveTheme() === "light" ? "dark" : "light";
+  applyTheme(next, true);
+  playNetSound("click");
+  showToast(next === "light" ? "Light theme enabled" : "Dark theme enabled", "info", 1800);
+}
+
+window.applyTheme = applyTheme;
+window.toggleTheme = toggleTheme;
 
 function handleEngineKeyDown(e) {
   if (!state.session || state.session.submitted) return;
   const tag = document.activeElement ? document.activeElement.tagName : "";
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
   if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+  // KeyP toggles timer pause/resume
+  if (e.code === "KeyP") {
+    e.preventDefault();
+    toggleTimerPause(() => renderQuestion());
+    return;
+  }
+
+  // Block all other quiz shortcuts while paused
+  if (state.session.timerPaused) return;
 
   const q = state.session.questions[state.session.idx];
   if (!q) return;
@@ -119,7 +201,7 @@ function handleEngineKeyDown(e) {
     e.preventDefault();
     const optIdx = keyMap[e.code];
     const opts = document.querySelectorAll(".opt input[type='radio'], .opt input[type='checkbox']");
-    if (opts[optIdx]) {
+    if (opts[optIdx] && !opts[optIdx].disabled) {
       opts[optIdx].click();
     }
     return;
@@ -130,20 +212,19 @@ function handleEngineKeyDown(e) {
     case "KeyN": {
       e.preventDefault();
       const nb = byId("nextQ") || byId("saveNext");
-      if (nb && !nb.disabled) nb.click();
+      if (nb && !nb.disabled && nb.style.display !== "none") nb.click();
       break;
     }
-    case "ArrowLeft":
-    case "KeyP": {
+    case "ArrowLeft": {
       e.preventDefault();
       const pb = byId("prevQ");
-      if (pb && !pb.disabled) pb.click();
+      if (pb && !pb.disabled && pb.style.display !== "none") pb.click();
       break;
     }
     case "KeyF": {
       e.preventDefault();
       const fb = byId("toggleMark");
-      if (fb) {
+      if (fb && !fb.disabled && fb.style.display !== "none") {
         fb.click();
         const isFlagged = state.session.flagged[state.session.idx];
         showToast(isFlagged ? "Question flagged for review" : "Flag removed", "info", 1800);
@@ -210,13 +291,10 @@ export function setPage(page, push = true) {
     state.subnet.timerRef = null;
   }
 
-  // Clear active study/exam session if navigating away from engine page
+  // When navigating away from engine with an unfinished session, pause timer and persist
+  // so the user can resume from Home ("Resume quiz?") or after reload without losing progress.
   if (page !== "engine" && state.session && !state.session.submitted) {
-    if (!confirm("You have an active quiz session. Are you sure you want to leave? Your progress will be lost.")) return;
-    if (state.session.timer) clearInterval(state.session.timer);
-    const headerTimerEl = byId("headerTimer");
-    if (headerTimerEl) headerTimerEl.classList.add("hidden");
-    state.session = null;
+    stopSessionTimer();
     persistSession();
   }
 
@@ -242,11 +320,14 @@ export function setPage(page, push = true) {
     btn.classList.toggle("active", btn.dataset.page === page);
   });
 
+  if (page === "home") {
+    renderResumeQuizBanner();
+  }
   if (page === "analytics") {
     renderAnalytics();
     renderAchievements();
   }
-  if (page === "guide") initStudyGuide();
+  if (page === "guide") ensureStudyGuideInit();
   if (page === "subnet") ensureSubnetInit();
   if (page === "videos") ensureVideosInit();
   if (page === "labs") ensureLabsInit();
@@ -257,36 +338,29 @@ export function setPage(page, push = true) {
 }
 
 function restoreSession() {
-  const raw = sessionStorage.getItem("ccna_session");
-  if (!raw) return false;
+  const saved = getSavedUnfinishedSession();
+  if (!saved || saved.submitted) return false;
   try {
-    const saved = JSON.parse(raw);
-    const currentUid = state.user ? state.user.uid : "guest";
-    if (saved && ((saved.bankVersion !== BANK_VERSION) || (saved.uid && saved.uid !== currentUid))) {
-      // Saved against an older question bank: ids/questions no longer match, so drop it.
-      sessionStorage.removeItem("ccna_session");
-      return false;
-    }
-    if (saved && !saved.submitted) {
-      if (saved.answers && !Array.isArray(saved.answers)) {
-        const arr = new Array(saved.questions.length).fill(null);
-        Object.keys(saved.answers).forEach(key => {
-          const idx = Number(key);
-          if (!isNaN(idx) && idx >= 0 && idx < arr.length) {
-            arr[idx] = saved.answers[key];
-          }
-        });
-        saved.answers = arr;
-      }
-      state.session = saved;
-      startSessionTimer();
-      
-      setPage("engine");
-      byId("reviewArea").classList.add("hidden");
-      byId("resultArea").classList.add("hidden");
-      byId("questionArea").classList.remove("hidden");
+    state.session = saved;
+    renderResumeQuizBanner();
+
+    const initialPage = new URLSearchParams(window.location.search).get("page");
+    const shouldAutoOpenEngine = initialPage === "engine" || (!initialPage && Boolean(sessionStorage.getItem("ccna_session")));
+
+    if (shouldAutoOpenEngine) {
+      const modeTitleEl = byId("modeTitle");
+      if (modeTitleEl) modeTitleEl.textContent = saved.title || "Practice Session";
+      const modeDescEl = byId("modeDesc");
+      if (modeDescEl) modeDescEl.textContent = saved.desc || "";
+
+      byId("timer")?.classList.remove("hidden");
+      setPage("engine", false);
+      byId("reviewArea")?.classList.add("hidden");
+      byId("resultArea")?.classList.add("hidden");
+      byId("questionArea")?.classList.remove("hidden");
       const examFooter = byId("examFooter") || document.querySelector(".exam-footer");
       if (examFooter) examFooter.style.display = "flex";
+      startSessionTimer();
       renderNavigator();
       renderQuestion();
       return true;
@@ -364,7 +438,10 @@ function updateMuteButton() {
   const btn = byId("btnMuteToggle");
   if (btn) {
     btn.textContent = state.muted ? "🔇" : "🔊";
-    btn.setAttribute("title", state.muted ? "Unmute Sound" : "Mute Sound");
+    const label = state.muted ? "Unmute sound effects" : "Mute sound effects";
+    btn.setAttribute("title", label);
+    btn.setAttribute("aria-label", label);
+    btn.setAttribute("aria-pressed", state.muted ? "true" : "false");
   }
 }
 
@@ -372,7 +449,10 @@ function updateContrastButton() {
   document.body.classList.toggle("high-contrast", state.highContrast);
   const btn = byId("btnToggleContrast");
   if (btn) {
-    btn.setAttribute("title", state.highContrast ? "Disable High Contrast" : "Enable High Contrast");
+    const label = state.highContrast ? "Disable high contrast mode" : "Enable high contrast mode";
+    btn.setAttribute("title", label);
+    btn.setAttribute("aria-label", label);
+    btn.setAttribute("aria-pressed", state.highContrast ? "true" : "false");
   }
 }
 
@@ -427,6 +507,57 @@ function wireEvents() {
     });
   }
 
+  const btnTheme = byId("btnThemeToggle");
+  if (btnTheme) {
+    btnTheme.addEventListener("click", () => {
+      toggleTheme();
+    });
+  }
+
+  if (window.matchMedia) {
+    const mq = window.matchMedia("(prefers-color-scheme: light)");
+    const onSchemeChange = (e) => {
+      if (!localStorage.getItem(THEME_STORAGE_KEY)) {
+        applyTheme(e.matches ? "light" : "dark", false);
+      }
+    };
+    if (typeof mq.addEventListener === "function") {
+      mq.addEventListener("change", onSchemeChange);
+    }
+  }
+
+  // Analytics Export / Import Progress controls (Home + Analytics page)
+  ["btnExportProgress", "btnHomeExportProgress"].forEach((id) => {
+    const btn = byId(id);
+    if (btn) {
+      btn.addEventListener("click", () => {
+        playNetSound("click");
+        exportAnalyticsProgress();
+      });
+    }
+  });
+
+  const importInput = byId("importProgressInput");
+  ["btnImportProgress", "btnHomeImportProgress"].forEach((id) => {
+    const btn = byId(id);
+    if (btn && importInput) {
+      btn.addEventListener("click", () => {
+        playNetSound("click");
+        importInput.value = "";
+        importInput.click();
+      });
+    }
+  });
+
+  if (importInput) {
+    importInput.addEventListener("change", async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        await importAnalyticsFromFile(file);
+      }
+      importInput.value = "";
+    });
+  }
 
   const chkTrouble = byId("chkTroubleshooting");
   if (chkTrouble) {
@@ -488,9 +619,10 @@ function wireEvents() {
   const exitBtn = byId("exitSession");
   if (exitBtn) {
     exitBtn.addEventListener("click", () => {
-      if (state.session?.timer) clearInterval(state.session.timer);
-      const timerEl = byId("timer");
-      if (timerEl) timerEl.classList.add("hidden");
+      if (state.session && !state.session.submitted) {
+        stopSessionTimer();
+        persistSession();
+      }
       setPage("home");
     });
   }
@@ -532,8 +664,8 @@ function wireEvents() {
   const btnCloseNav = byId("btnCloseSidebar");
   if (sidebarNav && btnToggleNav && btnCloseNav) {
     btnToggleNav.addEventListener("click", () => {
-      sidebarNav.classList.add("active");
-      byId("examNavBackdrop")?.classList.add("active");
+      const isOpen = sidebarNav.classList.toggle("active");
+      byId("examNavBackdrop")?.classList.toggle("active", isOpen);
     });
     btnCloseNav.addEventListener("click", () => {
       sidebarNav.classList.remove("active");
@@ -551,7 +683,7 @@ function wireEvents() {
   const qNavEl = byId("qNav");
   if (qNavEl && sidebarNav) {
     qNavEl.addEventListener("click", (e) => {
-      if (window.innerWidth <= 768 && e.target.closest("button")) {
+      if (e.target.closest("button")) {
         sidebarNav.classList.remove("active");
         byId("examNavBackdrop")?.classList.remove("active");
       }
@@ -573,7 +705,7 @@ function wireEvents() {
       } else if (target === "practice") {
         closeMobileMoreSheet();
         if (state.session && !state.session.submitted) {
-          setPage("engine");
+          resumeSavedSession();
         } else {
           setPage("home");
           syncMobileBottomNav("home", "practice");
@@ -724,9 +856,9 @@ function wireEvents() {
       if (confirm("Are you sure you want to reset all your progress statistics? A local recovery backup will be created before resetting.")) {
         const key = state.user ? `${STORE}_${state.user.uid}` : STORE;
         safeSetStorage(localStorage, `${key}_pre_reset_backup`, JSON.stringify({ at: new Date().toISOString(), analytics: state.analytics }));
-        try { sessionStorage.removeItem("ccna_session"); } catch (e) {}
+        clearSavedSessionStorage();
         if (state.session) {
-          clearInterval(state.session.timer);
+          stopSessionTimer();
           state.session = null;
         }
         state.analytics = createDefaultAnalytics();
@@ -1342,6 +1474,7 @@ function renderPricingPage() {
 window.renderPricingPage = renderPricingPage;
 
 function init() {
+  applyTheme(getEffectiveTheme(), false);
   state.bank = generateBank(rand);
   state.analytics = loadAnalytics();
   navSetup();
@@ -1357,6 +1490,7 @@ function init() {
   
   updateMuteButton();
   updateContrastButton();
+  updateThemeButton();
 
   // Restore active quiz session if user refreshed mid-exam
   const sessionRestored = restoreSession();
@@ -1402,25 +1536,16 @@ function init() {
     }
   });
 
-  window.addEventListener("beforeunload", (e) => {
+  window.addEventListener("beforeunload", () => {
     if (state.session && !state.session.submitted) {
-      e.preventDefault();
-      e.returnValue = "You have an active CCNA quiz session. Are you sure you want to leave?";
-      return e.returnValue;
-    }
-    if (state.subnet && state.subnet.timerRef) {
-      e.preventDefault();
-      e.returnValue = "You have an active subnetting challenge running. Are you sure you want to leave?";
-      return e.returnValue;
+      persistSession();
     }
   });
 
   window.addEventListener("popstate", (e) => {
     if (state.session && !state.session.submitted) {
-      if (!confirm("You have an active CCNA quiz session. Are you sure you want to leave? Your progress will be lost.")) {
-        history.pushState({ page: "engine" }, "", "?page=engine");
-        return;
-      }
+      stopSessionTimer();
+      persistSession();
     }
     const page = (e.state && e.state.page) ? e.state.page : "home";
     setPage(page, false);
@@ -1576,7 +1701,7 @@ function renderVideos() {
     const safeDesc = safeHTML(v.description);
     const safeDur = safeHTML(v.duration);
     return `
-      <article class="card video-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 16px; border: 1.5px solid ${isWatched ? "rgba(16, 185, 129, 0.3)" : "var(--border-color)"}; background: rgba(13, 19, 36, 0.4); position: relative; transition: border-color 0.2s;">
+      <article class="card video-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 16px; border: 1.5px solid ${isWatched ? "rgba(16, 185, 129, 0.3)" : "var(--border-color)"}; background: var(--bg-card, rgba(13, 19, 36, 0.4)); position: relative; transition: border-color 0.2s;">
         <div>
           <div class="video-thumbnail-container" data-video-id="${v.id}" style="position: relative; width: 100%; padding-bottom: 56.25%; background: rgba(0,0,0,0.6); border-radius: 8px; margin-bottom: 12px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; display: flex; align-items: center; justify-content: center;">
             <img src="https://img.youtube.com/vi/${safeYid}/mqdefault.jpg" alt="${safeTitle}" loading="lazy" decoding="async" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.75; transition: transform 0.3s;" />
@@ -1591,7 +1716,7 @@ function renderVideos() {
               Watched
             </label>
           </div>
-          <h4 style="margin: 6px 0 8px 0; font-size: 14px; line-height: 1.4; color: #fff;">${safeTitle}</h4>
+          <h4 style="margin: 6px 0 8px 0; font-size: 14px; line-height: 1.4; color: var(--text);">${safeTitle}</h4>
           <p style="margin: 0 0 12px 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">${safeDesc}</p>
         </div>
         <button class="primary btn-watch-video" data-youtube-id="${safeYid}" data-video-title="${safeTitle}" data-video-id="${v.id}" style="width: 100%; font-size: 12px; padding: 8px;">Watch Lesson</button>

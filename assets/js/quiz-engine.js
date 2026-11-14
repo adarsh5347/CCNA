@@ -1,6 +1,67 @@
-import { state, byId, playNetSound, gainXP, saveAnalytics, safeHTML, pick, rand, shuffle, showToast, persistSession } from "./core.js?v=77";
+import {
+  state,
+  byId,
+  playNetSound,
+  gainXP,
+  saveAnalytics,
+  safeHTML,
+  pick,
+  rand,
+  shuffle,
+  showToast,
+  persistSession,
+  validateAnalyticsSchema,
+  createDefaultAnalytics,
+  migrateBankVersion,
+  getSavedUnfinishedSession,
+  clearSavedSessionStorage
+} from "./core.js?v=78";
 import { blueprint, generateBank } from "./data.js?v=77";
 import { ccnaVideos } from "./videos.js?v=77";
+import {
+  toMMSS,
+  startSessionTimer,
+  toggleTimerPause,
+  updateTimerDisplay,
+  stopSessionTimer,
+  registerTimerHandlers
+} from "./timer.js?v=78";
+import {
+  getLocalDateStr,
+  normalizeDateStr,
+  getCalendarDayDiff,
+  getDisplayStreak,
+  getStreakBadgeInfo,
+  updateStreakOnAttempt
+} from "./streak.js?v=78";
+import {
+  openReview,
+  closeReview,
+  formatQuestionAnswer,
+  buildFinishReviewHTML,
+  wireFinishReviewInteractions,
+  registerReviewHandlers,
+  isQuestionAnswered
+} from "./review.js?v=83";
+
+export {
+  toMMSS,
+  startSessionTimer,
+  toggleTimerPause,
+  updateTimerDisplay,
+  stopSessionTimer,
+  getLocalDateStr,
+  normalizeDateStr,
+  getCalendarDayDiff,
+  getDisplayStreak,
+  getStreakBadgeInfo,
+  updateStreakOnAttempt,
+  openReview,
+  closeReview,
+  formatQuestionAnswer,
+  buildFinishReviewHTML,
+  wireFinishReviewInteractions
+};
 
 // We need these utility page/navigation functions from app.js / global scope
 // Question bank text uses light markdown (`code` and **bold**); escape first, then render it.
@@ -16,11 +77,16 @@ function setPage(pageId) {
   if (window.setPage) window.setPage(pageId);
 }
 
-export function toMMSS(sec) {
-  const m = Math.floor(Math.max(0, sec) / 60).toString().padStart(2, "0");
-  const s = Math.floor(Math.max(0, sec) % 60).toString().padStart(2, "0");
-  return `${m}:${s}`;
-}
+registerTimerHandlers({
+  onTimeout: () => submitSession(true),
+  onPauseRender: () => renderQuestion()
+});
+
+registerReviewHandlers({
+  onJump: (idx) => navToQuestion(idx),
+  onSubmit: (force) => submitSession(force),
+  onRenderQuestion: () => renderQuestion()
+});
 
 export function readinessScore() {
   const a = state.analytics;
@@ -72,8 +138,98 @@ export function calcDomainAccuracy() {
 export function renderStatsCards(targetId, cards) {
   const el = byId(targetId);
   if (el) {
-    el.innerHTML = cards.map((c) => `<div class="stat"><div class="k">${c.k}</div><div class="v">${c.v}</div></div>`).join("");
+    el.innerHTML = cards.map((c) => {
+      const strVal = String(c.v ?? "");
+      const isLongText = strVal.length > 12;
+      return `<div class="stat"><div class="k">${c.k}</div><div class="v"${isLongText ? ' style="font-size: 16px; line-height: 1.35; overflow-wrap: anywhere;"' : ""}>${c.v}</div></div>`;
+    }).join("");
   }
+}
+
+export function resumeSavedSession() {
+  const saved = getSavedUnfinishedSession();
+  if (!saved || saved.submitted) return false;
+  ensureBank();
+  state.session = saved;
+
+  const modeTitleEl = byId("modeTitle");
+  if (modeTitleEl) modeTitleEl.textContent = saved.title || "Practice Session";
+  const modeDescEl = byId("modeDesc");
+  if (modeDescEl) modeDescEl.textContent = saved.desc || "";
+
+  byId("timer")?.classList.remove("hidden");
+  persistSession();
+  setPage("engine");
+  byId("reviewArea")?.classList.add("hidden");
+  byId("resultArea")?.classList.add("hidden");
+  byId("questionArea")?.classList.remove("hidden");
+  const examFooter = byId("examFooter") || document.querySelector(".exam-footer");
+  if (examFooter) examFooter.style.display = "flex";
+
+  startSessionTimer();
+  renderNavigator();
+  renderQuestion();
+  return true;
+}
+
+export function discardSavedSession() {
+  stopSessionTimer();
+  state.session = null;
+  clearSavedSessionStorage();
+  renderResumeQuizBanner();
+  showToast("Unfinished quiz session discarded.", "info");
+}
+
+export function renderResumeQuizBanner() {
+  const homeSection = byId("home");
+  if (!homeSection) return;
+  let banner = byId("resumeQuizBanner");
+  if (!banner) {
+    banner = document.createElement("div");
+    banner.id = "resumeQuizBanner";
+    banner.className = "card resume-banner hidden";
+    banner.setAttribute("role", "region");
+    banner.setAttribute("aria-label", "Resume unfinished quiz");
+    homeSection.insertBefore(banner, homeSection.firstElementChild);
+  }
+
+  const saved = getSavedUnfinishedSession();
+  if (!saved || saved.submitted || !Array.isArray(saved.questions) || saved.questions.length === 0) {
+    banner.classList.add("hidden");
+    banner.innerHTML = "";
+    return;
+  }
+
+  const totalQ = saved.questions.length;
+  const curQ = Math.min(totalQ, (Number(saved.idx) || 0) + 1);
+  const answeredCount = saved.questions.filter((q, i) => isQuestionAnswered(q, saved.answers?.[i])).length;
+  const remTime = toMMSS(saved.timeLeft || 0);
+
+  banner.innerHTML = `
+    <div class="resume-banner-inner">
+      <div class="resume-banner-info">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
+          <span class="badge" style="border-color:rgba(0,242,254,0.45);color:var(--brand);margin:0;">⏸ Unfinished Quiz</span>
+          <strong style="font-size:15px;">Resume quiz? — ${safeHTML(saved.title || "Practice Quiz")}</strong>
+        </div>
+        <p class="muted" style="margin:0; font-size:13px;">
+          Question ${curQ} of ${totalQ} &nbsp;·&nbsp; ${answeredCount}/${totalQ} answered &nbsp;·&nbsp; ⏱ ${remTime} left${saved.timerPaused ? " (Paused)" : ""}
+        </p>
+      </div>
+      <div class="resume-banner-actions">
+        <button type="button" id="btnResumeSavedQuiz" class="primary" aria-label="Resume unfinished quiz">▶ Resume Quiz</button>
+        <button type="button" id="btnDiscardSavedQuiz" class="secondary" aria-label="Discard unfinished quiz">✕ Discard</button>
+      </div>
+    </div>
+  `;
+  banner.classList.remove("hidden");
+
+  byId("btnResumeSavedQuiz")?.addEventListener("click", () => {
+    resumeSavedSession();
+  });
+  byId("btnDiscardSavedQuiz")?.addEventListener("click", () => {
+    discardSavedSession();
+  });
 }
 
 export function renderHome() {
@@ -96,9 +252,14 @@ export function renderHome() {
   if (heroReadinessBar) heroReadinessBar.style.width = `${rs}%`;
   if (heroQuestions) heroQuestions.textContent = state.analytics.totalQ || 0;
   if (heroQuizzes) heroQuizzes.textContent = state.analytics.attempts ? state.analytics.attempts.length : 0;
-  if (heroStreak) heroStreak.textContent = `${state.analytics.streak || 0} Days`;
+  if (heroStreak) {
+    const streakInfo = getStreakBadgeInfo(getDisplayStreak(state.analytics));
+    heroStreak.innerHTML = streakInfo.html;
+  }
   if (heroLabs) heroLabs.textContent = `${state.analytics.labsCompleted || 0} / 10`;
   
+  renderResumeQuizBanner();
+
   if (window.updateHeaderProfile) window.updateHeaderProfile();
 
   const bankLength = state.bank ? state.bank.length : 0;
@@ -279,8 +440,9 @@ export function startChapterSession(chapterId, chapterTitle = "") {
 
   showToast(`${conf.title} initiated (${chQs.length} questions).`, "info", 3000);
 
-  if (state.session && state.session.timer) clearInterval(state.session.timer);
+  stopSessionTimer();
 
+  const totalDurationSec = conf.minutes * 60;
   state.session = {
     mode: "study",
     chapterId,
@@ -288,12 +450,16 @@ export function startChapterSession(chapterId, chapterTitle = "") {
     idx: 0,
     answers: new Array(conf.questions.length).fill(null),
     flagged: {},
+    revealed: {},
     feedback: {},
     statsApplied: {},
     startedAt: Date.now(),
     qStartAt: Date.now(),
-    timeLeft: conf.minutes * 60,
-    deadlineAt: Date.now() + conf.minutes * 60 * 1000,
+    totalDurationSec,
+    timeLeft: totalDurationSec,
+    deadlineAt: Date.now() + totalDurationSec * 1000,
+    timerPaused: false,
+    pausedAt: null,
     timer: null,
     submitted: false
   };
@@ -304,6 +470,7 @@ export function startChapterSession(chapterId, chapterTitle = "") {
   const modeDescEl = byId("modeDesc");
   if (modeDescEl) modeDescEl.textContent = conf.desc;
 
+  byId("timer")?.classList.remove("hidden");
   startSessionTimer();
 
   setPage("engine");
@@ -402,20 +569,25 @@ export function startSession(mode) {
 
   showToast(`${conf.title} initiated. Practice engine active.`, "info", 3000);
 
-  if (state.session && state.session.timer) clearInterval(state.session.timer);
+  stopSessionTimer();
 
+  const totalDurationSec = conf.minutes * 60;
   state.session = {
     mode,
     ...conf,
     idx: 0,
     answers: new Array(conf.questions.length).fill(null),
     flagged: {},
+    revealed: {},
     feedback: {},
     statsApplied: {},
     startedAt: Date.now(),
     qStartAt: Date.now(),
-    timeLeft: conf.minutes * 60,
-    deadlineAt: Date.now() + conf.minutes * 60 * 1000,
+    totalDurationSec,
+    timeLeft: totalDurationSec,
+    deadlineAt: Date.now() + totalDurationSec * 1000,
+    timerPaused: false,
+    pausedAt: null,
     timer: null,
     submitted: false
   };
@@ -426,6 +598,7 @@ export function startSession(mode) {
   const modeDescEl = byId("modeDesc");
   if (modeDescEl) modeDescEl.textContent = conf.desc;
 
+  byId("timer")?.classList.remove("hidden");
   startSessionTimer();
 
   setPage("engine");
@@ -438,58 +611,11 @@ export function startSession(mode) {
   renderQuestion();
 }
 
-export function startSessionTimer() {
-  if (state.session && state.session.timer) {
-    clearInterval(state.session.timer);
-  }
-  
-  const timerEl = byId("timer");
-  if (!timerEl) return;
-
-  timerEl.classList.remove("hidden", "warn", "danger");
-  timerEl.textContent = toMMSS(state.session.timeLeft);
-
-  let lastWarn = null;
-  let lastDanger = null;
-
-  state.session.timer = setInterval(() => {
-    if (typeof state.session.deadlineAt === "number" && state.session.deadlineAt > 0) {
-      state.session.timeLeft = Math.max(0, Math.round((state.session.deadlineAt - Date.now()) / 1000));
-    } else {
-      state.session.timeLeft = Math.max(0, state.session.timeLeft - 1);
-      state.session.deadlineAt = Date.now() + state.session.timeLeft * 1000;
-    }
-    
-    if (timerEl) {
-      timerEl.textContent = toMMSS(state.session.timeLeft);
-      
-      const isWarn = state.session.timeLeft <= 600 && state.session.timeLeft > 180;
-      const isDanger = state.session.timeLeft <= 180;
-      
-      if (isWarn !== lastWarn) {
-        timerEl.classList.toggle("warn", isWarn);
-        lastWarn = isWarn;
-      }
-      if (isDanger !== lastDanger) {
-        timerEl.classList.toggle("danger", isDanger);
-        lastDanger = isDanger;
-      }
-    }
-    
-    // Throttle sessionStorage writes: only persist every 5 seconds instead of every 1 second
-    if (state.session.timeLeft % 5 === 0) {
-      persistSession();
-    }
-    
-    if (state.session.timeLeft <= 0) {
-      submitSession(true);
-    }
-  }, 1000);
-}
-
 export function navToQuestion(i) {
-  state.session.idx = Math.max(0, Math.min(state.session.questions.length - 1, i));
-  state.session.qStartAt = Date.now();
+  const s = state.session;
+  if (!s) return;
+  s.idx = Math.max(0, Math.min(s.questions.length - 1, i));
+  s.qStartAt = Date.now();
   persistSession();
   renderNavigator();
   renderQuestion();
@@ -500,45 +626,114 @@ export function navToQuestion(i) {
 
   const sidebar = document.querySelector(".left");
   const backdrop = byId("sidebarBackdrop");
+  const examBackdrop = byId("examNavBackdrop");
   if (sidebar && sidebar.classList.contains("active")) {
     sidebar.classList.remove("active");
   }
   if (backdrop && backdrop.classList.contains("active")) {
     backdrop.classList.remove("active");
   }
+  if (examBackdrop && examBackdrop.classList.contains("active")) {
+    examBackdrop.classList.remove("active");
+  }
 }
 
 export function renderNavigator() {
   const s = state.session;
-  byId("qNav").innerHTML = s.questions.map((_, i) => {
-    let cls = "qbtn";
-    if (i === s.idx) cls += " current";
-    if (s.answers[i] != null) cls += " answered";
-    if (s.flagged[i]) cls += " flagged";
-    return `<button class="${cls}" data-qnav="${i}">${i + 1}</button>`;
-  }).join("");
+  if (!s || !Array.isArray(s.questions)) return;
+  if (!s.flagged) s.flagged = {};
+  if (!s.revealed) s.revealed = {};
+
+  const navEl = byId("qNav");
+  if (navEl) {
+    navEl.innerHTML = s.questions.map((q, i) => {
+      const isCurrent = i === s.idx;
+      const isAns = isQuestionAnswered(q, s.answers[i]);
+      const isFlag = Boolean(s.flagged[i]);
+      const isRev = Boolean(s.revealed[i]);
+      let cls = "qbtn";
+      if (isCurrent) cls += " current";
+      if (isAns) cls += " answered";
+      if (isFlag) cls += " flagged";
+      if (isRev) cls += " revealed";
+      const labelParts = [`Question ${i + 1}`];
+      if (isCurrent) labelParts.push("current");
+      if (isAns) labelParts.push("answered");
+      if (isFlag) labelParts.push("flagged");
+      if (isRev) labelParts.push("answer revealed");
+      return `<button type="button" class="${cls}" data-qnav="${i}" aria-label="${labelParts.join(", ")}" aria-current="${isCurrent ? "step" : "false"}">${i + 1}</button>`;
+    }).join("");
+
+    navEl.querySelectorAll("[data-qnav]").forEach((b) => {
+      b.addEventListener("click", () => navToQuestion(Number(b.dataset.qnav)));
+    });
+  }
 
   const qCounterEl = byId("qCounter");
   if (qCounterEl) qCounterEl.textContent = `Q ${s.idx + 1} / ${s.questions.length}`;
-  const answeredCount = s.answers.filter((a) => a != null).length;
+  const answeredCount = s.questions.filter((q, i) => isQuestionAnswered(q, s.answers[i])).length;
+  const flaggedCount = Object.values(s.flagged).filter(Boolean).length;
+  const revealedCount = Object.values(s.revealed).filter(Boolean).length;
   const pct = Math.round(((s.idx + 1) / s.questions.length) * 100);
   const fillEl = byId("progressFill");
   if (fillEl) fillEl.style.width = `${pct}%`;
   const pctEl = byId("progressPct");
   if (pctEl) pctEl.textContent = `${pct}%`;
   const navMetaEl = byId("navMeta");
-  if (navMetaEl) navMetaEl.textContent = `Answered: ${answeredCount} | Flagged: ${Object.values(s.flagged).filter(Boolean).length}`;
-
-  byId("qNav").querySelectorAll("[data-qnav]").forEach((b) => {
-    b.addEventListener("click", () => navToQuestion(Number(b.dataset.qnav)));
-  });
+  if (navMetaEl) {
+    navMetaEl.textContent = `Answered: ${answeredCount} | Flagged: ${flaggedCount}${revealedCount ? ` | Revealed: ${revealedCount}` : ""}`;
+  }
 }
 
 export function markCurrent() {
   const s = state.session;
-  s.flagged[s.idx] = !s.flagged[s.idx];
+  if (!s || s.submitted || s.timerPaused) return;
+  if (!s.flagged) s.flagged = {};
+  const isFlagged = !s.flagged[s.idx];
+  s.flagged[s.idx] = isFlagged;
+  const markBtn = byId("toggleMark");
+  if (markBtn) {
+    markBtn.setAttribute("aria-pressed", isFlagged ? "true" : "false");
+    const mFull = markBtn.querySelector(".btn-full-text");
+    const mMobile = markBtn.querySelector(".btn-mobile-text");
+    if (mFull) mFull.textContent = isFlagged ? "🚩 Unmark Review" : "🚩 Mark For Review";
+    if (mMobile) mMobile.textContent = isFlagged ? "🚩 Unmark" : "🚩 Mark";
+  }
   persistSession();
   renderNavigator();
+}
+
+export function revealCurrentAnswer() {
+  const s = state.session;
+  if (!s || s.submitted || s.timerPaused) return;
+  if (!s.revealed) s.revealed = {};
+  s.revealed[s.idx] = true;
+  persistSession();
+  renderNavigator();
+  renderQuestion();
+}
+
+export function jumpToSubmittedQuestion(idx) {
+  const s = state.session;
+  if (!s) return;
+  s.idx = Math.max(0, Math.min(s.questions.length - 1, Number(idx) || 0));
+  byId("resultArea")?.classList.add("hidden");
+  byId("reviewArea")?.classList.add("hidden");
+  byId("questionArea")?.classList.remove("hidden");
+  const examFooter = byId("examFooter") || document.querySelector(".exam-footer");
+  if (examFooter) examFooter.style.display = "flex";
+  renderNavigator();
+  renderQuestion();
+  window.scrollTo(0, 0);
+}
+
+export function returnToResults() {
+  byId("questionArea")?.classList.add("hidden");
+  byId("reviewArea")?.classList.add("hidden");
+  byId("resultArea")?.classList.remove("hidden");
+  const examFooter = byId("examFooter") || document.querySelector(".exam-footer");
+  if (examFooter) examFooter.style.display = "none";
+  window.scrollTo(0, 0);
 }
 
 export function answerEquals(q, ans) {
@@ -580,6 +775,7 @@ export function applyStats(q, ok, sec = 0) {
     if (ok) a.chapter[q.chapter].correct += 1;
   }
 }
+
 // Question topic -> video hub topic. Question topics come from the blueprint; video topics use
 // the hub's own category names, so a plain string match misses most of them.
 const VIDEO_TOPIC_MAP = {
@@ -610,8 +806,8 @@ function formatChapterBadge(chapterId) {
   return m ? `OCG Vol ${m[1]} Ch ${Number(m[2])}` : String(chapterId).toUpperCase();
 }
 
-export function explanationBlock(q, ok) {
-  if (!state.session.showFeedback) return "";
+export function explanationBlock(q, ok, forceShow = false) {
+  if (!forceShow && !state.session.showFeedback) return "";
   const e = q.expl;
   if (!e) return "";
   
@@ -631,7 +827,7 @@ export function explanationBlock(q, ok) {
   
   if (e.text && !e.why) {
     return `
-      <section class="block ${ok ? "correct" : "wrong"}">
+      <section class="block ${ok ? "correct" : "wrong"}" aria-live="polite">
         <h4>Detailed Explanation</h4>
         <p>${md(e.text)}</p>
         ${e.tip ? `<p><strong>Cisco exam tip:</strong> ${md(e.tip)}</p>` : ""}
@@ -641,7 +837,7 @@ export function explanationBlock(q, ok) {
   }
 
   return `
-    <section class="block ${ok ? "correct" : "wrong"}">
+    <section class="block ${ok ? "correct" : "wrong"}" aria-live="polite">
       <h4>Detailed Explanation</h4>
       <p><strong>Correct answer:</strong> ${safeHTML(e.correct || "")}</p>
       <p><strong>Why correct:</strong> ${md(e.why || "")}</p>
@@ -660,11 +856,34 @@ export function explanationBlock(q, ok) {
 
 export function renderQuestion() {
   const s = state.session;
+  if (!s || !Array.isArray(s.questions)) return;
   const q = s.questions[s.idx];
   if (!q) return;
 
+  if (!s.revealed) s.revealed = {};
+  if (!s.flagged) s.flagged = {};
+  if (!s.feedback) s.feedback = {};
+
+  const isRevealed = Boolean(s.revealed[s.idx]);
+  const isFlagged = Boolean(s.flagged[s.idx]);
+  const isSubmitted = Boolean(s.submitted);
+  const isChecked = s.feedback[s.idx] != null;
+  const isPaused = Boolean(s.timerPaused) && !isSubmitted;
+  const inputsDisabled = isPaused || isSubmitted || isRevealed;
+
   const chBadge = q.chapter ? `<span class="badge" style="border-color:rgba(16,185,129,0.45);color:#10b981;">📖 ${safeHTML(formatChapterBadge(q.chapter))}</span>` : "";
-  let html = `
+  let html = "";
+
+  if (isSubmitted) {
+    html += `
+      <div class="submitted-inspect-bar">
+        <span class="badge" style="border-color:rgba(0,242,254,0.45);color:var(--brand);margin:0;">📋 Reviewing Question ${s.idx + 1} of ${s.questions.length}</span>
+        <button type="button" id="backToResultsBtn" class="primary" aria-label="Return to quiz results and review list">⬅️ Back to Results</button>
+      </div>
+    `;
+  }
+
+  html += `
     <span class="badge">${safeHTML(q.domain)}</span><span class="badge">${safeHTML(q.topic)}</span>${chBadge}
     ${q.scenario ? `<div class="block"><strong>Scenario:</strong> ${safeHTML(q.scenario)}</div>` : ""}
     <h3>${md(q.text)}</h3>
@@ -680,44 +899,47 @@ export function renderQuestion() {
   `;
 
   const isMulti = q.type === "multi" || (Array.isArray(q.correct) && q.correct.length > 1);
-  // Study/instant-feedback mode: once checked, colour the correct options green and wrong picks red.
-  const revealed = s.feedback[s.idx] != null && Array.isArray(q.correct);
+  // Highlight correct options when checked in study mode, revealed via Show Answer, or reviewing after submit
+  const highlightOptions = (isChecked || isRevealed || isSubmitted) && Array.isArray(q.correct);
   const stateClass = (i, picked) => {
-    if (!revealed) return "";
+    if (!highlightOptions) return "";
     if (q.correct.includes(i)) return " correct";
     return picked ? " wrong" : "";
   };
 
   if (isMulti) {
     const selected = Array.isArray(s.answers[s.idx]) ? s.answers[s.idx] : [];
-    html += `<div class="options-list">` + q.options.map((o, i) => {
+    html += `<div class="options-list" role="group" aria-label="Multiple choice answer options">` + q.options.map((o, i) => {
       const letter = String.fromCharCode(65 + i);
       const isSelected = selected.includes(i);
-      return `<label class="opt${isSelected ? ' selected' : ''}${stateClass(i, isSelected)}" data-idx="${i}">
-        <input type="checkbox" value="${i}" ${isSelected ? "checked" : ""} aria-label="Option ${letter}">
+      return `<label class="opt${isSelected ? ' selected' : ''}${stateClass(i, isSelected)}${inputsDisabled ? ' disabled' : ''}" data-idx="${i}">
+        <input type="checkbox" value="${i}" ${isSelected ? "checked" : ""} ${inputsDisabled ? "disabled" : ""} aria-checked="${isSelected ? "true" : "false"}" aria-label="Option ${letter}">
         <span class="opt-key" aria-hidden="true">${letter}</span>
         <span>${md(o)}</span>
       </label>`;
     }).join("") + `</div>`;
   } else if (q.type === "single" || q.type === "scenario") {
     const v = s.answers[s.idx];
-    html += `<div class="options-list">` + q.options.map((o, i) => {
+    html += `<div class="options-list" role="radiogroup" aria-label="Answer options">` + q.options.map((o, i) => {
       const letter = String.fromCharCode(65 + i);
       const isSelected = v === i;
-      return `<label class="opt${isSelected ? ' selected' : ''}${stateClass(i, isSelected)}" data-idx="${i}">
-        <input type="radio" name="single" value="${i}" ${isSelected ? "checked" : ""} aria-label="Option ${letter}">
+      return `<label class="opt${isSelected ? ' selected' : ''}${stateClass(i, isSelected)}${inputsDisabled ? ' disabled' : ''}" data-idx="${i}">
+        <input type="radio" name="single" value="${i}" ${isSelected ? "checked" : ""} ${inputsDisabled ? "disabled" : ""} aria-checked="${isSelected ? "true" : "false"}" aria-label="Option ${letter}">
         <span class="opt-key" aria-hidden="true">${letter}</span>
         <span>${md(o)}</span>
       </label>`;
     }).join("") + `</div>`;
   } else if (q.type === "matching") {
     const cur = s.answers[s.idx] || {};
-    html += `<div class="options-list">`;
+    html += `<div class="options-list" role="group" aria-label="Matching pairs">`;
     q.pairs.forEach((pair, i) => {
       if (!s._matchOpts) s._matchOpts = {};
       if (!s._matchOpts[s.idx]) s._matchOpts[s.idx] = shuffle(q.pairs.map((x) => x[1]));
       const opts = s._matchOpts[s.idx];
-      html += `<div class="opt" style="display: flex; flex-direction: column; align-items: stretch; gap: 8px;"><strong>${safeHTML(pair[0])}</strong><select data-match="${i}"><option value="">Select</option>${opts.map((x) => `<option ${cur[i] === x ? "selected" : ""} value="${safeHTML(x)}">${safeHTML(x)}</option>`).join("")}</select></div>`;
+      const matchState = (isChecked || isRevealed || isSubmitted)
+        ? (cur[i] === pair[1] ? " correct" : " wrong")
+        : "";
+      html += `<div class="opt${matchState}" style="display: flex; flex-direction: column; align-items: stretch; gap: 8px;"><strong>${safeHTML(pair[0])}</strong><select data-match="${i}" aria-label="Select match for ${safeHTML(pair[0])}" ${inputsDisabled ? "disabled" : ""}><option value="">Select</option>${opts.map((x) => `<option ${cur[i] === x ? "selected" : ""} value="${safeHTML(x)}">${safeHTML(x)}</option>`).join("")}</select></div>`;
     });
     html += `</div>`;
   } else {
@@ -733,22 +955,60 @@ export function renderQuestion() {
       s._dragInit[s.idx] = start;
     }
     const order = s.answers[s.idx] || s._dragInit[s.idx];
-    if (!s.answers[s.idx]) s.answers[s.idx] = [...order];
-    html += `<div class="options-list">`;
+    if (!s.answers[s.idx]) {
+      s.answers[s.idx] = [...order];
+      persistSession();
+    }
+    html += `<div class="options-list" role="group" aria-label="Ordering steps">`;
     order.forEach((step, i) => {
-      html += `<div class="opt"><strong>${i + 1}.</strong> <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 16px; flex-wrap: wrap;"><span style="flex: 1; min-width: 150px;">${safeHTML(step)}</span><div class="inline" style="margin-top: 0; display: flex; gap: 8px;"><button class="secondary" data-up="${i}" style="padding: 6px 12px; font-size: 11px; height: auto;">Up</button><button class="secondary" data-down="${i}" style="padding: 6px 12px; font-size: 11px; height: auto;">Down</button></div></div></div>`;
+      const stepState = (isChecked || isRevealed || isSubmitted)
+        ? (step === q.order[i] ? " correct" : " wrong")
+        : "";
+      html += `<div class="opt${stepState}"><strong>${i + 1}.</strong> <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 16px; flex-wrap: wrap;"><span style="flex: 1; min-width: 150px;">${safeHTML(step)}</span><div class="inline" style="margin-top: 0; display: flex; gap: 8px;"><button type="button" class="secondary" data-up="${i}" aria-label="Move step ${i + 1} up" ${inputsDisabled ? "disabled" : ""} style="padding: 6px 12px; font-size: 11px; height: auto;">Up</button><button type="button" class="secondary" data-down="${i}" aria-label="Move step ${i + 1} down" ${inputsDisabled ? "disabled" : ""} style="padding: 6px 12px; font-size: 11px; height: auto;">Down</button></div></div></div>`;
     });
     html += `</div>`;
   }
 
-  const ok = s.feedback[s.idx];
-  if (ok != null) {
-    html += explanationBlock(q, ok);
-  } else if (s.mode === "study" && (isMulti || q.type === "matching" || q.type === "dragdrop")) {
-    html += `<div style="margin-top: 20px;"><button id="btnCheckAnswer" class="primary" style="width: 100%; max-width: 240px; height: 44px; font-weight: bold;">Check Answer</button></div>`;
+  // Action bar for Show Answer, Check Answer (Study multi/matching/dragdrop), and Pause Timer
+  if (!isSubmitted) {
+    const needsCheckBtn = s.mode === "study" && !isChecked && !isRevealed && (isMulti || q.type === "matching" || q.type === "dragdrop");
+    html += `
+      <div class="question-action-bar" style="margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        ${needsCheckBtn ? `<button type="button" id="btnCheckAnswer" class="primary" ${isPaused ? "disabled" : ""}>Check Answer</button>` : ""}
+        ${!isRevealed && !isChecked ? `<button type="button" id="showAnswerBtn" class="secondary" ${isPaused ? "disabled" : ""} aria-label="Show correct answer (marks question as revealed and excludes from score)">👁️ Show Answer</button>` : ""}
+        ${isRevealed ? `<span class="badge revealed-notice" role="status" aria-live="polite">👁️ Answer Revealed — Excluded from Score</span>` : ""}
+        <button type="button" id="pauseTimerBtn" class="secondary" aria-pressed="${isPaused ? "true" : "false"}" aria-label="${isPaused ? "Resume quiz timer (Shortcut P)" : "Pause quiz timer (Shortcut P)"}">${isPaused ? "▶️ Resume Timer" : "⏸️ Pause Timer"}</button>
+      </div>
+    `;
   }
 
-  byId("questionArea").innerHTML = html;
+  const ok = s.feedback[s.idx];
+  if (ok != null || isRevealed || isSubmitted) {
+    const effectiveOk = isRevealed ? false : (ok != null ? ok : answerEquals(q, s.answers[s.idx]));
+    if (q.type === "matching" || q.type === "dragdrop") {
+      html += `<div class="block correct" style="margin-top:14px;"><strong>Correct Solution:</strong> ${formatQuestionAnswer(q, null, false)}</div>`;
+    }
+    html += explanationBlock(q, effectiveOk, isRevealed || isSubmitted);
+  }
+
+  if (isPaused) {
+    html += `
+      <div id="quizPausedOverlay" class="quiz-paused-overlay" role="dialog" aria-modal="false" aria-label="Quiz Paused">
+        <div class="quiz-paused-card">
+          <div class="quiz-paused-icon" aria-hidden="true">⏸️</div>
+          <h4>Quiz Paused</h4>
+          <p class="muted">Timer is paused and answer inputs are disabled. Press <kbd>P</kbd> or click below to continue.</p>
+          <button type="button" id="resumeFromOverlayBtn" class="primary" aria-label="Resume quiz timer">▶️ Resume Quiz</button>
+        </div>
+      </div>
+    `;
+  }
+
+  const qa = byId("questionArea");
+  if (qa) {
+    qa.classList.toggle("is-paused", isPaused);
+    qa.innerHTML = html;
+  }
   
   const prevBtn = byId("prevQ");
   const markBtn = byId("toggleMark");
@@ -758,24 +1018,54 @@ export function renderQuestion() {
 
   if (prevBtn) {
     prevBtn.style.display = "";
-    prevBtn.disabled = (s.idx === 0);
+    prevBtn.disabled = (s.idx === 0) || isPaused;
     const pFull = prevBtn.querySelector(".btn-full-text");
     const pMobile = prevBtn.querySelector(".btn-mobile-text");
     if (pFull) pFull.textContent = "⬅️ Previous";
     if (pMobile) pMobile.textContent = "⬅️ Prev";
   }
-  if (markBtn) markBtn.style.display = "";
-  if (openReviewBtn) openReviewBtn.style.display = "";
 
-  if (s.idx === s.questions.length - 1) {
-    if (saveNextBtn) saveNextBtn.style.display = "none";
+  if (isSubmitted) {
+    if (markBtn) markBtn.style.display = "none";
+    if (openReviewBtn) openReviewBtn.style.display = "none";
+    if (saveNextBtn) {
+      saveNextBtn.style.display = s.idx < s.questions.length - 1 ? "" : "none";
+      saveNextBtn.disabled = false;
+    }
     if (submitSessionBtn) {
       submitSessionBtn.style.display = "";
-      submitSessionBtn.textContent = s.mode === "exam" ? "Submit Exam" : "Submit Quiz";
+      submitSessionBtn.innerHTML = `<span class="btn-full-text">⬅️ Back to Results</span><span class="btn-mobile-text">⬅️ Results</span>`;
     }
   } else {
-    if (saveNextBtn) saveNextBtn.style.display = "";
-    if (submitSessionBtn) submitSessionBtn.style.display = "none";
+    if (markBtn) {
+      markBtn.style.display = "";
+      markBtn.disabled = isPaused;
+      markBtn.setAttribute("aria-pressed", isFlagged ? "true" : "false");
+      const mFull = markBtn.querySelector(".btn-full-text");
+      const mMobile = markBtn.querySelector(".btn-mobile-text");
+      if (mFull) mFull.textContent = isFlagged ? "🚩 Unmark Review" : "🚩 Mark For Review";
+      if (mMobile) mMobile.textContent = isFlagged ? "🚩 Unmark" : "🚩 Mark";
+    }
+    if (openReviewBtn) {
+      openReviewBtn.style.display = "";
+      openReviewBtn.disabled = isPaused;
+    }
+
+    if (s.idx === s.questions.length - 1) {
+      if (saveNextBtn) saveNextBtn.style.display = "none";
+      if (submitSessionBtn) {
+        submitSessionBtn.style.display = "";
+        submitSessionBtn.disabled = isPaused;
+        const fullLabel = s.mode === "exam" ? "Submit Exam" : "Submit Quiz";
+        submitSessionBtn.innerHTML = `<span class="btn-full-text">${fullLabel}</span><span class="btn-mobile-text">Submit</span>`;
+      }
+    } else {
+      if (saveNextBtn) {
+        saveNextBtn.style.display = "";
+        saveNextBtn.disabled = isPaused;
+      }
+      if (submitSessionBtn) submitSessionBtn.style.display = "none";
+    }
   }
 
   wireQuestionInputs();
@@ -783,44 +1073,53 @@ export function renderQuestion() {
   // Phase 2: Reset scroll to top, then set up IntersectionObserver for header collapse
   // Guarded in a rAF so the DOM is fully painted before we measure/observe.
   requestAnimationFrame(() => {
-    const qa = byId("questionArea");
-    if (qa) qa.scrollTop = 0;
+    const qArea = byId("questionArea");
+    if (qArea) qArea.scrollTop = 0;
     if (window.setupScrollCollapseHeader) window.setupScrollCollapseHeader();
   });
 }
 
 function syncSelectedClasses() {
-  byId("questionArea").querySelectorAll("label.opt").forEach((l) => {
+  byId("questionArea")?.querySelectorAll("label.opt").forEach((l) => {
     const inp = l.querySelector("input[type=radio], input[type=checkbox]");
-    if (inp) l.classList.toggle("selected", inp.checked);
+    if (inp) {
+      l.classList.toggle("selected", inp.checked);
+      inp.setAttribute("aria-checked", inp.checked ? "true" : "false");
+    }
   });
 }
 
 export function wireQuestionInputs() {
   const s = state.session;
+  if (!s) return;
   const q = s.questions[s.idx];
+  const qa = byId("questionArea");
+  if (!qa) return;
 
-  byId("questionArea").querySelectorAll("input[type='radio'][name='single']").forEach((el) => {
+  qa.querySelectorAll("input[type='radio'][name='single']").forEach((el) => {
     el.addEventListener("change", (e) => {
+      if (s.timerPaused || s.submitted || s.revealed?.[s.idx]) return;
       s.answers[s.idx] = Number(el.value);
       syncSelectedClasses();
-      instantStudyFeedback(e);
       persistSession();
+      instantStudyFeedback(e);
       renderNavigator();
     });
   });
 
-  byId("questionArea").querySelectorAll("input[type='checkbox']").forEach((el) => {
-    el.addEventListener("change", (e) => {
-      s.answers[s.idx] = [...byId("questionArea").querySelectorAll("input[type='checkbox']:checked")].map((x) => Number(x.value));
+  qa.querySelectorAll("input[type='checkbox']").forEach((el) => {
+    el.addEventListener("change", () => {
+      if (s.timerPaused || s.submitted || s.revealed?.[s.idx]) return;
+      s.answers[s.idx] = [...qa.querySelectorAll("input[type='checkbox']:checked")].map((x) => Number(x.value));
       syncSelectedClasses();
       persistSession();
       renderNavigator();
     });
   });
 
-  byId("questionArea").querySelectorAll("[data-match]").forEach((el) => {
-    el.addEventListener("change", (e) => {
+  qa.querySelectorAll("[data-match]").forEach((el) => {
+    el.addEventListener("change", () => {
+      if (s.timerPaused || s.submitted || s.revealed?.[s.idx]) return;
       const cur = s.answers[s.idx] || {};
       cur[Number(el.dataset.match)] = el.value;
       s.answers[s.idx] = cur;
@@ -829,8 +1128,9 @@ export function wireQuestionInputs() {
     });
   });
 
-  byId("questionArea").querySelectorAll("[data-up]").forEach((el) => {
-    el.addEventListener("click", (e) => {
+  qa.querySelectorAll("[data-up]").forEach((el) => {
+    el.addEventListener("click", () => {
+      if (s.timerPaused || s.submitted || s.revealed?.[s.idx]) return;
       const i = Number(el.dataset.up);
       const list = s.answers[s.idx] || [...q.order];
       if (i <= 0) return;
@@ -842,8 +1142,9 @@ export function wireQuestionInputs() {
     });
   });
 
-  byId("questionArea").querySelectorAll("[data-down]").forEach((el) => {
-    el.addEventListener("click", (e) => {
+  qa.querySelectorAll("[data-down]").forEach((el) => {
+    el.addEventListener("click", () => {
+      if (s.timerPaused || s.submitted || s.revealed?.[s.idx]) return;
       const i = Number(el.dataset.down);
       const list = s.answers[s.idx] || [...q.order];
       if (i >= list.length - 1) return;
@@ -858,21 +1159,53 @@ export function wireQuestionInputs() {
   const checkBtn = byId("btnCheckAnswer");
   if (checkBtn) {
     checkBtn.addEventListener("click", (e) => {
+      if (s.timerPaused || s.submitted) return;
       instantStudyFeedback(e);
+    });
+  }
+
+  const showAnswerBtn = byId("showAnswerBtn");
+  if (showAnswerBtn) {
+    showAnswerBtn.addEventListener("click", () => {
+      revealCurrentAnswer();
+    });
+  }
+
+  const pauseTimerBtn = byId("pauseTimerBtn");
+  if (pauseTimerBtn) {
+    pauseTimerBtn.addEventListener("click", () => {
+      toggleTimerPause(() => renderQuestion());
+    });
+  }
+
+  const resumeOverlayBtn = byId("resumeFromOverlayBtn");
+  if (resumeOverlayBtn) {
+    resumeOverlayBtn.addEventListener("click", () => {
+      if (s.timerPaused) {
+        toggleTimerPause(() => renderQuestion());
+      }
+    });
+  }
+
+  const backToResultsBtn = byId("backToResultsBtn");
+  if (backToResultsBtn) {
+    backToResultsBtn.addEventListener("click", () => {
+      returnToResults();
     });
   }
 }
 
 export function instantStudyFeedback(e) {
   const s = state.session;
-  if (s.mode !== "study") return;
+  if (!s || s.mode !== "study") return;
   const q = s.questions[s.idx];
+  const isRevealed = Boolean(s.revealed && s.revealed[s.idx]);
   const ans = s.answers[s.idx];
-  const ok = answerEquals(q, ans);
+  const ok = !isRevealed && answerEquals(q, ans);
   s.feedback[s.idx] = ok;
 
   if (!s.statsApplied) s.statsApplied = {};
-  if (!s.statsApplied[s.idx]) {
+  if (!isRevealed && !s.statsApplied[s.idx]) {
     s.statsApplied[s.idx] = true;
     applyStats(q, ok, 35);
   }
@@ -901,24 +1234,19 @@ export function instantStudyFeedback(e) {
     }
   }
 
-  saveAnalytics();
+  updateStreakOnAttempt();
+  persistSession();
   renderQuestion();
   renderHome();
 }
 
 export function nextQuestion() {
+  if (!state.session || state.session.timerPaused) return;
   navToQuestion(state.session.idx + 1);
 }
 
-export function closeReview() {
-  const ra = byId("reviewArea");
-  if (ra) ra.classList.add("hidden");
-  const qa = byId("questionArea");
-  if (qa) qa.classList.remove("hidden");
-  renderQuestion();
-}
-
 export function prevQuestion() {
+  if (!state.session || state.session.timerPaused) return;
   const ra = byId("reviewArea");
   if (ra && !ra.classList.contains("hidden")) {
     closeReview();
@@ -928,86 +1256,32 @@ export function prevQuestion() {
 }
 
 export function saveAndNext() {
-  applyQuestionTime();
+  if (!state.session || state.session.timerPaused) return;
+  if (!state.session.submitted) {
+    applyQuestionTime();
+  }
   nextQuestion();
 }
 
 export function applyQuestionTime() {
   const s = state.session;
+  if (!s || s.timerPaused) return;
   const spent = Math.max(3, Math.floor((Date.now() - s.qStartAt) / 1000));
   state.analytics.totalTime += spent;
   s.qStartAt = Date.now();
 }
 
-export function openReview() {
-  const s = state.session;
-  const unanswered = s.questions.filter((_, i) => s.answers[i] == null).length;
-  let html = `<h3>Review Screen</h3><p>Unanswered: ${unanswered} | Flagged: ${Object.values(s.flagged).filter(Boolean).length}</p>`;
-  // Add a prominent "Back to Quiz" button at the top of the review screen
-  html += `<div style="margin-bottom: 16px;"><button class="secondary" id="backToQuizFromReview" style="padding: 10px 20px; font-size: 13px; min-height: 44px;">⬅️ Back to Quiz</button></div>`;
-  html += `<div class="review-table">`;
-  s.questions.forEach((q, i) => {
-    html += `<div class="review-row"><div>Q${i + 1}</div><div>${q.domain} - ${q.topic}</div><div>${s.answers[i] != null ? "Answered" : "Pending"}</div><div><button class="ghost" data-jump="${i}">Open</button></div></div>`;
-  });
-  html += "</div>";
-  if (s.mode === "exam") html += `<div class="inline"><button class="primary" id="finalizeFromReview">Finalize Exam</button></div>`;
-
-  byId("reviewArea").innerHTML = html;
-  byId("reviewArea").classList.remove("hidden");
-  byId("questionArea").classList.add("hidden");
-  byId("resultArea").classList.add("hidden");
-
-  const ra = byId("reviewArea");
-  if (ra) ra.scrollTop = 0;
-  window.scrollTo(0, 0);
-
-  // Wire "Back to Quiz" button at top of review
-  const backBtn = byId("backToQuizFromReview");
-  if (backBtn) {
-    backBtn.addEventListener("click", closeReview);
-  }
-
-  byId("reviewArea").querySelectorAll("[data-jump]").forEach((b) => {
-    b.addEventListener("click", () => {
-      byId("reviewArea").classList.add("hidden");
-      byId("questionArea").classList.remove("hidden");
-      navToQuestion(Number(b.dataset.jump));
-    });
-  });
-
-  const f = byId("finalizeFromReview");
-  if (f) f.addEventListener("click", () => submitSession(true));
-
-  const prevBtn = byId("prevQ");
-  const markBtn = byId("toggleMark");
-  const openReviewBtn = byId("openReview");
-  const saveNextBtn = byId("saveNext");
-  const submitSessionBtn = byId("submitSession");
-
-  // Repurpose "Previous" button as "Back to Quiz" in footer
-  if (prevBtn) {
-    prevBtn.style.display = "";
-    prevBtn.disabled = false;
-    const fullText = prevBtn.querySelector(".btn-full-text");
-    const mobileText = prevBtn.querySelector(".btn-mobile-text");
-    if (fullText) fullText.textContent = "⬅️ Back to Quiz";
-    if (mobileText) mobileText.textContent = "⬅️ Back";
-  }
-  if (markBtn) markBtn.style.display = "none";
-  if (openReviewBtn) openReviewBtn.style.display = "none";
-  if (saveNextBtn) saveNextBtn.style.display = "none";
-  if (submitSessionBtn) {
-    submitSessionBtn.style.display = "";
-    submitSessionBtn.textContent = s.mode === "exam" ? "Submit Exam" : "Submit Quiz";
-  }
-}
-
 export function submitSession(force) {
   const s = state.session;
-  if (!s || s.submitted) return;
+  if (!s) return;
+  if (s.submitted) {
+    returnToResults();
+    return;
+  }
 
-  const answeredCount = s.answers.filter((a) => a != null).length;
-  if (answeredCount === 0 && !force) {
+  const answeredCount = s.questions.filter((q, i) => isQuestionAnswered(q, s.answers[i])).length;
+  const revealedCount = Object.values(s.revealed || {}).filter(Boolean).length;
+  if (answeredCount === 0 && revealedCount === 0 && !force) {
     if (!confirm("You haven't answered any questions. Are you sure you want to submit?")) {
       return;
     }
@@ -1019,51 +1293,72 @@ export function submitSession(force) {
     return;
   }
 
+  if (s.timerPaused && s.pausedAt) {
+    const pausedDelta = Math.max(0, Date.now() - s.pausedAt);
+    if (typeof s.startedAt === "number") s.startedAt += pausedDelta;
+    s.pausedAt = null;
+  }
+  s.timerPaused = false;
   s.submitted = true;
-  clearInterval(s.timer);
+  stopSessionTimer();
   persistSession();
   const timer = byId("timer");
   if (timer) timer.classList.add("hidden");
 
   let correct = 0;
+  let scoredTotal = 0;
   const domain = {};
-  const wrong = [];
 
   if (!state.analytics.missedIds) state.analytics.missedIds = [];
+  if (!s.statsApplied) s.statsApplied = {};
+
   s.questions.forEach((q, i) => {
-    const ok = answerEquals(q, s.answers[i]);
-    if (ok) {
-      correct += 1;
-      state.analytics.missedIds = state.analytics.missedIds.filter(id => id !== q.id);
-      if (s.mode !== "study") {
-        gainXP(10);
+    const isRev = Boolean(s.revealed && s.revealed[i]);
+    const ok = !isRev && answerEquals(q, s.answers[i]);
+
+    if (!isRev) {
+      scoredTotal += 1;
+      if (ok) {
+        correct += 1;
+        state.analytics.missedIds = state.analytics.missedIds.filter(id => id !== q.id);
+        if (s.mode !== "study") {
+          gainXP(10);
+        }
+      } else {
+        if (!state.analytics.missedIds.includes(q.id)) {
+          state.analytics.missedIds.push(q.id);
+        }
+      }
+
+      if (!domain[q.domain]) domain[q.domain] = { total: 0, correct: 0 };
+      domain[q.domain].total += 1;
+      if (ok) domain[q.domain].correct += 1;
+
+      if (!s.statsApplied[i]) {
+        s.statsApplied[i] = true;
+        applyStats(q, ok, 0);
       }
     } else {
+      // Revealed questions are excluded from score & XP, and queued for spaced repetition review
       if (!state.analytics.missedIds.includes(q.id)) {
         state.analytics.missedIds.push(q.id);
       }
+      if (!domain[q.domain]) domain[q.domain] = { total: 0, correct: 0 };
     }
-    if (!domain[q.domain]) domain[q.domain] = { total: 0, correct: 0 };
-    domain[q.domain].total += 1;
-    if (ok) domain[q.domain].correct += 1;
-    if (!s.statsApplied) s.statsApplied = {};
-    if (!s.statsApplied[i]) {
-      s.statsApplied[i] = true;
-      applyStats(q, ok, 0);
-    }
-    if (!ok) wrong.push({ i, q });
   });
 
   const total = s.questions.length;
-  const pct = Math.round((correct / total) * 100);
+  const pct = scoredTotal > 0 ? Math.round((correct / scoredTotal) * 100) : 0;
   
-  if (pct >= 80) gainXP(30);
+  if (scoredTotal > 0 && pct >= 80) gainXP(30);
   updateStreakOnAttempt();
   
-  state.analytics.studyMin += Math.round((Date.now() - s.startedAt) / 60000);
+  state.analytics.studyMin += Math.max(0, Math.round((Date.now() - s.startedAt) / 60000));
   state.analytics.attempts.push({
     mode: s.mode,
     total,
+    scoredTotal,
+    revealed: revealedCount,
     correct,
     score: pct,
     at: new Date().toISOString()
@@ -1074,50 +1369,35 @@ export function submitSession(force) {
   showToast(`Session submitted! Score: ${pct}%`, "ok", 4000);
   renderHome();
 
-  const weak = Object.entries(domain).map(([k, v]) => ({ k, p: Math.round((v.correct / v.total) * 100) })).sort((a, b) => a.p - b.p).slice(0, 2);
-  const strong = Object.entries(domain).map(([k, v]) => ({ k, p: Math.round((v.correct / v.total) * 100) })).sort((a, b) => b.p - a.p).slice(0, 2);
+  const domainEntries = Object.entries(domain).filter(([, v]) => v.total > 0);
+  const weak = domainEntries.map(([k, v]) => ({ k, p: Math.round((v.correct / v.total) * 100) })).sort((a, b) => a.p - b.p).slice(0, 2);
+  const strong = domainEntries.map(([k, v]) => ({ k, p: Math.round((v.correct / v.total) * 100) })).sort((a, b) => b.p - a.p).slice(0, 2);
 
-  let html = `<h2>Session Complete: ${safeHTML(s.title)}</h2><div class="grid stats">`;
+  let html = `<div aria-live="polite"><h2>Session Complete: ${safeHTML(s.title)}</h2><div class="grid stats">`;
   html += `<div class="stat"><div class="k">Score</div><div class="v">${pct}%</div></div>`;
-  html += `<div class="stat"><div class="k">Correct</div><div class="v">${correct}/${total}</div></div>`;
+  html += `<div class="stat"><div class="k">Correct</div><div class="v">${correct}/${scoredTotal}${revealedCount ? ` <span class="muted" style="font-size:12px;">(${revealedCount} revealed)</span>` : ""}</div></div>`;
   html += `<div class="stat"><div class="k">Readiness</div><div class="v">${readinessLabel(readinessScore())}</div></div>`;
   html += `<div class="stat"><div class="k">Pass Probability</div><div class="v">${passProbability()}%</div></div>`;
-  html += `</div>`;
+  html += `</div></div>`;
 
-  html += `<div class="card"><h3>Domain Performance</h3>${Object.entries(domain).map(([d, v]) => {
-    const pct = Math.round((v.correct / v.total) * 100);
-    const color = pct >= 80 ? "#10b981" : pct >= 50 ? "#f59e0b" : "#ff5e3a";
-    return `
-      <div class="domain-item">
-        <div class="domain-header">
-          <strong>${safeHTML(d)}</strong>
-          <span class="pct">${v.correct}/${v.total} (${pct}%)</span>
+  if (domainEntries.length > 0) {
+    html += `<div class="card"><h3>Domain Performance</h3>${domainEntries.map(([d, v]) => {
+      const domPct = Math.round((v.correct / v.total) * 100);
+      const color = domPct >= 80 ? "#10b981" : domPct >= 50 ? "#f59e0b" : "#ff5e3a";
+      return `
+        <div class="domain-item">
+          <div class="domain-header">
+            <strong>${safeHTML(d)}</strong>
+            <span class="pct">${v.correct}/${v.total} (${domPct}%)</span>
+          </div>
+          <div class="progress"><div style="width:${domPct}%; background:${color};"></div></div>
         </div>
-        <div class="progress"><div style="width:${pct}%; background:${color};"></div></div>
-      </div>
-    `;
-  }).join("")}</div>`;
-  html += `<div class="grid stats"><div class="stat"><div class="k">Weak Areas</div><div class="v" style="font-size:16px">${weak.map((x) => `${x.k} (${x.p}%)`).join("<br />")}</div></div><div class="stat"><div class="k">Strong Areas</div><div class="v" style="font-size:16px">${strong.map((x) => `${x.k} (${x.p}%)`).join("<br />")}</div></div><div class="stat"><div class="k">Recommended Next Quiz</div><div class="v" style="font-size:15px">15 questions / 15 mins on ${weak.map((x) => x.k).join(" + ")}</div></div></div>`;
+      `;
+    }).join("")}</div>`;
+    html += `<div class="grid stats"><div class="stat"><div class="k">Weak Areas</div><div class="v" style="font-size:16px">${weak.map((x) => `${x.k} (${x.p}%)`).join("<br />") || "N/A"}</div></div><div class="stat"><div class="k">Strong Areas</div><div class="v" style="font-size:16px">${strong.map((x) => `${x.k} (${x.p}%)`).join("<br />") || "N/A"}</div></div><div class="stat"><div class="k">Recommended Next Quiz</div><div class="v" style="font-size:15px">15 questions / 15 mins on ${weak.map((x) => x.k).join(" + ") || "All Domains"}</div></div></div>`;
+  }
 
-  if (s.mode !== "exam") {
-    html += `<div class="card"><h3>Review (first 20 misses)</h3>${wrong.slice(0, 20).map((x) => {
-      let correctVal = x.q.expl?.correct;
-      if (!correctVal) {
-        if (x.q.type === "matching" && Array.isArray(x.q.pairs)) {
-          correctVal = x.q.pairs.map(p => `${p[0]}: ${p[1]}`).join(", ");
-        } else if (x.q.type === "dragdrop" && Array.isArray(x.q.order)) {
-          correctVal = x.q.order.join(" -> ");
-        } else if (Array.isArray(x.q.correct)) {
-          correctVal = x.q.correct.map(idx => String.fromCharCode(65 + idx)).join(", ");
-        } else {
-          correctVal = "See explanation";
-        }
-      }
-      const whyVal = x.q.expl?.why || x.q.expl?.text || "";
-      const tipVal = x.q.expl?.tip || "";
-      return `<div class="output"><strong>Q${x.i + 1}</strong> ${safeHTML(x.q.topic)} | Correct: ${safeHTML(correctVal)}<br /><span style="display:block; margin-top:6px; color:#a1b2c8"><strong>Explanation:</strong> ${safeHTML(whyVal)}</span>${tipVal ? `<span style="display:block; margin-top:4px; color:#a1b2c8"><strong>Tip:</strong> ${safeHTML(tipVal)}</span>` : ""}</div>`;
-    }).join("") || "No incorrect answers."}</div>`;
-  } else {
+  if (s.mode === "exam") {
     let statusText = "";
     let statusColor = "";
     let readinessDesc = "";
@@ -1136,7 +1416,7 @@ export function submitSession(force) {
       readinessDesc = "Study recommended. Your score is below the typical Cisco passing threshold. We suggest systematically reviewing the official Cisco Press certification guides for the highlighted weak domains, building practical lab configurations, and re-attempting practice exams.";
     }
 
-    const weakDomains = Object.entries(domain)
+    const weakDomains = domainEntries
       .map(([k, v]) => ({ name: k, pct: Math.round((v.correct / v.total) * 100) }))
       .filter(d => d.pct < 80)
       .sort((a, b) => a.pct - b.pct);
@@ -1168,150 +1448,131 @@ export function submitSession(force) {
           </span>
         </div>
         
-        <p style="color: #a1b2c8; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: var(--muted); line-height: 1.6; margin-bottom: 20px;">
           ${readinessDesc}
         </p>
         
-        <hr style="border: 0; border-top: 1px solid #1e293b; margin: 20px 0;" />
+        <hr style="border: 0; border-top: 1px solid var(--line); margin: 20px 0;" />
         
         <h4>Recommended Cisco Press Review Chapters:</h4>
-        <ul style="color: #a1b2c8; padding-left: 20px; line-height: 1.8;">
+        <ul style="color: var(--muted); padding-left: 20px; line-height: 1.8;">
           ${recommendedReadings}
         </ul>
-        
-        <hr style="border: 0; border-top: 1px solid #1e293b; margin: 20px 0;" />
-        
-        <h4>Verification of Key Competencies:</h4>
-        <table style="width: 100%; border-collapse: collapse; text-align: left; color: #a1b2c8; font-size: 14px;">
-          <thead>
-            <tr style="border-bottom: 1px solid #334155; color: #ffffff;">
-              <th style="padding: 8px 0;">CCNA Blueprint Domain</th>
-              <th style="padding: 8px 0; text-align: right;">Your Score</th>
-              <th style="padding: 8px 0; text-align: right;">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${Object.entries(domain).map(([name, val]) => {
-              const score = Math.round((val.correct / val.total) * 100);
-              const status = score >= 80 ? "Pass" : score >= 60 ? "Borderline" : "Needs Review";
-              const col = score >= 80 ? "#10b981" : score >= 60 ? "#f59e0b" : "#ff5e3a";
-              return `
-                <tr style="border-bottom: 1px solid #1e293b;">
-                  <td style="padding: 10px 0;">${safeHTML(name)}</td>
-                  <td style="padding: 10px 0; text-align: right; font-weight: bold; color: ${col};">${score}%</td>
-                  <td style="padding: 10px 0; text-align: right; color: ${col}; font-weight: 500;">${status}</td>
-                </tr>
-              `;
-            }).join("")}
-          </tbody>
-        </table>
-      </div>
-      
-      <div class="card" style="margin-top: 20px;">
-        <h3>Detailed Question Review</h3>
-        <p style="font-size:0.9em; color:#a1b2c8; margin-bottom:15px;">Below is the review list of your questions, detailing your answers versus correct answers and standard explanations.</p>
-        ${s.questions.map((q, idx) => {
-          const userAns = s.answers[idx];
-          const ok = answerEquals(q, userAns);
-          
-          let userAnsText = "";
-          let correctAnsText = "";
-          
-          const isMulti = q.type === "multi" || (Array.isArray(q.correct) && q.correct.length > 1);
-          if (isMulti) {
-            const list = Array.isArray(userAns) ? userAns : [];
-            userAnsText = list.length > 0 ? list.map(v => String.fromCharCode(65 + v)).join(", ") : "No Answer";
-            correctAnsText = q.correct.map(v => String.fromCharCode(65 + v)).join(", ");
-          } else if (q.type === "single" || q.type === "scenario") {
-            userAnsText = userAns != null ? `${String.fromCharCode(65 + userAns)}. ${q.options[userAns]}` : "No Answer";
-            correctAnsText = `${String.fromCharCode(65 + q.correct[0])}. ${q.options[q.correct[0]]}`;
-          } else if (q.type === "matching") {
-            userAnsText = userAns ? q.pairs.map((p, i) => `${p[0]}: ${userAns[i] || 'None'}`).join(", ") : "No Answer";
-            correctAnsText = q.pairs.map(p => `${p[0]}: ${p[1]}`).join(", ");
-          } else {
-            userAnsText = userAns ? userAns.join(" -> ") : "No Answer";
-            correctAnsText = q.order.join(" -> ");
-          }
-          
-          return `
-            <div class="output" style="border-left: 4px solid ${ok ? '#10b981' : '#ff5e3a'}; margin-bottom: 15px; padding: 12px; background: rgba(255,255,255,0.01);">
-              <strong>Q${idx + 1} (${safeHTML(q.topic)})</strong> — 
-              <span style="font-weight: bold; color: ${ok ? '#10b981' : '#ff5e3a'};">${ok ? 'CORRECT' : 'INCORRECT'}</span>
-              <br />
-              <div style="margin-top: 6px; font-size: 0.95em;"><strong>Question:</strong> ${md(q.text)}</div>
-              <div style="margin-top: 4px; font-size: 0.95em; color: ${ok ? '#10b981' : '#ff5e3a'};"><strong>Your Answer:</strong> ${safeHTML(userAnsText)}</div>
-              ${!ok ? `<div style="margin-top: 4px; font-size: 0.95em; color: #10b981;"><strong>Correct Answer:</strong> ${safeHTML(correctAnsText)}</div>` : ""}
-              <div style="margin-top: 8px; font-size: 0.95em; color: #a1b2c8; border-top: 1px dotted #334155; padding-top: 6px;">
-                <strong>Explanation:</strong> ${md(q.expl.why || q.expl.text || "")}
-              </div>
-              ${q.expl.tip ? `
-              <div style="margin-top: 4px; font-size: 0.95em; color: #a1b2c8;">
-                <strong>Tip:</strong> ${safeHTML(q.expl.tip)}
-              </div>` : ""}
-            </div>
-          `;
-        }).join("")}
       </div>
     `;
   }
 
-  html += `<div class="inline"><button id="backHome" class="primary">Back Home</button><button id="goAnalytics" class="secondary">Open Analytics</button></div>`;
+  // Full Answer Review screen with All / Incorrect / Flagged filters and Jump to question links
+  html += buildFinishReviewHTML(s, { answerEqualsFn: answerEquals });
 
-  byId("resultArea").innerHTML = html;
-  byId("resultArea").classList.remove("hidden");
-  byId("reviewArea").classList.add("hidden");
-  byId("questionArea").classList.add("hidden");
+  html += `<div class="inline" style="margin-top:20px;"><button id="backHome" class="primary">Back Home</button><button id="goAnalytics" class="secondary">Open Analytics</button></div>`;
+
+  const resultAreaEl = byId("resultArea");
+  if (resultAreaEl) {
+    resultAreaEl.innerHTML = html;
+    resultAreaEl.classList.remove("hidden");
+    wireFinishReviewInteractions(resultAreaEl, {
+      onJumpToQuestion: (idx) => jumpToSubmittedQuestion(idx)
+    });
+    resultAreaEl.scrollTop = 0;
+  }
+  byId("reviewArea")?.classList.add("hidden");
+  byId("questionArea")?.classList.add("hidden");
   const examFooter = byId("examFooter") || document.querySelector(".exam-footer");
   if (examFooter) examFooter.style.display = "none";
 
-  const rsa = byId("resultArea");
-  if (rsa) rsa.scrollTop = 0;
   window.scrollTo(0, 0);
 
-  byId("backHome").addEventListener("click", () => setPage("home"));
-  byId("goAnalytics").addEventListener("click", () => setPage("analytics"));
+  byId("backHome")?.addEventListener("click", () => setPage("home"));
+  byId("goAnalytics")?.addEventListener("click", () => setPage("analytics"));
 }
 
-export function updateStreakOnAttempt() {
-  // Normalize to local calendar date YYYY-MM-DD to avoid timezone and locale issues
-  const now = new Date();
-  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  const lastDate = state.analytics.lastAttemptDate;
+export function exportAnalyticsProgress() {
+  try {
+    const payload = JSON.stringify(state.analytics, null, 2);
+    const blob = new Blob([payload], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const dateStr = getLocalDateStr();
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `ccna-progress-${dateStr}.json`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+    showToast(`Downloaded ccna-progress-${dateStr}.json`, "ok");
+    return true;
+  } catch (err) {
+    console.error("Failed to export analytics:", err);
+    showToast("Failed to export progress JSON.", "error");
+    return false;
+  }
+}
 
-  // Migrate legacy toDateString() format (e.g. "Thu Jul 24 2025") to YYYY-MM-DD
-  let normalizedLast = lastDate;
-  if (lastDate && lastDate.length > 10) {
+export async function importAnalyticsFromFile(file) {
+  if (!file) return false;
+  try {
+    const text = await file.text();
+    let parsed;
     try {
-      const parsed = new Date(lastDate);
-      if (!isNaN(parsed.getTime())) {
-        normalizedLast = `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}-${String(parsed.getDate()).padStart(2, '0')}`;
-      }
-    } catch { /* keep original if parse fails */ }
-  }
-
-  if (!normalizedLast) {
-    // First ever activity
-    state.analytics.streak = 1;
-  } else if (normalizedLast === todayStr) {
-    // Same calendar day — do NOT increment, do NOT reset. Preserve current streak.
-    return;
-  } else {
-    // Calculate calendar day difference
-    const lastParts = normalizedLast.split('-').map(Number);
-    const todayParts = todayStr.split('-').map(Number);
-    const lastMidnight = new Date(lastParts[0], lastParts[1] - 1, lastParts[2]);
-    const todayMidnight = new Date(todayParts[0], todayParts[1] - 1, todayParts[2]);
-    const diffDays = Math.round((todayMidnight - lastMidnight) / 86400000);
-
-    if (diffDays === 1) {
-      // Consecutive day — increment streak
-      state.analytics.streak = (state.analytics.streak || 0) + 1;
-    } else {
-      // Gap of 2+ days — reset streak
-      state.analytics.streak = 1;
+      parsed = JSON.parse(text);
+    } catch {
+      showToast("Invalid progress file: JSON parse failed.", "error");
+      return false;
     }
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      showToast("Invalid progress file: root must be a JSON object.", "error");
+      return false;
+    }
+
+    // Validate required numeric keys from core.js L118
+    const requiredNums = [
+      "totalQ",
+      "correct",
+      "xp",
+      "studyMin",
+      "totalTime",
+      "labsCompleted",
+      "subnetMaxStreak",
+      "streak"
+    ];
+    for (const key of requiredNums) {
+      if (typeof parsed[key] !== "number" || !Number.isFinite(parsed[key]) || parsed[key] < 0) {
+        showToast(`Invalid progress file: missing or invalid numeric field "${key}".`, "error");
+        return false;
+      }
+    }
+
+    const base = createDefaultAnalytics();
+    const candidate = {
+      ...base,
+      ...parsed
+    };
+    if (!validateAnalyticsSchema(candidate)) {
+      showToast("Invalid progress file: failed analytics schema validation.", "error");
+      return false;
+    }
+
+    if (!confirm("Overwrite your current progress with the imported file? This will replace your current telemetry and streak.")) {
+      showToast("Progress import cancelled.", "info");
+      return false;
+    }
+
+    if (candidate.lastAttemptDate) {
+      candidate.lastAttemptDate = normalizeDateStr(candidate.lastAttemptDate);
+    }
+    state.analytics = migrateBankVersion(candidate);
+    saveAnalytics(false);
+    renderHome();
+    renderAnalytics();
+    if (window.updateHeaderProfile) window.updateHeaderProfile();
+    showToast("Progress imported successfully!", "ok");
+    return true;
+  } catch (err) {
+    console.error("Import progress error:", err);
+    showToast("Failed to import progress file.", "error");
+    return false;
   }
-  state.analytics.lastAttemptDate = todayStr;
 }
 
 export function renderAnalytics() {
@@ -1381,8 +1642,8 @@ export function renderAnalytics() {
       const score = Number(att.score) || 0;
       const col = score >= 80 ? "#10b981" : score >= 60 ? "#f59e0b" : "#ef4444";
       const dateStr = att.at ? new Date(att.at).toLocaleDateString() : `Session #${attempts.length - idx}`;
-      return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border-radius:8px;background:rgba(6,9,19,0.55);border:1px solid rgba(255,255,255,0.06);">
-        <div style="font-size:12.5px;color:#e2e8f0;"><strong>${safeHTML(String(att.mode || "quiz").toUpperCase())}</strong> · ${att.correct || 0}/${att.total || 0} Qs <span style="color:var(--text-muted);font-size:11px;margin-left:6px;">${safeHTML(dateStr)}</span></div>
+      return `<div class="trend-row-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border-radius:8px;background:var(--bg-elevated, rgba(6,9,19,0.55));border:1px solid var(--line, rgba(255,255,255,0.06));">
+        <div style="font-size:12.5px;color:var(--text);"><strong>${safeHTML(String(att.mode || "quiz").toUpperCase())}</strong> · ${att.correct || 0}/${att.total || 0} Qs <span style="color:var(--text-muted);font-size:11px;margin-left:6px;">${safeHTML(dateStr)}</span></div>
         <span style="font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:${col};">${score}%</span>
       </div>`;
     }).join("")}</div>`;
@@ -1390,7 +1651,7 @@ export function renderAnalytics() {
 
   const dasharray = 132;
   byId("domainBreakdown").innerHTML = `
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--sp-4);">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--sp-4);">
       ${blueprint.map((d) => {
         const p = da[d.name] || 0;
         const color = p >= 80 ? "var(--color-ok)" : p >= 50 ? "var(--color-warn)" : "var(--color-danger)";
@@ -1421,6 +1682,7 @@ export function renderAchievements() {
   const a = state.analytics;
   const rs = readinessScore();
   const da = calcDomainAccuracy();
+  const displayStreak = getDisplayStreak(a);
   
   const badges = [
     {
@@ -1462,7 +1724,7 @@ export function renderAchievements() {
       id: "streaks",
       title: "Streak Fanatic",
       desc: "Maintain a study streak of 3 or more consecutive days.",
-      unlocked: (a.streak || 0) >= 3,
+      unlocked: displayStreak >= 3,
       icon: "🔥"
     },
     {
@@ -1480,13 +1742,13 @@ export function renderAchievements() {
   `;
   
   badges.forEach(b => {
-    const border = b.unlocked ? "border: 1px solid #10b981; background: rgba(16,185,129,0.03);" : "border: 1px solid rgba(255,255,255,0.05); opacity:0.5;";
+    const border = b.unlocked ? "border: 1px solid #10b981; background: rgba(16,185,129,0.03);" : "border: 1px solid var(--line, rgba(255,255,255,0.05)); opacity:0.5;";
     const badgeColor = b.unlocked ? "#10b981" : "#64748b";
     html += `
       <div style="padding:12px; border-radius:10px; ${border} display:flex; align-items:center; gap:12px;">
         <span style="font-size:24px; color:${badgeColor}">${b.icon}</span>
         <div>
-          <h5 style="margin:0 0 2px 0; font-size:13px; color:${b.unlocked ? '#fff' : '#64748b'};">${b.title}</h5>
+          <h4 style="margin:0 0 2px 0; font-size:13px; color:${b.unlocked ? 'var(--text)' : '#64748b'};">${b.title}</h4>
           <p style="margin:0; font-size:10.5px; color:var(--text-muted); line-height:1.3;">${b.desc}</p>
         </div>
       </div>
