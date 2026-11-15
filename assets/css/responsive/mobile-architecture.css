@@ -171,18 +171,43 @@
   }
 }
 
-/* ─── Modal Overlay & Mobile Viewport Hardening ─── */
+/* ─── Modal Overlay & Mobile Viewport Hardening (Apple / Linear Precision) ─── */
 .modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 9998);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   box-sizing: border-box;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
+.modal-overlay.hidden {
+  display: none !important;
+}
+
 .modal-overlay .card {
   box-sizing: border-box;
-  max-width: min(92vw, 520px) !important;
+  max-width: min(92vw, 540px) !important;
+  width: 100%;
   max-height: 90dvh;
   overflow-y: auto;
+  border: 1px solid var(--color-separator-strong);
+  border-radius: 18px;
+  background: var(--surface-card);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.50);
+  animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 @media (max-width: 480px) {
@@ -190,7 +215,8 @@
     padding: 12px !important;
   }
   .modal-overlay .card {
-    padding: 16px !important;
+    padding: 18px !important;
+    border-radius: 16px;
   }
   #upgradeModal .card div[style*="grid-template-columns:1fr 1fr"],
   #upgradeModal .card div[style*="grid-template-columns: 1fr 1fr"] {

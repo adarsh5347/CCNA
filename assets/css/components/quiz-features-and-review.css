@@ -28,17 +28,17 @@ label.opt:has(input:focus-visible) {
   outline-offset: 2px !important;
 }
 
-/* Streak Badge Tiers (Phase 2 ? WCAG AA contrast >= 4.5:1) */
+/* Streak Badge Tiers (Apple / Linear Precision System) */
 .streak-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 4px 12px;
   border-radius: 999px;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 600;
   line-height: 1.3;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.02em;
   white-space: nowrap;
   -webkit-text-fill-color: currentColor;
   background-clip: padding-box;
@@ -46,22 +46,22 @@ label.opt:has(input:focus-visible) {
 }
 
 .streak-badge.streak-low {
-  background: rgba(148, 163, 184, 0.16);
-  color: #f8fafc;
-  border: 1px solid rgba(148, 163, 184, 0.42);
+  background: var(--surface-2);
+  color: var(--color-secondary-label);
+  border: 1px solid var(--color-separator);
 }
 
 .streak-badge.streak-mid {
-  background: rgba(245, 158, 11, 0.18);
-  color: #fef3c7;
-  border: 1px solid rgba(245, 158, 11, 0.55);
+  background: rgba(255, 159, 10, 0.14);
+  color: var(--color-warning);
+  border: 1px solid rgba(255, 159, 10, 0.35);
 }
 
 .streak-badge.streak-high {
-  background: rgba(16, 185, 129, 0.20);
-  color: #d1fae5;
-  border: 1px solid rgba(16, 185, 129, 0.60);
-  box-shadow: 0 0 14px rgba(16, 185, 129, 0.22);
+  background: rgba(48, 209, 88, 0.14);
+  color: var(--color-success);
+  border: 1px solid rgba(48, 209, 88, 0.35);
+  box-shadow: 0 0 12px rgba(48, 209, 88, 0.18);
 }
 
 /* Resume Unfinished Quiz Banner on Home (Phase 4) */
@@ -161,8 +161,9 @@ label.opt:has(input:focus-visible) {
   position: absolute;
   inset: 0;
   z-index: 35;
-  backdrop-filter: blur(8px);
-  background: rgba(6, 9, 19, 0.84);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.70);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -175,10 +176,11 @@ label.opt:has(input:focus-visible) {
   width: 100%;
   text-align: center;
   padding: 24px;
-  border-radius: 14px;
-  background: #0d1324;
-  border: 1.5px solid rgba(0, 242, 254, 0.4);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.6);
+  border-radius: 16px;
+  background: var(--surface-card);
+  border: 1px solid var(--color-separator-strong);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.5);
+  animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .quiz-paused-icon {
@@ -230,27 +232,43 @@ label.opt.disabled {
 }
 
 .review-filters {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  display: inline-flex;
+  background: var(--surface-2);
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid var(--color-separator);
+  gap: 2px;
+  align-items: center;
+  user-select: none;
 }
 
 .review-filter-btn {
-  min-height: 40px;
-  padding: 8px 14px;
-  border-radius: 999px;
+  min-height: 32px;
+  padding: 6px 14px;
+  border-radius: 7px;
   font-size: 12.5px;
-  font-weight: 700;
-  border: 1px solid var(--border-color);
-  background: rgba(30, 41, 59, 0.65);
-  color: #f8fafc;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--color-secondary-label);
   cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-std),
+    color var(--dur-fast) var(--ease-std),
+    box-shadow var(--dur-fast) var(--ease-std);
+}
+
+.review-filter-btn:hover {
+  background: var(--interactive-hover);
+  color: var(--color-label);
 }
 
 .review-filter-btn.active {
-  background: rgba(0, 242, 254, 0.18);
-  border-color: #00f2fe;
-  color: #67e8f9;
+  background: var(--surface-card);
+  border: 1px solid var(--color-separator);
+  color: var(--color-label);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.32);
+  font-weight: 600;
 }
 
 .review-filter-empty {

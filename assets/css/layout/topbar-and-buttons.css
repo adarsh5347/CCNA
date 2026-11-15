@@ -173,20 +173,22 @@ nav {
   border-color: transparent;
 }
 
-/* ─── Button Base ───────────────────────────────────── */
+/* ─── Button Base & System (Apple / Linear Precision) ─── */
 button {
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--color-separator-strong);
+  border-radius: var(--btn-radius, 10px);
   background: var(--surface-2);
-  color: var(--text-main);
+  color: var(--color-label);
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: var(--text-sm);
   cursor: pointer;
-  padding: var(--sp-2) var(--sp-4);
+  padding: 8px 16px;
+  min-height: 38px;
   transition:
     background-color var(--dur-fast) var(--ease-std),
     border-color var(--dur-fast) var(--ease-std),
+    color var(--dur-fast) var(--ease-std),
     box-shadow var(--dur-fast) var(--ease-std),
     transform var(--dur-instant) var(--ease-std);
   box-shadow: none;
@@ -195,11 +197,15 @@ button {
   justify-content: center;
   gap: var(--sp-2);
   line-height: var(--lh-tight);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
 }
 
 button:hover {
   background: var(--surface-3);
   border-color: var(--color-separator-strong);
+  color: var(--color-label);
   box-shadow: none;
   transform: none;
 }
@@ -207,6 +213,21 @@ button:hover {
 button:active {
   transform: scale(0.985);
   transition-duration: var(--dur-instant);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--color-tint);
+  outline-offset: 2px;
+}
+
+button:disabled,
+button.disabled,
+button[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
 }
 
 /* Primary — Apple Blue CTA */
@@ -220,7 +241,12 @@ button.primary {
 button.primary:hover {
   background: #0077ed;
   border-color: transparent;
+  color: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 113, 227, 0.28);
+}
+button.primary:active {
+  background: #0066cc;
+  transform: scale(0.985);
 }
 
 /* Secondary — subtle elevated surface */
@@ -228,21 +254,89 @@ button.secondary {
   background: var(--surface-2);
   border-color: var(--color-separator-strong);
   color: var(--color-label);
+  font-weight: 500;
 }
 button.secondary:hover {
   background: var(--surface-3);
   border-color: rgba(0, 113, 227, 0.45);
+  color: var(--color-label);
+}
+button.secondary:active {
+  transform: scale(0.985);
 }
 
 /* Ghost — transparent */
 button.ghost {
   background: transparent;
   border-color: transparent;
+  color: var(--color-secondary-label);
   box-shadow: none;
 }
 button.ghost:hover {
   background: var(--interactive-hover);
-  border-color: var(--border-color);
+  border-color: transparent;
+  color: var(--color-label);
+}
+button.ghost:active {
+  background: var(--interactive-active);
+  transform: scale(0.985);
+}
+
+/* Destructive / Danger */
+button.destructive,
+button.danger,
+button.btn-danger {
+  background: rgba(255, 69, 58, 0.12);
+  border-color: rgba(255, 69, 58, 0.32);
+  color: var(--color-danger);
+  font-weight: 600;
+}
+button.destructive:hover,
+button.danger:hover,
+button.btn-danger:hover {
+  background: rgba(255, 69, 58, 0.20);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+button.destructive:active,
+button.danger:active,
+button.btn-danger:active {
+  background: rgba(255, 69, 58, 0.28);
+  transform: scale(0.985);
+}
+
+/* Compact Button */
+button.btn-compact,
+button.btn-sm,
+.btn-compact {
+  padding: 4px 10px;
+  min-height: 30px;
+  font-size: 12px;
+  border-radius: 8px;
+  gap: 5px;
+}
+
+/* Icon-Only Button */
+button.btn-icon,
+.btn-icon {
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  min-width: 36px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Full-Width Mobile / Block Button */
+button.btn-block,
+button.btn-full-width,
+.btn-block {
+  width: 100%;
+  display: flex;
 }
 
 /* Timer Badge */

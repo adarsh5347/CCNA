@@ -136,9 +136,36 @@ html[data-theme="light"] body:not(.high-contrast) .stat .v {
 }
 
 html[data-theme="light"] body:not(.high-contrast) .badge {
-  color: #0369a1 !important;
-  background: #e0f2fe !important;
-  border-color: #7dd3fc !important;
+  color: #0071e3 !important;
+  background: rgba(0, 113, 227, 0.08) !important;
+  border-color: rgba(0, 113, 227, 0.25) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .badge:nth-of-type(2n) {
+  color: #b45309 !important;
+  background: rgba(245, 158, 11, 0.10) !important;
+  border-color: rgba(245, 158, 11, 0.28) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .badge.badge-success,
+html[data-theme="light"] body:not(.high-contrast) .badge.status-ok {
+  color: #15803d !important;
+  background: rgba(34, 197, 94, 0.10) !important;
+  border-color: rgba(34, 197, 94, 0.28) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .badge.badge-warning,
+html[data-theme="light"] body:not(.high-contrast) .badge.status-warn {
+  color: #b45309 !important;
+  background: rgba(245, 158, 11, 0.10) !important;
+  border-color: rgba(245, 158, 11, 0.28) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .badge.badge-danger,
+html[data-theme="light"] body:not(.high-contrast) .badge.status-danger {
+  color: #dc2626 !important;
+  background: rgba(239, 68, 68, 0.10) !important;
+  border-color: rgba(239, 68, 68, 0.28) !important;
 }
 
 html[data-theme="light"] body:not(.high-contrast) .exam-shell,
@@ -309,17 +336,57 @@ html[data-theme="light"] body:not(.high-contrast) .checks label {
   border-color: rgba(15, 23, 42, 0.12) !important;
 }
 
+html[data-theme="light"] body:not(.high-contrast) .segmented-control,
+html[data-theme="light"] body:not(.high-contrast) .subnet-mode-tabs,
 html[data-theme="light"] body:not(.high-contrast) .topology-selector,
-html[data-theme="light"] body:not(.high-contrast) .lab-mode-group {
-  background: #f1f5f9 !important;
-  border-color: rgba(15, 23, 42, 0.15) !important;
+html[data-theme="light"] body:not(.high-contrast) .lab-mode-group,
+html[data-theme="light"] body:not(.high-contrast) .review-filters {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
 }
 
+html[data-theme="light"] body:not(.high-contrast) .segmented-control button,
+html[data-theme="light"] body:not(.high-contrast) .subnet-mode-tabs button,
+html[data-theme="light"] body:not(.high-contrast) .topology-selector button,
+html[data-theme="light"] body:not(.high-contrast) .lab-mode-group button,
+html[data-theme="light"] body:not(.high-contrast) .review-filters button {
+  color: #515154 !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .segmented-control button:hover,
+html[data-theme="light"] body:not(.high-contrast) .subnet-mode-tabs button:hover,
+html[data-theme="light"] body:not(.high-contrast) .topology-selector button:hover,
+html[data-theme="light"] body:not(.high-contrast) .lab-mode-group button:hover,
+html[data-theme="light"] body:not(.high-contrast) .review-filters button:hover {
+  color: #1d1d1f !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .segmented-control button.primary,
+html[data-theme="light"] body:not(.high-contrast) .segmented-control button.active,
+html[data-theme="light"] body:not(.high-contrast) .subnet-mode-tabs button.primary,
+html[data-theme="light"] body:not(.high-contrast) .subnet-mode-tabs button.active,
 html[data-theme="light"] body:not(.high-contrast) .topology-selector button.primary,
-html[data-theme="light"] body:not(.high-contrast) .lab-mode-group button.primary {
-  background: #e0f2fe !important;
-  color: #0369a1 !important;
-  border: 1px solid #0284c7 !important;
+html[data-theme="light"] body:not(.high-contrast) .topology-selector button.active,
+html[data-theme="light"] body:not(.high-contrast) .lab-mode-group button.primary,
+html[data-theme="light"] body:not(.high-contrast) .lab-mode-group button.active,
+html[data-theme="light"] body:not(.high-contrast) .review-filters button.active,
+html[data-theme="light"] body:not(.high-contrast) .review-filters button.primary {
+  background: #ffffff !important;
+  color: #1d1d1f !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.10) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .modal-overlay {
+  background: rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .modal-overlay .card {
+  background: #ffffff !important;
+  color: #1d1d1f !important;
+  border-color: rgba(0, 0, 0, 0.10) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.16) !important;
 }
 
 html[data-theme="light"] body:not(.high-contrast) .topology-canvas-wrap,
@@ -680,12 +747,6 @@ html[data-theme="light"] body:not(.high-contrast) #simOsiPanel span {
 
 html[data-theme="light"] body:not(.high-contrast) #simOsiPanel .osi-layer-name {
   color: #f8fafc !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .subnet-mode-tabs button.primary {
-  background: #e0f2fe !important;
-  color: #0369a1 !important;
-  border-color: #0284c7 !important;
 }
 
 html[data-theme="light"] body:not(.high-contrast) #studyPlanOutput h4,

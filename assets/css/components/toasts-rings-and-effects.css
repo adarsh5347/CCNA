@@ -30,12 +30,12 @@
 /* ─── Toast Notification System (Fixed Overlay Layer - Zero CLS) ─────────────────────────── */
 #toastContainer {
   position: fixed;
-  top: 76px;
-  right: var(--sp-4);
+  top: calc(14px + var(--safe-top));
+  right: calc(16px + var(--safe-right));
   z-index: 100005;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
+  gap: 8px;
   pointer-events: none;
   width: max-content;
   max-width: calc(100vw - 2rem);
@@ -47,8 +47,8 @@
   position: absolute;
   top: -100px;
   left: var(--sp-4);
-  background: #00f2fe;
-  color: #060913;
+  background: var(--color-tint);
+  color: #ffffff;
   padding: 12px 20px;
   z-index: 100000;
   font-weight: 700;
@@ -61,64 +61,66 @@
 }
 .skip-link:focus {
   top: 0;
-  outline: 2px solid #00f2fe !important;
+  outline: 2px solid var(--color-tint) !important;
   outline-offset: 2px;
 }
 
 .toast {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-4) var(--sp-5);
-  background: rgba(13, 19, 36, 0.96);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--surface-card);
+  border: 1px solid var(--color-separator-strong);
+  border-radius: 12px;
   backdrop-filter: blur(20px);
-  box-shadow: var(--elev-4);
-  color: var(--text-main);
-  font-size: var(--text-sm);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  color: var(--color-label);
+  font-size: 13.5px;
   font-weight: 500;
   line-height: var(--lh-snug);
-  min-width: 260px;
+  min-width: 240px;
   max-width: 380px;
   pointer-events: auto;
   cursor: pointer;
-  animation: toastIn var(--dur-slow) var(--ease-spring) both;
+  animation: toastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
   will-change: transform, opacity;
+  box-sizing: border-box;
 }
 
 .toast::before {
   content: '';
   width: 3px;
-  align-self: stretch;
-  border-radius: 2px;
+  height: 16px;
+  border-radius: 999px;
   flex-shrink: 0;
 }
 
-.toast-ok::before    { background: var(--color-ok);     }
+.toast-ok::before    { background: var(--color-success); }
 .toast-error::before { background: var(--color-danger);  }
-.toast-info::before  { background: var(--color-info);    }
-.toast-warn::before  { background: var(--color-warn);    }
+.toast-info::before  { background: var(--color-tint);    }
+.toast-warn::before  { background: var(--color-warning); }
 
 .toast.dismissing {
-  animation: toastOut var(--dur-base) var(--ease-in) forwards;
+  animation: toastOut 0.2s ease forwards;
 }
 
 @keyframes toastIn {
-  from { opacity: 0; transform: translateX(16px) scale(0.96); }
-  to   { opacity: 1; transform: translateX(0)    scale(1);    }
+  from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 @keyframes toastOut {
-  from { opacity: 1; transform: translateX(0) scale(1); }
-  to   { opacity: 0; transform: translateX(16px) scale(0.95); }
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(-8px) scale(0.96); }
 }
 
 @media (max-width: 600px) {
   #toastContainer {
-    top: 1rem;
-    right: 1rem;
-    left: 1rem;
-    max-width: calc(100vw - 2rem);
+    top: calc(10px + var(--safe-top));
+    right: 12px;
+    left: 12px;
+    max-width: calc(100vw - 24px);
   }
   .toast { min-width: unset; max-width: 100%; }
 }
@@ -163,17 +165,18 @@
   gap: var(--sp-4);
   align-items: center;
   padding: var(--sp-4);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--surface-1);
+  border: 1px solid var(--color-separator);
+  border-radius: var(--radius-md, 12px);
+  background: var(--surface-card);
   margin-top: var(--sp-3);
+  box-shadow: var(--shadow-sm);
   transition:
     border-color var(--dur-fast) var(--ease-std),
     background var(--dur-fast) var(--ease-std);
 }
 .domain-ring-card:hover {
-  border-color: rgba(0,242,254,0.22);
-  background: var(--surface-2);
+  border-color: var(--color-separator-strong);
+  background: var(--surface-3);
 }
 
 .domain-ring {
@@ -187,32 +190,34 @@
 }
 .domain-ring .ring-bg {
   fill: none;
-  stroke: rgba(255,255,255,0.07);
+  stroke: var(--surface-3);
   stroke-width: 5;
 }
 .domain-ring .ring-fill {
   fill: none;
+  stroke: var(--color-tint);
   stroke-width: 5;
   stroke-linecap: round;
-  transition: stroke-dashoffset 0.9s var(--ease-out);
+  transition: stroke-dashoffset 0.6s var(--ease-out);
 }
 .domain-ring .ring-label {
   position: absolute;
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
+  color: var(--color-label);
 }
 
 .domain-ring-info strong {
   display: block;
   font-size: var(--text-sm);
   font-weight: 600;
-  color: var(--text-main);
+  color: var(--color-label);
   margin-bottom: 3px;
 }
 .domain-ring-info span {
   font-size: var(--text-xs);
-  color: var(--text-muted);
+  color: var(--color-secondary-label);
 }
 
 /* ─── Analytics Narrative Banner ────────────────────────── */

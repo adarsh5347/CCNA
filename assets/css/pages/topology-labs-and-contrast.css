@@ -164,33 +164,36 @@
 
 /* Topology Segmented Button Controls */
 .topology-selector {
-  background: rgba(6, 9, 19, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--color-separator);
+  padding: 3px;
   border-radius: 10px;
   width: fit-content;
 }
 .topology-selector button {
   border: none !important;
-  border-radius: 6px !important;
+  border-radius: 7px !important;
   font-family: var(--font-sans);
-  font-weight: 600;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  transition: background-color var(--dur-fast) var(--ease-std), color var(--dur-fast) var(--ease-std), box-shadow var(--dur-fast) var(--ease-std) !important;
   margin: 0 !important;
+  padding: 6px 14px !important;
+  font-size: 12px !important;
 }
 .topology-selector button.secondary {
   background: transparent !important;
-  color: var(--text-muted) !important;
+  color: var(--color-secondary-label) !important;
 }
 .topology-selector button.secondary:hover {
-  background: rgba(255, 255, 255, 0.04) !important;
-  color: #fff !important;
+  background: var(--interactive-hover) !important;
+  color: var(--color-label) !important;
 }
 .topology-selector button.primary {
-  background: rgba(0, 242, 254, 0.15) !important;
-  color: #00f2fe !important;
-  border: 1px solid rgba(0, 242, 254, 0.3) !important;
-  box-shadow: 0 0 12px rgba(0, 242, 254, 0.1);
+  background: var(--surface-card) !important;
+  color: var(--color-label) !important;
+  border: 1px solid var(--color-separator) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.32) !important;
+  font-weight: 600 !important;
 }
 
 /* Premium Animations & Visual Refinements */
@@ -348,28 +351,47 @@ body.high-contrast svg line {
 /* Lab Center Styles */
 .lab-mode-group button {
   border: none !important;
-  border-radius: 6px !important;
-  font-size: 11px;
-  padding: 6px 12px;
+  border-radius: 7px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  padding: 6px 14px !important;
   cursor: pointer;
+  color: var(--color-secondary-label) !important;
+  background: transparent !important;
+  transition: background-color var(--dur-fast) var(--ease-std), color var(--dur-fast) var(--ease-std) !important;
+}
+.lab-mode-group button:hover {
+  background: var(--interactive-hover) !important;
+  color: var(--color-label) !important;
 }
 .lab-mode-group button.primary {
-  background: rgba(0, 242, 254, 0.15) !important;
-  color: #00f2fe !important;
-  border: 1px solid rgba(0, 242, 254, 0.3) !important;
+  background: var(--surface-card) !important;
+  color: var(--color-label) !important;
+  border: 1px solid var(--color-separator) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.32) !important;
+  font-weight: 600 !important;
 }
 
 /* Subnetting mode tabs styling */
 .subnet-mode-tabs button {
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 11px;
+  border: none !important;
+  border-radius: 7px !important;
+  padding: 6px 14px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: var(--color-secondary-label) !important;
+  background: transparent !important;
+}
+.subnet-mode-tabs button:hover {
+  background: var(--interactive-hover) !important;
+  color: var(--color-label) !important;
 }
 .subnet-mode-tabs button.primary {
-  background: rgba(0, 242, 254, 0.15) !important;
-  color: #00f2fe !important;
-  border: 1px solid rgba(0, 242, 254, 0.3) !important;
+  background: var(--surface-card) !important;
+  color: var(--color-label) !important;
+  border: 1px solid var(--color-separator) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.32) !important;
+  font-weight: 600 !important;
 }
 
 /* Focus and accessibility outlines */
