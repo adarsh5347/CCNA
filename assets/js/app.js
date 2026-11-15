@@ -500,6 +500,22 @@ function wireEvents() {
     });
   }
 
+  const btnExplore = byId("btnExplorePlatform");
+  if (btnExplore) {
+    btnExplore.addEventListener("click", (e) => {
+      e.preventDefault();
+      byId("explorePlatform")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  const btnFooterStudy = byId("btnFooterStartStudy");
+  if (btnFooterStudy) {
+    btnFooterStudy.addEventListener("click", () => {
+      setPage("engine");
+      startSession("study");
+    });
+  }
+
   const btnMute = byId("btnMuteToggle");
   if (btnMute) {
     btnMute.addEventListener("click", () => {

@@ -663,6 +663,70 @@
     grid-column: 1 / -1 !important;
   }
 
+  /* Phase 5 Editorial Homepage Mobile Enhancements */
+  .home-hero {
+    padding: 20px !important;
+  }
+  .home-hero-layout {
+    flex-direction: column !important;
+    gap: 20px !important;
+    align-items: stretch !important;
+  }
+  .home-hero-content {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  .home-hero-visual {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12px !important;
+  }
+  .home-hero-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .home-hero-actions .btn-hero {
+    width: 100% !important;
+  }
+  .home-hero-contract-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  .home-hero-contract-actions button:not([data-page="admin"]) {
+    width: 100% !important;
+    min-height: 44px !important;
+    padding: 8px 6px !important;
+    font-size: 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+  .home-stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+  .stat-readiness {
+    grid-column: 1 / -1 !important;
+  }
+  .practice-modes-grid,
+  .blueprint-grid,
+  .explore-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .home-cta-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .home-cta-actions .btn-hero {
+    width: 100% !important;
+  }
+
   .stat {
     padding: 12px !important;
   }
@@ -1396,6 +1460,12 @@
   .hero-dashboard > div:nth-of-type(2) > div:last-child button:not([data-page="admin"]) {
     font-size: 11px !important;
     padding: 6px 4px !important;
+  }
+  .home-hero-contract-actions {
+    grid-template-columns: 1fr !important;
+  }
+  .home-stats-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 
