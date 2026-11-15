@@ -7,7 +7,7 @@
    body[data-active-page="engine"] is set by setPage() in app.js.
    ═══════════════════════════════════════════════════════════════ */
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
 
   /* STEP 0: Hide the global topbar entirely in simulator mode */
   body[data-active-page="engine"] header.topbar {
@@ -219,7 +219,7 @@
 
 @media (max-width: 768px) {
   :root {
-    --bottom-nav-height: 64px;
+    --bottom-nav-height: var(--tabbar-height);
     --header-height: 72px;
   }
 
@@ -1346,7 +1346,7 @@
 }
 
 /* Mobile-only: make the video blueprint filter read as selectable chips with a visible active state */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .video-filter-btn {
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
     border-radius: 999px !important;

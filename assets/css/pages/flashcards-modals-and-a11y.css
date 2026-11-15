@@ -5,7 +5,7 @@
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
   .topology-main {
     aspect-ratio: auto !important;
     height: 290px !important;
@@ -234,7 +234,7 @@
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 768px) {
 
   /* ═══ EXAM SHELL: Full-viewport flex column ═══ */
   .exam-shell {

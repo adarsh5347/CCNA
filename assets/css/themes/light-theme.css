@@ -2,33 +2,62 @@
    PHASE 9: LIGHT THEME OVERRIDES ([data-theme="light"])
    ??????????????????????????????????????????????????????????????????????????? */
 html[data-theme="light"] {
-  --bg-dark:        #f1f5f9;
-  --bg-panel:       rgba(255, 255, 255, 0.92);
-  --bg-panel-solid: #ffffff;
-  --bg-card:        rgba(255, 255, 255, 0.96);
-  --bg-elevated:    #f8fafc;
-  --border-color:   rgba(15, 23, 42, 0.14);
+  /* ─── Semantic Tokens (Light Theme Mapping) ────────── */
+  --color-label:                       var(--primitive-neutral-900);
+  --color-secondary-label:             var(--primitive-neutral-700);
+  --color-tertiary-label:              var(--primitive-neutral-600);
+  --color-system-background:           var(--primitive-neutral-100);
+  --color-secondary-system-background: var(--primitive-neutral-0);
+  --color-grouped-background:          var(--primitive-neutral-50);
+  --color-separator:                   rgba(15, 23, 42, 0.14);
+  --color-separator-strong:            rgba(15, 23, 42, 0.14);
+  --color-fill:                        rgba(15, 23, 42, 0.05);
+  --color-tint:                        var(--primitive-blue-700);
+
+  --color-success:                     var(--primitive-green-700);
+  --color-warning:                     var(--primitive-orange-700);
+  --color-danger:                      var(--primitive-red-700);
+  --color-info:                        var(--primitive-blue-700);
+
+  --surface-card:                      rgba(255, 255, 255, 0.96);
+  --surface-elevated:                  var(--color-grouped-background);
+  --surface-grouped:                   var(--color-secondary-system-background);
+  --surface-chrome:                    rgba(255, 255, 255, 0.92);
+
+  --focus-ring:                        rgba(2, 132, 199, 0.50);
+  --interactive-hover:                 rgba(15, 23, 42, 0.06);
+  --interactive-active:                rgba(15, 23, 42, 0.10);
+
+  /* ─── Legacy Compatibility Aliases (Light Theme) ───── */
+  --bg-dark:        var(--color-system-background);
+  --bg-panel:       var(--surface-chrome);
+  --bg-panel-solid: var(--surface-grouped);
+  --bg-card:        var(--surface-card);
+  --bg-elevated:    var(--surface-elevated);
+  --border-color:   var(--color-separator);
   --border-glow:    rgba(2, 132, 199, 0.32);
-  --text-main:      #0f172a;
-  --text-muted:     #334155;
-  --text-secondary: #475569;
-  --text:           #0f172a;
-  --muted:          #334155;
-  --line:           rgba(15, 23, 42, 0.14);
-  --brand:          #0369a1;
-  --color-ok:       #047857;
-  --color-danger:   #be123c;
-  --color-warn:     #b45309;
-  --color-info:     #0369a1;
-  --color-accent:   #0369a1;
-  --accent-color:   #0369a1;
+  --text-main:      var(--color-label);
+  --text-muted:     var(--color-secondary-label);
+  --text-secondary: var(--color-tertiary-label);
+  --text:           var(--color-label);
+  --muted:          var(--color-secondary-label);
+  --line:           var(--color-separator-strong);
+  --brand:          var(--color-tint);
+  --ok:             var(--color-success);
+  --warn:           var(--color-warning);
+  --danger:         var(--color-danger);
+  --color-ok:       var(--color-success);
+  --color-warn:     var(--color-warning);
+  --color-accent:   var(--color-info);
+  --accent-color:   var(--color-info);
   --surface-0:      rgba(15, 23, 42, 0.00);
   --surface-1:      rgba(15, 23, 42, 0.03);
-  --surface-2:      rgba(15, 23, 42, 0.05);
+  --surface-2:      var(--color-fill);
   --surface-3:      rgba(15, 23, 42, 0.08);
   --surface-4:      rgba(15, 23, 42, 0.12);
-  --state-hover:    rgba(15, 23, 42, 0.06);
-  --state-active:   rgba(15, 23, 42, 0.10);
+  --state-hover:    var(--interactive-hover);
+  --state-active:   var(--interactive-active);
+  --state-focus:    var(--focus-ring);
   color-scheme: light;
 }
 

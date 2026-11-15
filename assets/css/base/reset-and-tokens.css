@@ -26,101 +26,279 @@ html {
   scrollbar-gutter: stable;
 }
 
-:root {
+/* ==========================================================================
+   NETOPS COMMAND — THREE-LAYER DESIGN TOKEN ARCHITECTURE (PHASE 2)
+   Canonical Responsive Breakpoints Reference (CSS Media Queries):
+   - Compact Phone:     @media (max-width: 360px) / (max-width: 380px)
+   - Standard Phone:    @media (max-width: 480px) / (max-width: 500px) / (max-width: 600px)
+   - Mobile Shell Lock: @media (max-width: 768px)  <-- Canonical Mobile/Exam Boundary
+   - Desktop Shell:     @media (min-width: 769px)
+   - Tablet / Split:    @media (max-width: 900px) / (max-width: 920px) / (max-width: 1020px) / (max-width: 1080px)
+   - Compact Desktop:   @media (min-width: 921px) and (max-width: 1280px)
+   ========================================================================== */
+
+:root,
+:where(html[data-theme="dark"]) {
   /* ─── Safe Area Variables ──────────────────────────── */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
-  --bottom-nav-height: 0px;
-  --header-height: 0px;
-  --text: #f8fafc;
-  --muted: #94a3b8;
-  --line: rgba(255, 255, 255, 0.10);
-  --brand: #00f2fe;
-  --ok: #10b981;
-  --warn: #f59e0b;
-  --danger: #f43f5e;
 
-  /* ─── Colour Palette ───────────────────────────────── */
-  --bg-dark:        #060913;
-  --bg-panel:       rgba(13, 19, 36, 0.78);
-  --bg-panel-solid: #0d1324;
-  --bg-card:        rgba(17, 24, 39, 0.68);
-  --border-color:   rgba(255, 255, 255, 0.08);
+  /* ========================================================================
+     LAYER A: PRIMITIVE TOKENS (Raw Design Values)
+     ======================================================================== */
+
+  /* ─── Neutral Grayscale Family ─────────────────────── */
+  --primitive-neutral-0:    #ffffff;
+  --primitive-neutral-50:   #f8fafc;
+  --primitive-neutral-100:  #f1f5f9;
+  --primitive-neutral-200:  #e2e8f0;
+  --primitive-neutral-300:  #cbd5e1;
+  --primitive-neutral-400:  #94a3b8;
+  --primitive-neutral-500:  #64748b;
+  --primitive-neutral-600:  #475569;
+  --primitive-neutral-700:  #334155;
+  --primitive-neutral-800:  #1e293b;
+  --primitive-neutral-850:  #111827;
+  --primitive-neutral-900:  #0f172a;
+  --primitive-neutral-925:  #0d1324;
+  --primitive-neutral-950:  #060913;
+  --primitive-neutral-1000: #000000;
+
+  /* ─── Blue / Cyan Family ───────────────────────────── */
+  --primitive-blue-100: #e0f2fe;
+  --primitive-blue-200: #bae6fd;
+  --primitive-blue-300: #7dd3fc;
+  --primitive-blue-400: #4facfe;
+  --primitive-blue-450: #00f2fe;
+  --primitive-blue-500: #3b82f6;
+  --primitive-blue-600: #0284c7;
+  --primitive-blue-700: #0369a1;
+
+  /* ─── Green Family ─────────────────────────────────── */
+  --primitive-green-100: #d1fae5;
+  --primitive-green-300: #34d399;
+  --primitive-green-500: #10b981;
+  --primitive-green-700: #047857;
+  --primitive-green-900: #064e3b;
+  --primitive-green-hc:  #00ff00;
+
+  /* ─── Orange / Amber Family ────────────────────────── */
+  --primitive-orange-100: #fef3c7;
+  --primitive-orange-400: #ff9233;
+  --primitive-orange-500: #f59e0b;
+  --primitive-orange-550: #ff5e3a;
+  --primitive-orange-700: #b45309;
+  --primitive-orange-900: #78350f;
+  --primitive-yellow-hc:  #ffff00;
+
+  /* ─── Red / Rose Family ────────────────────────────── */
+  --primitive-red-100: #ffe4e6;
+  --primitive-red-500: #f43f5e;
+  --primitive-red-700: #be123c;
+  --primitive-red-900: #881337;
+  --primitive-red-hc:  #ff0000;
+
+  /* ─── Networking Visualisation Primitives ──────────── */
+  --primitive-net-terminal-bg: #02050c;
+  --primitive-net-terminal-fg: #34d399;
+  --primitive-net-canvas-bg:   #060913;
+  --primitive-net-osi-l7:      #f43f5e;
+  --primitive-net-osi-l4:      #a855f7;
+  --primitive-net-osi-l3:      #3b82f6;
+  --primitive-net-osi-l2:      #10b981;
+  --primitive-net-osi-l1:      #f59e0b;
+
+  /* ─── Spacing Primitives (4px/8px grid) ────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ─── Border Radius Primitives ─────────────────────── */
+  --radius-6:    6px;
+  --radius-10:   10px;
+  --radius-14:   14px;
+  --radius-16:   16px;
+  --radius-20:   20px;
+  --radius-24:   24px;
+  --radius-pill: 9999px;
+
+  /* ─── Motion Primitives ────────────────────────────── */
+  --duration-instant:  80ms;
+  --duration-short:    150ms;
+  --duration-standard: 250ms;
+  --duration-long:     380ms;
+  --duration-xlong:    550ms;
+
+  --easing-out:        cubic-bezier(0.0, 0.0, 0.2, 1.0);
+  --easing-in:         cubic-bezier(0.4, 0.0, 1.0, 1.0);
+  --easing-standard:   cubic-bezier(0.4, 0.0, 0.2, 1.0);
+  --easing-emphasized: cubic-bezier(0.34, 1.56, 0.64, 1.0);
+
+  /* ─── Typography Scale Primitives (Apple HIG) ──────── */
+  --type-caption:     clamp(10px, 2.2vw, 11px);
+  --type-footnote:    clamp(12px, 2.5vw, 13px);
+  --type-subhead:     clamp(13px, 2.6vw, 14px);
+  --type-body:        clamp(13.5px, 2.8vw, 15px);
+  --type-callout:     clamp(14.5px, 2.9vw, 16px);
+  --type-headline:    clamp(15px, 3vw, 17px);
+  --type-title-3:     clamp(16px, 3.2vw, 18px);
+  --type-title-2:     clamp(18px, 3.5vw, 22px);
+  --type-title-1:     clamp(22px, 4vw, 28px);
+  --type-large-title: clamp(26px, 5vw, 36px);
+
+  /* ========================================================================
+     LAYER B: SEMANTIC TOKENS (Apple HIG Inspired — Default Dark Theme)
+     ======================================================================== */
+
+  /* ─── Labels & Hierarchy ───────────────────────────── */
+  --color-label:           var(--primitive-neutral-50);
+  --color-secondary-label: var(--primitive-neutral-400);
+  --color-tertiary-label:  var(--primitive-neutral-500);
+
+  /* ─── System Backgrounds & Separators ──────────────── */
+  --color-system-background:           var(--primitive-neutral-950);
+  --color-secondary-system-background: var(--primitive-neutral-925);
+  --color-grouped-background:          rgba(6, 9, 19, 0.55);
+  --color-separator:                   rgba(255, 255, 255, 0.08);
+  --color-separator-strong:            rgba(255, 255, 255, 0.10);
+  --color-fill:                        rgba(255, 255, 255, 0.04);
+  --color-tint:                        var(--primitive-blue-450);
+
+  /* ─── Semantic Status Colours ──────────────────────── */
+  --color-success: var(--primitive-green-500);
+  --color-warning: var(--primitive-orange-500);
+  --color-danger:  var(--primitive-red-500);
+  --color-info:    var(--primitive-blue-450);
+
+  /* ─── Semantic Surfaces ────────────────────────────── */
+  --surface-card:     rgba(17, 24, 39, 0.68);
+  --surface-elevated: var(--color-grouped-background);
+  --surface-grouped:  var(--color-secondary-system-background);
+  --surface-chrome:   rgba(13, 19, 36, 0.78);
+
+  /* ─── Semantic Interactions ────────────────────────── */
+  --focus-ring:         rgba(0, 242, 254, 0.50);
+  --interactive-hover:  rgba(255, 255, 255, 0.06);
+  --interactive-active: rgba(255, 255, 255, 0.10);
+
+  /* ========================================================================
+     LAYER C: COMPONENT TOKENS, Z-INDEX SCALE & LEGACY COMPATIBILITY
+     ======================================================================== */
+
+  /* ─── Component Tokens ─────────────────────────────── */
+  --btn-height:           44px;
+  --btn-padding-x:        var(--space-4);
+  --btn-radius:           var(--radius-10);
+  --card-padding:         var(--space-6);
+  --card-radius:          var(--radius-16);
+  --opt-radius:           var(--radius-14);
+  --exam-container-width: 1280px;
+  --tabbar-height:        64px;
+  --bottom-nav-height:    0px;
+  --header-height:        0px;
+  --modal-radius:         var(--radius-16);
+  --modal-max-width:      min(92vw, 520px);
+
+  /* ─── Semantic Z-Index Scale ───────────────────────── */
+  --z-base:    1;
+  --z-sticky:  100;
+  --z-drawer:  1000;
+  --z-overlay: 9990;
+  --z-modal:   9998;
+  --z-toast:   100000;
+
+  /* ─── Legacy Colour & Surface Compatibility Aliases ── */
+  --text:           var(--color-label);
+  --muted:          var(--color-secondary-label);
+  --line:           var(--color-separator-strong);
+  --brand:          var(--color-tint);
+  --ok:             var(--color-success);
+  --warn:           var(--color-warning);
+  --danger:         var(--color-danger);
+
+  --bg-dark:        var(--color-system-background);
+  --bg-panel:       var(--surface-chrome);
+  --bg-panel-solid: var(--surface-grouped);
+  --bg-card:        var(--surface-card);
+  --border-color:   var(--color-separator);
   --border-glow:    rgba(0, 242, 254, 0.2);
-  --text-main:      #f8fafc;
-  --text-muted:     #94a3b8;
-  --text-secondary: #64748b;
+  --text-main:      var(--color-label);
+  --text-muted:     var(--color-secondary-label);
+  --text-secondary: var(--color-tertiary-label);
 
-  /* ─── Color Semantics ──────────────────────────────── */
-  --color-ok:      #10b981;
-  --color-danger:  #f43f5e;
-  --color-warn:    #f59e0b;
-  --color-info:    #00f2fe;
-
-  /* Aliases for inline styles and JS consistency */
-  --color-success: var(--color-ok);
-  --color-accent:  var(--color-info);
-  --color-error:   #ff5e3a; --accent-color: var(--color-info); --bg-elevated: rgba(6, 9, 19, 0.55);
+  --color-ok:       var(--color-success);
+  --color-warn:     var(--color-warning);
+  --color-accent:   var(--color-info);
+  --color-error:    var(--primitive-orange-550);
+  --accent-color:   var(--color-info);
+  --bg-elevated:    var(--surface-elevated);
 
   /* ─── Surface Hierarchy ────────────────────────────── */
   --surface-0: rgba(255, 255, 255, 0.00);
   --surface-1: rgba(255, 255, 255, 0.02);
-  --surface-2: rgba(255, 255, 255, 0.04);
+  --surface-2: var(--color-fill);
   --surface-3: rgba(255, 255, 255, 0.07);
   --surface-4: rgba(255, 255, 255, 0.12);
 
   /* ─── Interactive States ───────────────────────────── */
-  --state-hover:    rgba(255, 255, 255, 0.06);
-  --state-active:   rgba(255, 255, 255, 0.10);
+  --state-hover:           var(--interactive-hover);
+  --state-active:          var(--interactive-active);
   --state-selected-bg:     rgba(0, 242, 254, 0.06);
   --state-selected-border: rgba(0, 242, 254, 0.32);
-  --state-focus:    rgba(0, 242, 254, 0.50);
+  --state-focus:           var(--focus-ring);
 
   /* ─── Brand Gradients ──────────────────────────────── */
-  --accent-orange: linear-gradient(135deg, #ff5e3a, #ff9233);
-  --accent-cyan:   linear-gradient(135deg, #00f2fe, #4facfe);
+  --accent-orange: linear-gradient(135deg, var(--primitive-orange-550), var(--primitive-orange-400));
+  --accent-cyan:   linear-gradient(135deg, var(--primitive-blue-450), var(--primitive-blue-400));
 
-  /* ─── Typography Scale (Responsive clamp scale) ────── */
-  --text-xs:   clamp(10px, 2.2vw, 11px);
-  --text-sm:   clamp(12px, 2.5vw, 13px);
-  --text-base: clamp(13.5px, 2.8vw, 15px);
-  --text-md:   clamp(15px, 3vw, 17px);
-  --text-lg:   clamp(16px, 3.2vw, 18px);
-  --text-xl:   clamp(18px, 3.5vw, 22px);
-  --text-2xl:  clamp(22px, 4vw, 28px);
-  --text-3xl:  clamp(26px, 5vw, 36px);
+  /* ─── Legacy Typography Scale Aliases ──────────────── */
+  --text-xs:   var(--type-caption);
+  --text-sm:   var(--type-footnote);
+  --text-base: var(--type-body);
+  --text-md:   var(--type-headline);
+  --text-lg:   var(--type-title-3);
+  --text-xl:   var(--type-title-2);
+  --text-2xl:  var(--type-title-1);
+  --text-3xl:  var(--type-large-title);
 
   /* ─── Line Heights ─────────────────────────────────── */
-  --lh-tight:  1.25;
-  --lh-snug:   1.40;
-  --lh-base:   1.60;
-  --lh-relaxed:1.75;
+  --lh-tight:   1.25;
+  --lh-snug:    1.40;
+  --lh-base:    1.60;
+  --lh-relaxed: 1.75;
 
   /* ─── Font Families ────────────────────────────────── */
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
-  --font-sans: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  --font-sans:    "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-display: "Bebas Neue", "Arial Black", Impact, sans-serif;
 
-  /* ─── Spacing Scale (8pt grid) ─────────────────────── */
-  --sp-1:  4px;
-  --sp-2:  8px;
-  --sp-3:  12px;
-  --sp-4:  16px;
-  --sp-5:  20px;
-  --sp-6:  24px;
-  --sp-8:  32px;
-  --sp-10: 40px;
-  --sp-12: 48px;
-  --sp-16: 64px;
+  /* ─── Legacy Spacing Aliases (8pt grid) ────────────── */
+  --sp-1:  var(--space-1);
+  --sp-2:  var(--space-2);
+  --sp-3:  var(--space-3);
+  --sp-4:  var(--space-4);
+  --sp-5:  var(--space-5);
+  --sp-6:  var(--space-6);
+  --sp-8:  var(--space-8);
+  --sp-10: var(--space-10);
+  --sp-12: var(--space-12);
+  --sp-16: var(--space-16);
 
-  /* ─── Border Radius ────────────────────────────────── */
-  --radius-sm:   6px;
-  --radius-md:   10px;
-  --radius-lg:   16px;
-  --radius-xl:   24px;
-  --radius-full: 9999px;
+  /* ─── Legacy Border Radius Aliases ─────────────────── */
+  --radius-sm:   var(--radius-6);
+  --radius-md:   var(--radius-10);
+  --radius-lg:   var(--radius-16);
+  --radius-xl:   var(--radius-24);
+  --radius-full: var(--radius-pill);
 
   /* ─── Elevation System ─────────────────────────────── */
   --elev-0: none;
@@ -131,23 +309,23 @@ html {
   --elev-glow-cyan: 0 0 0 1px rgba(0,242,254,0.12), 0 8px 24px rgba(0,242,254,0.08);
   --elev-glow-ok:   0 0 0 1px rgba(16,185,129,0.15), 0 4px 16px rgba(16,185,129,0.10);
 
-  /* Legacy aliases (keep for compat with existing JS) */
+  /* Legacy shadow aliases (keep for compat with existing JS) */
   --shadow-sm: var(--elev-1);
   --shadow-lg: var(--elev-3);
 
-  /* ─── Animation Language ───────────────────────────── */
-  --ease-out:     cubic-bezier(0.0, 0.0, 0.2, 1.0);
-  --ease-in:      cubic-bezier(0.4, 0.0, 1.0, 1.0);
-  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1.0);
-  --ease-std:     cubic-bezier(0.4, 0.0, 0.2, 1.0);
+  /* ─── Legacy Motion Aliases ────────────────────────── */
+  --ease-out:    var(--easing-out);
+  --ease-in:     var(--easing-in);
+  --ease-spring: var(--easing-emphasized);
+  --ease-std:    var(--easing-standard);
 
-  --dur-instant: 80ms;
-  --dur-fast:    150ms;
-  --dur-base:    250ms;
-  --dur-slow:    380ms;
-  --dur-xslow:   550ms;
+  --dur-instant: var(--duration-instant);
+  --dur-fast:    var(--duration-short);
+  --dur-base:    var(--duration-standard);
+  --dur-slow:    var(--duration-long);
+  --dur-xslow:   var(--duration-xlong);
 
-  /* Legacy aliases */
+  /* Legacy transition aliases */
   --transition-smooth: background-color var(--dur-base) var(--ease-std),
                        border-color var(--dur-base) var(--ease-std);
   --transition-lucid:  transform var(--dur-slow) var(--ease-spring),

@@ -277,16 +277,45 @@ svg polygon[fill="#ff5e3a"] {
 
 /* High Contrast Mode */
 body.high-contrast {
-  --bg-dark: #000000;
-  --bg-panel: #000000;
-  --bg-panel-solid: #000000;
-  --bg-card: #000000;
-  --border-color: #ffffff;
-  --text-main: #ffffff;
-  --text-muted: #e2e8f0;
-  --color-ok: #00ff00;
-  --color-danger: #ff0000;
-  --color-warn: #ffff00;
+  /* Semantic Tokens (High Contrast Mapping) */
+  --color-label:                       var(--primitive-neutral-0);
+  --color-secondary-label:             var(--primitive-neutral-200);
+  --color-tertiary-label:              var(--primitive-neutral-200);
+  --color-system-background:           var(--primitive-neutral-1000);
+  --color-secondary-system-background: var(--primitive-neutral-1000);
+  --color-grouped-background:          var(--primitive-neutral-1000);
+  --color-separator:                   var(--primitive-neutral-0);
+  --color-separator-strong:            var(--primitive-neutral-0);
+  --color-fill:                        var(--primitive-neutral-1000);
+  --color-tint:                        var(--primitive-neutral-0);
+  --color-success:                     var(--primitive-green-hc);
+  --color-warning:                     var(--primitive-yellow-hc);
+  --color-danger:                      var(--primitive-red-hc);
+  --color-info:                        var(--primitive-blue-450);
+  --surface-card:                      var(--primitive-neutral-1000);
+  --surface-elevated:                  var(--primitive-neutral-1000);
+  --surface-grouped:                   var(--primitive-neutral-1000);
+  --surface-chrome:                    var(--primitive-neutral-1000);
+  --focus-ring:                        var(--primitive-neutral-0);
+
+  /* Legacy Compatibility Aliases (High Contrast) */
+  --bg-dark:        var(--color-system-background);
+  --bg-panel:       var(--surface-chrome);
+  --bg-panel-solid: var(--surface-grouped);
+  --bg-card:        var(--surface-card);
+  --bg-elevated:    var(--surface-elevated);
+  --border-color:   var(--color-separator);
+  --text-main:      var(--color-label);
+  --text-muted:     var(--color-secondary-label);
+  --text-secondary: var(--color-tertiary-label);
+  --text:           var(--color-label);
+  --muted:          var(--color-secondary-label);
+  --line:           var(--color-separator-strong);
+  --color-ok:       var(--color-success);
+  --color-warn:     var(--color-warning);
+  --ok:             var(--color-success);
+  --warn:           var(--color-warning);
+  --danger:         var(--color-danger);
   background: #000000 !important;
 }
 body.high-contrast * {
