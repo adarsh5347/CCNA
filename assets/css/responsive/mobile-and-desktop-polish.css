@@ -131,27 +131,31 @@
 
 @media (min-width: 921px) and (max-width: 1280px) {
   .topbar {
-    padding: 8px 14px;
+    padding: 6px 14px;
     gap: 8px;
   }
   .brand h1 {
-    font-size: 18px;
-    letter-spacing: 1px;
+    font-size: 14px;
+    letter-spacing: -0.015em;
   }
   .brand p {
     display: none;
   }
   .nav-btn {
-    padding: 6px 8px;
-    font-size: 9.5px;
-    min-width: 52px;
+    padding: 5px 8px;
+    font-size: 12px;
+    gap: 4px;
     white-space: nowrap;
+  }
+  .nav-btn svg {
+    width: 14px;
+    height: 14px;
   }
   .topbar-utils {
     gap: 6px;
   }
   .xp-badge {
-    max-width: 145px;
+    max-width: 135px;
     overflow: hidden;
     text-overflow: ellipsis;
     padding: 4px 8px;

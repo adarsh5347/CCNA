@@ -513,42 +513,25 @@
   border-bottom: 1px solid rgba(0, 242, 254, 0.4);
 }
 
-/* Cyberpunk Dashboard Glowing Animations */
-@keyframes borderPulse {
-  0%, 100% {
-    border-color: rgba(0, 242, 254, 0.25);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2), 0 0 15px rgba(0, 242, 254, 0.08);
-  }
-  50% {
-    border-color: rgba(0, 242, 254, 0.5);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25), 0 0 25px rgba(0, 242, 254, 0.2);
-  }
-}
+/* Hero Dashboard Surface */
 .hero-dashboard {
-  background: var(--bg-panel);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: var(--sp-6);
   margin-bottom: var(--sp-5);
-  animation: borderPulse 4s infinite ease-in-out;
+  animation: none;
 }
-
-/* statGlow animation — integrated into the single .stat rule above */
-@keyframes statGlow {
-  0%, 100% { border-color: rgba(255, 255, 255, 0.06); }
-  50%       { border-color: rgba(0, 242, 254, 0.18);  }
-}
-/* Apply the ambient glow animation via the single consolidated .stat rule */
 
 /* Level Up Modal animations */
 @keyframes pulseLevel {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 30px rgba(255, 94, 58, 0.4);
+    box-shadow: 0 0 24px rgba(0, 113, 227, 0.35);
   }
   50% {
-    transform: scale(1.06);
-    box-shadow: 0 0 45px rgba(255, 94, 58, 0.7);
+    transform: scale(1.04);
+    box-shadow: 0 0 36px rgba(0, 113, 227, 0.55);
   }
 }
 
@@ -559,13 +542,13 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [role="button"]:focus-visible {
-  outline: 2px solid #00f2fe;
+  outline: 2px solid var(--color-tint);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(0, 242, 254, 0.15);
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.18);
 }
 
 .opt:focus-within {
-  outline: 2px solid rgba(0, 242, 254, 0.4);
+  outline: 2px solid rgba(0, 113, 227, 0.45);
   outline-offset: 2px;
   border-radius: 8px;
 }

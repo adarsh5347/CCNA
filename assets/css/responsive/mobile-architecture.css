@@ -112,8 +112,9 @@
     box-sizing: border-box !important;
     height: calc(var(--bottom-nav-height) + var(--safe-bottom)) !important;
     padding: 10px 14px calc(10px + var(--safe-bottom)) 14px !important;
-    background: rgba(15, 23, 42, 0.96) !important;
-    backdrop-filter: blur(16px) !important;
+    background: var(--surface-chrome) !important;
+    backdrop-filter: saturate(180%) blur(20px) !important;
+    -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
     border-top: 1px solid var(--border-color) !important;
     display: flex !important;
     flex-direction: row !important;
@@ -283,19 +284,19 @@
   }
 
   header.topbar .logo-container {
-    width: 34px !important;
-    height: 34px !important;
+    width: 32px !important;
+    height: 32px !important;
     flex-shrink: 0 !important;
   }
 
   header.topbar .brand strong {
     display: block !important;
     font-size: 14px !important;
-    letter-spacing: 0.8px !important;
+    letter-spacing: -0.015em !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    color: #f8fafc !important;
+    color: var(--color-label) !important;
   }
 
   header.topbar .brand .sub {
@@ -341,12 +342,17 @@
     font-size: 12px !important;
   }
 
-  /* ─── 2. DEDICATED 5-TAB MOBILE BOTTOM NAVIGATION ─── */
+  /* Lock background scroll when More sheet is open */
+  body.more-sheet-open {
+    overflow: hidden !important;
+  }
+
+  /* ─── 2. DEDICATED 5-TAB MOBILE BOTTOM NAVIGATION (Apple iOS Tab Bar) ─── */
   .mobile-bottom-nav {
     display: grid !important;
     grid-template-columns: repeat(5, 1fr) !important;
     align-items: center !important;
-    gap: 4px !important;
+    gap: 2px !important;
     position: fixed !important;
     left: 0 !important;
     right: 0 !important;
@@ -354,11 +360,11 @@
     z-index: 9990 !important;
     height: calc(64px + var(--safe-bottom)) !important;
     padding: 6px 8px calc(6px + var(--safe-bottom)) 8px !important;
-    background: rgba(6, 10, 22, 0.96) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border-top: 1px solid rgba(0, 242, 254, 0.2) !important;
-    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.65) !important;
+    background: var(--surface-chrome) !important;
+    backdrop-filter: saturate(180%) blur(20px) !important;
+    -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
+    border-top: 1px solid var(--color-separator) !important;
+    box-shadow: none !important;
     box-sizing: border-box !important;
   }
 
@@ -380,12 +386,13 @@
     border-radius: 10px !important;
     border: 1px solid transparent !important;
     background: transparent !important;
-    color: #94a3b8 !important;
+    color: var(--color-secondary-label) !important;
     font-family: var(--font-sans) !important;
     font-size: 10.5px !important;
-    font-weight: 600 !important;
+    font-weight: 500 !important;
     cursor: pointer !important;
-    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+    transition: color 0.18s ease, background-color 0.18s ease !important;
   }
 
   .mobile-nav-item svg {
@@ -400,26 +407,27 @@
     display: block !important;
     font-size: 10.5px !important;
     line-height: 1.1 !important;
-    letter-spacing: 0.2px !important;
+    letter-spacing: -0.01em !important;
     white-space: nowrap !important;
   }
 
   .mobile-nav-item.active {
-    color: #00f2fe !important;
-    background: rgba(0, 242, 254, 0.1) !important;
-    border-color: rgba(0, 242, 254, 0.3) !important;
-    box-shadow: 0 0 12px rgba(0, 242, 254, 0.14) !important;
+    color: var(--color-tint) !important;
+    background: rgba(0, 113, 227, 0.10) !important;
+    border-color: transparent !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
   }
 
-  /* ─── 3. MOBILE "MORE" BOTTOM SHEET ─── */
+  /* ─── 3. MOBILE "MORE" BOTTOM SHEET (Apple iOS Sheet) ─── */
   .mobile-more-backdrop {
     display: block !important;
     position: fixed !important;
     inset: 0 !important;
     z-index: 9994 !important;
-    background: rgba(2, 5, 14, 0.78) !important;
-    backdrop-filter: blur(6px) !important;
-    -webkit-backdrop-filter: blur(6px) !important;
+    background: rgba(0, 0, 0, 0.48) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
     opacity: 1;
     transition: opacity 0.22s ease;
   }
@@ -431,7 +439,7 @@
   .mobile-more-sheet {
     display: flex !important;
     flex-direction: column !important;
-    gap: 12px !important;
+    gap: 14px !important;
     position: fixed !important;
     left: 0 !important;
     right: 0 !important;
@@ -440,11 +448,11 @@
     max-height: 84dvh !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
-    background: #091022 !important;
-    border-top: 1.5px solid rgba(0, 242, 254, 0.35) !important;
+    background: var(--surface-card) !important;
+    border-top: 1px solid var(--color-separator-strong) !important;
     border-radius: 20px 20px 0 0 !important;
     padding: 10px 16px calc(80px + var(--safe-bottom)) 16px !important;
-    box-shadow: 0 -16px 42px rgba(0, 0, 0, 0.8) !important;
+    box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.45) !important;
     box-sizing: border-box !important;
   }
 
@@ -453,10 +461,11 @@
   }
 
   .mobile-more-handle {
-    width: 42px;
+    width: 38px;
     height: 4px;
     border-radius: 999px;
-    background: rgba(148, 163, 184, 0.35);
+    background: var(--color-tertiary-label);
+    opacity: 0.45;
     margin: 2px auto 4px auto;
   }
 
@@ -465,20 +474,22 @@
     justify-content: space-between;
     align-items: center;
     gap: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--color-separator);
     padding-bottom: 10px;
   }
 
   .mobile-more-header h3 {
     margin: 0 0 2px 0 !important;
     font-size: 16px !important;
-    color: #00f2fe !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.015em !important;
+    color: var(--color-label) !important;
   }
 
   .mobile-more-header p {
     margin: 0 !important;
     font-size: 12px !important;
-    color: var(--text-muted) !important;
+    color: var(--color-secondary-label) !important;
   }
 
   #btnCloseMobileMore {
@@ -488,7 +499,8 @@
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 18px !important;
+    font-size: 17px !important;
+    color: var(--color-secondary-label) !important;
   }
 
   .mobile-more-grid {
@@ -504,21 +516,37 @@
     padding: 12px !important;
     min-height: 60px !important;
     border-radius: 12px !important;
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: var(--surface-2) !important;
+    border: 1px solid var(--color-separator) !important;
     text-align: left !important;
     width: 100% !important;
     box-sizing: border-box !important;
+    box-shadow: none !important;
   }
 
   .mobile-more-card:active {
-    background: rgba(0, 242, 254, 0.1) !important;
-    border-color: rgba(0, 242, 254, 0.35) !important;
+    background: rgba(0, 113, 227, 0.12) !important;
+    border-color: rgba(0, 113, 227, 0.40) !important;
   }
 
   .mobile-more-icon {
-    font-size: 22px;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: rgba(0, 113, 227, 0.12);
+    color: var(--color-tint);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .mobile-more-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    fill: none;
     flex-shrink: 0;
   }
 
@@ -531,14 +559,14 @@
 
   .mobile-more-text strong {
     font-size: 13px;
-    color: #f8fafc;
+    color: var(--color-label);
     font-weight: 600;
     line-height: 1.2;
   }
 
   .mobile-more-text span {
     font-size: 11px;
-    color: var(--text-muted);
+    color: var(--color-secondary-label);
     line-height: 1.25;
   }
 

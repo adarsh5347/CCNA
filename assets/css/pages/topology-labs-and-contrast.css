@@ -195,13 +195,13 @@
 
 /* Premium Animations & Visual Refinements */
 
-/* Active nav buttons glowing highlight */
+/* Active nav buttons restrained highlight */
 nav button.active {
-  background: rgba(0, 242, 254, 0.08) !important;
-  border-color: rgba(0, 242, 254, 0.45) !important;
-  color: #00f2fe !important;
-  box-shadow: 0 0 12px rgba(0, 242, 254, 0.22) !important;
-  text-shadow: 0 0 4px rgba(0, 242, 254, 0.3);
+  background: var(--surface-3);
+  border-color: var(--color-separator);
+  color: var(--color-label);
+  box-shadow: none;
+  text-shadow: none;
 }
 
 /* Smooth Inspections (No-vibrate node styles) */

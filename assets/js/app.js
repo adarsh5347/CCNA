@@ -391,6 +391,13 @@ function syncMobileBottomNav(page, overrideTab = null) {
   });
 }
 
+function handleMoreSheetKeyDown(e) {
+  if (e.key === "Escape") {
+    e.preventDefault();
+    closeMobileMoreSheet(true);
+  }
+}
+
 function openMobileMoreSheet() {
   const sheet = byId("mobileMoreSheet");
   const backdrop = byId("mobileMoreBackdrop");
@@ -407,9 +414,11 @@ function openMobileMoreSheet() {
     backdrop.classList.add("active");
   }
   if (moreBtn) moreBtn.setAttribute("aria-expanded", "true");
+  document.body.classList.add("more-sheet-open");
+  document.addEventListener("keydown", handleMoreSheetKeyDown);
 }
 
-function closeMobileMoreSheet() {
+function closeMobileMoreSheet(restoreFocus = false) {
   const sheet = byId("mobileMoreSheet");
   const backdrop = byId("mobileMoreBackdrop");
   const moreBtn = document.querySelector('#mobileBottomNav [data-mobile-nav="more"]');
@@ -422,7 +431,12 @@ function closeMobileMoreSheet() {
     backdrop.classList.remove("active");
     backdrop.classList.add("hidden");
   }
-  if (moreBtn) moreBtn.setAttribute("aria-expanded", "false");
+  if (moreBtn) {
+    moreBtn.setAttribute("aria-expanded", "false");
+    if (restoreFocus) moreBtn.focus();
+  }
+  document.body.classList.remove("more-sheet-open");
+  document.removeEventListener("keydown", handleMoreSheetKeyDown);
 }
 
 function navSetup() {
