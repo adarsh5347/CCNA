@@ -121,6 +121,9 @@ window.initiateCheckout = initiateCheckout;
 window.toggleTimerPause = toggleTimerPause;
 window.exportAnalyticsProgress = exportAnalyticsProgress;
 window.importAnalyticsFromFile = importAnalyticsFromFile;
+window.calcDomainAccuracy = calcDomainAccuracy;
+window.readinessScore = readinessScore;
+window.passProbability = passProbability;
 // Exposed for cross-module call from quiz-engine.js after renderQuestion
 window.setupScrollCollapseHeader = setupScrollCollapseHeader;
 window.syncHeaderHeight = syncHeaderHeight;

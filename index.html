@@ -1143,49 +1143,129 @@
 
     <!-- READINESS DASHBOARD PAGE -->
     <section id="analytics" class="page">
-      <article class="hero" style="position: relative; overflow: hidden;">
-        <!-- Immersive Awwwards-style perspective cyber grid -->
-        <div class="cyber-grid" aria-hidden="true"></div>
-        <h2 class="reveal-text glow-accent" style="position: relative; z-index: 1;">Readiness Dashboard</h2>
-        <p style="position: relative; z-index: 1; color: var(--text-muted);">Track pass probability, readiness score, weak domains, and trend across attempts.</p>
-        <div style="position: relative; z-index: 2; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-          <button type="button" id="btnExportProgress" class="primary magnetic-btn" aria-label="Download Progress JSON">⬇️ Download Progress</button>
-          <button type="button" id="btnImportProgress" class="secondary magnetic-btn" aria-label="Import Progress JSON">⬆️ Import Progress</button>
-          <input type="file" id="importProgressInput" accept=".json,application/json" class="hidden" aria-label="Import progress JSON file" />
-          <button type="button" id="btnResetProgress" class="secondary magnetic-btn">⚠️ Reset Progress</button>
+      <!-- Section 2: Editorial Header -->
+      <article class="analytics-hero">
+        <div class="analytics-hero-eyebrow">
+          <span>⚡</span>
+          <span>CCNA 200-301 Preparation Intelligence</span>
+        </div>
+        <h2 class="analytics-hero-title">
+          Your progress.<br />
+          <span class="analytics-hero-gradient">Your next milestone.</span>
+        </h2>
+        <p class="analytics-hero-desc">
+          Understand your CCNA preparation, identify knowledge gaps and turn your practice into measurable progress.
+        </p>
+        <div class="analytics-meta-bar">
+          <div class="analytics-status-group">
+            <span id="analyticsPrepStatus" class="analytics-status-pill">Active Learner</span>
+            <span id="analyticsLastActivity" class="analytics-meta-pill">Last activity: None</span>
+            <a href="#studyPlannerHeading" class="btn btn-secondary btn-sm" id="btnJumpPlanner">📅 Plan Exam Date</a>
+          </div>
+          <div class="analytics-hero-actions">
+            <button type="button" id="btnExportProgress" class="btn btn-primary btn-sm" aria-label="Download Progress JSON">⬇️ Download Progress</button>
+            <button type="button" id="btnImportProgress" class="btn btn-secondary btn-sm" aria-label="Import Progress JSON">⬆️ Import Progress</button>
+            <input type="file" id="importProgressInput" accept=".json,application/json" class="hidden" aria-label="Import progress JSON file" />
+            <button type="button" id="btnResetProgress" class="btn btn-ghost btn-sm" aria-label="Reset Progress Statistics">⚠️ Reset Progress</button>
+          </div>
         </div>
       </article>
-      <div id="analyticsNarrative" class="analytics-narrative hidden"></div>
-      <section id="analyticsStats" class="grid stats"></section>
-      <section class="card">
-        <h3>Domain Breakdown</h3>
+
+      <!-- Section 3: Overall Readiness Overview -->
+      <div class="readiness-overview-grid">
+        <div class="readiness-hero-card" id="readinessHeroCard">
+          <div class="readiness-ring-row">
+            <div class="readiness-ring-wrap" aria-label="Overall Readiness Ring">
+              <svg viewBox="0 0 96 96" aria-hidden="true">
+                <circle class="ring-bg" cx="48" cy="48" r="38"></circle>
+                <circle class="ring-fill" id="readinessHeroRingFill" cx="48" cy="48" r="38" stroke-dasharray="238.76" stroke-dashoffset="238.76"></circle>
+              </svg>
+              <div class="readiness-ring-center">
+                <div class="readiness-ring-number" id="readinessHeroScore">0%</div>
+                <div class="readiness-ring-label">Readiness</div>
+              </div>
+            </div>
+            <div class="readiness-heading-info">
+              <div class="readiness-eyebrow">Certification Status</div>
+              <h3 class="readiness-tier-title" id="readinessTierTitle">Not Started</h3>
+              <span class="readiness-badge-pill" id="readinessStatusPill">Awaiting Diagnostic Data</span>
+            </div>
+          </div>
+          <div class="readiness-prob-box">
+            <div class="readiness-prob-val">
+              <span class="readiness-prob-label">CCNA Pass Probability (Estimated)</span>
+              <span class="readiness-prob-number" id="readinessPassProbVal">0%</span>
+            </div>
+            <p class="readiness-disclaimer">
+              <span aria-hidden="true">ℹ️</span> Pass probability is a practice-based estimate derived from mock performance, not an official Cisco guarantee or statistically validated forecast.
+            </p>
+          </div>
+        </div>
+
+        <div id="analyticsNarrative" class="analytics-narrative-card">
+          <div class="analytics-narrative-eyebrow">
+            <span>📡</span>
+            <span>Telemetry Insights</span>
+          </div>
+          <p class="analytics-narrative-content" id="analyticsNarrativeText">
+            Complete practice questions, virtual labs, or simulated exams to compile diagnostic telemetry and compute your CCNA readiness metrics across all 6 Cisco blueprint domains.
+          </p>
+        </div>
+      </div>
+
+      <!-- KPI Key Metric Cards -->
+      <section id="analyticsStats" class="grid stats" aria-label="Preparation Statistics"></section>
+
+      <!-- Section 4: Six CCNA Blueprint Domains -->
+      <section class="analytics-section-card" id="analyticsDomainSection">
+        <div class="analytics-section-header">
+          <div>
+            <h3 class="analytics-section-title">Cisco CCNA 200-301 Blueprint Domains</h3>
+            <p class="analytics-section-desc">Official exam weighting indicates Cisco's blueprint distribution. Personal accuracy reflects your verified practice performance.</p>
+          </div>
+        </div>
         <div id="domainBreakdown"></div>
       </section>
-      <section class="card">
-        <h3>Improvement Trend</h3>
+
+      <!-- Section 5 & 7: Improvement Trend and Recent Activity -->
+      <section class="analytics-section-card" id="analyticsTrendSection">
+        <div class="analytics-section-header">
+          <div>
+            <h3 class="analytics-section-title">Score Trajectory & Recent Sessions</h3>
+            <p class="analytics-section-desc">Performance tracking across your recent examination, practice, and diagnostic sessions.</p>
+          </div>
+        </div>
         <div id="trend"></div>
       </section>
-      
-      <section class="card">
-        <h3 id="studyPlannerHeading">📅 NOC Dynamic Exam Study Planner</h3>
-        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">Set your target exam date to generate a personalized daily training regimen based on your weak domains and readiness level.</p>
-        <div style="display: flex; gap: 12px; align-items: center; margin-top: 14px; flex-wrap: wrap;">
+
+      <!-- Section 6: XP, Levels and Achievements -->
+      <section id="achievementsPanel" class="analytics-section-card"></section>
+
+      <!-- Study Planner -->
+      <section class="analytics-section-card">
+        <div class="analytics-section-header">
           <div>
-            <label for="studyExamDate" style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px; color: var(--text-muted);">Target Exam Date</label>
-            <input type="date" id="studyExamDate" style="background: #111827; border: 1px solid #374151; color: #fff; padding: 8px; border-radius: 8px; font-size: 12.5px;" />
+            <h3 class="analytics-section-title" id="studyPlannerHeading">📅 NOC Dynamic Exam Study Planner</h3>
+            <p class="analytics-section-desc">Set your target exam date to generate a personalized daily training regimen based on your weak domains and readiness level.</p>
           </div>
-          <div>
-            <label for="studyDailyHours" style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 4px; color: var(--text-muted);">Daily Study Target</label>
-            <select id="studyDailyHours" style="background: #111827; border: 1px solid #374151; color: #fff; padding: 8px; border-radius: 8px; min-width: 120px; font-size: 12.5px;">
+        </div>
+        <div class="planner-form-row">
+          <div class="planner-field">
+            <label for="studyExamDate">Target Exam Date</label>
+            <input type="date" id="studyExamDate" />
+          </div>
+          <div class="planner-field">
+            <label for="studyDailyHours">Daily Study Target</label>
+            <select id="studyDailyHours">
               <option value="1">1 Hour</option>
               <option value="2" selected>2 Hours</option>
               <option value="3">3 Hours</option>
               <option value="4">4+ Hours</option>
             </select>
           </div>
-          <button id="btnGeneratePlan" class="primary" style="margin-top: 18px; padding: 8px 16px; font-size: 12.5px;">Generate Plan</button>
+          <button id="btnGeneratePlan" class="btn btn-primary" type="button">Generate Plan</button>
         </div>
-        <div id="studyPlanOutput" style="margin-top: 18px; padding: 16px; background: rgba(0, 242, 254, 0.03); border: 1px dashed rgba(0, 242, 254, 0.3); border-radius: 10px; display: none; font-size: 13px; line-height: 1.6;"></div>
+        <div id="studyPlanOutput" style="display: none;"></div>
       </section>
     </section>
 

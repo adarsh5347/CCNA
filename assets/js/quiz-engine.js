@@ -3,6 +3,7 @@ import {
   byId,
   playNetSound,
   gainXP,
+  getLevelInfo,
   saveAnalytics,
   safeHTML,
   pick,
@@ -1583,102 +1584,222 @@ export async function importAnalyticsFromFile(file) {
 export function renderAnalytics() {
   const attempts = state.analytics.attempts || [];
   const narrativeEl = byId("analyticsNarrative");
-  
-  if (attempts.length === 0) {
-    if (narrativeEl) narrativeEl.classList.add("hidden");
-    
-    byId("analyticsStats").innerHTML = "";
-    byId("domainBreakdown").innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">📡</div>
-        <h3>No telemetry data available</h3>
-        <p>Complete at least one practice quiz or simulated exam to compile telemetry diagnostics and compute your CCNA readiness metrics across all 6 Cisco blueprint domains.</p>
-        <button class="primary" onclick="setPage('home')">Start Practice Session</button>
-      </div>
-    `;
-    
-    const trendEl = byId("trend");
-    if (trendEl) {
-      trendEl.innerHTML = `
-        <div class="empty-state" style="padding: var(--sp-6) 0;">
-          <p style="color: var(--text-secondary); font-size: var(--text-sm);">No active telemetry trends detected.</p>
-        </div>
-      `;
-    }
-    
-    renderAchievements();
-    return;
+  const narrativeTextEl = byId("analyticsNarrativeText");
+  const da = calcDomainAccuracy();
+  const rs = readinessScore();
+  const pp = passProbability();
+  const label = readinessLabel(rs);
+
+  // Update Hero elements
+  const heroScoreEl = byId("readinessHeroScore");
+  if (heroScoreEl) heroScoreEl.textContent = `${rs}%`;
+
+  const heroTierEl = byId("readinessTierTitle");
+  if (heroTierEl) heroTierEl.textContent = label;
+
+  const heroStatusPill = byId("readinessStatusPill");
+  if (heroStatusPill) {
+    heroStatusPill.textContent = rs >= 85 ? "Exam Ready Status" : rs >= 70 ? "Targeting Pass Margin" : rs > 0 ? "Diagnostic Foundation" : "Awaiting Diagnostic Data";
   }
 
-  const da = calcDomainAccuracy();
+  const heroRingFill = byId("readinessHeroRingFill");
+  if (heroRingFill) {
+    const circumference = 238.76;
+    const offset = Math.round(circumference * (1 - rs / 100));
+    heroRingFill.style.strokeDashoffset = offset;
+    heroRingFill.style.stroke = rs >= 85 ? "var(--color-success, #30d158)" : rs >= 70 ? "var(--color-tint, #0071e3)" : rs >= 50 ? "var(--color-warning, #ff9f0a)" : "var(--color-danger, #ff453a)";
+  }
+
+  const passProbValEl = byId("readinessPassProbVal");
+  if (passProbValEl) passProbValEl.textContent = `${pp}%`;
+
+  const prepStatusEl = byId("analyticsPrepStatus");
+  if (prepStatusEl) prepStatusEl.textContent = label;
+
+  const lastActivityEl = byId("analyticsLastActivity");
+  if (lastActivityEl) {
+    if (attempts.length > 0 && attempts[attempts.length - 1].at) {
+      try {
+        lastActivityEl.textContent = `Last: ${new Date(attempts[attempts.length - 1].at).toLocaleDateString()}`;
+      } catch {
+        lastActivityEl.textContent = `Last: Session #${attempts.length}`;
+      }
+    } else {
+      lastActivityEl.textContent = "Last activity: None";
+    }
+  }
+
   const weak = Object.entries(da).sort((a, b) => a[1] - b[1])[0];
   const strong = Object.entries(da).sort((a, b) => b[1] - a[1])[0];
-  const avg = state.analytics.totalQ ? Math.round(state.analytics.totalTime / state.analytics.totalQ) : 0;
-  const pp = passProbability();
-  const rs = readinessScore();
+  const totalQ = state.analytics.totalQ || 0;
+  const correct = state.analytics.correct || 0;
+  const overallAcc = totalQ ? Math.round((correct / totalQ) * 100) : 0;
+  const avg = totalQ ? Math.round(state.analytics.totalTime / totalQ) : 0;
+  const studyHours = ((state.analytics.studyMin || 0) / 60).toFixed(1);
 
+  // Update Narrative insight banner
   if (narrativeEl) {
+    narrativeEl.classList.remove("hidden");
     let narrativeText = "";
-    if (rs >= 85) {
+    if (attempts.length === 0) {
+      narrativeText = "Welcome to your Readiness Dashboard. Complete your first practice quiz, simulated exam, or virtual lab to compile real-time diagnostic telemetry, domain breakdown analytics, and your CCNA readiness rating.";
+    } else if (rs >= 85) {
       narrativeText = `Excellent progress! Your readiness score is <strong>${rs}%</strong>, indicating a high likelihood of passing the CCNA exam. Continue to review your weak areas, particularly <strong>${weak[0]}</strong> (${weak[1]}%), to maintain peak performance.`;
     } else if (rs >= 70) {
       narrativeText = `You are in the intermediate readiness zone at <strong>${rs}%</strong>. You demonstrate solid competency in <strong>${strong[0]}</strong> (${strong[1]}%), but security and connectivity controls remain critical improvement vectors. Focus heavily on <strong>${weak[0]}</strong> (${weak[1]}%) to cross the exam readiness threshold.`;
     } else {
       narrativeText = `Telemetry analysis indicates an active readiness score of <strong>${rs}%</strong>. To construct a reliable pass margin, prioritize high-impact study sessions. Your weakest domain is currently <strong>${weak[0]}</strong> (${weak[1]}%), which represents the largest leverage point for boosting your overall rating.`;
     }
-    narrativeEl.innerHTML = `<h3>Telemetry Insights</h3><p>${narrativeText}</p>`;
-    narrativeEl.classList.remove("hidden");
+    if (narrativeTextEl) {
+      narrativeTextEl.innerHTML = narrativeText;
+    } else {
+      narrativeEl.innerHTML = `<div class="analytics-narrative-eyebrow"><span>📡</span><span>Telemetry Insights</span></div><p class="analytics-narrative-content">${narrativeText}</p>`;
+    }
   }
 
+  // Render KPI Stat cards
   renderStatsCards("analyticsStats", [
     { k: "Overall Readiness Score", v: `${rs}%` },
-    { k: "CCNA Pass Probability", v: `${pp}%` },
+    { k: "CCNA Pass Probability (Est.)", v: `${pp}%` },
+    { k: "Questions Answered", v: totalQ },
+    { k: "Overall Accuracy", v: `${overallAcc}%` },
     { k: "Quizzes Completed", v: attempts.length },
-    { k: "Study Hours", v: (state.analytics.studyMin / 60).toFixed(1) },
-    { k: "Average Time Per Question", v: `${avg}s` },
-    { k: "Weakest Domain", v: weak ? `${weak[0]} (${weak[1]}%)` : "N/A" },
-    { k: "Strongest Domain", v: strong ? `${strong[0]} (${strong[1]}%)` : "N/A" }
+    { k: "Study Hours", v: `${studyHours}h` },
+    { k: "Average Time / Question", v: `${avg}s` },
+    { k: "Weakest Domain", v: weak && attempts.length > 0 ? `${weak[0]} (${weak[1]}%)` : "N/A" },
+    { k: "Strongest Domain", v: strong && attempts.length > 0 ? `${strong[0]} (${strong[1]}%)` : "N/A" }
   ]);
 
-  const trendEl = byId("trend");
-  if (trendEl) {
-    const recent = attempts.slice(-10).reverse();
-    trendEl.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px;">${recent.map((att, idx) => {
-      const score = Number(att.score) || 0;
-      const col = score >= 80 ? "#10b981" : score >= 60 ? "#f59e0b" : "#ef4444";
-      const dateStr = att.at ? new Date(att.at).toLocaleDateString() : `Session #${attempts.length - idx}`;
-      return `<div class="trend-row-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border-radius:8px;background:var(--bg-elevated, rgba(6,9,19,0.55));border:1px solid var(--line, rgba(255,255,255,0.06));">
-        <div style="font-size:12.5px;color:var(--text);"><strong>${safeHTML(String(att.mode || "quiz").toUpperCase())}</strong> · ${att.correct || 0}/${att.total || 0} Qs <span style="color:var(--text-muted);font-size:11px;margin-left:6px;">${safeHTML(dateStr)}</span></div>
-        <span style="font-family:var(--font-mono);font-size:12.5px;font-weight:700;color:${col};">${score}%</span>
-      </div>`;
-    }).join("")}</div>`;
+  // Render Domain Breakdown cards (ALWAYS renders all 6 domains with .domain-ring-card)
+  const dasharray = 132;
+  const domainBreakdownEl = byId("domainBreakdown");
+  if (domainBreakdownEl) {
+    domainBreakdownEl.innerHTML = `
+      <div class="analytics-domains-grid">
+        ${blueprint.map((d) => {
+          const s = state.analytics.domain && state.analytics.domain[d.name] ? state.analytics.domain[d.name] : { total: 0, correct: 0 };
+          const p = da[d.name] || 0;
+          const color = p >= 80 ? "var(--color-success, #30d158)" : p >= 50 ? "var(--color-warning, #ff9f0a)" : "var(--color-danger, #ff453a)";
+          const dashoffset = Math.round(dasharray * (1 - p / 100));
+          const isWeak = weak && weak[0] === d.name && attempts.length > 0;
+          return `
+            <div class="domain-ring-card${isWeak ? ' is-weak-domain' : ''}">
+              <div class="domain-ring-card-top">
+                <div class="domain-ring" style="position: relative; display: flex; align-items: center; justify-content: center;">
+                  <svg viewBox="0 0 52 52" aria-hidden="true">
+                    <circle class="ring-bg" cx="26" cy="26" r="21"></circle>
+                    <circle class="ring-fill" cx="26" cy="26" r="21" stroke="${color}" stroke-dasharray="${dasharray}" stroke-dashoffset="${dashoffset}"></circle>
+                  </svg>
+                  <span class="ring-label" style="color: ${color};">${p}%</span>
+                </div>
+                <div class="domain-ring-info">
+                  <div class="domain-badge-row">
+                    <span class="domain-weight-pill">${d.weight}% Exam Weight</span>
+                    ${isWeak ? '<span class="domain-focus-pill">Focus Area</span>' : ''}
+                  </div>
+                  <strong>${safeHTML(d.name)}</strong>
+                  <span class="domain-sub-metric">${s.correct || 0} / ${s.total || 0} correct (${p}% accuracy)</span>
+                </div>
+              </div>
+              <div class="domain-bar-wrap">
+                <div class="domain-progress-bar">
+                  <div class="domain-progress-fill" style="width: ${p}%; background: ${color};"></div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
   }
 
-  const dasharray = 132;
-  byId("domainBreakdown").innerHTML = `
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--sp-4);">
-      ${blueprint.map((d) => {
-        const p = da[d.name] || 0;
-        const color = p >= 80 ? "var(--color-ok)" : p >= 50 ? "var(--color-warn)" : "var(--color-danger)";
-        const dashoffset = Math.round(dasharray * (1 - p / 100));
-        return `
-          <div class="domain-ring-card">
-            <div class="domain-ring" style="position: relative; display: flex; align-items: center; justify-content: center;">
-              <svg viewBox="0 0 52 52">
-                <circle class="ring-bg" cx="26" cy="26" r="21"></circle>
-                <circle class="ring-fill" cx="26" cy="26" r="21" stroke="${color}" stroke-dasharray="${dasharray}" stroke-dashoffset="${dashoffset}"></circle>
-              </svg>
-              <span class="ring-label" style="color: ${color};">${p}%</span>
-            </div>
-            <div class="domain-ring-info">
-              <strong>${d.name}</strong>
-              <span>Exam Weight: ${d.weight}%</span>
-            </div>
+  // Render Trend Chart & Recent Sessions
+  const trendEl = byId("trend");
+  if (trendEl) {
+    if (attempts.length === 0) {
+      trendEl.innerHTML = `
+        <div class="trend-empty-state">
+          <div class="trend-empty-icon">📈</div>
+          <h4 style="margin: 0 0 6px 0; font-size: 14px; color: var(--color-label);">No Active Telemetry Trends</h4>
+          <p style="margin: 0 0 16px 0; font-size: 12.5px; color: var(--color-secondary-label);">Complete quizzes or practice sessions to visualize your score trajectory over time.</p>
+          <button class="btn btn-primary btn-sm" onclick="window.setPage('home')">Start Practice Session</button>
+        </div>
+      `;
+    } else {
+      const recent = attempts.slice(-10);
+      const points = recent.map((att, idx) => {
+        const score = Math.max(0, Math.min(100, Number(att.score) || 0));
+        const x = recent.length === 1 ? 300 : 40 + Math.round((idx / (recent.length - 1)) * 520);
+        const y = Math.round(105 - (score / 100) * 80);
+        return { x, y, score, mode: att.mode || "quiz", correct: att.correct || 0, total: att.total || 0, at: att.at };
+      });
+
+      let pathD = "";
+      let areaD = "";
+      if (points.length === 1) {
+        pathD = `M ${points[0].x - 20} ${points[0].y} L ${points[0].x + 20} ${points[0].y}`;
+        areaD = `M ${points[0].x - 20} 115 L ${points[0].x - 20} ${points[0].y} L ${points[0].x + 20} ${points[0].y} L ${points[0].x + 20} 115 Z`;
+      } else {
+        pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+        areaD = `${pathD} L ${points[points.length - 1].x} 115 L ${points[0].x} 115 Z`;
+      }
+
+      const svgHtml = `
+        <div class="trend-sparkline-wrap">
+          <div class="trend-sparkline-header">
+            <span>Score Trajectory (Last ${recent.length} Sessions)</span>
+            <strong>Target: 80% Passing Score</strong>
           </div>
-        `;
-      }).join("")}
-    </div>
-  `;
+          <svg class="trend-chart-svg" viewBox="0 0 600 130" preserveAspectRatio="none" aria-label="Score Trend Chart">
+            <defs>
+              <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--color-tint)" stop-opacity="0.28" />
+                <stop offset="100%" stop-color="var(--color-tint)" stop-opacity="0.0" />
+              </linearGradient>
+            </defs>
+            <!-- 80% passing line -->
+            <line x1="20" y1="41" x2="580" y2="41" stroke="var(--color-success, #30d158)" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.65" />
+            <text x="580" y="36" fill="var(--color-success, #30d158)" font-size="9" text-anchor="end" font-family="var(--font-mono)">80% Passing Benchmark</text>
+            <!-- Area fill and trend line -->
+            <path d="${areaD}" fill="url(#trendGradient)"></path>
+            <path d="${pathD}" fill="none" stroke="var(--color-tint)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <!-- Data points -->
+            ${points.map((p) => {
+              const col = p.score >= 80 ? "var(--color-success, #30d158)" : p.score >= 60 ? "var(--color-warning, #ff9f0a)" : "var(--color-danger, #ff453a)";
+              return `
+                <g>
+                  <circle cx="${p.x}" cy="${p.y}" r="4" fill="var(--surface-card)" stroke="${col}" stroke-width="2"></circle>
+                  <text x="${p.x}" y="${Math.max(14, p.y - 7)}" fill="var(--color-label)" font-size="10" font-weight="700" text-anchor="middle" font-family="var(--font-mono)">${p.score}%</text>
+                </g>
+              `;
+            }).join("")}
+          </svg>
+        </div>
+      `;
+
+      const listHtml = `
+        <div class="trend-sessions-list">
+          ${recent.slice().reverse().map((att, idx) => {
+            const score = Number(att.score) || 0;
+            const col = score >= 80 ? "var(--color-success, #30d158)" : score >= 60 ? "var(--color-warning, #ff9f0a)" : "var(--color-danger, #ff453a)";
+            const dateStr = att.at ? new Date(att.at).toLocaleDateString() : `Session #${attempts.length - idx}`;
+            return `
+              <div class="trend-row-item">
+                <div style="font-size:13px; color:var(--color-label);">
+                  <span class="trend-mode-badge">${safeHTML(String(att.mode || "quiz").toUpperCase())}</span>
+                  <strong>${att.correct || 0}/${att.total || 0} Qs</strong>
+                  <span style="color:var(--color-secondary-label); font-size:11.5px; margin-left:8px;">${safeHTML(dateStr)}</span>
+                </div>
+                <span class="trend-score-pill" style="color:${col};">${score}%</span>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+
+      trendEl.innerHTML = svgHtml + listHtml;
+    }
+  }
 
   renderAchievements();
 }
@@ -1688,7 +1809,9 @@ export function renderAchievements() {
   const rs = readinessScore();
   const da = calcDomainAccuracy();
   const displayStreak = getDisplayStreak(a);
-  
+  const xp = a.xp || 0;
+  const info = getLevelInfo(xp);
+
   const badges = [
     {
       id: "first_lab",
@@ -1699,7 +1822,7 @@ export function renderAchievements() {
     },
     {
       id: "100_questions",
-      title: "100 Questions",
+      title: "Century Club",
       desc: "Solve 100 or more questions in the preparation engine.",
       unlocked: (a.totalQ || 0) >= 100,
       icon: "📚"
@@ -1713,70 +1836,88 @@ export function renderAchievements() {
     },
     {
       id: "ospf_expert",
-      title: "OSPF Expert",
-      desc: "Reach 80% or higher accuracy in the IP Connectivity domain.",
-      unlocked: (da["IP Connectivity"] || 0) >= 80 && (a.domain["IP Connectivity"]?.total || 0) >= 5,
+      title: "OSPF Specialist",
+      desc: "Reach 80% or higher accuracy in the IP Connectivity domain (min 5 Qs).",
+      unlocked: (da["IP Connectivity"] || 0) >= 80 && (a.domain && a.domain["IP Connectivity"] ? a.domain["IP Connectivity"].total : 0) >= 5,
       icon: "🕸️"
     },
     {
       id: "routing_champion",
       title: "Routing Champion",
       desc: "Successfully run OSPF and ROAS packet traversal paths.",
-      unlocked: a.simPathsRun && a.simPathsRun.ospf && a.simPathsRun.roas,
+      unlocked: Boolean(a.simPathsRun && a.simPathsRun.ospf && a.simPathsRun.roas),
       icon: "🏆"
     },
     {
       id: "streaks",
-      title: "Streak Fanatic",
+      title: "Consistent Learner",
       desc: "Maintain a study streak of 3 or more consecutive days.",
       unlocked: displayStreak >= 3,
       icon: "🔥"
     },
     {
       id: "ccna_ready",
-      title: "CCNA Ready",
+      title: "CCNA Certified Ready",
       desc: "Achieve an Overall Readiness Score of 85% or higher.",
       unlocked: rs >= 85,
       icon: "🎓"
     }
   ];
-  
-  let html = `
-    <h3 style="margin-bottom:12px;">🏆 Professional Certification Badges</h3>
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
-  `;
-  
-  badges.forEach(b => {
-    const border = b.unlocked ? "border: 1px solid #10b981; background: rgba(16,185,129,0.03);" : "border: 1px solid var(--line, rgba(255,255,255,0.05)); opacity:0.5;";
-    const badgeColor = b.unlocked ? "#10b981" : "#64748b";
-    html += `
-      <div style="padding:12px; border-radius:10px; ${border} display:flex; align-items:center; gap:12px;">
-        <span style="font-size:24px; color:${badgeColor}">${b.icon}</span>
-        <div>
-          <h4 style="margin:0 0 2px 0; font-size:13px; color:${b.unlocked ? 'var(--text)' : '#64748b'};">${b.title}</h4>
-          <p style="margin:0; font-size:10.5px; color:var(--text-muted); line-height:1.3;">${b.desc}</p>
-        </div>
-      </div>
-    `;
-  });
-  
-  html += `</div>`;
-  
+
   let panel = byId("achievementsPanel");
   if (!panel) {
     panel = document.createElement("section");
     panel.id = "achievementsPanel";
-    panel.className = "card";
-    panel.style.marginTop = "20px";
-    
+    panel.className = "analytics-section-card";
     const analyticsPage = byId("analytics");
     if (analyticsPage) {
       analyticsPage.appendChild(panel);
     }
   }
-  
+
   if (panel) {
-    panel.innerHTML = html;
+    panel.innerHTML = `
+      <div class="analytics-section-header">
+        <div>
+          <h3 class="analytics-section-title">🏆 Professional Certification Badges & Learner Level</h3>
+          <p class="analytics-section-desc">Unlock milestones as you demonstrate hands-on networking proficiency, domain mastery, and study consistency.</p>
+        </div>
+      </div>
+
+      <div class="achievements-level-banner">
+        <div class="achievements-level-info">
+          <span class="achievements-level-badge">Level ${info.level}</span>
+          <span class="achievements-level-name">${safeHTML(info.label)}</span>
+        </div>
+        <div class="achievements-xp-bar-wrap">
+          <div class="achievements-xp-meta">
+            <span>Level Progression</span>
+            <span>${info.currentXP} / 100 XP</span>
+          </div>
+          <div class="achievements-xp-bar">
+            <div class="achievements-xp-fill" style="width: ${Math.min(100, info.currentXP)}%;"></div>
+          </div>
+        </div>
+        <span class="achievements-streak-pill">🔥 ${displayStreak} Day Streak</span>
+      </div>
+
+      <div class="badges-grid">
+        ${badges.map((b) => `
+          <div class="badge-card ${b.unlocked ? 'unlocked' : 'locked'}">
+            <div class="badge-card-icon" aria-hidden="true">${b.icon}</div>
+            <div class="badge-card-body">
+              <div class="badge-card-header">
+                <h4 class="badge-card-title">${safeHTML(b.title)}</h4>
+                <span class="badge-status-pill ${b.unlocked ? 'unlocked' : 'locked'}">
+                  ${b.unlocked ? '✓ Unlocked' : '🔒 Locked'}
+                </span>
+              </div>
+              <p class="badge-card-desc">${safeHTML(b.desc)}</p>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    `;
   }
 }
 

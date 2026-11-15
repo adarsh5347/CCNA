@@ -786,6 +786,74 @@ html[data-theme="light"] body:not(.high-contrast) #studyPlanOutput span {
   color: #0f172a;
 }
 
+/* ─── Phase 6: Analytics & Readiness Dashboard Light Theme ─── */
+html[data-theme="light"] body:not(.high-contrast) .analytics-hero,
+html[data-theme="light"] body:not(.high-contrast) .readiness-hero-card,
+html[data-theme="light"] body:not(.high-contrast) .analytics-narrative-card,
+html[data-theme="light"] body:not(.high-contrast) .analytics-section-card,
+html[data-theme="light"] body:not(.high-contrast) #achievementsPanel {
+  background: #ffffff !important;
+  color: #1d1d1f !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .analytics-hero-title,
+html[data-theme="light"] body:not(.high-contrast) .readiness-tier-title,
+html[data-theme="light"] body:not(.high-contrast) .analytics-section-title,
+html[data-theme="light"] body:not(.high-contrast) .achievements-level-name,
+html[data-theme="light"] body:not(.high-contrast) .badge-card-title,
+html[data-theme="light"] body:not(.high-contrast) .domain-ring-info strong {
+  color: #1d1d1f !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .analytics-hero-desc,
+html[data-theme="light"] body:not(.high-contrast) .analytics-section-desc,
+html[data-theme="light"] body:not(.high-contrast) .readiness-eyebrow,
+html[data-theme="light"] body:not(.high-contrast) .readiness-disclaimer,
+html[data-theme="light"] body:not(.high-contrast) .analytics-meta-pill,
+html[data-theme="light"] body:not(.high-contrast) .domain-sub-metric,
+html[data-theme="light"] body:not(.high-contrast) .badge-card-desc,
+html[data-theme="light"] body:not(.high-contrast) .trend-sparkline-header,
+html[data-theme="light"] body:not(.high-contrast) .achievements-xp-meta {
+  color: #86868b !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .readiness-prob-box,
+html[data-theme="light"] body:not(.high-contrast) .trend-sparkline-wrap,
+html[data-theme="light"] body:not(.high-contrast) .trend-row-item,
+html[data-theme="light"] body:not(.high-contrast) .achievements-level-banner,
+html[data-theme="light"] body:not(.high-contrast) .planner-field input[type="date"],
+html[data-theme="light"] body:not(.high-contrast) .planner-field select,
+html[data-theme="light"] body:not(.high-contrast) #studyPlanOutput {
+  background: #f5f5f7 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #1d1d1f !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .badge-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .badge-card.unlocked {
+  background: rgba(48, 209, 88, 0.08) !important;
+  border-color: rgba(48, 209, 88, 0.35) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .badge-card.locked {
+  background: #f5f5f7 !important;
+  opacity: 0.75 !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .domain-ring .ring-bg,
+html[data-theme="light"] body:not(.high-contrast) .readiness-ring-wrap .ring-bg,
+html[data-theme="light"] body:not(.high-contrast) .domain-progress-bar,
+html[data-theme="light"] body:not(.high-contrast) .achievements-xp-bar {
+  background: #e5e5ea !important;
+  stroke: #e5e5ea !important;
+}
+
 #subnetOut:empty {
   display: none;
 }

@@ -1147,6 +1147,23 @@
   }
 
   /* ─── 9. READINESS DASHBOARD, PLANNER, VIDEOS & SUPPORT ─── */
+  .planner-form-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .planner-field,
+  .planner-field input[type="date"],
+  .planner-field select,
+  #btnGeneratePlan {
+    width: 100% !important;
+  }
+  .achievements-level-banner {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .achievements-xp-bar-wrap {
+    max-width: 100% !important;
+  }
   #analytics > section.card > div[style*="display: flex; gap: 12px"] {
     flex-direction: column !important;
     align-items: stretch !important;
