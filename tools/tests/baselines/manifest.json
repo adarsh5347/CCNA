@@ -1,0 +1,1045 @@
+{
+  "generatedAt": "2026-11-15T11:49:18.671Z",
+  "totalScreenshots": 110,
+  "themes": [
+    "dark",
+    "light"
+  ],
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 900,
+      "mobile": false,
+      "label": "1440px"
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "mobile": false,
+      "label": "1024px"
+    },
+    {
+      "width": 982,
+      "height": 731,
+      "mobile": false,
+      "label": "982px"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "mobile": true,
+      "label": "390px"
+    },
+    {
+      "width": 360,
+      "height": 740,
+      "mobile": true,
+      "label": "360px"
+    }
+  ],
+  "pages": [
+    "home",
+    "subnet",
+    "labs",
+    "analytics",
+    "videos",
+    "guide",
+    "support",
+    "engine",
+    "pricing",
+    "account",
+    "admin"
+  ],
+  "files": [
+    {
+      "theme": "dark",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "home",
+      "bytes": 445735,
+      "relPath": "tools/tests/baselines/dark/1440px/home.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "subnet",
+      "bytes": 399718,
+      "relPath": "tools/tests/baselines/dark/1440px/subnet.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "labs",
+      "bytes": 423127,
+      "relPath": "tools/tests/baselines/dark/1440px/labs.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "analytics",
+      "bytes": 388201,
+      "relPath": "tools/tests/baselines/dark/1440px/analytics.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "videos",
+      "bytes": 347348,
+      "relPath": "tools/tests/baselines/dark/1440px/videos.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "guide",
+      "bytes": 578733,
+      "relPath": "tools/tests/baselines/dark/1440px/guide.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "support",
+      "bytes": 472148,
+      "relPath": "tools/tests/baselines/dark/1440px/support.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "engine",
+      "bytes": 314263,
+      "relPath": "tools/tests/baselines/dark/1440px/engine.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "pricing",
+      "bytes": 480293,
+      "relPath": "tools/tests/baselines/dark/1440px/pricing.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "account",
+      "bytes": 469934,
+      "relPath": "tools/tests/baselines/dark/1440px/account.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "admin",
+      "bytes": 480009,
+      "relPath": "tools/tests/baselines/dark/1440px/admin.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "home",
+      "bytes": 365571,
+      "relPath": "tools/tests/baselines/dark/1024px/home.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "subnet",
+      "bytes": 314389,
+      "relPath": "tools/tests/baselines/dark/1024px/subnet.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "labs",
+      "bytes": 310753,
+      "relPath": "tools/tests/baselines/dark/1024px/labs.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "analytics",
+      "bytes": 277132,
+      "relPath": "tools/tests/baselines/dark/1024px/analytics.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "videos",
+      "bytes": 448451,
+      "relPath": "tools/tests/baselines/dark/1024px/videos.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "guide",
+      "bytes": 414393,
+      "relPath": "tools/tests/baselines/dark/1024px/guide.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "support",
+      "bytes": 332407,
+      "relPath": "tools/tests/baselines/dark/1024px/support.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "engine",
+      "bytes": 229533,
+      "relPath": "tools/tests/baselines/dark/1024px/engine.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "pricing",
+      "bytes": 319319,
+      "relPath": "tools/tests/baselines/dark/1024px/pricing.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "account",
+      "bytes": 302803,
+      "relPath": "tools/tests/baselines/dark/1024px/account.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "admin",
+      "bytes": 312369,
+      "relPath": "tools/tests/baselines/dark/1024px/admin.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "home",
+      "bytes": 334499,
+      "relPath": "tools/tests/baselines/dark/982px/home.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "subnet",
+      "bytes": 297104,
+      "relPath": "tools/tests/baselines/dark/982px/subnet.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "labs",
+      "bytes": 296026,
+      "relPath": "tools/tests/baselines/dark/982px/labs.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "analytics",
+      "bytes": 259174,
+      "relPath": "tools/tests/baselines/dark/982px/analytics.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "videos",
+      "bytes": 402426,
+      "relPath": "tools/tests/baselines/dark/982px/videos.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "guide",
+      "bytes": 393181,
+      "relPath": "tools/tests/baselines/dark/982px/guide.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "support",
+      "bytes": 308726,
+      "relPath": "tools/tests/baselines/dark/982px/support.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "engine",
+      "bytes": 206775,
+      "relPath": "tools/tests/baselines/dark/982px/engine.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "pricing",
+      "bytes": 292190,
+      "relPath": "tools/tests/baselines/dark/982px/pricing.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "account",
+      "bytes": 276294,
+      "relPath": "tools/tests/baselines/dark/982px/account.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "admin",
+      "bytes": 285949,
+      "relPath": "tools/tests/baselines/dark/982px/admin.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "home",
+      "bytes": 189094,
+      "relPath": "tools/tests/baselines/dark/390px/home.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "subnet",
+      "bytes": 156584,
+      "relPath": "tools/tests/baselines/dark/390px/subnet.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "labs",
+      "bytes": 171587,
+      "relPath": "tools/tests/baselines/dark/390px/labs.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "analytics",
+      "bytes": 158881,
+      "relPath": "tools/tests/baselines/dark/390px/analytics.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "videos",
+      "bytes": 180939,
+      "relPath": "tools/tests/baselines/dark/390px/videos.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "guide",
+      "bytes": 192655,
+      "relPath": "tools/tests/baselines/dark/390px/guide.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "support",
+      "bytes": 168548,
+      "relPath": "tools/tests/baselines/dark/390px/support.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "engine",
+      "bytes": 126225,
+      "relPath": "tools/tests/baselines/dark/390px/engine.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "pricing",
+      "bytes": 142064,
+      "relPath": "tools/tests/baselines/dark/390px/pricing.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "account",
+      "bytes": 144583,
+      "relPath": "tools/tests/baselines/dark/390px/account.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "admin",
+      "bytes": 151613,
+      "relPath": "tools/tests/baselines/dark/390px/admin.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "home",
+      "bytes": 161248,
+      "relPath": "tools/tests/baselines/dark/360px/home.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "subnet",
+      "bytes": 138027,
+      "relPath": "tools/tests/baselines/dark/360px/subnet.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "labs",
+      "bytes": 147841,
+      "relPath": "tools/tests/baselines/dark/360px/labs.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "analytics",
+      "bytes": 140969,
+      "relPath": "tools/tests/baselines/dark/360px/analytics.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "videos",
+      "bytes": 153236,
+      "relPath": "tools/tests/baselines/dark/360px/videos.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "guide",
+      "bytes": 174278,
+      "relPath": "tools/tests/baselines/dark/360px/guide.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "support",
+      "bytes": 149756,
+      "relPath": "tools/tests/baselines/dark/360px/support.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "engine",
+      "bytes": 76458,
+      "relPath": "tools/tests/baselines/dark/360px/engine.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "pricing",
+      "bytes": 120969,
+      "relPath": "tools/tests/baselines/dark/360px/pricing.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "account",
+      "bytes": 116683,
+      "relPath": "tools/tests/baselines/dark/360px/account.png"
+    },
+    {
+      "theme": "dark",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "admin",
+      "bytes": 127686,
+      "relPath": "tools/tests/baselines/dark/360px/admin.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "home",
+      "bytes": 185372,
+      "relPath": "tools/tests/baselines/light/1440px/home.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "subnet",
+      "bytes": 148890,
+      "relPath": "tools/tests/baselines/light/1440px/subnet.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "labs",
+      "bytes": 166733,
+      "relPath": "tools/tests/baselines/light/1440px/labs.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "analytics",
+      "bytes": 118747,
+      "relPath": "tools/tests/baselines/light/1440px/analytics.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "videos",
+      "bytes": 477739,
+      "relPath": "tools/tests/baselines/light/1440px/videos.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "guide",
+      "bytes": 228987,
+      "relPath": "tools/tests/baselines/light/1440px/guide.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "support",
+      "bytes": 115068,
+      "relPath": "tools/tests/baselines/light/1440px/support.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "engine",
+      "bytes": 149729,
+      "relPath": "tools/tests/baselines/light/1440px/engine.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "pricing",
+      "bytes": 105566,
+      "relPath": "tools/tests/baselines/light/1440px/pricing.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "account",
+      "bytes": 69615,
+      "relPath": "tools/tests/baselines/light/1440px/account.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1440px",
+      "width": 1440,
+      "height": 900,
+      "page": "admin",
+      "bytes": 63015,
+      "relPath": "tools/tests/baselines/light/1440px/admin.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "home",
+      "bytes": 132347,
+      "relPath": "tools/tests/baselines/light/1024px/home.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "subnet",
+      "bytes": 118274,
+      "relPath": "tools/tests/baselines/light/1024px/subnet.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "labs",
+      "bytes": 134094,
+      "relPath": "tools/tests/baselines/light/1024px/labs.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "analytics",
+      "bytes": 98031,
+      "relPath": "tools/tests/baselines/light/1024px/analytics.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "videos",
+      "bytes": 324200,
+      "relPath": "tools/tests/baselines/light/1024px/videos.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "guide",
+      "bytes": 145249,
+      "relPath": "tools/tests/baselines/light/1024px/guide.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "support",
+      "bytes": 104104,
+      "relPath": "tools/tests/baselines/light/1024px/support.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "engine",
+      "bytes": 92383,
+      "relPath": "tools/tests/baselines/light/1024px/engine.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "pricing",
+      "bytes": 94650,
+      "relPath": "tools/tests/baselines/light/1024px/pricing.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "account",
+      "bytes": 58510,
+      "relPath": "tools/tests/baselines/light/1024px/account.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "1024px",
+      "width": 1024,
+      "height": 768,
+      "page": "admin",
+      "bytes": 52386,
+      "relPath": "tools/tests/baselines/light/1024px/admin.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "home",
+      "bytes": 121225,
+      "relPath": "tools/tests/baselines/light/982px/home.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "subnet",
+      "bytes": 115520,
+      "relPath": "tools/tests/baselines/light/982px/subnet.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "labs",
+      "bytes": 127171,
+      "relPath": "tools/tests/baselines/light/982px/labs.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "analytics",
+      "bytes": 95014,
+      "relPath": "tools/tests/baselines/light/982px/analytics.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "videos",
+      "bytes": 284969,
+      "relPath": "tools/tests/baselines/light/982px/videos.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "guide",
+      "bytes": 140557,
+      "relPath": "tools/tests/baselines/light/982px/guide.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "support",
+      "bytes": 101877,
+      "relPath": "tools/tests/baselines/light/982px/support.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "engine",
+      "bytes": 108277,
+      "relPath": "tools/tests/baselines/light/982px/engine.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "pricing",
+      "bytes": 92784,
+      "relPath": "tools/tests/baselines/light/982px/pricing.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "account",
+      "bytes": 56756,
+      "relPath": "tools/tests/baselines/light/982px/account.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "982px",
+      "width": 982,
+      "height": 731,
+      "page": "admin",
+      "bytes": 50973,
+      "relPath": "tools/tests/baselines/light/982px/admin.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "home",
+      "bytes": 83518,
+      "relPath": "tools/tests/baselines/light/390px/home.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "subnet",
+      "bytes": 75791,
+      "relPath": "tools/tests/baselines/light/390px/subnet.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "labs",
+      "bytes": 86409,
+      "relPath": "tools/tests/baselines/light/390px/labs.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "analytics",
+      "bytes": 73207,
+      "relPath": "tools/tests/baselines/light/390px/analytics.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "videos",
+      "bytes": 133924,
+      "relPath": "tools/tests/baselines/light/390px/videos.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "guide",
+      "bytes": 84116,
+      "relPath": "tools/tests/baselines/light/390px/guide.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "support",
+      "bytes": 75876,
+      "relPath": "tools/tests/baselines/light/390px/support.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "engine",
+      "bytes": 77658,
+      "relPath": "tools/tests/baselines/light/390px/engine.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "pricing",
+      "bytes": 70230,
+      "relPath": "tools/tests/baselines/light/390px/pricing.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "account",
+      "bytes": 46628,
+      "relPath": "tools/tests/baselines/light/390px/account.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "390px",
+      "width": 390,
+      "height": 844,
+      "page": "admin",
+      "bytes": 42152,
+      "relPath": "tools/tests/baselines/light/390px/admin.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "home",
+      "bytes": 72456,
+      "relPath": "tools/tests/baselines/light/360px/home.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "subnet",
+      "bytes": 70003,
+      "relPath": "tools/tests/baselines/light/360px/subnet.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "labs",
+      "bytes": 70779,
+      "relPath": "tools/tests/baselines/light/360px/labs.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "analytics",
+      "bytes": 66953,
+      "relPath": "tools/tests/baselines/light/360px/analytics.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "videos",
+      "bytes": 111342,
+      "relPath": "tools/tests/baselines/light/360px/videos.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "guide",
+      "bytes": 78546,
+      "relPath": "tools/tests/baselines/light/360px/guide.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "support",
+      "bytes": 68586,
+      "relPath": "tools/tests/baselines/light/360px/support.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "engine",
+      "bytes": 65682,
+      "relPath": "tools/tests/baselines/light/360px/engine.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "pricing",
+      "bytes": 64167,
+      "relPath": "tools/tests/baselines/light/360px/pricing.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "account",
+      "bytes": 45113,
+      "relPath": "tools/tests/baselines/light/360px/account.png"
+    },
+    {
+      "theme": "light",
+      "viewport": "360px",
+      "width": 360,
+      "height": 740,
+      "page": "admin",
+      "bytes": 40559,
+      "relPath": "tools/tests/baselines/light/360px/admin.png"
+    }
+  ]
+}
