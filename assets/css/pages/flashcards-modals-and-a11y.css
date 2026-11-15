@@ -1,0 +1,613 @@
+/* Mobile Responsive Optimization Overrides */
+@media (max-width: 800px) {
+  .lab-shell {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .topology-main {
+    aspect-ratio: auto !important;
+    height: 290px !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    display: block !important;
+  }
+  #topoSvg, #topoSvg2 {
+    min-width: 700px !important;
+    height: 280px !important;
+  }
+  #labTopologyContainer {
+    overflow-x: auto !important;
+    display: block !important;
+  }
+  #labTopologyContainer svg {
+    min-width: 500px !important;
+    height: 176px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .row-compact {
+    grid-template-columns: 1fr !important;
+  }
+  .stats {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .container {
+    padding-bottom: calc(80px + var(--safe-bottom)) !important;
+  }
+  .topology-main {
+    overflow-x: auto !important;
+    display: block !important;
+    max-width: 100% !important;
+    aspect-ratio: unset !important;
+    height: 180px !important;
+    border: 1px solid rgba(0, 242, 254, 0.2);
+    border-radius: 12px;
+  }
+  .topology-main svg {
+    min-width: 680px !important;
+    height: 100% !important;
+  }
+  .row-compact {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+  .row-compact > div {
+    width: 100% !important;
+  }
+  .row-compact select {
+    width: 100% !important;
+    height: 44px !important;
+    font-size: 13.5px !important;
+  }
+  .row-compact button {
+    height: 44px !important;
+    flex: 1 !important;
+  }
+  .row-compact div[style*="height: 42px"] {
+    height: 44px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .osi-stack {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    padding-bottom: 6px !important;
+    white-space: nowrap !important;
+  }
+  .osi-layer {
+    flex: 0 0 auto !important;
+    padding: 6px 12px !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    align-items: center !important;
+  }
+  
+  /* Binary Grid wrapping on mobile */
+  #calcBitGrid {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+  #calcBitGrid > span {
+    margin: 2px 0 !important;
+  }
+  /* Hide the dot separator on mobile vertical layout */
+  #calcBitGrid > span[style*="font-size: 16px"] {
+    display: none !important;
+  }
+  
+  /* Cheat sheet scroll wrapper trigger */
+  .cheat-sheet-table {
+    min-width: 520px !important;
+  }
+  
+  /* Show mobile button texts, hide full texts */
+  .btn-full-text {
+    display: none !important;
+  }
+  .btn-mobile-text {
+    display: inline !important;
+  }
+  
+  /* Virtual Lab Center mobile layout */
+  .lab-shell {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  /* Video Lessons Library mobile layout */
+  #videos .lab-shell {
+    grid-template-columns: 1fr !important;
+  }
+  #videos aside {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  #videoFiltersContainer {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    padding-bottom: 8px !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .video-filter-btn {
+    flex: 0 0 auto !important;
+    width: auto !important;
+  }
+  #labSelector {
+    width: 100% !important;
+    height: 44px !important;
+    font-size: 13px !important;
+    text-overflow: ellipsis !important;
+  }
+  .console-input-btn {
+    height: 44px !important;
+    font-size: 12.5px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* Pearson VUE Exam Simulator mobile layout */
+  #examNavigator {
+    position: fixed !important;
+    left: -100% !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 85% !important;
+    max-width: 320px !important;
+    z-index: 10001 !important;
+    background: rgba(15, 23, 42, 0.98) !important;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.6) !important;
+  }
+  #examNavigator.active {
+    left: 0 !important;
+  }
+  .qnav {
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 6px !important;
+  }
+  /* exam-footer styles consolidated in max-width: 760px block below */
+
+  /* Compact metadata chips on mobile */
+  .meta {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin: 10px 0 !important;
+  }
+  .meta > div {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
+    margin: 0 !important;
+    background: rgba(0, 242, 254, 0.05) !important;
+    border: 1px solid rgba(0, 242, 254, 0.15) !important;
+    color: #00f2fe !important;
+  }
+  .meta strong {
+    display: inline !important;
+    font-size: 11px !important;
+    margin-right: 4px !important;
+    color: var(--text-secondary) !important;
+  }
+  #heroInteractiveSphere, .hero-graphics {
+    display: none !important;
+  }
+
+
+  /* Compact option cards on mobile */
+  .opt {
+    margin-top: 8px !important;
+    padding: 10px 12px !important;
+    font-size: 13.5px !important;
+    gap: 8px !important;
+  }
+  .opt .opt-key {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 11px !important;
+  }
+
+  /* Question area height layout fix */
+  #questionArea, #reviewArea, #resultArea {
+    min-height: auto !important;
+  }
+
+  /* Touch target sizes for key inputs */
+  select, input[type="text"], textarea {
+    min-height: 44px !important;
+  }
+}
+
+@media (max-width: 760px) {
+
+  /* ═══ EXAM SHELL: Full-viewport flex column ═══ */
+  .exam-shell {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: 100dvh !important;
+    height: 100vh !important; /* dvh fallback for older browsers */
+    min-height: 100dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border: none !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+    padding-bottom: 0 !important;
+  }
+  .exam-shell > div {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    min-height: 0 !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+  .exam-shell > div > div {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* ═══ SCROLLABLE QUESTION AREA ═══
+     Uses CSS custom properties updated by dynamic safe area and header height.
+     Bottom padding and scroll-padding guarantee last option clears fixed footer. */
+  .scroll {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    box-sizing: border-box !important;
+    /* vh fallback first, then dvh */
+    height: calc(100vh - var(--header-height) - var(--bottom-nav-height) - var(--safe-bottom)) !important;
+    height: calc(100dvh - var(--header-height) - var(--bottom-nav-height) - var(--safe-bottom)) !important;
+    padding: 12px 14px calc(var(--bottom-nav-height) + var(--safe-bottom) + 48px) 14px !important;
+    scroll-padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 48px) !important;
+  }
+
+  /* ═══ EXAM HEADER — Phase 1: Compact 2-row layout ═══ */
+  .exam-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+    padding: 8px 12px !important;
+  }
+  .exam-header > div {
+    width: 100% !important;
+    justify-content: space-between !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
+
+  /* Row 1: Navigator button + mode title — tighter */
+  .exam-header > div:first-child {
+    gap: 8px !important;
+    align-items: center !important;
+  }
+  #modeTitle {
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  #btnToggleSidebar {
+    flex-shrink: 0 !important;
+    padding: 6px 8px !important;
+    font-size: 11px !important;
+    min-height: 36px !important;
+    height: 36px !important;
+  }
+
+  /* Row 2: Progress counter + bar — tighter */
+  .exam-header > div:nth-child(2) {
+    gap: 8px !important;
+    align-items: center !important;
+  }
+  #qCounter {
+    font-size: 11px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+  #progressPct {
+    font-size: 10px !important;
+    flex-shrink: 0 !important;
+    min-width: 28px !important;
+  }
+
+  /* Row 3: Timer + Fullscreen + Exit — tighter */
+  .exam-header > div:last-child {
+    gap: 6px !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+  }
+  #timer {
+    font-size: 13px !important;
+  }
+  #btnToggleFullScreen {
+    padding: 4px 8px !important;
+    font-size: 10px !important;
+    min-height: 32px !important;
+    height: 32px !important;
+  }
+  #exitSession {
+    padding: 4px 8px !important;
+    font-size: 10px !important;
+    min-height: 32px !important;
+    height: 32px !important;
+  }
+
+  /* ═══ STICKY COLLAPSED HEADER (Phase 2) ═══
+     Added by JS when user scrolls past the sentinel.
+     Collapses to a single row: progress + timer + Exit only. */
+  .exam-header.collapsed {
+    padding: 6px 12px !important;
+    gap: 0 !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+  .exam-header.collapsed > div:first-child,
+  .exam-header.collapsed #btnToggleSidebar,
+  .exam-header.collapsed #modeTitle {
+    display: none !important;
+  }
+  .exam-header.collapsed > div:nth-child(2) {
+    flex: 1 !important;
+  }
+  .exam-header.collapsed > div:last-child {
+    flex-shrink: 0 !important;
+  }
+  .exam-header.collapsed #btnToggleFullScreen {
+    display: none !important;
+  }
+
+  /* ═══ EXAM FOOTER: Fixed bottom nav ═══ */
+  .exam-footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9998 !important;
+    height: calc(var(--bottom-nav-height) + var(--safe-bottom)) !important;
+    padding: 10px 14px calc(10px + var(--safe-bottom)) 14px !important;
+    background: rgba(15, 23, 42, 0.96) !important;
+    backdrop-filter: blur(16px) !important;
+    border-top: 1px solid var(--border-color) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+    justify-content: space-between !important;
+  }
+  .exam-footer-actions {
+    display: contents !important;
+  }
+  .exam-footer button {
+    flex: 1 !important;
+    margin: 0 !important;
+    padding: 10px 8px !important;
+    font-size: 11px !important;
+    height: 44px !important;
+  }
+  
+  /* Optimize metadata chips on mobile */
+  .meta > div {
+    padding: 8px !important;
+    font-size: 11.5px !important;
+  }
+}
+
+/* Hero Radar Animation CSS */
+@keyframes radarSweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes pulseCenter {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px #ff5e3a); }
+  50% { transform: scale(1.25); filter: drop-shadow(0 0 8px #ff5e3a); }
+}
+@keyframes bounceNodes {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@media (max-width: 480px) {
+  .hero-graphics {
+    display: none !important;
+  }
+}
+
+/* 3D Flashcard Styles */
+.flashcard-container {
+  perspective: 1000px;
+}
+.flashcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  min-height: 130px;
+  cursor: pointer;
+}
+.flashcard-inner.flipped {
+  transform: rotateY(180deg);
+}
+.flashcard-front, .flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+.flashcard-front {
+  background: rgba(6, 9, 19, 0.75);
+  border: 1px solid rgba(0, 242, 254, 0.2);
+}
+.flashcard-back {
+  background: rgba(6, 9, 19, 0.75);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  transform: rotateY(180deg);
+}
+
+/* Cheat Sheet Table Styles */
+.cheat-sheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 10px;
+}
+.cheat-sheet-table th {
+  padding: 8px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.cheat-sheet-table td {
+  padding: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-family: var(--font-mono);
+}
+.cheat-sheet-row {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.cheat-sheet-row.highlighted-row {
+  background: rgba(0, 242, 254, 0.12) !important;
+  color: #00f2fe;
+  font-weight: bold;
+}
+.cheat-sheet-row.highlighted-row td {
+  border-top: 1px solid rgba(0, 242, 254, 0.4);
+  border-bottom: 1px solid rgba(0, 242, 254, 0.4);
+}
+
+/* Cyberpunk Dashboard Glowing Animations */
+@keyframes borderPulse {
+  0%, 100% {
+    border-color: rgba(0, 242, 254, 0.25);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2), 0 0 15px rgba(0, 242, 254, 0.08);
+  }
+  50% {
+    border-color: rgba(0, 242, 254, 0.5);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25), 0 0 25px rgba(0, 242, 254, 0.2);
+  }
+}
+.hero-dashboard {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-6);
+  margin-bottom: var(--sp-5);
+  animation: borderPulse 4s infinite ease-in-out;
+}
+
+/* statGlow animation — integrated into the single .stat rule above */
+@keyframes statGlow {
+  0%, 100% { border-color: rgba(255, 255, 255, 0.06); }
+  50%       { border-color: rgba(0, 242, 254, 0.18);  }
+}
+/* Apply the ambient glow animation via the single consolidated .stat rule */
+
+/* Level Up Modal animations */
+@keyframes pulseLevel {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 30px rgba(255, 94, 58, 0.4);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 45px rgba(255, 94, 58, 0.7);
+  }
+}
+
+/* BUG-009: Accessible focus indicators */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #00f2fe;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 242, 254, 0.15);
+}
+
+.opt:focus-within {
+  outline: 2px solid rgba(0, 242, 254, 0.4);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+@media (max-width: 360px) {
+  .exam-header .domain-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 160px;
+  }
+  #prevQ, #nextQ, #submitSession {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* BUG-010: Reduced Motion and Print Styles */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  nav, footer, .sidebar, .btn, button, .fab, .floating-actions {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+  .page {
+    display: block !important;
+  }
+  .card, .stat {
+    box-shadow: none;
+    border: 1px solid #ddd;
+    color: #000;
+  }
+}
+

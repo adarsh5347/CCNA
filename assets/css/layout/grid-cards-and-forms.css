@@ -1,0 +1,290 @@
+/* Layout Framework */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page {
+  display: none;
+  animation: fadeIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.page.active {
+  display: block;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Premium Glass Cards */
+.hero, .card {
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition-lucid);
+}
+
+/* ─── Performance Isolation & Subtree Style Recalculation Containment ─── */
+.card,
+.hero-dashboard,
+.page.active,
+.quiz-shell,
+.lab-shell,
+.meta {
+  contain: layout style paint;
+}
+
+/* Placeholder sizing strategy to prevent dynamic content layout shifts */
+.hero-dashboard { min-height: 200px; }
+#bankStats      { min-height: 100px; }
+#questionArea   { min-height: 280px; }
+#videoLessonsGrid { min-height: 320px; }
+#labContainer   { min-height: 380px; }
+
+/* Eliminate LCP entry animation delay on hero title element */
+.hero-dashboard .reveal-text {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+
+
+.hero {
+  background: 
+    radial-gradient(ellipse at top right, rgba(0, 242, 254, 0.08), transparent 60%),
+    linear-gradient(to right, rgba(13, 25, 43, 0.8), rgba(9, 18, 32, 0.8));
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--accent-cyan);
+}
+
+.hero h2 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.hero p {
+  color: var(--text-muted);
+  font-size: 16px;
+  max-width: 900px;
+}
+
+/* Responsive Grid layouts */
+.grid {
+  display: grid;
+  gap: 16px;
+}
+.stats {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.modes {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  margin-bottom: 20px;
+}
+.labs {
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+}
+
+.checks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+  margin-bottom: 16px;
+}
+.checks label {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13.5px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.checks label:hover {
+  background: rgba(0, 242, 254, 0.04);
+  border-color: rgba(0, 242, 254, 0.2);
+}
+.checks input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #00f2fe;
+  cursor: pointer;
+}
+.checks label:has(input:checked) {
+  background: rgba(0, 242, 254, 0.08) !important;
+  border-color: #00f2fe !important;
+  color: #00f2fe;
+}
+
+.subnet-mode-tabs {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 4px !important;
+  border: 1px solid var(--border-color) !important;
+  gap: 4px !important;
+  margin-bottom: 8px !important;
+  -webkit-overflow-scrolling: touch;
+}
+.subnet-mode-tabs button {
+  flex: 1 0 auto !important;
+  padding: 8px 12px !important;
+  font-size: 12px !important;
+  border-radius: 4px !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  margin: 0 !important;
+  transition: all 0.2s ease !important;
+}
+.subnet-mode-tabs button.primary {
+  background: var(--state-selected-bg) !important;
+  color: #00f2fe !important;
+  border: 1px solid rgba(0, 242, 254, 0.25) !important;
+}
+
+.card h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.card p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.card ul {
+  margin: 12px 0 18px 0;
+  padding-left: 20px;
+  color: var(--text-muted);
+  font-size: 13.5px;
+}
+
+.card li {
+  margin-bottom: 6px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+
+/* Form Controls */
+label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  display: block;
+}
+
+select, input[type="text"], textarea {
+  width: 100%;
+  margin-top: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(6, 9, 19, 0.65);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 14px;
+  padding: 11px 14px;
+  transition: var(--transition-smooth);
+}
+
+select:focus, input[type="text"]:focus, textarea:focus {
+  border-color: rgba(0, 242, 254, 0.6);
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+  background: rgba(6, 9, 19, 0.85);
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* Domain Checklist in Quiz */
+.checks {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 12px;
+  background: rgba(6, 9, 19, 0.4);
+  margin-bottom: 18px;
+}
+
+.checks label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: none;
+  font-weight: normal;
+  letter-spacing: normal;
+  color: var(--text-main);
+  font-size: 13.5px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.checks label:last-child {
+  margin-bottom: 0;
+}
+
+.checks input[type="checkbox"], input[type="radio"] {
+  accent-color: #00f2fe;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Output Console Styling */
+.output {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(6, 9, 19, 0.7);
+  padding: 14px;
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.inline {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
