@@ -136,106 +136,147 @@
 
         <div class="home-hero-layout">
           <div class="home-hero-content">
+            <div class="noc-telemetry-ribbon" aria-hidden="true">
+              <span class="noc-status-dot"></span>
+              <span class="noc-ribbon-tag">EXAM 200-301 v1.1</span>
+              <span class="noc-ribbon-sep">//</span>
+              <span class="noc-ribbon-tag">OSPFv2 • 802.1Q • NAT • ACL</span>
+              <span class="noc-ribbon-sep">//</span>
+              <span class="noc-ribbon-tag">IOS-XE CLI</span>
+            </div>
             <span class="home-hero-eyebrow">Cisco CCNA 200-301 Preparation Engine</span>
             <h2 class="home-hero-title">Master the network.<br /><span class="home-hero-gradient">Own your future.</span></h2>
             <p class="home-hero-desc">Everything you need to prepare for CCNA 200-301. Learn networking, configure Cisco IOS, troubleshoot real-world topologies and build the confidence to pass.</p>
             <div class="home-hero-actions">
-              <button id="btnLaunchStudy" class="btn btn-primary btn-hero">Continue Learning</button>
+              <button id="btnLaunchStudy" class="btn btn-primary btn-hero">Continue Learning →</button>
               <a href="#explorePlatform" id="btnExplorePlatform" class="btn btn-secondary btn-hero">Explore the Platform</a>
             </div>
             <div class="home-hero-contract-actions">
-              <button id="btnLaunchGuide" data-page="guide" class="btn btn-secondary btn-sm">48-Ch Cert Guide</button>
-              <button id="btnLaunchExam" class="btn btn-secondary btn-sm">Take Exam</button>
-              <button id="btnLaunchLabs" class="btn btn-secondary btn-sm">Virtual Labs</button>
-              <button id="btnHomeExportProgress" class="btn btn-secondary btn-sm" aria-label="Download Progress JSON">Download Progress</button>
+              <button id="btnLaunchGuide" data-page="guide" class="btn btn-secondary btn-sm"><span class="pathway-step">01</span> 48-Ch Cert Guide</button>
+              <button id="btnLaunchLabs" class="btn btn-secondary btn-sm"><span class="pathway-step">02</span> Virtual Labs</button>
+              <button id="btnLaunchExam" class="btn btn-secondary btn-sm"><span class="pathway-step">03</span> Take Exam</button>
+              <button id="btnHomeExportProgress" class="btn btn-secondary btn-sm" aria-label="Download Progress JSON"><span class="pathway-step">04</span> Download Progress</button>
               <button data-page="admin" class="btn btn-secondary btn-sm" style="display:none; color: var(--color-danger);">Admin Panel</button>
             </div>
           </div>
-          <div class="home-hero-visual" aria-hidden="true">
+          <div class="home-hero-visual noc-dark-console" aria-hidden="true">
+            <div class="noc-console-bar">
+              <div class="noc-console-dots">
+                <span class="noc-dot noc-dot-red"></span>
+                <span class="noc-dot noc-dot-amber"></span>
+                <span class="noc-dot noc-dot-green"></span>
+              </div>
+              <span class="noc-console-title">NOC-CORE-01 // PACKET TOPOLOGY</span>
+              <span class="noc-console-status">● OSPF FULL · 0.4ms</span>
+            </div>
             <svg class="home-hero-svg" viewBox="0 0 460 220" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract Cisco CCNA Network Topology">
               <defs>
                 <pattern id="heroGridPattern" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="currentColor" stroke-opacity="0.04" stroke-width="0.5" />
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#38bdf8" stroke-opacity="0.07" stroke-width="0.6" />
                 </pattern>
                 <linearGradient id="heroLinkGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="#0071e3" stop-opacity="0.7" />
-                  <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.9" />
-                  <stop offset="100%" stop-color="#10b981" stop-opacity="0.7" />
+                  <stop offset="0%" stop-color="#0071e3" stop-opacity="0.85" />
+                  <stop offset="50%" stop-color="#38bdf8" stop-opacity="1" />
+                  <stop offset="100%" stop-color="#10b981" stop-opacity="0.9" />
                 </linearGradient>
+                <radialGradient id="heroGlowCenter" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#0071e3" stop-opacity="0.18" />
+                  <stop offset="100%" stop-color="#090d16" stop-opacity="0" />
+                </radialGradient>
               </defs>
+              <rect width="100%" height="100%" fill="#090d16" rx="8" />
               <rect width="100%" height="100%" fill="url(#heroGridPattern)" rx="8" />
+              <ellipse cx="235" cy="110" rx="170" ry="85" fill="url(#heroGlowCenter)" />
 
-              <path d="M 65 110 L 155 110" stroke="url(#heroLinkGrad)" stroke-width="2" stroke-linecap="round" />
-              <path d="M 155 110 L 250 65" stroke="url(#heroLinkGrad)" stroke-width="2" stroke-linecap="round" />
-              <path d="M 155 110 L 250 155" stroke="url(#heroLinkGrad)" stroke-width="1.8" stroke-dasharray="4, 3" stroke-linecap="round" />
-              <path d="M 250 65 L 375 110" stroke="url(#heroLinkGrad)" stroke-width="2" stroke-linecap="round" />
-              <path d="M 250 155 L 375 110" stroke="url(#heroLinkGrad)" stroke-width="1.8" stroke-dasharray="4, 3" stroke-linecap="round" />
+              <!-- Subnet Zone Halo -->
+              <rect x="198" y="28" width="104" height="72" rx="10" fill="rgba(16, 185, 129, 0.04)" stroke="rgba(16, 185, 129, 0.22)" stroke-dasharray="3 3" stroke-width="1" />
+              <text x="250" y="39" font-family="var(--font-mono)" font-size="6.5" fill="#10b981" text-anchor="middle" letter-spacing="0.06em">AREA 0 BACKBONE</text>
 
-              <circle cx="110" cy="110" r="3.5" fill="#38bdf8" />
-              <circle cx="202" cy="88" r="3.5" fill="#10b981" />
-              <circle cx="202" cy="132" r="3" fill="#f59e0b" />
-              <circle cx="312" cy="88" r="3.5" fill="#10b981" />
+              <!-- Active Topology Links -->
+              <path d="M 52 110 L 155 110" stroke="url(#heroLinkGrad)" stroke-width="2.2" stroke-linecap="round" />
+              <path d="M 155 110 L 250 68" stroke="url(#heroLinkGrad)" stroke-width="2.2" stroke-linecap="round" />
+              <path d="M 155 110 L 250 156" stroke="#f59e0b" stroke-opacity="0.65" stroke-width="1.8" stroke-dasharray="4, 3" stroke-linecap="round" />
+              <path d="M 250 68 L 380 110" stroke="url(#heroLinkGrad)" stroke-width="2.2" stroke-linecap="round" />
+              <path d="M 250 156 L 380 110" stroke="#f59e0b" stroke-opacity="0.65" stroke-width="1.8" stroke-dasharray="4, 3" stroke-linecap="round" />
 
-              <text x="110" y="103" font-family="var(--font-mono)" font-size="7.5" fill="var(--color-secondary-label)" text-anchor="middle">Fa0/1 • 1 Gbps</text>
-              <text x="200" y="72" font-family="var(--font-mono)" font-size="7.5" fill="var(--color-secondary-label)" text-anchor="middle">Gi0/0/0</text>
-              <text x="200" y="150" font-family="var(--font-mono)" font-size="7.5" fill="var(--color-secondary-label)" text-anchor="middle">Gi0/0/1</text>
-              <text x="315" y="93" font-family="var(--font-mono)" font-size="7.5" fill="var(--color-secondary-label)" text-anchor="middle">Serial / BGP</text>
+              <!-- Packet Hop Indicators -->
+              <circle cx="104" cy="110" r="4" fill="#38bdf8" class="pkt-anim" />
+              <circle cx="202" cy="89" r="4" fill="#10b981" class="pkt-anim" />
+              <circle cx="202" cy="133" r="3.2" fill="#f59e0b" />
+              <circle cx="315" cy="89" r="4" fill="#10b981" class="pkt-anim" />
 
-              <g transform="translate(65, 110)">
-                <rect x="-26" y="-20" width="52" height="40" rx="8" fill="var(--surface-1)" stroke="var(--color-separator-strong)" stroke-width="1.5" />
-                <text y="-2" font-family="var(--font-sans)" font-size="10" font-weight="600" fill="var(--color-label)" text-anchor="middle">💻 Host</text>
-                <text y="11" font-family="var(--font-mono)" font-size="7" fill="var(--color-tertiary-label)" text-anchor="middle">192.168.1.10</text>
+              <!-- Interface Telemetry Labels -->
+              <text x="104" y="99" font-family="var(--font-mono)" font-size="7.5" fill="#94a3b8" text-anchor="middle">1 Gbps</text>
+              <text x="195" y="75" font-family="var(--font-mono)" font-size="7.5" fill="#38bdf8" text-anchor="middle">802.1Q</text>
+              <text x="195" y="150" font-family="var(--font-mono)" font-size="7.5" fill="#fbbf24" text-anchor="middle">Gi0/0/1</text>
+              <text x="322" y="81" font-family="var(--font-mono)" font-size="7.5" fill="#34d399" text-anchor="middle">BGP AS 65001</text>
+
+              <!-- Node 1: Host Endpoint -->
+              <g transform="translate(52, 110)">
+                <rect x="-28" y="-22" width="56" height="44" rx="9" fill="#111827" stroke="#475569" stroke-width="1.5" />
+                <text y="-3" font-family="var(--font-sans)" font-size="10" font-weight="700" fill="#f8fafc" text-anchor="middle">💻 Host</text>
+                <text y="11" font-family="var(--font-mono)" font-size="7" fill="#94a3b8" text-anchor="middle">192.168.1.10</text>
               </g>
 
+              <!-- Node 2: L2 Access Switch -->
               <g transform="translate(155, 110)">
-                <rect x="-26" y="-20" width="52" height="40" rx="8" fill="var(--surface-1)" stroke="var(--color-tint)" stroke-width="1.5" />
-                <text y="-2" font-family="var(--font-sans)" font-size="10" font-weight="600" fill="var(--color-label)" text-anchor="middle">🎛️ SW-1</text>
-                <text y="11" font-family="var(--font-mono)" font-size="7" fill="var(--color-tint)" text-anchor="middle">VLAN 10</text>
+                <rect x="-28" y="-22" width="56" height="44" rx="9" fill="#0f172a" stroke="#0071e3" stroke-width="1.8" />
+                <text y="-3" font-family="var(--font-sans)" font-size="10" font-weight="700" fill="#f8fafc" text-anchor="middle">🎛️ SW-1</text>
+                <text y="11" font-family="var(--font-mono)" font-size="7" fill="#38bdf8" text-anchor="middle">VLAN 10 • STP</text>
               </g>
 
-              <g transform="translate(250, 65)">
-                <rect x="-26" y="-20" width="52" height="40" rx="8" fill="var(--surface-1)" stroke="#10b981" stroke-width="1.5" />
-                <text y="-2" font-family="var(--font-sans)" font-size="10" font-weight="600" fill="var(--color-label)" text-anchor="middle">🌐 R-1</text>
-                <text y="11" font-family="var(--font-mono)" font-size="7" fill="#10b981" text-anchor="middle">OSPF Area 0</text>
+              <!-- Node 3: Core OSPF Router -->
+              <g transform="translate(250, 68)">
+                <rect x="-28" y="-21" width="56" height="42" rx="9" fill="#0f172a" stroke="#10b981" stroke-width="1.8" />
+                <text y="-3" font-family="var(--font-sans)" font-size="10" font-weight="700" fill="#f8fafc" text-anchor="middle">🌐 R-1</text>
+                <text y="11" font-family="var(--font-mono)" font-size="7" fill="#34d399" text-anchor="middle">OSPF Area 0</text>
               </g>
 
-              <g transform="translate(250, 155)">
-                <rect x="-26" y="-20" width="52" height="40" rx="8" fill="var(--surface-1)" stroke="#f59e0b" stroke-width="1.5" />
-                <text y="-2" font-family="var(--font-sans)" font-size="10" font-weight="600" fill="var(--color-label)" text-anchor="middle">🔒 FW-1</text>
-                <text y="11" font-family="var(--font-mono)" font-size="7" fill="#f59e0b" text-anchor="middle">NAT / ACL</text>
+              <!-- Node 4: Security Appliance -->
+              <g transform="translate(250, 156)">
+                <rect x="-28" y="-21" width="56" height="42" rx="9" fill="#0f172a" stroke="#f59e0b" stroke-width="1.6" />
+                <text y="-3" font-family="var(--font-sans)" font-size="10" font-weight="700" fill="#f8fafc" text-anchor="middle">🔒 FW-1</text>
+                <text y="11" font-family="var(--font-mono)" font-size="7" fill="#fbbf24" text-anchor="middle">PAT / ACL 101</text>
               </g>
 
-              <g transform="translate(375, 110)">
-                <rect x="-28" y="-22" width="56" height="44" rx="10" fill="var(--surface-1)" stroke="#38bdf8" stroke-width="1.5" />
-                <text y="-2" font-family="var(--font-sans)" font-size="10" font-weight="600" fill="var(--color-label)" text-anchor="middle">☁️ WAN</text>
-                <text y="11" font-family="var(--font-mono)" font-size="7" fill="#38bdf8" text-anchor="middle">8.8.8.8 / CCNA</text>
+              <!-- Node 5: Edge WAN Cloud -->
+              <g transform="translate(380, 110)">
+                <rect x="-32" y="-23" width="64" height="46" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="1.8" />
+                <text y="-3" font-family="var(--font-sans)" font-size="10" font-weight="700" fill="#f8fafc" text-anchor="middle">☁️ WAN</text>
+                <text y="11" font-family="var(--font-mono)" font-size="7" fill="#38bdf8" text-anchor="middle">203.0.113.1/30</text>
               </g>
             </svg>
+            <div class="noc-pdu-strip">
+              <span class="pdu-seg pdu-l2">L2 802.1Q</span>
+              <span class="pdu-seg pdu-l3">L3 IPv4 192.168.1.10</span>
+              <span class="pdu-seg pdu-l4">L4 TCP:443</span>
+              <span class="pdu-seg pdu-fcs">FCS 0x8F4A</span>
+            </div>
           </div>
         </div>
       </article>
 
-      <!-- ─── 2. Quick Access Bar ─── -->
+      <!-- ─── 2. Quick Access Learning Pathway Bar ─── -->
       <nav class="home-quick-access" aria-label="Quick Access Navigation">
-        <button type="button" class="quick-access-btn" onclick="document.getElementById('startStudy')?.click();">⚡ Study Mode</button>
-        <button type="button" class="quick-access-btn" onclick="document.getElementById('practiceModulesHeading')?.scrollIntoView({behavior:'smooth'});">📝 Section Quiz</button>
-        <button type="button" class="quick-access-btn" onclick="document.getElementById('startExam')?.click();">🏆 Real Exam</button>
-        <button type="button" class="quick-access-btn" data-page="labs">🖥️ Virtual Labs</button>
-        <button type="button" class="quick-access-btn" data-page="subnet">🧮 Subnetting</button>
-        <button type="button" class="quick-access-btn" data-page="videos">🎬 Video Library</button>
-        <button type="button" class="quick-access-btn" data-page="guide">📖 Cert Guide</button>
+        <button type="button" class="quick-access-btn" onclick="document.getElementById('startStudy')?.click();"><span class="qa-num">01</span> ⚡ Study Mode</button>
+        <button type="button" class="quick-access-btn" onclick="document.getElementById('practiceModulesHeading')?.scrollIntoView({behavior:'smooth'});"><span class="qa-num">02</span> 📝 Section Quiz</button>
+        <button type="button" class="quick-access-btn" onclick="document.getElementById('startExam')?.click();"><span class="qa-num">03</span> 🏆 Real Exam</button>
+        <button type="button" class="quick-access-btn" data-page="labs"><span class="qa-num">04</span> 🖥️ Virtual Labs</button>
+        <button type="button" class="quick-access-btn" data-page="subnet"><span class="qa-num">05</span> 🧮 Subnetting</button>
+        <button type="button" class="quick-access-btn" data-page="videos"><span class="qa-num">06</span> 🎬 Video Library</button>
+        <button type="button" class="quick-access-btn" data-page="guide"><span class="qa-num">07</span> 📖 Cert Guide</button>
       </nav>
 
       <!-- ─── 3. Preparation Telemetry & Readiness Section ─── -->
       <section class="home-status-section" aria-label="Preparation Telemetry">
         <div class="home-section-header">
           <div>
-            <span class="home-section-eyebrow">Preparation Telemetry</span>
-            <h3 class="home-section-title">Your Progress & Readiness</h3>
+            <span class="home-section-eyebrow">01 // Preparation Telemetry</span>
+            <h3 class="home-section-title">Your Progress &amp; Readiness</h3>
           </div>
           <span class="badge badge-accent">CCNA v1.1 Live Tracking</span>
         </div>
-        <div class="grid stats home-stats-grid">
+        <div class="grid stats home-stats-grid home-stats-grouped">
           <div class="stat stat-readiness">
             <div class="k">Readiness Score</div>
             <div class="v" id="heroReadiness">0%</div>
@@ -245,7 +286,7 @@
           <div class="stat">
             <div class="k">Questions Solved</div>
             <div class="v" id="heroQuestions">0</div>
-            <div class="stat-meta">Single, multi, drag & scenario</div>
+            <div class="stat-meta">Single, multi, drag &amp; scenario</div>
           </div>
           <div class="stat">
             <div class="k">Active Streak</div>
@@ -260,43 +301,46 @@
           <div class="stat">
             <div class="k">Quizzes Completed</div>
             <div class="v" id="heroQuizzes">0</div>
-            <div class="stat-meta">Study, section & exam sessions</div>
+            <div class="stat-meta">Study, section &amp; exam sessions</div>
           </div>
         </div>
       </section>
-
-
 
       <!-- ─── 4. Practice & Simulation Modules ─── -->
       <section class="home-modes-section">
         <div class="home-section-header">
           <div>
-            <span class="home-section-eyebrow">Adaptive Learning Engine</span>
+            <span class="home-section-eyebrow">02 // Adaptive Learning Engine</span>
             <h3 id="practiceModulesHeading" class="home-section-title">Practice &amp; Simulation Modules</h3>
           </div>
           <span class="badge">5 Practice Modalities</span>
         </div>
         <div id="practiceModulesSection" class="grid modes practice-modes-grid">
           <!-- 1. Study Mode -->
-          <article class="card mode-card">
+          <article class="card mode-card mode-card-study">
             <div class="mode-card-header">
               <div class="mode-card-icon">⚡</div>
-              <span class="badge">Immediate Feedback</span>
+              <span class="badge badge-accent">Immediate Feedback</span>
             </div>
             <h4 class="mode-card-title">Study Mode</h4>
             <p class="mode-card-desc">Instant feedback with explanations, exam tips, memory tricks, and command-focused guidance.</p>
-            <button id="startStudy" class="btn btn-primary" style="width: 100%;">Start Study Mode</button>
+            <ul class="mode-spec-list">
+              <li><span class="spec-dot spec-dot-blue"></span>Instant answer verification &amp; RFC rationales</li>
+              <li><span class="spec-dot spec-dot-cyan"></span>Cisco IOS CLI syntax hints &amp; memory aids</li>
+              <li><span class="spec-dot spec-dot-green"></span>Untimed conceptual &amp; packet-flow mastery</li>
+            </ul>
+            <button id="startStudy" class="btn btn-primary" style="width: 100%;">Start Study Mode →</button>
           </article>
 
           <!-- 2. Section Quiz Mode -->
-          <article class="card mode-card">
+          <article class="card mode-card mode-card-custom">
             <div class="mode-card-header">
               <div class="mode-card-icon">📝</div>
               <span class="badge">Custom Constraints</span>
             </div>
             <h4 class="mode-card-title">Section Quiz Mode</h4>
             <p class="mode-card-desc">Target specific learning objectives and domains with custom duration constraints.</p>
-            <div class="row row-compact" style="margin-bottom: 12px;">
+            <div class="row row-compact" style="margin-bottom: 10px;">
               <label>Duration
                 <select id="quizDuration">
                   <option value="10">10 mins</option>
@@ -312,8 +356,8 @@
                 </select>
               </label>
             </div>
-            <div id="domainChecks" class="checks" style="margin-bottom: 14px;"><label><input class="qdomain" type="checkbox" value="Network Fundamentals" checked /> Network Fundamentals (20%)</label><label><input class="qdomain" type="checkbox" value="Network Access" /> Network Access (20%)</label><label><input class="qdomain" type="checkbox" value="IP Connectivity" /> IP Connectivity (25%)</label><label><input class="qdomain" type="checkbox" value="IP Services" /> IP Services (10%)</label><label><input class="qdomain" type="checkbox" value="Security Fundamentals" /> Security Fundamentals (15%)</label><label><input class="qdomain" type="checkbox" value="Automation and Programmability" /> Automation and Programmability (10%)</label></div>
-            <button id="startQuiz" class="btn btn-primary" style="width: 100%;">Start Section Quiz</button>
+            <div id="domainChecks" class="checks checks-compact-grid" style="margin-bottom: 14px;"><label><input class="qdomain" type="checkbox" value="Network Fundamentals" checked /> Network Fundamentals (20%)</label><label><input class="qdomain" type="checkbox" value="Network Access" /> Network Access (20%)</label><label><input class="qdomain" type="checkbox" value="IP Connectivity" /> IP Connectivity (25%)</label><label><input class="qdomain" type="checkbox" value="IP Services" /> IP Services (10%)</label><label><input class="qdomain" type="checkbox" value="Security Fundamentals" /> Security Fundamentals (15%)</label><label><input class="qdomain" type="checkbox" value="Automation and Programmability" /> Automation and Programmability (10%)</label></div>
+            <button id="startQuiz" class="btn btn-secondary" style="width: 100%;">Start Section Quiz →</button>
           </article>
 
           <!-- 3. Real Exam Mode -->
@@ -324,21 +368,23 @@
             </div>
             <h4 class="mode-card-title">Real Exam Mode</h4>
             <p class="mode-card-desc">Simulate the actual Pearson VUE exam environment with full constraints, timed pressure, and comprehensive domain distribution.</p>
-            <div style="margin-bottom: 16px; padding: 10px 14px; background: var(--surface-2); border-radius: var(--radius-sm); font-size: 12px; color: var(--color-secondary-label);">
-              ⏱ 120 minutes • 100-120 weighted questions • Passing score 825/1000
-            </div>
-            <button id="startExam" class="btn btn-primary" style="width: 100%;">Start Real Exam</button>
+            <ul class="mode-spec-list">
+              <li><span class="spec-dot spec-dot-amber"></span>Strict 120-minute Pearson VUE countdown lock</li>
+              <li><span class="spec-dot spec-dot-blue"></span>Weighted 6-domain distribution (100–120 Qs)</li>
+              <li><span class="spec-dot spec-dot-green"></span>825 / 1000 passing benchmark &amp; domain audit</li>
+            </ul>
+            <button id="startExam" class="btn btn-primary" style="width: 100%;">Start Real Exam →</button>
           </article>
 
           <!-- 4. Smart Adaptive Quiz -->
-          <article class="card mode-card">
+          <article class="card mode-card mode-card-adaptive">
             <div class="mode-card-header">
               <div class="mode-card-icon">🧠</div>
               <span class="badge">Adaptive AI</span>
             </div>
             <h4 class="mode-card-title">Smart Adaptive Quiz</h4>
             <p class="mode-card-desc">Target your weaknesses. The system automatically finds your two weakest domains and builds a focused custom quiz.</p>
-            <div id="smartQuizInfo" class="quiz-info-text" style="margin-bottom: 12px;"><strong>Current Focus Areas:</strong><br />
+            <div id="smartQuizInfo" class="quiz-info-text mode-Status-box" style="margin-bottom: 12px;"><strong>Current Focus Areas:</strong><br />
           Cross-domain random fallback (fewer than 2 domains with &ge; 5 attempts)</div>
             <div class="row row-compact" style="margin-bottom: 14px;">
               <label>Questions
@@ -348,18 +394,18 @@
                 </select>
               </label>
             </div>
-            <button id="startSmartQuiz" class="btn btn-primary" style="width: 100%;">Start Smart Quiz</button>
+            <button id="startSmartQuiz" class="btn btn-secondary" style="width: 100%;">Start Smart Quiz →</button>
           </article>
 
           <!-- 5. Spaced Repetition Quiz -->
-          <article class="card mode-card">
+          <article class="card mode-card mode-card-spaced">
             <div class="mode-card-header">
               <div class="mode-card-icon">🔁</div>
               <span class="badge">Spaced Repetition</span>
             </div>
             <h4 class="mode-card-title">Spaced Repetition Quiz</h4>
             <p class="mode-card-desc">Review and master your weak spots. This mode targets only the questions you have previously answered incorrectly.</p>
-            <div id="missedQuizInfo" class="quiz-info-text" style="margin-bottom: 12px;"><strong>Status:</strong> Clear!<br />You have 0 incorrect questions to review. Great job!</div>
+            <div id="missedQuizInfo" class="quiz-info-text mode-Status-box" style="margin-bottom: 12px;"><strong>Status:</strong> Clear!<br />You have 0 incorrect questions to review. Great job!</div>
             <div class="row row-compact" style="margin-bottom: 14px;">
               <label>Questions
                 <select id="missedQuizCount">
@@ -369,7 +415,7 @@
                 </select>
               </label>
             </div>
-            <button id="startMissedQuiz" class="btn btn-primary" disabled style="opacity: 0.5; pointer-events: none; width: 100%;">Start Review Quiz</button>
+            <button id="startMissedQuiz" class="btn btn-secondary" disabled style="opacity: 0.5; pointer-events: none; width: 100%;">Start Review Quiz</button>
           </article>
         </div>
       </section>
@@ -378,59 +424,94 @@
       <section class="home-blueprint-section" aria-label="Cisco CCNA 200-301 Blueprint Coverage">
         <div class="home-section-header">
           <div>
-            <span class="home-section-eyebrow">Official Cisco Syllabus</span>
+            <span class="home-section-eyebrow">03 // Official Cisco Syllabus Architecture</span>
             <h3 class="home-section-title">CCNA 200-301 Blueprint Domains</h3>
           </div>
           <button data-page="analytics" class="btn btn-secondary btn-sm">View Detailed Domain Telemetry →</button>
         </div>
+
+        <!-- Segmented 100% Exam Weight Distribution Bar -->
+        <div class="blueprint-distribution-strip" aria-label="Official Exam Weight Distribution">
+          <div class="bp-seg bp-seg-1" style="flex: 20;" title="1.0 Network Fundamentals: 20%"><span>1.0 Fundamentals (20%)</span></div>
+          <div class="bp-seg bp-seg-2" style="flex: 20;" title="2.0 Network Access: 20%"><span>2.0 Access (20%)</span></div>
+          <div class="bp-seg bp-seg-3" style="flex: 25;" title="3.0 IP Connectivity: 25%"><span>3.0 IP Connectivity (25%)</span></div>
+          <div class="bp-seg bp-seg-4" style="flex: 10;" title="4.0 IP Services: 10%"><span>4.0 (10%)</span></div>
+          <div class="bp-seg bp-seg-5" style="flex: 15;" title="5.0 Security Fundamentals: 15%"><span>5.0 Security (15%)</span></div>
+          <div class="bp-seg bp-seg-6" style="flex: 10;" title="6.0 Automation: 10%"><span>6.0 (10%)</span></div>
+        </div>
+
         <div class="blueprint-grid">
-          <div class="card blueprint-card">
+          <div class="card blueprint-card bp-card-1">
             <div class="blueprint-card-header">
               <h4 class="blueprint-domain-title">1.0 Network Fundamentals</h4>
               <span class="badge badge-accent">20% Weight</span>
             </div>
+            <div class="blueprint-proto-tags"><span>RFC 1918</span><span>IPv4 / IPv6</span><span>TCP / UDP</span></div>
             <div class="blueprint-card-topics">Routers, switches, cabling, IPv4/IPv6 addressing, subnetting, TCP/UDP transport operations.</div>
-            <div class="blueprint-card-footer"><span>Exam Weight: 20%</span><span>Readiness: Active</span></div>
+            <div class="blueprint-card-footer">
+              <span>Exam Weight: 20%</span>
+              <button type="button" class="bp-drill-link" onclick="window.startDomainDrill && window.startDomainDrill('Network Fundamentals')">Drill Domain →</button>
+            </div>
           </div>
-          <div class="card blueprint-card">
+          <div class="card blueprint-card bp-card-2">
             <div class="blueprint-card-header">
               <h4 class="blueprint-domain-title">2.0 Network Access</h4>
               <span class="badge badge-accent">20% Weight</span>
             </div>
+            <div class="blueprint-proto-tags"><span>IEEE 802.1Q</span><span>LACP</span><span>Rapid PVST+</span></div>
             <div class="blueprint-card-topics">VLANs, 802.1Q trunking, EtherChannel (LACP), Spanning Tree Protocol (STP), Cisco wireless architectures.</div>
-            <div class="blueprint-card-footer"><span>Exam Weight: 20%</span><span>Readiness: Active</span></div>
+            <div class="blueprint-card-footer">
+              <span>Exam Weight: 20%</span>
+              <button type="button" class="bp-drill-link" onclick="window.startDomainDrill && window.startDomainDrill('Network Access')">Drill Domain →</button>
+            </div>
           </div>
-          <div class="card blueprint-card">
+          <div class="card blueprint-card bp-card-3">
             <div class="blueprint-card-header">
               <h4 class="blueprint-domain-title">3.0 IP Connectivity</h4>
               <span class="badge badge-accent">25% Weight</span>
             </div>
+            <div class="blueprint-proto-tags"><span>OSPFv2 Area 0</span><span>Longest Match</span><span>FHRP</span></div>
             <div class="blueprint-card-topics">Routing tables, administrative distance, static routing, single-area OSPFv2 point-to-point &amp; broadcast.</div>
-            <div class="blueprint-card-footer"><span>Exam Weight: 25% (Highest)</span><span>Readiness: Active</span></div>
+            <div class="blueprint-card-footer">
+              <span>Exam Weight: 25% (Highest)</span>
+              <button type="button" class="bp-drill-link" onclick="window.startDomainDrill && window.startDomainDrill('IP Connectivity')">Drill Domain →</button>
+            </div>
           </div>
-          <div class="card blueprint-card">
+          <div class="card blueprint-card bp-card-4">
             <div class="blueprint-card-header">
               <h4 class="blueprint-domain-title">4.0 IP Services</h4>
               <span class="badge badge-accent">10% Weight</span>
             </div>
+            <div class="blueprint-proto-tags"><span>NAT / PAT</span><span>DHCP Relay</span><span>NTP / SNMP</span></div>
             <div class="blueprint-card-topics">Inside Source NAT (Static &amp; PAT), NTP synchronization, DHCP server &amp; relay, DNS resolution, SNMP, Syslog.</div>
-            <div class="blueprint-card-footer"><span>Exam Weight: 10%</span><span>Readiness: Active</span></div>
+            <div class="blueprint-card-footer">
+              <span>Exam Weight: 10%</span>
+              <button type="button" class="bp-drill-link" onclick="window.startDomainDrill && window.startDomainDrill('IP Services')">Drill Domain →</button>
+            </div>
           </div>
-          <div class="card blueprint-card">
+          <div class="card blueprint-card bp-card-5">
             <div class="blueprint-card-header">
               <h4 class="blueprint-domain-title">5.0 Security Fundamentals</h4>
               <span class="badge badge-accent">15% Weight</span>
             </div>
+            <div class="blueprint-proto-tags"><span>IPv4 ACLs</span><span>DHCP Snooping</span><span>DAI / WPA3</span></div>
             <div class="blueprint-card-topics">Threat defense concepts, standard &amp; extended IPv4 ACLs, Layer 2 security (DAI, DHCP snooping, port security).</div>
-            <div class="blueprint-card-footer"><span>Exam Weight: 15%</span><span>Readiness: Active</span></div>
+            <div class="blueprint-card-footer">
+              <span>Exam Weight: 15%</span>
+              <button type="button" class="bp-drill-link" onclick="window.startDomainDrill && window.startDomainDrill('Security Fundamentals')">Drill Domain →</button>
+            </div>
           </div>
-          <div class="card blueprint-card">
+          <div class="card blueprint-card bp-card-6">
             <div class="blueprint-card-header">
               <h4 class="blueprint-domain-title">6.0 Automation &amp; Programmability</h4>
               <span class="badge badge-accent">10% Weight</span>
             </div>
+            <div class="blueprint-proto-tags"><span>RESTCONF</span><span>JSON</span><span>Ansible / SDN</span></div>
             <div class="blueprint-card-topics">Controller-based architectures (DNA Center), RESTCONF, JSON data formats, Ansible, Puppet &amp; Chef automation.</div>
-            <div class="blueprint-card-footer"><span>Exam Weight: 10%</span><span>Readiness: Active</span></div>
+            <div class="blueprint-card-footer">
+              <span>Exam Weight: 10%</span>
+              <button type="button" class="bp-drill-link" onclick="window.startDomainDrill && window.startDomainDrill('Automation and Programmability')">Drill Domain →</button>
+            </div>
           </div>
         </div>
       </section>
@@ -439,7 +520,7 @@
       <section id="explorePlatform" class="home-explore-section" aria-label="Platform Deep-Dive Features">
         <div class="home-section-header">
           <div>
-            <span class="home-section-eyebrow">Complete Learning Suite</span>
+            <span class="home-section-eyebrow">04 // Complete Engineering Suite</span>
             <h3 class="home-section-title">Explore the Platform</h3>
           </div>
           <p class="home-section-subtitle">Beyond multiple-choice questions: interactive packet visualisations, Cisco CLI terminal labs, rapid-recall flashcards, and complete official syllabus coverage.</p>
@@ -447,55 +528,84 @@
 
         <div class="explore-grid">
           <div class="card explore-feature-card">
-            <div class="explore-card-badge">
-              <span class="badge badge-accent">48 Chapters</span>
-              <span class="badge">Vol 1 &amp; Vol 2</span>
+            <div>
+              <div class="explore-card-badge">
+                <span class="badge badge-accent">48 Chapters</span>
+                <span class="badge">Vol 1 &amp; Vol 2</span>
+              </div>
+              <h4 class="explore-card-title">📖 Official Cert Guide Companion</h4>
+              <p class="explore-card-desc">Structured chapter-by-chapter summaries, key exam topics, Cisco IOS CLI command tables, and comprehensive glossary terminology.</p>
+              <div class="explore-tech-preview">
+                <code>Vol 1 (Ch 1–29) • Vol 2 (Ch 1–19) • IOS Command Index</code>
+              </div>
             </div>
-            <h4 class="explore-card-title">📖 Official Cert Guide Companion</h4>
-            <p class="explore-card-desc">Structured chapter-by-chapter summaries, key exam topics, Cisco IOS CLI command tables, and comprehensive glossary terminology.</p>
-            <button data-page="guide" class="btn btn-primary" style="width: 100%;">Explore Cert Guide</button>
+            <button data-page="guide" class="btn btn-primary" style="width: 100%;">Explore Cert Guide →</button>
           </div>
 
           <div class="card explore-feature-card">
-            <div class="explore-card-badge">
-              <span class="badge badge-success">10 Guided Labs</span>
-              <span class="badge">Real Cisco CLI</span>
+            <div>
+              <div class="explore-card-badge">
+                <span class="badge badge-success">10 Guided Labs</span>
+                <span class="badge">Real Cisco CLI</span>
+              </div>
+              <h4 class="explore-card-title">🖥️ Cisco Virtual IOS Lab Center</h4>
+              <p class="explore-card-desc">Interactive terminal simulations with live command validation. Practice VLANs, Router-on-a-Stick, OSPFv2, and ACLs on authentic Cisco IOS syntax.</p>
+              <div class="explore-tech-preview">
+                <code>R1(config-if)# ip ospf 1 area 0 • show ip route ospf</code>
+              </div>
             </div>
-            <h4 class="explore-card-title">🖥️ Cisco Virtual IOS Lab Center</h4>
-            <p class="explore-card-desc">Interactive terminal simulations with live command validation. Practice VLANs, Router-on-a-Stick, OSPFv2, and ACLs on authentic Cisco IOS syntax.</p>
-            <button data-page="labs" class="btn btn-primary" style="width: 100%;">Open Virtual Labs</button>
+            <button data-page="labs" class="btn btn-primary" style="width: 100%;">Open Virtual Labs →</button>
           </div>
 
           <div class="card explore-feature-card">
-            <div class="explore-card-badge">
-              <span class="badge badge-accent">VLSM Calculator</span>
-              <span class="badge">Speed Drills</span>
+            <div>
+              <div class="explore-card-badge">
+                <span class="badge badge-accent">VLSM Calculator</span>
+                <span class="badge">Speed Drills</span>
+              </div>
+              <h4 class="explore-card-title">🧮 Subnetting Arcade &amp; Calculator</h4>
+              <p class="explore-card-desc">Master IPv4 binary math, CIDR prefix conversions, usable host counts, and variable-length subnet masks with interactive drills.</p>
+              <div class="explore-tech-preview">
+                <code>192.168.10.0/26 → 255.255.255.192 • 62 Usable Hosts</code>
+              </div>
             </div>
-            <h4 class="explore-card-title">🧮 Subnetting Arcade &amp; Calculator</h4>
-            <p class="explore-card-desc">Master IPv4 binary math, CIDR prefix conversions, usable host counts, and variable-length subnet masks with interactive drills.</p>
-            <button data-page="subnet" class="btn btn-primary" style="width: 100%;">Practice Subnetting</button>
+            <button data-page="subnet" class="btn btn-primary" style="width: 100%;">Practice Subnetting →</button>
           </div>
 
           <div class="card explore-feature-card">
-            <div class="explore-card-badge">
-              <span class="badge">126 Lessons</span>
-              <span class="badge">Jeremy's IT Lab</span>
+            <div>
+              <div class="explore-card-badge">
+                <span class="badge">126 Lessons</span>
+                <span class="badge">Jeremy's IT Lab</span>
+              </div>
+              <h4 class="explore-card-title">🎬 Curated Video Course Library</h4>
+              <p class="explore-card-desc">The acclaimed Jeremy's IT Lab CCNA video playlist mapped directly to syllabus domains with persistent completion tracking.</p>
+              <div class="explore-tech-preview">
+                <code>126 Blueprint-Mapped HD Lectures • Watch Telemetry</code>
+              </div>
             </div>
-            <h4 class="explore-card-title">🎬 Curated Video Course Library</h4>
-            <p class="explore-card-desc">The acclaimed Jeremy's IT Lab CCNA video playlist mapped directly to syllabus domains with persistent completion tracking.</p>
-            <button data-page="videos" class="btn btn-primary" style="width: 100%;">Browse Video Lessons</button>
+            <button data-page="videos" class="btn btn-primary" style="width: 100%;">Browse Video Lessons →</button>
           </div>
         </div>
 
-        <!-- NOC Packet Traversal Simulator -->
-        <section class="card" style="margin-bottom: 24px;">
-          <h4 id="simulatorHeading" style="font-size: 18px; font-weight: 700; color: var(--color-label); margin: 0 0 6px 0;">🕸️ NOC Packet Traversal Simulator</h4>
-          <p style="color: var(--color-secondary-label); font-size: 13.5px; margin-bottom: 16px;">Choose a packet type, click "Run Simulation", and watch how data traverses network nodes and gets encapsulated/decapsulated at each hop.</p>
-          
-          <div class="row row-compact" style="margin-bottom: 16px; display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
-            <div style="flex: 1; min-width: 200px;">
-              <label for="simPacketType" style="margin-bottom: 4px; display: block; font-size: 12px; font-weight: 600;">Select Packet Type</label>
-              <select id="simPacketType" style="width: 100%;">
+        <!-- NOC Packet Traversal Simulator (Focused Dark Technical Console) -->
+        <section id="nocSimulatorSection" class="noc-workbench-panel noc-dark-surface" style="margin-bottom: 24px;">
+          <div class="noc-workbench-header">
+            <div>
+              <span class="noc-workbench-eyebrow">INTERACTIVE PACKET ENGINE // LAYER 1–4</span>
+              <h4 id="simulatorHeading" style="font-size: 19px; font-weight: 700; color: #f8fafc; margin: 4px 0 6px 0;">🕸️ NOC Packet Traversal Simulator</h4>
+              <p style="color: #94a3b8; font-size: 13.5px; margin: 0;">Select a protocol flow, inject faults, and inspect hop-by-hop frame encapsulation across enterprise topologies.</p>
+            </div>
+            <div class="topology-selector" style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button id="btnTopo1" class="primary" style="padding: 6px 12px; font-size: 12px;">Topology 1: Branch Gateway (NOC)</button>
+              <button id="btnTopo2" class="secondary" style="padding: 6px 12px; font-size: 12px;">Topology 2: Enterprise ROAS &amp; VPN</button>
+            </div>
+          </div>
+
+          <div class="row row-compact noc-sim-controls" style="margin-top: 16px; margin-bottom: 16px; display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 210px;">
+              <label for="simPacketType" style="margin-bottom: 4px; display: block; font-size: 11px; font-weight: 600; color: #94a3b8;">Select Packet Type</label>
+              <select id="simPacketType" style="width: 100%; background: #111827; color: #f8fafc; border-color: rgba(255,255,255,0.14);">
                 <option value="dhcp">DHCP Request (Broadcast Drill)</option>
                 <option value="ping">ICMP Echo Request (Ping to 8.8.8.8)</option>
                 <option value="nat">HTTP Web Request (NAT Overload PAT)</option>
@@ -505,16 +615,16 @@
                 <option value="acl">Firewall ACL Block (Telnet Access Denied)</option>
               </select>
             </div>
-            <div style="width: 130px;">
-              <label for="simSpeed" style="margin-bottom: 4px; display: block; font-size: 12px; font-weight: 600;">Simulation Speed</label>
-              <select id="simSpeed" style="width: 100%;">
+            <div style="width: 140px;">
+              <label for="simSpeed" style="margin-bottom: 4px; display: block; font-size: 11px; font-weight: 600; color: #94a3b8;">Simulation Speed</label>
+              <select id="simSpeed" style="width: 100%; background: #111827; color: #f8fafc; border-color: rgba(255,255,255,0.14);">
                 <option value="2200">Normal (2.2s)</option>
                 <option value="1200">Fast (1.2s)</option>
                 <option value="3500">Slow (3.5s)</option>
               </select>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 10px; background: rgba(245, 158, 11, 0.04); height: 42px;">
-              <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 0; cursor: pointer; font-size: 11.5px; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.5px;">
+            <div style="display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 1px solid rgba(245, 158, 11, 0.28); border-radius: 10px; background: rgba(245, 158, 11, 0.06); height: 42px;">
+              <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 0; cursor: pointer; font-size: 11.5px; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.5px;">
                 <input type="checkbox" id="chkTroubleshooting" style="margin: 0; width: 15px; height: 15px; accent-color: #f59e0b;" /> Inject Configuration Bug
               </label>
             </div>
@@ -522,11 +632,6 @@
               <button id="btnStartSim" class="primary" style="height: 42px;">▶ Run Simulation</button>
               <button id="btnResetSim" class="secondary" style="height: 42px;">🛑 Reset</button>
             </div>
-          </div>
-
-          <div class="topology-selector" style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
-            <button id="btnTopo1" class="primary" style="padding: 6px 12px; font-size: 12.5px;">Topology 1: Branch Gateway (NOC)</button>
-            <button id="btnTopo2" class="secondary" style="padding: 6px 12px; font-size: 12.5px;">Topology 2: Enterprise ROAS &amp; VPN</button>
           </div>
 
           <div class="mobile-topo-toolbar" aria-label="Topology display controls">
@@ -757,58 +862,69 @@
                   </g>
                 </svg>
               </div>
-
-              <!-- Device config console panel -->
-              <div id="nodeConfigPanel" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; background: #02040a; font-family: var(--font-mono); display: flex; flex-direction: column; min-height: 140px;">
-                <h4 style="color: #00f2fe; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">🖥️ Device Running Configuration &amp; Status</h4>
-                <div id="nodeConfigContent" style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
-                  <span style="color: var(--text-muted); font-style: italic;">Click on any network node in the diagram (Host, SW-1, R-1, FW-1, WAN) to inspect interfaces, MAC/routing tables, security policies, and CCNA CLI commands.</span>
-                </div>
-              </div>
             </div>
 
             <div class="topology-right" style="display: flex; flex-direction: column; gap: 16px;">
-              <!-- Traversal Logs -->
-              <div id="simLogPanel" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; background: #02040a; font-family: var(--font-mono); display: flex; flex-direction: column; height: 180px; overflow-y: auto;">
-                <h4 style="color: #00f2fe; margin-bottom: 10px; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">📋 Packet Traversal Logs</h4>
-                <div id="simLogContent" style="font-size: 12.5px; color: #a7f3d0; line-height: 1.5; display: flex; flex-direction: column; gap: 8px;">
-                  <div>System Ready. Select a packet simulation and click "Run Simulation" to observe packet flows.</div>
-                </div>
-              </div>
-
               <!-- OSI Stack Inspector -->
-              <div id="simOsiPanel" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; background: #02040a; display: flex; flex-direction: column; height: auto;">
-                <h4 style="color: #00f2fe; margin-bottom: 10px; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">🛡️ OSI Stack Inspector (Active Hop)</h4>
-                
-                <div class="osi-stack">
-                  <div class="osi-layer" data-layer="4">
-                    <span class="osi-layer-num">L4</span>
-                    <span class="osi-layer-name">Transport</span>
-                    <span id="osi-l4-val" class="osi-layer-val">-</span>
-                  </div>
-                  <div class="osi-layer" data-layer="3">
-                    <span class="osi-layer-num">L3</span>
-                    <span class="osi-layer-name">Network</span>
-                    <span id="osi-l3-val" class="osi-layer-val">-</span>
-                  </div>
-                  <div class="osi-layer" data-layer="2">
-                    <span class="osi-layer-num">L2</span>
-                    <span class="osi-layer-name">Data Link</span>
-                    <span id="osi-l2-val" class="osi-layer-val">-</span>
-                  </div>
-                  <div class="osi-layer" data-layer="1">
-                    <span class="osi-layer-num">L1</span>
-                    <span class="osi-layer-name">Physical</span>
-                    <span id="osi-l1-val" class="osi-layer-val">-</span>
+              <div id="simOsiPanel" style="border: 1px solid rgba(56, 189, 248, 0.18); border-radius: 12px; padding: 16px; background: #02040a; display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
+                <div>
+                  <h4 style="color: #38bdf8; margin-bottom: 10px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">🛡️ OSI Stack Inspector (Active Hop)</h4>
+                  
+                  <div class="osi-stack">
+                    <div class="osi-layer" data-layer="4">
+                      <span class="osi-layer-num">L4</span>
+                      <span class="osi-layer-name">Transport</span>
+                      <span id="osi-l4-val" class="osi-layer-val">-</span>
+                    </div>
+                    <div class="osi-layer" data-layer="3">
+                      <span class="osi-layer-num">L3</span>
+                      <span class="osi-layer-name">Network</span>
+                      <span id="osi-l3-val" class="osi-layer-val">-</span>
+                    </div>
+                    <div class="osi-layer" data-layer="2">
+                      <span class="osi-layer-num">L2</span>
+                      <span class="osi-layer-name">Data Link</span>
+                      <span id="osi-l2-val" class="osi-layer-val">-</span>
+                    </div>
+                    <div class="osi-layer" data-layer="1">
+                      <span class="osi-layer-num">L1</span>
+                      <span class="osi-layer-name">Physical</span>
+                      <span id="osi-l1-val" class="osi-layer-val">-</span>
+                    </div>
                   </div>
                 </div>
                 
                 <div id="osiLayerDescBox" class="osi-layer-desc-box">
-                  <span style="color: var(--text-muted); font-style: italic;">Run a simulation and click any OSI layer tab above to inspect the active hop encapsulation details.</span>
+                  <span style="color: #94a3b8; font-style: italic;">Run a simulation and click any OSI layer tab above to inspect the active hop encapsulation details.</span>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- Progressive Disclosure: Device IOS CLI & Packet Traversal Logs -->
+          <details id="nocConsoleDrawer" class="noc-telemetry-disclosure">
+            <summary class="noc-drawer-summary">
+              <span>🖥️ Device IOS Running-Config &amp; Packet Traversal Logs</span>
+              <span class="noc-drawer-hint">Click any node or run a simulation to auto-open console telemetry</span>
+            </summary>
+            <div class="noc-drawer-grid">
+              <!-- Device config console panel -->
+              <div id="nodeConfigPanel" style="border: 1px solid rgba(56, 189, 248, 0.18); border-radius: 12px; padding: 16px; background: #02040a; font-family: var(--font-mono); display: flex; flex-direction: column; min-height: 150px;">
+                <h4 style="color: #38bdf8; margin-bottom: 8px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">🖥️ Device Running Configuration &amp; Status</h4>
+                <div id="nodeConfigContent" style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
+                  <span style="color: #64748b; font-style: italic;">Click on any network node in the diagram (Host, SW-1, R-1, FW-1, WAN) to inspect interfaces, MAC/routing tables, security policies, and CCNA CLI commands.</span>
+                </div>
+              </div>
+
+              <!-- Traversal Logs -->
+              <div id="simLogPanel" style="border: 1px solid rgba(56, 189, 248, 0.18); border-radius: 12px; padding: 16px; background: #02040a; font-family: var(--font-mono); display: flex; flex-direction: column; min-height: 150px; max-height: 220px; overflow-y: auto;">
+                <h4 style="color: #38bdf8; margin-bottom: 10px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">📋 Packet Traversal Logs</h4>
+                <div id="simLogContent" style="font-size: 12.5px; color: #a7f3d0; line-height: 1.5; display: flex; flex-direction: column; gap: 8px;">
+                  <div>System Ready. Select a packet simulation and click "Run Simulation" to observe packet flows.</div>
+                </div>
+              </div>
+            </div>
+          </details>
         </section>
 
         <!-- Flashcards & Question Bank Grid -->
@@ -824,7 +940,7 @@
           <div class="card" id="flashcardBox" style="display: flex; flex-direction: column; gap: 12px; min-height: 250px; margin-bottom: 0;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <h4 style="margin: 0; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: var(--color-label);">💡 CCNA Rapid Recall Flashcards</h4>
-              <span id="flashcardCount" style="font-size: 11px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; padding: 3px 8px; border-radius: 6px; font-family: var(--font-mono); font-weight: 600;">Card 1 / 15</span>
+              <span id="flashcardCount" style="font-size: 11px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.2); color: #38bdf8; padding: 3px 8px; border-radius: 6px; font-family: var(--font-mono); font-weight: 600;">Card 1 / 15</span>
             </div>
             <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Quickly flip through key CCNA parameters, routing metrics, protocol details, and port numbers.</p>
             
@@ -833,7 +949,7 @@
               <div id="flashcardInner" class="flashcard-inner">
                 <!-- Front Side -->
                 <div class="flashcard-front">
-                  <span id="flashcardTopic" style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #00f2fe; letter-spacing: 1.2px; margin-bottom: 6px;">Routing Protocols</span>
+                  <span id="flashcardTopic" style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #38bdf8; letter-spacing: 1.2px; margin-bottom: 6px;">Routing Protocols</span>
                   <span id="flashcardQuestion" style="font-size: 14.5px; font-weight: 600; color: #fff; line-height: 1.4;">What is the default Administrative Distance (AD) of OSPF?</span>
                   <span style="font-size: 9.5px; color: var(--text-muted); margin-top: 8px;">(Click card to reveal answer)</span>
                 </div>
@@ -854,31 +970,22 @@
           </div>
         </section>
 
-        <!-- Live NOC Stats Panel -->
-        <section class="card" style="margin-bottom: 24px;">
-          <div class="home-card-header">
-            <h4 class="home-card-title">🛰️ Live NOC System Status</h4>
-            <span class="badge badge-success">Telemetry Online</span>
+        <!-- Compact Dark Telemetry System Status Bar -->
+        <div class="noc-system-ticker noc-dark-surface" role="status" aria-label="Live NOC System Status">
+          <div class="noc-ticker-brand">
+            <span class="pulse-green"></span>
+            <span>NOC TELEMETRY ONLINE</span>
           </div>
-          <div class="grid stats">
-            <div class="stat">
-              <div class="k">Link Status</div>
-              <div class="v"><span class="pulse-green"></span> Operational</div>
-            </div>
-            <div class="stat">
-              <div class="k">Ping Latency</div>
-              <div class="v">12 ms (Local Host)</div>
-            </div>
-            <div class="stat">
-              <div class="k">Active Route AD</div>
-              <div class="v">AD 110 (OSPF Area 0)</div>
-            </div>
-            <div class="stat">
-              <div class="k">Interface Duplex</div>
-              <div class="v">Full / 1 Gbps Link</div>
-            </div>
+          <div class="noc-ticker-metrics">
+            <span><strong>LINK:</strong> Full / 1 Gbps</span>
+            <span class="ticker-sep">|</span>
+            <span><strong>LATENCY:</strong> 12 ms Local</span>
+            <span class="ticker-sep">|</span>
+            <span><strong>ROUTING:</strong> AD 110 (OSPF Area 0)</span>
+            <span class="ticker-sep">|</span>
+            <span><strong>STORAGE:</strong> Offline PWA Synced</span>
           </div>
-        </section>
+        </div>
       </section>
 
       <!-- ─── 7. Final Call to Action ─── -->
@@ -1203,13 +1310,25 @@
         </div>
 
         <div id="analyticsNarrative" class="analytics-narrative-card">
-          <div class="analytics-narrative-eyebrow">
-            <span>📡</span>
-            <span>Telemetry Insights</span>
+          <div>
+            <div class="analytics-narrative-eyebrow">
+              <span>📡</span>
+              <span>Telemetry Insights &amp; Recommended Action</span>
+            </div>
+            <p class="analytics-narrative-content" id="analyticsNarrativeText">
+              Complete practice questions, virtual labs, or simulated exams to compile diagnostic telemetry and compute your CCNA readiness metrics across all 6 Cisco blueprint domains.
+            </p>
           </div>
-          <p class="analytics-narrative-content" id="analyticsNarrativeText">
-            Complete practice questions, virtual labs, or simulated exams to compile diagnostic telemetry and compute your CCNA readiness metrics across all 6 Cisco blueprint domains.
-          </p>
+          <div id="analyticsNextFocusBox" class="next-focus-box">
+            <div class="next-focus-meta">
+              <span class="next-focus-label">YOUR NEXT FOCUS</span>
+              <strong class="next-focus-title" id="nextFocusDomainTitle">Diagnostic Baseline Session</strong>
+              <p class="next-focus-desc" id="nextFocusDomainDesc">Start a Study Mode session or 10-question Section Quiz to establish your baseline accuracy across the 6 Cisco CCNA blueprint domains.</p>
+            </div>
+            <div class="next-focus-action">
+              <button type="button" class="btn btn-primary btn-sm" id="btnNextFocusCta" onclick="window.setPage('home')">Start Practice Session →</button>
+            </div>
+          </div>
         </div>
       </div>
 

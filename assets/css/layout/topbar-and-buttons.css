@@ -174,7 +174,9 @@ nav {
 }
 
 /* ─── Button Base & System (Apple / Linear Precision) ─── */
-button {
+button,
+a.btn,
+.btn {
   border: 1px solid var(--color-separator-strong);
   border-radius: var(--btn-radius, 10px);
   background: var(--surface-2);
@@ -185,6 +187,7 @@ button {
   cursor: pointer;
   padding: 8px 16px;
   min-height: 38px;
+  text-decoration: none;
   transition:
     background-color var(--dur-fast) var(--ease-std),
     border-color var(--dur-fast) var(--ease-std),
@@ -202,27 +205,36 @@ button {
   touch-action: manipulation;
 }
 
-button:hover {
+button:hover,
+a.btn:hover,
+.btn:hover {
   background: var(--surface-3);
   border-color: var(--color-separator-strong);
   color: var(--color-label);
+  text-decoration: none;
   box-shadow: none;
   transform: none;
 }
 
-button:active {
+button:active,
+a.btn:active,
+.btn:active {
   transform: scale(0.985);
   transition-duration: var(--dur-instant);
 }
 
-button:focus-visible {
+button:focus-visible,
+a.btn:focus-visible,
+.btn:focus-visible {
   outline: 2px solid var(--color-tint);
   outline-offset: 2px;
 }
 
 button:disabled,
 button.disabled,
-button[aria-disabled="true"] {
+button[aria-disabled="true"],
+.btn:disabled,
+.btn.disabled {
   opacity: 0.45;
   cursor: not-allowed;
   pointer-events: none;
@@ -231,53 +243,80 @@ button[aria-disabled="true"] {
 }
 
 /* Primary — Apple Blue CTA */
-button.primary {
+button.primary,
+button.btn-primary,
+a.btn-primary,
+.btn-primary {
   background: var(--color-tint);
   border-color: transparent;
   color: #ffffff;
   font-weight: 600;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 1px 3px rgba(0, 113, 227, 0.28);
 }
-button.primary:hover {
+button.primary:hover,
+button.btn-primary:hover,
+a.btn-primary:hover,
+.btn-primary:hover {
   background: #0077ed;
   border-color: transparent;
   color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 113, 227, 0.28);
+  box-shadow: 0 4px 14px rgba(0, 113, 227, 0.36);
 }
-button.primary:active {
+button.primary:active,
+button.btn-primary:active,
+a.btn-primary:active,
+.btn-primary:active {
   background: #0066cc;
   transform: scale(0.985);
 }
 
 /* Secondary — subtle elevated surface */
-button.secondary {
+button.secondary,
+button.btn-secondary,
+a.btn-secondary,
+.btn-secondary {
   background: var(--surface-2);
   border-color: var(--color-separator-strong);
   color: var(--color-label);
   font-weight: 500;
 }
-button.secondary:hover {
+button.secondary:hover,
+button.btn-secondary:hover,
+a.btn-secondary:hover,
+.btn-secondary:hover {
   background: var(--surface-3);
   border-color: rgba(0, 113, 227, 0.45);
   color: var(--color-label);
 }
-button.secondary:active {
+button.secondary:active,
+button.btn-secondary:active,
+a.btn-secondary:active,
+.btn-secondary:active {
   transform: scale(0.985);
 }
 
 /* Ghost — transparent */
-button.ghost {
+button.ghost,
+button.btn-ghost,
+a.btn-ghost,
+.btn-ghost {
   background: transparent;
   border-color: transparent;
   color: var(--color-secondary-label);
   box-shadow: none;
 }
-button.ghost:hover {
+button.ghost:hover,
+button.btn-ghost:hover,
+a.btn-ghost:hover,
+.btn-ghost:hover {
   background: var(--interactive-hover);
   border-color: transparent;
   color: var(--color-label);
 }
-button.ghost:active {
+button.ghost:active,
+button.btn-ghost:active,
+a.btn-ghost:active,
+.btn-ghost:active {
   background: var(--interactive-active);
   transform: scale(0.985);
 }
@@ -285,7 +324,8 @@ button.ghost:active {
 /* Destructive / Danger */
 button.destructive,
 button.danger,
-button.btn-danger {
+button.btn-danger,
+.btn-danger {
   background: rgba(255, 69, 58, 0.12);
   border-color: rgba(255, 69, 58, 0.32);
   color: var(--color-danger);
@@ -293,14 +333,16 @@ button.btn-danger {
 }
 button.destructive:hover,
 button.danger:hover,
-button.btn-danger:hover {
+button.btn-danger:hover,
+.btn-danger:hover {
   background: rgba(255, 69, 58, 0.20);
   border-color: var(--color-danger);
   color: var(--color-danger);
 }
 button.destructive:active,
 button.danger:active,
-button.btn-danger:active {
+button.btn-danger:active,
+.btn-danger:active {
   background: rgba(255, 69, 58, 0.28);
   transform: scale(0.985);
 }
@@ -308,9 +350,11 @@ button.btn-danger:active {
 /* Compact Button */
 button.btn-compact,
 button.btn-sm,
+a.btn-sm,
+.btn-sm,
 .btn-compact {
-  padding: 4px 10px;
-  min-height: 30px;
+  padding: 5px 12px;
+  min-height: 32px;
   font-size: 12px;
   border-radius: 8px;
   gap: 5px;

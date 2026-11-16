@@ -113,7 +113,7 @@ html[data-theme="light"] body:not(.high-contrast) .toast {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12) !important;
 }
 
-html[data-theme="light"] body:not(.high-contrast) .card:not(.terminal-box),
+html[data-theme="light"] body:not(.high-contrast) .card:not(.terminal-box):not(.noc-dark-surface),
 html[data-theme="light"] body:not(.high-contrast) .hero,
 html[data-theme="light"] body:not(.high-contrast) .hero-dashboard,
 html[data-theme="light"] body:not(.high-contrast) .home-hero,
@@ -122,6 +122,8 @@ html[data-theme="light"] body:not(.high-contrast) .blueprint-card,
 html[data-theme="light"] body:not(.high-contrast) .explore-feature-card,
 html[data-theme="light"] body:not(.high-contrast) .home-closing-cta,
 html[data-theme="light"] body:not(.high-contrast) .stat,
+html[data-theme="light"] body:not(.high-contrast) .home-stats-grouped,
+html[data-theme="light"] body:not(.high-contrast) #analyticsStats,
 html[data-theme="light"] body:not(.high-contrast) .domain-ring-card {
   background: #ffffff !important;
   color: #1d1d1f !important;
@@ -129,9 +131,24 @@ html[data-theme="light"] body:not(.high-contrast) .domain-ring-card {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02) !important;
 }
 
-html[data-theme="light"] body:not(.high-contrast) .home-hero-visual {
+html[data-theme="light"] body:not(.high-contrast) .home-stats-grouped .stat,
+html[data-theme="light"] body:not(.high-contrast) #analyticsStats .stat {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .home-hero-visual:not(.noc-dark-console) {
   background: #f5f5f7 !important;
   border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .home-hero-visual.noc-dark-console,
+html[data-theme="light"] body:not(.high-contrast) .noc-workbench-panel,
+html[data-theme="light"] body:not(.high-contrast) .noc-system-ticker {
+  background: #090d16 !important;
+  color: #f8fafc !important;
+  border-color: rgba(56, 189, 248, 0.25) !important;
 }
 
 html[data-theme="light"] body:not(.high-contrast) .home-quick-access {
@@ -324,16 +341,65 @@ html[data-theme="light"] body:not(.high-contrast) textarea {
   border-color: rgba(15, 23, 42, 0.24) !important;
 }
 
-html[data-theme="light"] body:not(.high-contrast) button.secondary {
+html[data-theme="light"] body:not(.high-contrast) button.btn-primary,
+html[data-theme="light"] body:not(.high-contrast) a.btn-primary,
+html[data-theme="light"] body:not(.high-contrast) .btn-primary {
+  background: #0071e3 !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) button.btn-primary:hover,
+html[data-theme="light"] body:not(.high-contrast) a.btn-primary:hover,
+html[data-theme="light"] body:not(.high-contrast) .btn-primary:hover {
+  background: #0077ed !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) button.secondary,
+html[data-theme="light"] body:not(.high-contrast) button.btn-secondary,
+html[data-theme="light"] body:not(.high-contrast) a.btn-secondary,
+html[data-theme="light"] body:not(.high-contrast) .btn-secondary {
   color: #1d1d1f !important;
   border-color: rgba(0, 0, 0, 0.14) !important;
   background: rgba(0, 0, 0, 0.04) !important;
 }
 
-html[data-theme="light"] body:not(.high-contrast) button.ghost:not(.nav-btn):not(.nav-util-btn) {
+html[data-theme="light"] body:not(.high-contrast) button.ghost:not(.nav-btn):not(.nav-util-btn),
+html[data-theme="light"] body:not(.high-contrast) button.btn-ghost,
+html[data-theme="light"] body:not(.high-contrast) a.btn-ghost {
   color: #1d1d1f !important;
   border-color: rgba(0, 0, 0, 0.12) !important;
   background: rgba(0, 0, 0, 0.03) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .noc-dark-surface button.secondary {
+  color: #e2e8f0 !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .noc-dark-surface .topology-selector {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .noc-dark-surface .topology-selector button {
+  color: #94a3b8 !important;
+  background: transparent !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .noc-dark-surface .topology-selector button.primary,
+html[data-theme="light"] body:not(.high-contrast) .noc-dark-surface .topology-selector button.active {
+  background: #0071e3 !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .noc-dark-surface select {
+  background: #111827 !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
 }
 
 html[data-theme="light"] body:not(.high-contrast) .nav-btn:not(.active),
@@ -852,6 +918,41 @@ html[data-theme="light"] body:not(.high-contrast) .domain-progress-bar,
 html[data-theme="light"] body:not(.high-contrast) .achievements-xp-bar {
   background: #e5e5ea !important;
   stroke: #e5e5ea !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .noc-telemetry-ribbon,
+html[data-theme="light"] body:not(.high-contrast) .blueprint-proto-tags span,
+html[data-theme="light"] body:not(.high-contrast) .explore-tech-preview,
+html[data-theme="light"] body:not(.high-contrast) .mode-Status-box,
+html[data-theme="light"] body:not(.high-contrast) .domain-weight-pill {
+  background: #f5f5f7 !important;
+  color: #515154 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .explore-tech-preview code {
+  color: #0071e3 !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .next-focus-box {
+  background: rgba(245, 158, 11, 0.08) !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .next-focus-title {
+  color: #1d1d1f !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .next-focus-desc {
+  color: #515154 !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .next-focus-label,
+html[data-theme="light"] body:not(.high-contrast) .focus-acc-pill,
+html[data-theme="light"] body:not(.high-contrast) .domain-focus-pill {
+  color: #b45309 !important;
+  background: rgba(245, 158, 11, 0.14) !important;
+  border-color: rgba(245, 158, 11, 0.32) !important;
 }
 
 #subnetOut:empty {

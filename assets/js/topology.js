@@ -265,6 +265,9 @@ export function renderCLI(nodeName) {
   const container = byId("nodeConfigContent");
   if (!container) return;
 
+  const drawer = byId("nocConsoleDrawer");
+  if (drawer) drawer.open = true;
+
   const isTrouble = byId("chkTroubleshooting")?.checked;
   const currentPacketType = byId("simPacketType")?.value;
   const bug = bugsData[currentPacketType];
@@ -619,6 +622,8 @@ export function setupTraversalSimulator() {
 
   btnStart.addEventListener("click", async () => {
     btnStart.disabled = true;
+    const drawer = byId("nocConsoleDrawer");
+    if (drawer) drawer.open = true;
     try {
       const type = byId("simPacketType").value;
       const activePkt = activeTopology === 1 ? byId("simPacket") : byId("simPacket2");

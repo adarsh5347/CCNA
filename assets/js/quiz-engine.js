@@ -1637,7 +1637,16 @@ export function renderAnalytics() {
   const avg = totalQ ? Math.round(state.analytics.totalTime / totalQ) : 0;
   const studyHours = ((state.analytics.studyMin || 0) / 60).toFixed(1);
 
-  // Update Narrative insight banner
+  const domainFocusGuidance = {
+    "Network Fundamentals": "Strengthen your understanding of IPv4/IPv6 addressing, subnetting math, cabling standards, and TCP/UDP transport operations.",
+    "Network Access": "Strengthen your understanding of 802.1Q VLAN trunking, EtherChannel (LACP), Rapid PVST+, and Cisco wireless architectures.",
+    "IP Connectivity": "Strengthen your understanding of IPv4/IPv6 routing tables, longest-prefix match, administrative distance, and single-area OSPFv2.",
+    "IP Services": "Strengthen your understanding of Inside Source NAT (Static & PAT), DHCP server & relay, NTP synchronization, and SNMP/Syslog.",
+    "Security Fundamentals": "Strengthen your understanding of standard & extended IPv4 ACLs, Layer 2 security (DHCP snooping, DAI, port-security), and AAA.",
+    "Automation and Programmability": "Strengthen your understanding of RESTCONF, JSON data encoding, controller-based SDN architectures, and Ansible/Puppet/Chef."
+  };
+
+  // Update Narrative insight banner & Actionable Next Focus Box
   if (narrativeEl) {
     narrativeEl.classList.remove("hidden");
     let narrativeText = "";
@@ -1655,19 +1664,38 @@ export function renderAnalytics() {
     } else {
       narrativeEl.innerHTML = `<div class="analytics-narrative-eyebrow"><span>📡</span><span>Telemetry Insights</span></div><p class="analytics-narrative-content">${narrativeText}</p>`;
     }
+
+    const focusTitleEl = byId("nextFocusDomainTitle");
+    const focusDescEl = byId("nextFocusDomainDesc");
+    const focusCtaEl = byId("btnNextFocusCta");
+    if (focusTitleEl && focusDescEl && focusCtaEl) {
+      if (attempts.length === 0 || !weak) {
+        focusTitleEl.textContent = "Diagnostic Baseline Session";
+        focusDescEl.textContent = "Start a Study Mode session or 10-question Section Quiz to establish your baseline accuracy across the 6 Cisco CCNA blueprint domains.";
+        focusCtaEl.textContent = "Start Practice Session →";
+        focusCtaEl.onclick = () => window.setPage("home");
+      } else {
+        const weakDomainName = weak[0];
+        const weakAcc = weak[1];
+        focusTitleEl.innerHTML = `${safeHTML(weakDomainName)} <span class="focus-acc-pill">${weakAcc}% accuracy</span>`;
+        focusDescEl.textContent = domainFocusGuidance[weakDomainName] || `Strengthen your understanding of ${weakDomainName} objectives to raise your overall CCNA readiness.`;
+        focusCtaEl.textContent = `⚡ Practice ${weakDomainName} Now →`;
+        focusCtaEl.onclick = () => {
+          if (window.startDomainDrill) window.startDomainDrill(weakDomainName);
+          else window.setPage("home");
+        };
+      }
+    }
   }
 
-  // Render KPI Stat cards
+  // Render balanced 6-card KPI Telemetry Strip
   renderStatsCards("analyticsStats", [
-    { k: "Overall Readiness Score", v: `${rs}%` },
-    { k: "CCNA Pass Probability (Est.)", v: `${pp}%` },
     { k: "Questions Answered", v: totalQ },
     { k: "Overall Accuracy", v: `${overallAcc}%` },
     { k: "Quizzes Completed", v: attempts.length },
     { k: "Study Hours", v: `${studyHours}h` },
     { k: "Average Time / Question", v: `${avg}s` },
-    { k: "Weakest Domain", v: weak && attempts.length > 0 ? `${weak[0]} (${weak[1]}%)` : "N/A" },
-    { k: "Strongest Domain", v: strong && attempts.length > 0 ? `${strong[0]} (${strong[1]}%)` : "N/A" }
+    { k: "Weakest Domain", v: weak && attempts.length > 0 ? `${weak[0]} (${weak[1]}%)` : "N/A" }
   ]);
 
   // Render Domain Breakdown cards (ALWAYS renders all 6 domains with .domain-ring-card)
@@ -1685,7 +1713,7 @@ export function renderAnalytics() {
           return `
             <div class="domain-ring-card${isWeak ? ' is-weak-domain' : ''}">
               <div class="domain-ring-card-top">
-                <div class="domain-ring" style="position: relative; display: flex; align-items: center; justify-content: center;">
+                <div class="domain-ring">
                   <svg viewBox="0 0 52 52" aria-hidden="true">
                     <circle class="ring-bg" cx="26" cy="26" r="21"></circle>
                     <circle class="ring-fill" cx="26" cy="26" r="21" stroke="${color}" stroke-dasharray="${dasharray}" stroke-dashoffset="${dashoffset}"></circle>
@@ -1705,6 +1733,10 @@ export function renderAnalytics() {
                 <div class="domain-progress-bar">
                   <div class="domain-progress-fill" style="width: ${p}%; background: ${color};"></div>
                 </div>
+              </div>
+              <div class="domain-card-actions">
+                <span class="domain-target-note">Target: 80%+</span>
+                <button type="button" class="domain-drill-btn" onclick="window.startDomainDrill && window.startDomainDrill('${safeHTML(d.name)}')">Practice Domain →</button>
               </div>
             </div>
           `;
@@ -1729,47 +1761,59 @@ export function renderAnalytics() {
       const recent = attempts.slice(-10);
       const points = recent.map((att, idx) => {
         const score = Math.max(0, Math.min(100, Number(att.score) || 0));
-        const x = recent.length === 1 ? 300 : 40 + Math.round((idx / (recent.length - 1)) * 520);
-        const y = Math.round(105 - (score / 100) * 80);
-        return { x, y, score, mode: att.mode || "quiz", correct: att.correct || 0, total: att.total || 0, at: att.at };
+        const x = recent.length === 1 ? 430 : 75 + Math.round((idx / (recent.length - 1)) * 710);
+        const y = Math.round(135 - (score / 100) * 100);
+        return { x, y, score, idx: idx + 1, mode: att.mode || "quiz", correct: att.correct || 0, total: att.total || 0, at: att.at };
       });
 
       let pathD = "";
       let areaD = "";
       if (points.length === 1) {
-        pathD = `M ${points[0].x - 20} ${points[0].y} L ${points[0].x + 20} ${points[0].y}`;
-        areaD = `M ${points[0].x - 20} 115 L ${points[0].x - 20} ${points[0].y} L ${points[0].x + 20} ${points[0].y} L ${points[0].x + 20} 115 Z`;
+        pathD = `M ${points[0].x - 40} ${points[0].y} L ${points[0].x + 40} ${points[0].y}`;
+        areaD = `M ${points[0].x - 40} 135 L ${points[0].x - 40} ${points[0].y} L ${points[0].x + 40} ${points[0].y} L ${points[0].x + 40} 135 Z`;
       } else {
         pathD = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
-        areaD = `${pathD} L ${points[points.length - 1].x} 115 L ${points[0].x} 115 Z`;
+        areaD = `${pathD} L ${points[points.length - 1].x} 135 L ${points[0].x} 135 Z`;
       }
 
       const svgHtml = `
         <div class="trend-sparkline-wrap">
           <div class="trend-sparkline-header">
             <span>Score Trajectory (Last ${recent.length} Sessions)</span>
-            <strong>Target: 80% Passing Score</strong>
+            <strong>Target: 80% Passing Benchmark</strong>
           </div>
-          <svg class="trend-chart-svg" viewBox="0 0 600 130" preserveAspectRatio="none" aria-label="Score Trend Chart">
+          <svg class="trend-chart-svg" viewBox="0 0 860 165" preserveAspectRatio="xMidYMid meet" aria-label="Score Trend Chart">
             <defs>
               <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="var(--color-tint)" stop-opacity="0.28" />
+                <stop offset="0%" stop-color="var(--color-tint)" stop-opacity="0.25" />
                 <stop offset="100%" stop-color="var(--color-tint)" stop-opacity="0.0" />
               </linearGradient>
             </defs>
-            <!-- 80% passing line -->
-            <line x1="20" y1="41" x2="580" y2="41" stroke="var(--color-success, #30d158)" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.65" />
-            <text x="580" y="36" fill="var(--color-success, #30d158)" font-size="9" text-anchor="end" font-family="var(--font-mono)">80% Passing Benchmark</text>
+            <!-- Horizontal Reference Gridlines (Exact 1px/% scale: y = 135 - score) -->
+            <line x1="50" y1="35" x2="820" y2="35" stroke="var(--color-separator)" stroke-width="1" />
+            <text x="40" y="38" fill="var(--color-secondary-label)" font-size="10" text-anchor="end" font-family="var(--font-mono)">100%</text>
+
+            <line x1="50" y1="55" x2="820" y2="55" stroke="var(--color-success, #30d158)" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.75" />
+            <text x="40" y="58" fill="var(--color-success, #30d158)" font-size="10" font-weight="700" text-anchor="end" font-family="var(--font-mono)">80%</text>
+
+            <line x1="50" y1="85" x2="820" y2="85" stroke="var(--color-separator)" stroke-width="1" />
+            <text x="40" y="88" fill="var(--color-secondary-label)" font-size="10" text-anchor="end" font-family="var(--font-mono)">50%</text>
+
+            <line x1="50" y1="135" x2="820" y2="135" stroke="var(--color-separator)" stroke-width="1" />
+            <text x="40" y="138" fill="var(--color-secondary-label)" font-size="10" text-anchor="end" font-family="var(--font-mono)">0%</text>
+
             <!-- Area fill and trend line -->
             <path d="${areaD}" fill="url(#trendGradient)"></path>
             <path d="${pathD}" fill="none" stroke="var(--color-tint)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
             <!-- Data points -->
             ${points.map((p) => {
               const col = p.score >= 80 ? "var(--color-success, #30d158)" : p.score >= 60 ? "var(--color-warning, #ff9f0a)" : "var(--color-danger, #ff453a)";
+              const labelY = p.y < 32 ? p.y + 18 : p.y - 10;
               return `
                 <g>
-                  <circle cx="${p.x}" cy="${p.y}" r="4" fill="var(--surface-card)" stroke="${col}" stroke-width="2"></circle>
-                  <text x="${p.x}" y="${Math.max(14, p.y - 7)}" fill="var(--color-label)" font-size="10" font-weight="700" text-anchor="middle" font-family="var(--font-mono)">${p.score}%</text>
+                  <circle cx="${p.x}" cy="${p.y}" r="5" fill="var(--surface-card)" stroke="${col}" stroke-width="2.5"></circle>
+                  <text x="${p.x}" y="${labelY}" fill="var(--color-label)" font-size="11" font-weight="700" text-anchor="middle" font-family="var(--font-mono)">${p.score}%</text>
+                  <text x="${p.x}" y="153" fill="var(--color-secondary-label)" font-size="9.5" text-anchor="middle" font-family="var(--font-mono)">#${p.idx} ${safeHTML(String(p.mode).toUpperCase())}</text>
                 </g>
               `;
             }).join("")}

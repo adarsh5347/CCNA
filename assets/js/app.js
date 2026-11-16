@@ -932,15 +932,36 @@ function wireEvents() {
   const onboarding = byId("onboardingModal");
   const dismissBtn = byId("btnOnboardingDismiss");
   if (onboarding && dismissBtn) {
-    if (!localStorage.getItem("ccna_onboarded")) {
-      onboarding.classList.remove("hidden");
-    }
+    onboarding.classList.add("hidden");
+    window.openOnboardingModal = () => onboarding.classList.remove("hidden");
     dismissBtn.addEventListener("click", () => {
       playNetSound("success");
       onboarding.classList.add("hidden");
       safeSetStorage(localStorage, "ccna_onboarded", "true");
     });
   }
+
+  window.startDomainDrill = function (domainName) {
+    playNetSound("click");
+    const checks = document.querySelectorAll("#domainChecks .qdomain");
+    if (checks.length > 0 && domainName) {
+      let matched = false;
+      checks.forEach((cb) => {
+        if (cb.value === domainName) {
+          cb.checked = true;
+          matched = true;
+        } else {
+          cb.checked = false;
+        }
+      });
+      if (!matched) {
+        checks[0].checked = true;
+      }
+      startSession("quiz");
+    } else {
+      startSession("study");
+    }
+  };
 
   const btnGeneratePlan = byId("btnGeneratePlan");
   if (btnGeneratePlan) {

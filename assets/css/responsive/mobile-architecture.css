@@ -708,23 +708,44 @@
   }
   .home-stats-grid {
     display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 8px !important;
+  }
+  .home-stats-grouped,
+  #analyticsStats {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+  }
+  .home-stats-grouped .stat,
+  #analyticsStats .stat {
+    border-bottom: 1px solid var(--color-separator) !important;
   }
   .stat-readiness {
     grid-column: 1 / -1 !important;
+    border-right: none !important;
   }
   .practice-modes-grid,
   .blueprint-grid,
-  .explore-grid {
-    grid-template-columns: 1fr !important;
+  .explore-grid,
+  .badges-grid,
+  .analytics-domains-grid,
+  .noc-drawer-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
   }
-  .home-cta-actions {
+  .home-cta-actions,
+  .analytics-hero-actions {
     flex-direction: column !important;
     align-items: stretch !important;
   }
-  .home-cta-actions .btn-hero {
+  .home-cta-actions .btn-hero,
+  .analytics-hero-actions button,
+  .domain-drill-btn,
+  .bp-drill-link,
+  #btnNextFocusCta,
+  #btnJumpPlanner {
     width: 100% !important;
+    min-height: 44px !important;
   }
 
   .stat {
@@ -744,23 +765,34 @@
   .grid.modes,
   .grid.labs,
   #videoLessonsGrid,
-  #domainBreakdown > div,
-  #achievementsPanel > div {
-    grid-template-columns: 1fr !important;
+  #domainBreakdown > div {
+    grid-template-columns: minmax(0, 1fr) !important;
     gap: 14px !important;
   }
 
   /* ─── 5. NOC PACKET TRAVERSAL SIMULATOR ─── */
-  #simulatorSection .row.row-compact {
+  #simulatorSection .row.row-compact,
+  #nocSimulatorSection .noc-sim-controls {
     display: flex !important;
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 10px !important;
   }
 
-  #simulatorSection .row.row-compact > div {
+  #simulatorSection .row.row-compact > div,
+  #nocSimulatorSection .noc-sim-controls > div {
     width: 100% !important;
     min-width: 0 !important;
+  }
+
+  #nocSimulatorSection .noc-sim-controls button {
+    flex: 1 !important;
+    min-height: 44px !important;
+  }
+
+  .noc-system-ticker {
+    flex-direction: column !important;
+    align-items: flex-start !important;
   }
 
   #simulatorSection .row.row-compact > div:last-child {
