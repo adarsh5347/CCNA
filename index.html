@@ -588,24 +588,24 @@
           </div>
         </div>
 
-        <!-- NOC Packet Traversal Simulator (Focused Dark Technical Console) -->
-        <section id="nocSimulatorSection" class="noc-workbench-panel noc-dark-surface" style="margin-bottom: 24px;">
+        <!-- NOC Packet Traversal Simulator (Precision Engineering Workstation) -->
+        <section id="nocSimulatorSection" class="noc-workbench-panel noc-dark-surface">
           <div class="noc-workbench-header">
-            <div>
-              <span class="noc-workbench-eyebrow">INTERACTIVE PACKET ENGINE // LAYER 1–4</span>
-              <h4 id="simulatorHeading" style="font-size: 19px; font-weight: 700; color: #f8fafc; margin: 4px 0 6px 0;">🕸️ NOC Packet Traversal Simulator</h4>
-              <p style="color: #94a3b8; font-size: 13.5px; margin: 0;">Select a protocol flow, inject faults, and inspect hop-by-hop frame encapsulation across enterprise topologies.</p>
+            <div class="noc-workbench-title-group">
+              <span class="noc-workbench-eyebrow">PRECISION ENGINEERING · LAYER 1–4 PACKET WORKSTATION</span>
+              <h4 id="simulatorHeading" class="noc-workbench-title">See every packet.<br />Understand every path.</h4>
+              <p class="noc-workbench-desc">Follow traffic across enterprise topologies, inspect protocol behaviour and troubleshoot network failures.</p>
             </div>
-            <div class="topology-selector" style="display: flex; gap: 6px; flex-wrap: wrap;">
-              <button id="btnTopo1" class="primary" style="padding: 6px 12px; font-size: 12px;">Topology 1: Branch Gateway (NOC)</button>
-              <button id="btnTopo2" class="secondary" style="padding: 6px 12px; font-size: 12px;">Topology 2: Enterprise ROAS &amp; VPN</button>
+            <div class="topology-selector" role="group" aria-label="Select network topology">
+              <button type="button" id="btnTopo1" class="primary">Topology 1: Branch Gateway (NOC)</button>
+              <button type="button" id="btnTopo2" class="secondary">Topology 2: Enterprise ROAS &amp; VPN</button>
             </div>
           </div>
 
-          <div class="row row-compact noc-sim-controls" style="margin-top: 16px; margin-bottom: 16px; display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
-            <div style="flex: 1; min-width: 210px;">
-              <label for="simPacketType" style="margin-bottom: 4px; display: block; font-size: 11px; font-weight: 600; color: #94a3b8;">Select Packet Type</label>
-              <select id="simPacketType" style="width: 100%; background: #111827; color: #f8fafc; border-color: rgba(255,255,255,0.14);">
+          <div class="row row-compact noc-sim-controls">
+            <div class="noc-control-field noc-control-packet">
+              <label for="simPacketType">Packet Flow</label>
+              <select id="simPacketType">
                 <option value="dhcp">DHCP Request (Broadcast Drill)</option>
                 <option value="ping">ICMP Echo Request (Ping to 8.8.8.8)</option>
                 <option value="nat">HTTP Web Request (NAT Overload PAT)</option>
@@ -615,287 +615,330 @@
                 <option value="acl">Firewall ACL Block (Telnet Access Denied)</option>
               </select>
             </div>
-            <div style="width: 140px;">
-              <label for="simSpeed" style="margin-bottom: 4px; display: block; font-size: 11px; font-weight: 600; color: #94a3b8;">Simulation Speed</label>
-              <select id="simSpeed" style="width: 100%; background: #111827; color: #f8fafc; border-color: rgba(255,255,255,0.14);">
+            <div class="noc-control-field noc-control-speed">
+              <label for="simSpeed">Hop Timing</label>
+              <select id="simSpeed">
                 <option value="2200">Normal (2.2s)</option>
                 <option value="1200">Fast (1.2s)</option>
                 <option value="3500">Slow (3.5s)</option>
               </select>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; padding: 10px 14px; border: 1px solid rgba(245, 158, 11, 0.28); border-radius: 10px; background: rgba(245, 158, 11, 0.06); height: 42px;">
-              <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 0; cursor: pointer; font-size: 11.5px; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.5px;">
-                <input type="checkbox" id="chkTroubleshooting" style="margin: 0; width: 15px; height: 15px; accent-color: #f59e0b;" /> Inject Configuration Bug
-              </label>
+            <label class="noc-trouble-toggle" for="chkTroubleshooting">
+              <input type="checkbox" id="chkTroubleshooting" />
+              <span>Inject Configuration Bug</span>
+            </label>
+            <div class="noc-control-actions">
+              <button type="button" id="btnStartSim" class="primary">Run Simulation</button>
+              <button type="button" id="btnResetSim" class="secondary">Reset</button>
             </div>
-            <div style="display: flex; gap: 8px;">
-              <button id="btnStartSim" class="primary" style="height: 42px;">▶ Run Simulation</button>
-              <button id="btnResetSim" class="secondary" style="height: 42px;">🛑 Reset</button>
+          </div>
+
+          <div id="nocTroubleSymptomBanner" class="noc-trouble-banner hidden" role="status" aria-live="polite">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" width="16" height="16" aria-hidden="true"><path d="M10 3L2.5 16.5h15L10 3z" stroke-linejoin="round"/><path d="M10 8v4M10 14.5h.01" stroke-linecap="round"/></svg>
+            <span id="nocTroubleSymptomText">Troubleshooting Mode active — Run the simulation to observe where traffic fails, then inspect devices to diagnose and resolve the misconfiguration.</span>
+          </div>
+
+          <div id="simStatusStrip" class="noc-sim-status-strip" aria-live="polite">
+            <div class="noc-status-route">
+              <span class="noc-status-badge idle" id="simStatusBadge">READY</span>
+              <span class="noc-status-path" id="simStatusRouteText">Branch Gateway NOC · Select a flow and run simulation</span>
+            </div>
+            <div class="noc-status-progress-wrap">
+              <span class="noc-status-hop-label" id="simStatusHopText">Hop 0 / 0</span>
+              <div class="noc-status-progress-track" aria-hidden="true">
+                <div class="noc-status-progress-fill" id="simStatusProgressBar" style="width: 0%;"></div>
+              </div>
             </div>
           </div>
 
           <div class="mobile-topo-toolbar" aria-label="Topology display controls">
-            <span class="mobile-topo-hint">💡 Tap any node to inspect CLI • Swipe or toggle zoom</span>
+            <span class="mobile-topo-hint">Select or Tab to any device node to inspect IOS state · Use zoom controls to pan</span>
             <div class="mobile-topo-zoom-btns">
               <button type="button" id="btnTopoZoomFit" class="secondary active">Fit View</button>
               <button type="button" id="btnTopoZoomPan" class="ghost">Pan / 1.5×</button>
             </div>
           </div>
+
           <div class="topology-wrapper">
-            <div class="topology-left" style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="topology-left">
               <div class="topology-main">
-                <svg id="topoSvg" viewBox="0 0 700 280" width="100%" height="100%" style="background: rgba(6, 9, 19, 0.65); border-radius: 12px; border: 1px solid rgba(0, 242, 254, 0.2); position: relative;">
+                <svg id="topoSvg" class="noc-topo-svg" viewBox="0 0 700 280" width="100%" height="100%" role="img" aria-label="Topology 1: Branch Gateway NOC Network Diagram">
                   <defs>
-                    <!-- Cyberpunk grid background pattern -->
                     <pattern id="gridPattern" width="20" height="20" patternUnits="userSpaceOnUse">
-                      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255, 255, 255, 0.025)" stroke-width="0.5" />
+                      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(148, 163, 184, 0.06)" stroke-width="0.6" />
                     </pattern>
                   </defs>
 
-                  <!-- Grid Overlay -->
                   <rect width="100%" height="100%" fill="url(#gridPattern)" rx="12" />
 
-                  <!-- Cable links -->
-                  <line x1="80" y1="140" x2="240" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-                  <line x1="240" y1="140" x2="400" y2="80" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-                  <line x1="240" y1="140" x2="400" y2="200" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-                  <line x1="400" y1="80" x2="600" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-                  <line x1="400" y1="200" x2="600" y2="140" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
+                  <!-- Logical Network Zones -->
+                  <rect x="20" y="20" width="278" height="240" rx="10" class="topo-zone-box" />
+                  <text x="34" y="38" class="topo-zone-label">LAN ACCESS · VLAN 10</text>
+                  <rect x="314" y="20" width="172" height="240" rx="10" class="topo-zone-box" />
+                  <text x="328" y="38" class="topo-zone-label">GATEWAY &amp; EDGE</text>
+                  <rect x="502" y="20" width="178" height="240" rx="10" class="topo-zone-box" />
+                  <text x="516" y="38" class="topo-zone-label">PUBLIC WAN</text>
 
-                  <!-- Active glowing lines -->
-                  <line id="link-pc-sw" x1="80" y1="140" x2="240" y2="140" stroke="#00f2fe" stroke-width="2" class="cable-link" />
-                  <line id="link-sw-r1" x1="240" y1="140" x2="400" y2="80" stroke="#00f2fe" stroke-width="2" class="cable-link" />
-                  <line id="link-sw-fw" x1="240" y1="140" x2="400" y2="200" stroke="#ff9233" stroke-width="1.5" class="cable-link secondary-link" />
-                  <line id="link-r1-wan" x1="400" y1="80" x2="600" y2="140" stroke="#10b981" stroke-width="2" class="cable-link" />
-                  <line id="link-fw-wan" x1="400" y1="200" x2="600" y2="140" stroke="#10b981" stroke-width="2" class="cable-link" />
+                  <!-- Base cable paths -->
+                  <line x1="80" y1="140" x2="240" y2="140" class="topo-link-base" />
+                  <line x1="240" y1="140" x2="400" y2="80" class="topo-link-base" />
+                  <line x1="240" y1="140" x2="400" y2="200" class="topo-link-base" />
+                  <line x1="400" y1="80" x2="600" y2="140" class="topo-link-base" />
+                  <line x1="400" y1="200" x2="600" y2="140" class="topo-link-base" />
 
-                  <!-- Interface Link Status Triangles (Packet Tracer Style) -->
-                  <!-- PC port -->
-                  <polygon points="108,137 114,140 108,143" fill="#10b981" />
-                  <!-- SW-1 ports -->
-                  <polygon points="212,137 206,140 212,143" fill="#10b981" />
-                  <polygon points="270,129 275,124 276,130" fill="#10b981" />
-                  <polygon points="270,151 275,156 276,150" fill="#10b981" />
-                  <!-- R1 ports -->
-                  <polygon points="380,95 385,90 380,87" fill="#10b981" />
-                  <polygon points="420,90 425,93 420,97" fill="#10b981" />
-                  <!-- FW1 ports -->
-                  <polygon points="380,185 385,190 380,193" fill="#10b981" />
-                  <polygon points="420,190 425,187 420,183" fill="#10b981" />
+                  <!-- Active protocol links -->
+                  <line id="link-pc-sw" x1="80" y1="140" x2="240" y2="140" stroke="#38bdf8" stroke-width="2" class="cable-link" />
+                  <line id="link-sw-r1" x1="240" y1="140" x2="400" y2="80" stroke="#38bdf8" stroke-width="2" class="cable-link" />
+                  <line id="link-sw-fw" x1="240" y1="140" x2="400" y2="200" stroke="#ff9f0a" stroke-width="1.5" class="cable-link secondary-link" />
+                  <line id="link-r1-wan" x1="400" y1="80" x2="600" y2="140" stroke="#30d158" stroke-width="2" class="cable-link" />
+                  <line id="link-fw-wan" x1="400" y1="200" x2="600" y2="140" stroke="#30d158" stroke-width="2" class="cable-link" />
 
-                  <!-- Port interface labels -->
-                  <text x="115" y="135" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Fa0/1</text>
-                  <text x="200" y="135" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Fa0/1</text>
-                  <text x="260" y="118" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi0/1</text>
-                  <text x="260" y="168" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi0/2</text>
-                  <text x="370" y="100" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi0/0/0</text>
-                  <text x="435" y="100" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi0/0/1</text>
-                  <text x="370" y="180" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi1/1</text>
-                  <text x="435" y="180" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi1/2</text>
-                  <text x="575" y="130" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)" text-anchor="middle">Gi0/24</text>
+                  <!-- Interface Link Status Indicators -->
+                  <polygon points="108,137 114,140 108,143" fill="#30d158" />
+                  <polygon points="212,137 206,140 212,143" fill="#30d158" />
+                  <polygon points="270,129 275,124 276,130" fill="#30d158" />
+                  <polygon points="270,151 275,156 276,150" fill="#30d158" />
+                  <polygon points="380,95 385,90 380,87" fill="#30d158" />
+                  <polygon points="420,90 425,93 420,97" fill="#30d158" />
+                  <polygon points="380,185 385,190 380,193" fill="#30d158" />
+                  <polygon points="420,190 425,187 420,183" fill="#30d158" />
+
+                  <!-- Interface Labels -->
+                  <text x="115" y="132" class="topo-iface-label" text-anchor="middle">Fa0/1</text>
+                  <text x="200" y="132" class="topo-iface-label" text-anchor="middle">Fa0/1</text>
+                  <text x="260" y="114" class="topo-iface-label" text-anchor="middle">Gi0/1</text>
+                  <text x="260" y="170" class="topo-iface-label" text-anchor="middle">Gi0/2</text>
+                  <text x="366" y="102" class="topo-iface-label" text-anchor="middle">Gi0/0/0</text>
+                  <text x="438" y="102" class="topo-iface-label" text-anchor="middle">Gi0/0/1</text>
+                  <text x="368" y="180" class="topo-iface-label" text-anchor="middle">Gi1/1</text>
+                  <text x="438" y="180" class="topo-iface-label" text-anchor="middle">Gi1/2</text>
+                  <text x="556" y="122" class="topo-iface-label" text-anchor="middle">Gi0/24</text>
 
                   <!-- Animated Packet -->
-                  <circle id="simPacket" cx="80" cy="140" r="8" fill="#00f2fe" style="opacity: 0; filter: drop-shadow(0 0 8px #00f2fe); pointer-events: none;" />
+                  <circle id="simPacket" cx="80" cy="140" r="8" fill="#38bdf8" class="topo-packet" style="opacity: 0; pointer-events: none;" />
 
-                  <!-- Nodes -->
                   <!-- Host PC -->
-                  <g class="topo-node" data-node="pc" transform="translate(80, 140)">
-                    <circle r="25" class="topo-orbit" stroke="rgba(0, 242, 254, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
-                    <circle r="20" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-pc" />
-                    <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">💻 Host</text>
-                    <text y="35" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">192.168.1.10</text>
+                  <g class="topo-node" data-node="pc" transform="translate(80, 140)" tabindex="0" role="button" aria-label="Inspect Host PC (192.168.1.10)" aria-pressed="false">
+                    <circle r="26" class="topo-orbit" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
+                    <circle r="21" fill="#0d111a" stroke="#38bdf8" stroke-width="2" id="node-pc" />
+                    <rect x="-8" y="-9" width="16" height="10" rx="1.5" fill="none" stroke="#e2e8f0" stroke-width="1.3" />
+                    <path d="M-10 4h20M-4 1v3M4 1v3" stroke="#e2e8f0" stroke-width="1.2" stroke-linecap="round" />
+                    <text y="34" class="topo-node-name" text-anchor="middle">Host PC</text>
+                    <text y="45" class="topo-node-sub" text-anchor="middle">192.168.1.10</text>
                   </g>
 
                   <!-- Access Switch -->
-                  <g class="topo-node" data-node="switch" transform="translate(240, 140)">
-                    <rect x="-28" y="-18" width="56" height="36" rx="6" class="topo-orbit" stroke="rgba(0, 242, 254, 0.15)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
-                    <rect x="-24" y="-14" width="48" height="28" rx="4" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-switch" />
-                    <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🎛️ SW-1</text>
-                    <text y="26" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">VLAN 10</text>
+                  <g class="topo-node" data-node="switch" transform="translate(240, 140)" tabindex="0" role="button" aria-label="Inspect Access Switch SW-1 (VLAN 10)" aria-pressed="false">
+                    <rect x="-29" y="-19" width="58" height="38" rx="7" class="topo-orbit" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
+                    <rect x="-24" y="-14" width="48" height="28" rx="5" fill="#0d111a" stroke="#38bdf8" stroke-width="2" id="node-switch" />
+                    <path d="M-14 -4h28M10 -7l4 3-4 3M-14 4h28M-10 1l-4 3 4 3" fill="none" stroke="#e2e8f0" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+                    <text y="29" class="topo-node-name" text-anchor="middle">SW-1</text>
+                    <text y="40" class="topo-node-sub" text-anchor="middle">VLAN 10</text>
                   </g>
 
                   <!-- Core Router -->
-                  <g class="topo-node" data-node="router" transform="translate(400, 80)">
-                    <circle r="25" class="topo-orbit" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
-                    <circle r="20" fill="#060913" stroke="#10b981" stroke-width="2" id="node-router" />
-                    <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🌐 R-1</text>
-                    <text y="35" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">ISR 4331</text>
+                  <g class="topo-node" data-node="router" transform="translate(400, 80)" tabindex="0" role="button" aria-label="Inspect Core Router R-1 (ISR 4331)" aria-pressed="false">
+                    <circle r="26" class="topo-orbit" stroke="rgba(48, 209, 88, 0.22)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
+                    <circle r="21" fill="#0d111a" stroke="#30d158" stroke-width="2" id="node-router" />
+                    <path d="M-10 0h20M0 -10v20M7 -3l3 3-3 3M-7 -3l-3 3 3 3M-3 -7l3-3 3 3M-3 7l3 3 3-3" fill="none" stroke="#e2e8f0" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+                    <text y="33" class="topo-node-name" text-anchor="middle">R-1 Edge</text>
+                    <text y="44" class="topo-node-sub" text-anchor="middle">ISR 4331</text>
                   </g>
 
                   <!-- Firewall -->
-                  <g class="topo-node" data-node="firewall" transform="translate(400, 200)">
-                    <circle r="25" class="topo-orbit" stroke="rgba(255, 94, 58, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
-                    <circle r="20" fill="#060913" stroke="#ff5e3a" stroke-width="2" id="node-firewall" />
-                    <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">🔒 FW-1</text>
-                    <text y="35" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">FW 1010</text>
+                  <g class="topo-node" data-node="firewall" transform="translate(400, 200)" tabindex="0" role="button" aria-label="Inspect Security Firewall FW-1 (FW 1010)" aria-pressed="false">
+                    <circle r="26" class="topo-orbit" stroke="rgba(255, 69, 58, 0.24)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
+                    <circle r="21" fill="#0d111a" stroke="#ff453a" stroke-width="2" id="node-firewall" />
+                    <path d="M-9 -6h18v12H-9zM-9 0h18M0 -6v6M-4 0v6M4 0v6" fill="none" stroke="#e2e8f0" stroke-width="1.2" />
+                    <text y="33" class="topo-node-name" text-anchor="middle">FW-1</text>
+                    <text y="44" class="topo-node-sub" text-anchor="middle">FW 1010</text>
                   </g>
 
                   <!-- WAN -->
-                  <g class="topo-node" data-node="wan" transform="translate(600, 140)">
-                    <rect x="-28" y="-18" width="56" height="36" rx="8" class="topo-orbit" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
-                    <rect x="-24" y="-14" width="48" height="28" rx="6" fill="#060913" stroke="#10b981" stroke-width="2" id="node-wan" />
-                    <text y="4" font-family="Space Grotesk" font-size="10" fill="#fff" text-anchor="middle">☁️ WAN</text>
-                    <text y="26" font-family="JetBrains Mono" font-size="8" fill="#94a3b8" text-anchor="middle">8.8.8.8</text>
+                  <g class="topo-node" data-node="wan" transform="translate(600, 140)" tabindex="0" role="button" aria-label="Inspect WAN Gateway (8.8.8.8)" aria-pressed="false">
+                    <rect x="-29" y="-19" width="58" height="38" rx="9" class="topo-orbit" stroke="rgba(48, 209, 88, 0.22)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
+                    <rect x="-24" y="-14" width="48" height="28" rx="6" fill="#0d111a" stroke="#30d158" stroke-width="2" id="node-wan" />
+                    <path d="M-11 4h22a5 5 0 0 0-.5-10 7 7 0 0 0-13.2-1.2A4.5 4.5 0 0 0-11 4z" fill="none" stroke="#e2e8f0" stroke-width="1.3" stroke-linejoin="round" />
+                    <text y="29" class="topo-node-name" text-anchor="middle">WAN Cloud</text>
+                    <text y="40" class="topo-node-sub" text-anchor="middle">8.8.8.8</text>
                   </g>
                 </svg>
 
                 <!-- SECOND TOPOLOGY SVG MAP -->
-                <svg id="topoSvg2" viewBox="0 0 700 280" width="100%" height="100%" style="background: rgba(6, 9, 19, 0.65); border-radius: 12px; border: 1px solid rgba(0, 242, 254, 0.2); position: relative; display: none;">
+                <svg id="topoSvg2" class="noc-topo-svg" viewBox="0 0 700 280" width="100%" height="100%" style="display: none;" role="img" aria-label="Topology 2: Enterprise ROAS, EtherChannel and IPSec VPN Diagram">
                   <defs>
                     <pattern id="gridPattern2" width="20" height="20" patternUnits="userSpaceOnUse">
-                      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255, 255, 255, 0.025)" stroke-width="0.5" />
+                      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(148, 163, 184, 0.06)" stroke-width="0.6" />
                     </pattern>
                   </defs>
                   <rect width="100%" height="100%" fill="url(#gridPattern2)" rx="12" />
 
-                  <!-- Cable links -->
-                  <line x1="60" y1="180" x2="200" y2="130" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-                  <line x1="60" y1="80" x2="200" y2="130" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-                  <line x1="200" y1="130" x2="360" y2="130" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-                  <line x1="360" y1="125" x2="520" y2="75" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-                  <line x1="360" y1="135" x2="520" y2="85" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-                  <line x1="360" y1="130" x2="520" y2="180" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-                  <line x1="520" y1="80" x2="640" y2="80" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-   
-                  <!-- Active glowing lines -->
-                  <line id="link-sales-sw" x1="60" y1="180" x2="200" y2="130" stroke="#00f2fe" stroke-width="2" class="cable-link" />
-                  <line id="link-phone-sw" x1="60" y1="80" x2="200" y2="130" stroke="#00f2fe" stroke-width="2" class="cable-link" />
-                  <line id="link-sw-rbranch" x1="200" y1="130" x2="360" y2="130" stroke="#00f2fe" stroke-width="2" class="cable-link" />
-                  <line id="link-rbranch-hq1" x1="360" y1="125" x2="520" y2="75" stroke="#10b981" stroke-width="2" class="cable-link" />
-                  <line id="link-rbranch-hq2" x1="360" y1="135" x2="520" y2="85" stroke="#10b981" stroke-width="2" class="cable-link" />
-                  <line id="link-rbranch-fwbranch" x1="360" y1="130" x2="520" y2="180" stroke="#ff9233" stroke-width="1.5" class="cable-link secondary-link" />
-                  <line id="link-hq-server" x1="520" y1="80" x2="640" y2="80" stroke="#10b981" stroke-width="2" class="cable-link" />
-   
-                  <!-- Interface Link Status Triangles (Packet Tracer Style) -->
-                  <!-- PC / Phone ports -->
-                  <polygon points="80,175 85,172 80,168" fill="#10b981" />
-                  <polygon points="80,90 85,93 80,97" fill="#10b981" />
-                  <!-- SW-Branch ports -->
-                  <polygon points="178,138 174,143 180,145" fill="#10b981" />
-                  <polygon points="178,122 174,117 180,115" fill="#10b981" />
-                  <polygon points="230,127 236,130 230,133" fill="#10b981" />
-                  <!-- R-Branch ports -->
-                  <polygon points="337,127 331,130 337,133" fill="#10b981" />
-                  <!-- LACP Links Status -->
-                  <polygon points="380,120 385,115 380,112" fill="#10b981" />
-                  <polygon id="status-lacp-link1" points="495,82 490,85 495,89" fill="#10b981" />
-                  
-                  <polygon points="380,130 385,135 380,138" fill="#10b981" />
-                  <polygon points="495,95 490,92 495,88" fill="#10b981" />
-                  <!-- VPN tunnel link status -->
-                  <polygon points="378,137 382,142 384,137" fill="#10b981" />
+                  <!-- Logical Network Zones -->
+                  <rect x="16" y="18" width="234" height="244" rx="10" class="topo-zone-box" />
+                  <text x="28" y="36" class="topo-zone-label">BRANCH LAN · VLAN 10/20</text>
+                  <rect x="266" y="18" width="176" height="244" rx="10" class="topo-zone-box" />
+                  <text x="278" y="36" class="topo-zone-label">ROAS &amp; LACP / VPN</text>
+                  <rect x="458" y="18" width="226" height="244" rx="10" class="topo-zone-box" />
+                  <text x="470" y="36" class="topo-zone-label">HQ CORE &amp; DATACENTER</text>
 
-                  <!-- Port interface labels -->
-                  <text x="82" y="172" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Fa0/1</text>
-                  <text x="82" y="96" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Fa0/2</text>
-                  <text x="160" y="148" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Fa0/1</text>
-                  <text x="160" y="112" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Fa0/2</text>
-                  <text x="225" y="125" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/1</text>
-                  <text x="330" y="125" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/0</text>
-                  
-                  <text x="382" y="112" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/1</text>
-                  <text x="382" y="150" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/2</text>
-                  <text x="382" y="180" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/3</text>
-                  
-                  <text x="485" y="68" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Po1</text>
-                  <text x="485" y="172" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/0</text>
-                  <text x="595" y="75" font-family="JetBrains Mono" font-size="7" fill="rgba(255,255,255,0.35)">Gi0/24</text>
+                  <!-- Cable links -->
+                  <line x1="60" y1="180" x2="200" y2="130" class="topo-link-base" />
+                  <line x1="60" y1="80" x2="200" y2="130" class="topo-link-base" />
+                  <line x1="200" y1="130" x2="360" y2="130" class="topo-link-base" />
+                  <line x1="360" y1="125" x2="520" y2="75" class="topo-link-base" />
+                  <line x1="360" y1="135" x2="520" y2="85" class="topo-link-base" />
+                  <line x1="360" y1="130" x2="520" y2="180" class="topo-link-base" />
+                  <line x1="520" y1="80" x2="640" y2="80" class="topo-link-base" />
+
+                  <!-- Active protocol links -->
+                  <line id="link-sales-sw" x1="60" y1="180" x2="200" y2="130" stroke="#38bdf8" stroke-width="2" class="cable-link" />
+                  <line id="link-phone-sw" x1="60" y1="80" x2="200" y2="130" stroke="#38bdf8" stroke-width="2" class="cable-link" />
+                  <line id="link-sw-rbranch" x1="200" y1="130" x2="360" y2="130" stroke="#38bdf8" stroke-width="2" class="cable-link" />
+                  <line id="link-rbranch-hq1" x1="360" y1="125" x2="520" y2="75" stroke="#30d158" stroke-width="2" class="cable-link" />
+                  <line id="link-rbranch-hq2" x1="360" y1="135" x2="520" y2="85" stroke="#30d158" stroke-width="2" class="cable-link" />
+                  <line id="link-rbranch-fwbranch" x1="360" y1="130" x2="520" y2="180" stroke="#ff9f0a" stroke-width="1.5" class="cable-link secondary-link" />
+                  <line id="link-hq-server" x1="520" y1="80" x2="640" y2="80" stroke="#30d158" stroke-width="2" class="cable-link" />
+
+                  <!-- Interface Link Status Triangles -->
+                  <polygon points="80,175 85,172 80,168" fill="#30d158" />
+                  <polygon points="80,90 85,93 80,97" fill="#30d158" />
+                  <polygon points="178,138 174,143 180,145" fill="#30d158" />
+                  <polygon points="178,122 174,117 180,115" fill="#30d158" />
+                  <polygon points="230,127 236,130 230,133" fill="#30d158" />
+                  <polygon points="337,127 331,130 337,133" fill="#30d158" />
+                  <polygon points="380,120 385,115 380,112" fill="#30d158" />
+                  <polygon id="status-lacp-link1" points="495,82 490,85 495,89" fill="#30d158" />
+                  <polygon points="380,130 385,135 380,138" fill="#30d158" />
+                  <polygon points="495,95 490,92 495,88" fill="#30d158" />
+                  <polygon points="378,137 382,142 384,137" fill="#30d158" />
+
+                  <!-- Interface labels -->
+                  <text x="86" y="172" class="topo-iface-label">Fa0/1</text>
+                  <text x="86" y="96" class="topo-iface-label">Fa0/2</text>
+                  <text x="158" y="150" class="topo-iface-label">Fa0/1</text>
+                  <text x="158" y="110" class="topo-iface-label">Fa0/2</text>
+                  <text x="225" y="123" class="topo-iface-label">Gi0/1</text>
+                  <text x="326" y="123" class="topo-iface-label">Gi0/0</text>
+                  <text x="384" y="110" class="topo-iface-label">Gi0/1</text>
+                  <text x="384" y="150" class="topo-iface-label">Gi0/2</text>
+                  <text x="384" y="176" class="topo-iface-label">Gi0/3</text>
+                  <text x="486" y="66" class="topo-iface-label">Po1</text>
+                  <text x="484" y="172" class="topo-iface-label">Gi0/0</text>
+                  <text x="588" y="74" class="topo-iface-label">Gi0/24</text>
 
                   <!-- Animated Packet -->
-                  <circle id="simPacket2" cx="60" cy="180" r="8" fill="#00f2fe" style="opacity: 0; filter: drop-shadow(0 0 8px #00f2fe); pointer-events: none;" />
+                  <circle id="simPacket2" cx="60" cy="180" r="8" fill="#38bdf8" class="topo-packet" style="opacity: 0; pointer-events: none;" />
 
-                  <!-- Nodes -->
                   <!-- PC-Sales -->
-                  <g class="topo-node" data-node="pc-sales" transform="translate(60, 180)">
-                    <circle r="23" class="topo-orbit" stroke="rgba(0, 242, 254, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
-                    <circle r="18" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-pc-sales" />
-                    <text y="4" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">💻 Sales</text>
-                    <text y="32" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">10.10.10.10</text>
+                  <g class="topo-node" data-node="pc-sales" transform="translate(60, 180)" tabindex="0" role="button" aria-label="Inspect Sales PC (10.10.10.10)" aria-pressed="false">
+                    <circle r="23" class="topo-orbit" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
+                    <circle r="18" fill="#0d111a" stroke="#38bdf8" stroke-width="2" id="node-pc-sales" />
+                    <rect x="-7" y="-8" width="14" height="9" rx="1.5" fill="none" stroke="#e2e8f0" stroke-width="1.2" />
+                    <path d="M-9 4h18" stroke="#e2e8f0" stroke-width="1.2" stroke-linecap="round" />
+                    <text y="30" class="topo-node-name" text-anchor="middle">Sales PC</text>
+                    <text y="40" class="topo-node-sub" text-anchor="middle">10.10.10.10</text>
                   </g>
 
                   <!-- IP-Phone -->
-                  <g class="topo-node" data-node="ip-phone" transform="translate(60, 80)">
-                    <circle r="23" class="topo-orbit" stroke="rgba(0, 242, 254, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
-                    <circle r="18" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-ip-phone" />
-                    <text y="4" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">📞 Phone</text>
-                    <text y="32" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">10.10.20.10</text>
+                  <g class="topo-node" data-node="ip-phone" transform="translate(60, 80)" tabindex="0" role="button" aria-label="Inspect Voice IP Phone (10.10.20.10)" aria-pressed="false">
+                    <circle r="23" class="topo-orbit" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
+                    <circle r="18" fill="#0d111a" stroke="#38bdf8" stroke-width="2" id="node-ip-phone" />
+                    <path d="M-7 -4c0-2 3-3 7-3s7 1 7 3v2h-4v-1H-3v1h-4v-2zM-6 2h12v5H-6z" fill="none" stroke="#e2e8f0" stroke-width="1.2" stroke-linejoin="round" />
+                    <text y="30" class="topo-node-name" text-anchor="middle">IP Phone</text>
+                    <text y="40" class="topo-node-sub" text-anchor="middle">10.10.20.10</text>
                   </g>
 
                   <!-- SW-Branch -->
-                  <g class="topo-node" data-node="sw-branch" transform="translate(200, 130)">
-                    <rect x="-28" y="-16" width="56" height="32" rx="6" class="topo-orbit" stroke="rgba(0, 242, 254, 0.15)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
-                    <rect x="-24" y="-12" width="48" height="24" rx="4" fill="#060913" stroke="#00f2fe" stroke-width="2" id="node-sw-branch" />
-                    <text y="3" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">🎛️ SW-Br</text>
-                    <text y="24" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">VLAN 10/20</text>
+                  <g class="topo-node" data-node="sw-branch" transform="translate(200, 130)" tabindex="0" role="button" aria-label="Inspect Branch Switch SW-Br (VLAN 10/20)" aria-pressed="false">
+                    <rect x="-28" y="-16" width="56" height="32" rx="6" class="topo-orbit" stroke="rgba(56, 189, 248, 0.2)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
+                    <rect x="-24" y="-12" width="48" height="24" rx="4" fill="#0d111a" stroke="#38bdf8" stroke-width="2" id="node-sw-branch" />
+                    <path d="M-12 -3h24M9 -6l3 3-3 3M-12 3h24M-9 0l-3 3 3 3" fill="none" stroke="#e2e8f0" stroke-width="1.2" stroke-linecap="round" />
+                    <text y="26" class="topo-node-name" text-anchor="middle">SW-Branch</text>
+                    <text y="36" class="topo-node-sub" text-anchor="middle">VLAN 10/20</text>
                   </g>
 
                   <!-- R-Branch -->
-                  <g class="topo-node" data-node="r-branch" transform="translate(360, 130)">
-                    <circle r="23" class="topo-orbit" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
-                    <circle r="18" fill="#060913" stroke="#10b981" stroke-width="2" id="node-r-branch" />
-                    <text y="4" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">🌐 R-Br</text>
-                    <text y="32" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">ROAS</text>
+                  <g class="topo-node" data-node="r-branch" transform="translate(360, 130)" tabindex="0" role="button" aria-label="Inspect Branch Router R-Branch (ROAS)" aria-pressed="false">
+                    <circle r="23" class="topo-orbit" stroke="rgba(48, 209, 88, 0.22)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
+                    <circle r="18" fill="#0d111a" stroke="#30d158" stroke-width="2" id="node-r-branch" />
+                    <path d="M-8 0h16M0 -8v16M5 -2l3 2-3 2M-5 -2l-3 2 3 2" fill="none" stroke="#e2e8f0" stroke-width="1.2" stroke-linecap="round" />
+                    <text y="30" class="topo-node-name" text-anchor="middle">R-Branch</text>
+                    <text y="40" class="topo-node-sub" text-anchor="middle">ROAS</text>
                   </g>
 
                   <!-- HQ-Core -->
-                  <g class="topo-node" data-node="hq-core" transform="translate(520, 80)">
-                    <rect x="-28" y="-16" width="56" height="32" rx="6" class="topo-orbit" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
-                    <rect x="-24" y="-12" width="48" height="24" rx="4" fill="#060913" stroke="#10b981" stroke-width="2" id="node-hq-core" />
-                    <text y="3" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">🎛️ L3-HQ</text>
-                    <text y="24" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">EtherChan</text>
+                  <g class="topo-node" data-node="hq-core" transform="translate(520, 80)" tabindex="0" role="button" aria-label="Inspect HQ Core L3 Switch (EtherChannel)" aria-pressed="false">
+                    <rect x="-28" y="-16" width="56" height="32" rx="6" class="topo-orbit" stroke="rgba(48, 209, 88, 0.22)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
+                    <rect x="-24" y="-12" width="48" height="24" rx="4" fill="#0d111a" stroke="#30d158" stroke-width="2" id="node-hq-core" />
+                    <path d="M-12 -3h24M-12 3h24M-6 -7v14M6 -7v14" fill="none" stroke="#e2e8f0" stroke-width="1.2" />
+                    <text y="26" class="topo-node-name" text-anchor="middle">L3-HQ</text>
+                    <text y="36" class="topo-node-sub" text-anchor="middle">EtherChan</text>
                   </g>
 
                   <!-- FW-Branch -->
-                  <g class="topo-node" data-node="fw-branch" transform="translate(520, 180)">
-                    <circle r="23" class="topo-orbit" stroke="rgba(255, 94, 58, 0.15)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
-                    <circle r="18" fill="#060913" stroke="#ff5e3a" stroke-width="2" id="node-fw-branch" />
-                    <text y="4" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">🔒 FW-HQ</text>
-                    <text y="32" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">VPN Peer</text>
+                  <g class="topo-node" data-node="fw-branch" transform="translate(520, 180)" tabindex="0" role="button" aria-label="Inspect HQ Firewall FW-Branch (VPN Peer)" aria-pressed="false">
+                    <circle r="23" class="topo-orbit" stroke="rgba(255, 69, 58, 0.24)" stroke-width="1" stroke-dasharray="3, 3" fill="none" />
+                    <circle r="18" fill="#0d111a" stroke="#ff453a" stroke-width="2" id="node-fw-branch" />
+                    <path d="M-7 -5h14v10H-7zM-7 0h14M0 -5v5" fill="none" stroke="#e2e8f0" stroke-width="1.2" />
+                    <text y="30" class="topo-node-name" text-anchor="middle">FW-HQ</text>
+                    <text y="40" class="topo-node-sub" text-anchor="middle">VPN Peer</text>
                   </g>
 
                   <!-- HQ Server -->
-                  <g class="topo-node" data-node="hq-server" transform="translate(640, 80)">
-                    <rect x="-28" y="-16" width="56" height="32" rx="6" class="topo-orbit" stroke="rgba(16, 185, 129, 0.15)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
-                    <rect x="-24" y="-12" width="48" height="24" rx="4" fill="#060913" stroke="#10b981" stroke-width="2" id="node-hq-server" />
-                    <text y="3" font-family="Space Grotesk" font-size="9" fill="#fff" text-anchor="middle">🖥️ Server</text>
-                    <text y="24" font-family="JetBrains Mono" font-size="7" fill="#94a3b8" text-anchor="middle">172.16.100.5</text>
+                  <g class="topo-node" data-node="hq-server" transform="translate(640, 80)" tabindex="0" role="button" aria-label="Inspect HQ Server (172.16.100.5)" aria-pressed="false">
+                    <rect x="-28" y="-16" width="56" height="32" rx="6" class="topo-orbit" stroke="rgba(48, 209, 88, 0.22)" stroke-width="1" stroke-dasharray="4, 4" fill="none" />
+                    <rect x="-24" y="-12" width="48" height="24" rx="4" fill="#0d111a" stroke="#30d158" stroke-width="2" id="node-hq-server" />
+                    <path d="M-12 -5h24v4H-12zM-12 1h24v4H-12z" fill="none" stroke="#e2e8f0" stroke-width="1.1" />
+                    <text y="26" class="topo-node-name" text-anchor="middle">HQ Server</text>
+                    <text y="36" class="topo-node-sub" text-anchor="middle">172.16.100.5</text>
                   </g>
                 </svg>
               </div>
             </div>
 
-            <div class="topology-right" style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="topology-right">
               <!-- OSI Stack Inspector -->
-              <div id="simOsiPanel" style="border: 1px solid rgba(56, 189, 248, 0.18); border-radius: 12px; padding: 16px; background: #02040a; display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
+              <div id="simOsiPanel" class="noc-osi-panel">
                 <div>
-                  <h4 style="color: #38bdf8; margin-bottom: 10px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">🛡️ OSI Stack Inspector (Active Hop)</h4>
-                  
+                  <div class="noc-osi-header">
+                    <h4>OSI Stack Inspector</h4>
+                    <span id="simActiveHopBadge" class="noc-osi-hop-badge">Idle</span>
+                  </div>
+
                   <div class="osi-stack">
-                    <div class="osi-layer" data-layer="4">
-                      <span class="osi-layer-num">L4</span>
-                      <span class="osi-layer-name">Transport</span>
+                    <button type="button" class="osi-layer" data-layer="4" data-layer-state="pending">
+                      <span class="osi-layer-left">
+                        <span class="osi-layer-num">L4</span>
+                        <span class="osi-layer-name">Transport</span>
+                      </span>
                       <span id="osi-l4-val" class="osi-layer-val">-</span>
-                    </div>
-                    <div class="osi-layer" data-layer="3">
-                      <span class="osi-layer-num">L3</span>
-                      <span class="osi-layer-name">Network</span>
+                    </button>
+                    <button type="button" class="osi-layer" data-layer="3" data-layer-state="pending">
+                      <span class="osi-layer-left">
+                        <span class="osi-layer-num">L3</span>
+                        <span class="osi-layer-name">Network</span>
+                      </span>
                       <span id="osi-l3-val" class="osi-layer-val">-</span>
-                    </div>
-                    <div class="osi-layer" data-layer="2">
-                      <span class="osi-layer-num">L2</span>
-                      <span class="osi-layer-name">Data Link</span>
+                    </button>
+                    <button type="button" class="osi-layer" data-layer="2" data-layer-state="pending">
+                      <span class="osi-layer-left">
+                        <span class="osi-layer-num">L2</span>
+                        <span class="osi-layer-name">Data Link</span>
+                      </span>
                       <span id="osi-l2-val" class="osi-layer-val">-</span>
-                    </div>
-                    <div class="osi-layer" data-layer="1">
-                      <span class="osi-layer-num">L1</span>
-                      <span class="osi-layer-name">Physical</span>
+                    </button>
+                    <button type="button" class="osi-layer" data-layer="1" data-layer-state="pending">
+                      <span class="osi-layer-left">
+                        <span class="osi-layer-num">L1</span>
+                        <span class="osi-layer-name">Physical</span>
+                      </span>
                       <span id="osi-l1-val" class="osi-layer-val">-</span>
-                    </div>
+                    </button>
                   </div>
                 </div>
-                
+
                 <div id="osiLayerDescBox" class="osi-layer-desc-box">
-                  <span style="color: #94a3b8; font-style: italic;">Run a simulation and click any OSI layer tab above to inspect the active hop encapsulation details.</span>
+                  <span class="noc-muted-italic">Run a simulation and click any OSI layer tab above to inspect the active hop encapsulation details.</span>
                 </div>
               </div>
             </div>
@@ -904,23 +947,21 @@
           <!-- Progressive Disclosure: Device IOS CLI & Packet Traversal Logs -->
           <details id="nocConsoleDrawer" class="noc-telemetry-disclosure">
             <summary class="noc-drawer-summary">
-              <span>🖥️ Device IOS Running-Config &amp; Packet Traversal Logs</span>
-              <span class="noc-drawer-hint">Click any node or run a simulation to auto-open console telemetry</span>
+              <span>Device IOS Running-Config &amp; Packet Traversal Logs</span>
+              <span class="noc-drawer-hint">Select any topology device node or run a simulation to open console telemetry</span>
             </summary>
             <div class="noc-drawer-grid">
-              <!-- Device config console panel -->
-              <div id="nodeConfigPanel" style="border: 1px solid rgba(56, 189, 248, 0.18); border-radius: 12px; padding: 16px; background: #02040a; font-family: var(--font-mono); display: flex; flex-direction: column; min-height: 150px;">
-                <h4 style="color: #38bdf8; margin-bottom: 8px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">🖥️ Device Running Configuration &amp; Status</h4>
-                <div id="nodeConfigContent" style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
-                  <span style="color: #64748b; font-style: italic;">Click on any network node in the diagram (Host, SW-1, R-1, FW-1, WAN) to inspect interfaces, MAC/routing tables, security policies, and CCNA CLI commands.</span>
+              <div id="nodeConfigPanel" class="noc-drawer-subpanel">
+                <h4>Device Running Configuration &amp; CLI</h4>
+                <div id="nodeConfigContent" class="noc-drawer-content">
+                  <span class="noc-muted-italic">Select any network node in the topology (Host PC, SW-1, R-1, FW-1, WAN) to inspect interfaces, MAC/routing tables, security policies, and supported IOS show commands.</span>
                 </div>
               </div>
 
-              <!-- Traversal Logs -->
-              <div id="simLogPanel" style="border: 1px solid rgba(56, 189, 248, 0.18); border-radius: 12px; padding: 16px; background: #02040a; font-family: var(--font-mono); display: flex; flex-direction: column; min-height: 150px; max-height: 220px; overflow-y: auto;">
-                <h4 style="color: #38bdf8; margin-bottom: 10px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">📋 Packet Traversal Logs</h4>
-                <div id="simLogContent" style="font-size: 12.5px; color: #a7f3d0; line-height: 1.5; display: flex; flex-direction: column; gap: 8px;">
-                  <div>System Ready. Select a packet simulation and click "Run Simulation" to observe packet flows.</div>
+              <div id="simLogPanel" class="noc-drawer-subpanel noc-log-subpanel">
+                <h4>Packet Traversal Timeline</h4>
+                <div id="simLogContent" class="noc-log-content">
+                  <div>System Ready. Select a packet simulation and click "Run Simulation" to trace live hops.</div>
                 </div>
               </div>
             </div>
@@ -1185,66 +1226,138 @@
 
     <!-- CCNA LAB CENTER -->
     <section id="labs" class="page">
-      <article class="hero" style="position: relative; overflow: hidden;">
-        <!-- Immersive Awwwards-style perspective cyber grid -->
-        <div class="cyber-grid" aria-hidden="true"></div>
-        <h2 class="reveal-text glow-accent" style="position: relative; z-index: 1;">Cisco Virtual Lab Center</h2>
-        <p style="position: relative; z-index: 1; color: var(--text-muted); margin-bottom: 0;">Gain hands-on configuration experience with VLANs, OSPF, ACLs, STP, and VPNs. Configure parameters, audit status, and solve troubleshooting challenges.</p>
+      <article class="hero labs-hero">
+        <div class="labs-hero-top">
+          <div class="labs-hero-copy">
+            <span class="labs-eyebrow">Precision Engineering · Virtual IOS Workstation</span>
+            <h2 class="labs-hero-title">Build. Configure. Troubleshoot.</h2>
+            <p class="labs-hero-desc">Step beyond theory. Configure network infrastructure, understand routing behaviour and develop practical Cisco IOS skills.</p>
+          </div>
+          <div class="labs-hero-actions">
+            <button type="button" id="btnToggleLabCatalogue" class="secondary" aria-expanded="true" aria-controls="labCatalogueSection">Browse 10-Lab Catalogue</button>
+          </div>
+        </div>
+        <div class="grid stats labs-stats-grouped">
+          <div class="stat">
+            <div class="k">Available Labs</div>
+            <div class="v" id="labStatAvailable">10 Scenarios</div>
+          </div>
+          <div class="stat">
+            <div class="k">Completed</div>
+            <div class="v" id="labStatCompleted">0 / 10</div>
+          </div>
+          <div class="stat">
+            <div class="k">Current XP</div>
+            <div class="v" id="labStatXP">0 XP</div>
+          </div>
+          <div class="stat">
+            <div class="k">Lab Progress</div>
+            <div class="v" id="labStatProgress">0%</div>
+          </div>
+          <div class="stat">
+            <div class="k">Learning Mode</div>
+            <div class="v" id="labStatMode">Step-by-Step</div>
+          </div>
+        </div>
       </article>
 
-      <div class="lab-shell" style="display: grid; grid-template-columns: 320px 1fr; gap: 20px; min-height: 60vh;">
-        <!-- Left Panel: Lab Selector and Objectives -->
-        <aside class="card" style="display: flex; flex-direction: column; gap: 16px; padding: 16px;">
+      <!-- Structured 10-Lab Selection Catalogue -->
+      <section id="labCatalogueSection" class="card lab-catalogue-section">
+        <div class="lab-catalogue-header">
           <div>
-            <label for="labSelector" style="font-size: 11px; font-weight: 700; margin-bottom: 6px;">Select Lab Module</label>
-            <select id="labSelector" style="width: 100%; margin-top: 0;"></select>
+            <h3 class="lab-catalogue-title">CCNA Laboratory Catalogue</h3>
+            <p class="lab-catalogue-sub">Select a configuration scenario across Switching, Routing &amp; Services, or Security &amp; Wireless.</p>
           </div>
-          
-          <div class="lab-mode-group" style="display: flex; gap: 4px; border: 1px solid var(--border-color); border-radius: 8px; padding: 2px; background: rgba(0,0,0,0.25); height: 44px; align-items: center;">
-            <button id="btnModeStep" class="primary magnetic-btn" style="flex: 1; padding: 6px; font-size: 12px; border: none !important; border-radius: 6px !important; height: 100%;">Step-by-Step</button>
-            <button id="btnModeChallenge" class="ghost magnetic-btn" style="flex: 1; padding: 6px; font-size: 12px; border: none !important; border-radius: 6px !important; height: 100%;">Challenge</button>
-            <button id="btnModeExam" class="ghost magnetic-btn" style="flex: 1; padding: 6px; font-size: 12px; border: none !important; border-radius: 6px !important; height: 100%;">Exam</button>
+          <div class="lab-catalogue-picker">
+            <label for="labSelector">Active Lab</label>
+            <select id="labSelector"></select>
+          </div>
+        </div>
+        <div id="labCatalogueGrid" class="lab-catalogue-grid">
+          <!-- Rendered dynamically across accurate functional groups -->
+        </div>
+      </section>
+
+      <!-- Multi-Panel Engineering Workstation -->
+      <div id="labWorkspace" class="lab-shell lab-workstation">
+        <!-- Left Panel: Objectives, Step Progress & Lab Switcher -->
+        <aside class="card lab-objectives-panel">
+          <div class="lab-panel-header">
+            <h3>Objectives</h3>
+            <span id="labStepProgressBadge" class="lab-progress-badge">0 / 0</span>
           </div>
 
-          <div style="border-top: 1px solid var(--border-color); padding-top: 12px; flex: 1; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;">
-            <h3 style="font-size: 13px; color: #00f2fe; text-transform: uppercase;">Objectives Checklist</h3>
-            <div id="labObjectivesList" style="font-size: 12.5px; line-height: 1.5; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px;"></div>
+          <div class="lab-mode-group" role="group" aria-label="Select lab learning mode">
+            <button type="button" id="btnModeStep" class="primary">Step-by-Step</button>
+            <button type="button" id="btnModeChallenge" class="ghost">Challenge</button>
+            <button type="button" id="btnModeExam" class="ghost">Exam</button>
+          </div>
+
+          <div class="lab-objectives-scroll">
+            <div id="labObjectivesList" class="lab-objectives-list"></div>
+          </div>
+
+          <div class="lab-aside-nav">
+            <button type="button" id="btnPrevLab" class="secondary">← Prev Lab</button>
+            <button type="button" id="btnNextLab" class="secondary">Next Lab →</button>
           </div>
         </aside>
 
-        <!-- Right Panel: Topology and CLI Console -->
-        <div style="display: flex; flex-direction: column; gap: 16px;">
-          <div class="card" style="padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 12px; margin-bottom: 0;">
-            <h3 id="labTitle" style="font-size: 16px; color: var(--text-main);">Lab Module</h3>
-            <p id="labScenario" style="font-size: 13px; color: var(--text-muted); margin-bottom: 0;"></p>
-            
-            <!-- Simulated Lab Topology -->
-            <div id="labTopologyContainer" style="border: 1px solid var(--border-color); border-radius: 12px; background: rgba(6,9,19,0.5); padding: 12px; height: 200px; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;"></div>
+        <!-- Centre Panel: Topology & Authentic Obsidian Cisco IOS Terminal -->
+        <div class="lab-center-panel">
+          <div class="card lab-brief-card">
+            <div class="lab-brief-top">
+              <div>
+                <h3 id="labTitle" class="lab-active-title">Lab Module</h3>
+                <p id="labScenario" class="lab-active-scenario"></p>
+              </div>
+              <button type="button" id="btnRetryLabTop" class="secondary lab-retry-btn">Reset Lab</button>
+            </div>
+            <div id="labTopologyContainer" class="lab-topology-viewport"></div>
           </div>
 
-          <!-- CLI Console / Challenge Interface -->
-          <div class="card terminal-box" style="padding: 16px; min-height: 260px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 0;">
-            <h3 id="labConsoleHeader" style="font-size: 13px; color: #10b981; border-bottom: 1px solid rgba(16,185,129,0.15); padding-bottom: 6px; text-transform: uppercase; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
-              <span>💻 Cisco IOS Command Console</span>
-            </h3>
-            <div id="labCliOutput" style="font-family: var(--font-mono); font-size: 12.5px; color: #34d399; line-height: 1.45; overflow-y: auto; flex: 1; max-height: 160px; white-space: pre-wrap;"></div>
-            
-            <!-- Interactive inputs based on mode -->
-            <div id="labConsoleInputArea" style="display: flex; align-items: center; gap: 8px; border-top: 1px solid rgba(16,185,129,0.15); padding-top: 10px;">
-              <span id="labCliPrompt" style="font-family: var(--font-mono); font-size: 13px; color: #10b981;">Switch(config)#</span>
-              <div id="labInteractiveInputs" style="flex: 1; display: flex; gap: 8px; flex-wrap: wrap;"></div>
+          <!-- CLI Console / Challenge / Exam Interface -->
+          <div class="card terminal-box lab-terminal-card">
+            <div id="labConsoleHeader" class="lab-terminal-header">
+              <div class="lab-terminal-title-group">
+                <div class="lab-terminal-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                <span>Cisco IOS Command Console</span>
+              </div>
+              <span id="labTerminalModeTag" class="lab-terminal-mode-tag">GUIDED</span>
             </div>
-            
-            <div id="labFeedbackBox" style="font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 6px; display: none;"></div>
+
+            <div id="labCliOutput" class="lab-cli-output" aria-live="polite"></div>
+
+            <div id="labCompletionBanner" class="lab-completion-banner hidden" role="status"></div>
+
+            <!-- Interactive inputs / command pills based on mode -->
+            <div id="labConsoleInputArea" class="lab-console-input-area">
+              <span id="labCliPrompt" class="lab-cli-prompt">Switch(config)#</span>
+              <div id="labInteractiveInputs" class="lab-interactive-inputs"></div>
+            </div>
+
+            <div id="labFeedbackBox" class="lab-feedback-box" style="display: none;"></div>
+
             <div class="mobile-lab-cli-bar">
-              <input id="labManualCliInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type IOS command (or tap a command pill above)..." />
+              <input id="labManualCliInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type IOS command (supports int gi0/0, no shut, Up/Down history)..." aria-label="Cisco IOS command input" />
               <div class="mobile-lab-cli-actions">
                 <button type="button" id="btnLabRunManual" class="primary">Run Command</button>
-                <button type="button" id="btnLabHint" class="secondary">💡 Hint</button>
+                <button type="button" id="btnLabHint" class="secondary">Hint</button>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Right Panel: Task Inspector, Validation & Verification Reference -->
+        <aside id="labInspectorPanel" class="card lab-inspector-panel">
+          <div class="lab-panel-header">
+            <h3>Lab Inspector</h3>
+            <button type="button" id="btnToggleLabInspector" class="ghost lab-inspector-toggle" aria-expanded="true">Inspector</button>
+          </div>
+          <div id="labInspectorBody" class="lab-inspector-body">
+            <!-- Rendered dynamically based on mode and current step -->
+          </div>
+        </aside>
       </div>
     </section>
 

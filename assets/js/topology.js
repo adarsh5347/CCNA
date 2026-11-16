@@ -6,200 +6,224 @@ export let activeTopology = 1;
 
 export const deviceConfigs = {
   pc: `
-<strong style="color: #00f2fe; font-size: 13px;">💻 Device: Host PC (End Station)</strong>
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<strong>IP Address:</strong> 192.168.1.10
-<strong>Subnet Mask:</strong> 255.255.255.0
-<strong>Default Gateway:</strong> 192.168.1.1 (R-1)
-<strong>MAC Address:</strong> 0050.7966.6800
-<strong>NIC Status:</strong> UP (1000BASE-T Full)
-<strong>Active Connections:</strong> TCP 192.168.1.10:49152 -> 8.8.8.8:80 (ESTABLISHED)
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<span style="color: #10b981;">💡 CCNA Command Tip:</span>
-Use <code>ipconfig /all</code> to inspect network adapters, and <code>arp -a</code> to view the local ARP table.
-  `,
+<div class="noc-device-sheet">
+  <div class="noc-device-sheet-title">Host PC — End Station</div>
+  <div class="noc-device-kv">
+    <div><span>IP Address</span><strong>192.168.1.10</strong></div>
+    <div><span>Subnet Mask</span><strong>255.255.255.0</strong></div>
+    <div><span>Default Gateway</span><strong>192.168.1.1 (R-1)</strong></div>
+    <div><span>MAC Address</span><strong>0050.7966.6800</strong></div>
+    <div><span>NIC Status</span><strong>UP (1000BASE-T Full)</strong></div>
+    <div><span>Active Session</span><strong>TCP 192.168.1.10:49152 → 8.8.8.8:80</strong></div>
+  </div>
+  <div class="noc-device-tip">Command Hint: <code>ipconfig /all</code> · <code>arp -a</code></div>
+</div>`,
   switch: `
-<strong style="color: #00f2fe; font-size: 13px;">🎛️ Device: Switch SW-1 (Catalyst 2960)</strong>
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<strong>VLAN Database:</strong>
-  - VLAN 10 (LAN Users): Ports Fa0/1, Fa0/2
-  - VLAN 99 (Management): IP 192.168.1.250/24
-<strong>Spanning Tree Protocol (STP):</strong>
-  - Mode: PVST+ (Rapid)
-  - Bridge ID Priority: 32768 (MAC: 00e0.f901.abcd)
-  - Status: Root Bridge for VLAN 10
-<strong>MAC Address Table:</strong>
-  - 0050.7966.6800 -> Port Fa0/1 [Dynamic, Age: 42s]
-  - 0011.2233.4455 -> Port Gi0/1 [Dynamic, Age: 120s]
-  - 55aa.bbcc.ddee -> Port Gi0/2 [Dynamic, Age: 88s]
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<span style="color: #10b981;">💡 CCNA Command Tip:</span>
-Use <code>show mac address-table</code> to verify bridging learning, and <code>show vlan brief</code> to view port memberships.
-  `,
+<div class="noc-device-sheet">
+  <div class="noc-device-sheet-title">Switch SW-1 — Catalyst 2960</div>
+  <div class="noc-device-block"><strong>VLAN Database:</strong> VLAN 10 (LAN Users: Fa0/1, Fa0/2) · VLAN 99 (Mgmt: 192.168.1.250/24)</div>
+  <div class="noc-device-block"><strong>Spanning Tree:</strong> Mode Rapid PVST+ · Bridge Priority 32768 (00e0.f901.abcd) · Root for VLAN 10</div>
+  <div class="noc-device-block"><strong>MAC Table:</strong> 0050.7966.6800 (Fa0/1) · 0011.2233.4455 (Gi0/1) · 55aa.bbcc.ddee (Gi0/2)</div>
+  <div class="noc-device-tip">Command Hint: <code>show mac address-table</code> · <code>show vlan brief</code></div>
+</div>`,
   router: `
-<strong style="color: #00f2fe; font-size: 13px;">🌐 Device: Router R-1 (Cisco ISR 4331)</strong>
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<strong>Interfaces:</strong>
-  - Gi0/0/0 (LAN Gateway): 192.168.1.1/24 (UP) - <i>ip helper-address 10.10.10.1</i>
-  - Gi0/0/1 (WAN Uplink): 192.168.1.2/30 (UP) - <i>ip nat outside</i>
-<strong>Routing Table (OSPF Area 0):</strong>
-  - C 192.168.1.0/24 is directly connected, Gi0/0/0
-  - C 192.168.1.2/30 is directly connected, Gi0/0/1
-  - O*E2 0.0.0.0/0 [110/1] via 192.168.1.2, 00:45:12, Gi0/0/1
-<strong>Dynamic NAT Table:</strong>
-  - Inside Local: 192.168.1.10:49152 <-> Inside Global: 192.168.1.2:1024
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<span style="color: #10b981;">💡 CCNA Command Tip:</span>
-Use <code>show ip route</code> to inspect routing decisions, and <code>show ip interface brief</code> to verify line protocol status.
-  `,
+<div class="noc-device-sheet">
+  <div class="noc-device-sheet-title">Router R-1 — Cisco ISR 4331</div>
+  <div class="noc-device-block"><strong>Interfaces:</strong> Gi0/0/0 (192.168.1.1/24 UP, ip helper-address 10.10.10.1) · Gi0/0/1 (192.168.1.2/30 UP, ip nat outside)</div>
+  <div class="noc-device-block"><strong>Routing (OSPF Area 0):</strong> C 192.168.1.0/24 · C 192.168.1.2/30 · O*E2 0.0.0.0/0 [110/1] via 192.168.1.2</div>
+  <div class="noc-device-block"><strong>NAT Overload Table:</strong> Inside Local 192.168.1.10:49152 ↔ Inside Global 192.168.1.2:1024</div>
+  <div class="noc-device-tip">Command Hint: <code>show ip route</code> · <code>show ip interface brief</code></div>
+</div>`,
   firewall: `
-<strong style="color: #00f2fe; font-size: 13px;">🔒 Device: Firewall FW-1 (Cisco Secure Firewall 1010)</strong>
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<strong>Security Zones:</strong>
-  - Inside (Gi1/1): Security Level 100 (Trust) - IP: 192.168.1.254/24
-  - Outside (Gi1/2): Security Level 0 (Untrust) - IP: 192.168.1.3/30
-<strong>Active Access-Control List (OUTSIDE_IN):</strong>
-  - 10 permit tcp any host 192.168.1.10 eq 80 (HTTP)
-  - 20 permit tcp any host 192.168.1.10 eq 443 (HTTPS)
-  - 30 deny tcp any any eq 23 (Telnet block) [Matches: 14 hits]
-  - 40 deny ip any any (Implicit Deny)
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<span style="color: #10b981;">💡 CCNA Command Tip:</span>
-Use <code>show access-list</code> to check rule hit-counts, and <code>show conn</code> to audit stateful sessions.
-  `,
+<div class="noc-device-sheet">
+  <div class="noc-device-sheet-title">Firewall FW-1 — Cisco Secure Firewall 1010</div>
+  <div class="noc-device-block"><strong>Zones:</strong> Inside Gi1/1 (Security 100, 192.168.1.254/24) · Outside Gi1/2 (Security 0, 192.168.1.3/30)</div>
+  <div class="noc-device-block"><strong>ACL OUTSIDE_IN:</strong> permit tcp eq 80/443 · deny tcp any any eq 23 [14 hits] · implicit deny</div>
+  <div class="noc-device-tip">Command Hint: <code>show access-list</code> · <code>show conn</code></div>
+</div>`,
   wan: `
-<strong style="color: #00f2fe; font-size: 13px;">☁️ WAN Cloud Server (Destination 8.8.8.8)</strong>
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<strong>Endpoint IP:</strong> 8.8.8.8 (Google DNS / Public Web Host)
-<strong>Autonomous System:</strong> AS 15169 (Google LLC)
-<strong>BGP Peerings:</strong> Established with ISP Edge Routers
-<strong>Supported Protocols:</strong> ICMP (Echo), TCP (80, 443), UDP (53)
-<strong>Route Path:</strong> 192.168.1.2 -> ISP Edge AS65001 -> Core WAN -> 8.8.8.8
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<span style="color: #10b981;">💡 CCNA Command Tip:</span>
-Use <code>tracert 8.8.8.8</code> to map the TTL-expired ICMP hops traversing Internet Autonomous Systems.
-  `,
+<div class="noc-device-sheet">
+  <div class="noc-device-sheet-title">WAN Cloud Server — 8.8.8.8</div>
+  <div class="noc-device-kv">
+    <div><span>Endpoint IP</span><strong>8.8.8.8</strong></div>
+    <div><span>AS Number</span><strong>AS 15169</strong></div>
+    <div><span>Protocols</span><strong>ICMP · TCP 80/443 · UDP 53</strong></div>
+    <div><span>Route Path</span><strong>192.168.1.2 → AS65001 → 8.8.8.8</strong></div>
+  </div>
+  <div class="noc-device-tip">Command Hint: <code>tracert 8.8.8.8</code></div>
+</div>`,
   "pc-sales": `
-<strong style="color: #00f2fe; font-size: 13px;">💻 Device: Sales PC (VLAN 10 client)</strong>
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<strong>IP Address:</strong> 10.10.10.10
-<strong>Subnet Mask:</strong> 255.255.255.0
-<strong>Default Gateway:</strong> 10.10.10.1 (R-Branch subinterface Gi0/0.10)
-<strong>MAC Address:</strong> 00aa.bbcc.1010
-<strong>Active Port:</strong> SW-Branch port Fa0/1 (VLAN 10)
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<span style="color: #10b981;">💡 CCNA Command Tip:</span>
-On Windows clients, use <code>route print</code> to verify default gateway settings, and <code>ipconfig /renew</code> to acquire fresh DHCP bindings.
-  `,
+<div class="noc-device-sheet">
+  <div class="noc-device-sheet-title">Sales PC — VLAN 10 Client</div>
+  <div class="noc-device-kv">
+    <div><span>IP Address</span><strong>10.10.10.10 /24</strong></div>
+    <div><span>Default Gateway</span><strong>10.10.10.1 (R-Branch Gi0/0.10)</strong></div>
+    <div><span>MAC Address</span><strong>00aa.bbcc.1010</strong></div>
+    <div><span>Switch Port</span><strong>SW-Branch Fa0/1 (VLAN 10)</strong></div>
+  </div>
+  <div class="noc-device-tip">Command Hint: <code>route print</code> · <code>ipconfig /renew</code></div>
+</div>`,
   "ip-phone": `
-<strong style="color: #00f2fe; font-size: 13px;">📞 Device: Voice IP Phone (VLAN 20 voice client)</strong>
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<strong>IP Address:</strong> 10.10.20.10
-<strong>Subnet Mask:</strong> 255.255.255.0
-<strong>Default Gateway:</strong> 10.10.20.1 (R-Branch subinterface Gi0/0.20)
-<strong>MAC Address:</strong> 00bb.ccdd.2020
-<strong>Active Port:</strong> SW-Branch port Fa0/2 (VLAN 20 - Voice VLAN)
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<span style="color: #10b981;">💡 CCNA Command Tip:</span>
-Use <code>show interface &lt;id&gt; switchport</code> on the switch to verify that a port has both a data VLAN and a voice VLAN tag assigned.
-  `,
+<div class="noc-device-sheet">
+  <div class="noc-device-sheet-title">Voice IP Phone — VLAN 20 Client</div>
+  <div class="noc-device-kv">
+    <div><span>IP Address</span><strong>10.10.20.10 /24</strong></div>
+    <div><span>Default Gateway</span><strong>10.10.20.1 (R-Branch Gi0/0.20)</strong></div>
+    <div><span>MAC Address</span><strong>00bb.ccdd.2020</strong></div>
+    <div><span>Switch Port</span><strong>SW-Branch Fa0/2 (Voice VLAN 20)</strong></div>
+  </div>
+  <div class="noc-device-tip">Command Hint: <code>show interface &lt;id&gt; switchport</code></div>
+</div>`,
   "sw-branch": `
-<strong style="color: #00f2fe; font-size: 13px;">🎛️ Device: Branch Switch SW-Branch (Catalyst 2960)</strong>
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<strong>Interface Configurations:</strong>
-  - Fa0/1: Access VLAN 10 (Sales PC)
-  - Fa0/2: Access VLAN 10, Voice VLAN 20 (IP Phone)
-  - Gi0/1: 802.1Q Trunk to R-Branch (Allowed: 10,20)
-<strong>802.1Q Native VLAN:</strong> VLAN 1 (Default)
-<strong>VLAN Database:</strong>
-  - VLAN 10: Sales (10.10.10.0/24)
-  - VLAN 20: Voice (10.10.20.0/24)
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<span style="color: #10b981;">💡 CCNA Command Tip:</span>
-Use <code>switchport trunk allowed vlan add &lt;vlan&gt;</code> to specify active broadcast boundaries over trunks, protecting switch backplane performance.
-  `,
+<div class="noc-device-sheet">
+  <div class="noc-device-sheet-title">Branch Switch SW-Branch — Catalyst 2960</div>
+  <div class="noc-device-block"><strong>Ports:</strong> Fa0/1 (Access VLAN 10) · Fa0/2 (Data 10 / Voice 20) · Gi0/1 (802.1Q Trunk Allowed 10,20)</div>
+  <div class="noc-device-block"><strong>VLAN Database:</strong> VLAN 10 Sales (10.10.10.0/24) · VLAN 20 Voice (10.10.20.0/24) · Native VLAN 1</div>
+  <div class="noc-device-tip">Command Hint: <code>switchport trunk allowed vlan add &lt;vlan&gt;</code></div>
+</div>`,
   "r-branch": `
-<strong style="color: #00f2fe; font-size: 13px;">🌐 Device: Branch Router R-Branch (ISR 4321)</strong>
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<strong>Router-on-a-Stick Subinterfaces:</strong>
-  - Gi0/0.10 (VLAN 10): 10.10.10.1/24 (encapsulation dot1Q 10)
-  - Gi0/0.20 (VLAN 20): 10.10.20.1/24 (encapsulation dot1Q 20)
-<strong>EtherChannel LACP Config:</strong>
-  - Port-Channel 1: Gi0/1, Gi0/2 (mode active)
-  - IP Address Po1: 192.168.100.1/30
-<strong>Crypto Map Config (VPN):</strong>
-  - crypto map MYMAP 10 ipsec-isakmp
-  - match address VPN_ACL (permit 10.10.10.0/24 to 172.16.100.0/24)
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<span style="color: #10b981;">💡 CCNA Command Tip:</span>
-Use <code>show interface port-channel 1</code> to audit bundle status, and <code>show crypto ipsec sa</code> to check active security tunnels.
-  `,
+<div class="noc-device-sheet">
+  <div class="noc-device-sheet-title">Branch Router R-Branch — ISR 4321</div>
+  <div class="noc-device-block"><strong>ROAS Subinterfaces:</strong> Gi0/0.10 (10.10.10.1/24 dot1Q 10) · Gi0/0.20 (10.10.20.1/24 dot1Q 20)</div>
+  <div class="noc-device-block"><strong>LACP Po1:</strong> Gi0/1, Gi0/2 active (192.168.100.1/30) · <strong>IPSec Map:</strong> MYMAP 10 VPN_ACL</div>
+  <div class="noc-device-tip">Command Hint: <code>show interface port-channel 1</code> · <code>show crypto ipsec sa</code></div>
+</div>`,
   "hq-core": `
-<strong style="color: #00f2fe; font-size: 13px;">🎛️ Device: HQ Core L3 Switch (Catalyst 3850)</strong>
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<strong>EtherChannel Config:</strong>
-  - Port-Channel 1: Gi1/0/1, Gi1/0/2 (mode active - LACP)
-  - IP Address: 192.168.100.2/30 (no switchport)
-<strong>Routing Table (OSPF Area 0):</strong>
-  - O 10.10.10.0/24 [110/2] via 192.168.100.1
-  - C 172.16.100.0/24 is directly connected, Gi1/0/24
-<strong>Inter-VLAN SVI Interfaces:</strong>
-  - Interface VLAN 100: 172.16.100.1/24
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<span style="color: #10b981;">💡 CCNA Command Tip:</span>
-Use <code>show etherchannel summary</code> to audit LACP member ports. State code (P) means bundled, (D) means down/suspended.
-  `,
+<div class="noc-device-sheet">
+  <div class="noc-device-sheet-title">HQ Core L3 Switch — Catalyst 3850</div>
+  <div class="noc-device-block"><strong>LACP Po1:</strong> Gi1/0/1, Gi1/0/2 active (192.168.100.2/30 no switchport)</div>
+  <div class="noc-device-block"><strong>OSPF Area 0 &amp; SVI:</strong> O 10.10.10.0/24 via 192.168.100.1 · VLAN 100 SVI 172.16.100.1/24</div>
+  <div class="noc-device-tip">Command Hint: <code>show etherchannel summary</code></div>
+</div>`,
   "fw-branch": `
-<strong style="color: #00f2fe; font-size: 13px;">🔒 Device: HQ Firewall FW-Branch (ASA 5515)</strong>
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<strong>IPSec VPN Tunnel Configuration:</strong>
-  - Crypto map outside_map 10 match VPN_ACL
-  - Peer IP address: 192.0.2.1 (R-Branch outside IP)
-  - Transform Set: ESP-AES-256 ESP-SHA-HMAC
-<strong>Security Policies:</strong>
-  - permit esp any any
-  - permit udp any any eq 500 (ISAKMP)
-  - permit udp any any eq 4500 (NAT Traversal)
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<span style="color: #10b981;">💡 CCNA Command Tip:</span>
-Use <code>show crypto isakmp sa</code> to inspect Phase 1 negotiation state (should read MM_ACTIVE).
-  `,
+<div class="noc-device-sheet">
+  <div class="noc-device-sheet-title">HQ Firewall FW-Branch — ASA 5515</div>
+  <div class="noc-device-block"><strong>IPSec VPN:</strong> outside_map 10 (VPN_ACL) · Peer 192.0.2.1 · Transform ESP-AES-256 ESP-SHA-HMAC</div>
+  <div class="noc-device-block"><strong>Policies:</strong> permit esp · permit udp/500 (ISAKMP) · permit udp/4500 (NAT-T)</div>
+  <div class="noc-device-tip">Command Hint: <code>show crypto isakmp sa</code></div>
+</div>`,
   "hq-server": `
-<strong style="color: #00f2fe; font-size: 13px;">🖥️ Device: HQ Server (Private Datacenter Host)</strong>
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<strong>IP Address:</strong> 172.16.100.5
-<strong>Subnet Mask:</strong> 255.255.255.0
-<strong>Default Gateway:</strong> 172.16.100.1 (HQ-Core switch)
-<strong>Supported Services:</strong> HTTPS (443), SSH (22), Database (3306)
-<strong>Access Policy:</strong> Private subnets only (VPN/Trunk routing required)
-<hr style="border-color: rgba(255,255,255,0.08); margin: 6px 0;" />
-<span style="color: #10b981;">💡 CCNA Command Tip:</span>
-Server hosting requires static routing or local gateway configuration. Audit with <code>netstat -ano</code> to view active listening ports.
-  `
+<div class="noc-device-sheet">
+  <div class="noc-device-sheet-title">HQ Server — Datacenter Host</div>
+  <div class="noc-device-kv">
+    <div><span>IP Address</span><strong>172.16.100.5 /24</strong></div>
+    <div><span>Default Gateway</span><strong>172.16.100.1 (HQ-Core)</strong></div>
+    <div><span>Services</span><strong>HTTPS (443) · SSH (22) · DB (3306)</strong></div>
+    <div><span>Policy</span><strong>Private Subnets / VPN Only</strong></div>
+  </div>
+  <div class="noc-device-tip">Command Hint: <code>netstat -ano</code></div>
+</div>`
 };
+
+const NODE_META = {
+  pc: "Host PC",
+  switch: "Switch SW-1",
+  router: "Router R-1",
+  firewall: "Firewall FW-1",
+  wan: "WAN Cloud",
+  "pc-sales": "Sales PC",
+  "ip-phone": "IP Phone",
+  "sw-branch": "SW-Branch",
+  "r-branch": "R-Branch",
+  "hq-core": "L3-HQ Core",
+  "fw-branch": "FW-Branch",
+  "hq-server": "HQ Server"
+};
+
+function getDefaultStroke(n) {
+  if (n === "router" || n === "wan" || n === "r-branch" || n === "hq-core" || n === "hq-server") {
+    return "var(--color-ok)";
+  }
+  if (n === "firewall" || n === "fw-branch") {
+    return "var(--color-error)";
+  }
+  return "#38bdf8";
+}
+
+function setOsiLayerStates(osiData, activeLayerNum, isBlocked = false) {
+  document.querySelectorAll(".osi-layer").forEach((el) => {
+    const num = Number(el.getAttribute("data-layer"));
+    const key = "l" + num;
+    const hasVal = Boolean(osiData && osiData[key] && osiData[key].val && osiData[key].val !== "-");
+    el.classList.toggle("active", num === Number(activeLayerNum));
+    if (!osiData) {
+      el.dataset.layerState = "pending";
+    } else if (isBlocked && num === Number(activeLayerNum)) {
+      el.dataset.layerState = "blocked";
+    } else if (num === Number(activeLayerNum)) {
+      el.dataset.layerState = "active";
+    } else if (hasVal && num < Number(activeLayerNum)) {
+      el.dataset.layerState = "completed";
+    } else {
+      el.dataset.layerState = hasVal ? "completed" : "pending";
+    }
+  });
+}
+
+function updateSimStatus({ badgeClass = "idle", badgeText = "READY", routeText, hopText = "Hop 0 / 0", pct = 0 }) {
+  const badge = byId("simStatusBadge");
+  const routeEl = byId("simStatusRouteText");
+  const hopEl = byId("simStatusHopText");
+  const bar = byId("simStatusProgressBar");
+
+  if (badge) {
+    badge.className = `noc-status-badge ${badgeClass}`;
+    badge.textContent = badgeText;
+  }
+  if (routeEl && routeText !== undefined) routeEl.textContent = routeText;
+  if (hopEl) hopEl.textContent = hopText;
+  if (bar) bar.style.width = `${pct}%`;
+}
+
+function syncTroubleBanner() {
+  const banner = byId("nocTroubleSymptomBanner");
+  const textEl = byId("nocTroubleSymptomText");
+  const isTrouble = Boolean(byId("chkTroubleshooting")?.checked);
+  const pktType = byId("simPacketType")?.value;
+  if (!banner || !textEl) return;
+
+  if (!isTrouble) {
+    banner.classList.add("hidden");
+    banner.classList.remove("fault-fixed", "fault-detected");
+    document.querySelectorAll(".topo-node.faulted").forEach((el) => el.classList.remove("faulted"));
+    return;
+  }
+
+  banner.classList.remove("hidden");
+  const bug = bugsData[pktType];
+  if (bug && state.simBugsFixed[pktType]) {
+    banner.classList.remove("fault-detected");
+    banner.classList.add("fault-fixed");
+    textEl.textContent = "Configuration fault resolved for this flow. Re-run simulation to confirm clean packet traversal.";
+  } else {
+    banner.classList.remove("fault-fixed");
+    banner.classList.add("fault-detected");
+    textEl.textContent = "Troubleshooting Mode Active — Run simulation to identify where traffic drops, then click the failing device node to diagnose and apply a fix.";
+  }
+}
 
 export function showOsiLayerDetail(layerNum) {
   const descBox = byId("osiLayerDescBox");
   if (!descBox) return;
-  
+
   if (!window.currentOsiData) {
-    descBox.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">No active packet simulation. Run a simulation to inspect layers.</span>`;
+    descBox.innerHTML = `<span class="noc-muted-italic">No active packet simulation. Run a simulation to inspect layers.</span>`;
     return;
   }
-  
+
   const layerKey = "l" + layerNum;
   const data = window.currentOsiData[layerKey];
-  
+
   if (data && data.val !== "-") {
     descBox.innerHTML = `
-      <strong style="color: #00f2fe;">Layer ${layerNum} details:</strong><br/>
-      <div style="margin-top: 4px; font-family: var(--font-mono); color: #a7f3d0; font-size:12px;">Field Value: ${data.val}</div>
-      <div style="margin-top: 6px;">${data.desc}</div>
+      <div class="noc-osi-detail-head">Layer ${layerNum} details:</div>
+      <div class="noc-osi-detail-val">Field Value: ${safeHTML(data.val)}</div>
+      <div class="noc-osi-detail-desc">${safeHTML(data.desc)}</div>
     `;
   } else {
     descBox.innerHTML = `
-      <strong style="color: var(--text-muted);">Layer ${layerNum} details:</strong><br/>
-      <div style="margin-top: 4px; font-style: italic;">Not applicable / Not encapsulated at this hop.</div>
+      <div class="noc-osi-detail-muted">Layer ${layerNum} details:</div>
+      <div class="noc-osi-detail-na">Not applicable / Not encapsulated at this hop.</div>
     `;
   }
 }
@@ -210,7 +234,7 @@ export function updateOsiLabels(osiData) {
   const l3Val = byId("osi-l3-val");
   const l2Val = byId("osi-l2-val");
   const l1Val = byId("osi-l1-val");
-  
+
   if (!osiData) {
     if (l4Val) l4Val.textContent = "-";
     if (l3Val) l3Val.textContent = "-";
@@ -218,7 +242,7 @@ export function updateOsiLabels(osiData) {
     if (l1Val) l1Val.textContent = "-";
     return;
   }
-  
+
   if (l4Val) l4Val.textContent = osiData.l4 ? osiData.l4.val : "-";
   if (l3Val) l3Val.textContent = osiData.l3 ? osiData.l3.val : "-";
   if (l2Val) l2Val.textContent = osiData.l2 ? osiData.l2.val : "-";
@@ -228,34 +252,22 @@ window.updateOsiLabels = updateOsiLabels;
 
 export function highlightNode(nodeId, isBlocked = false) {
   const nodes = ["pc", "switch", "router", "firewall", "wan", "pc-sales", "ip-phone", "sw-branch", "r-branch", "hq-core", "fw-branch", "hq-server"];
-  nodes.forEach(n => {
+  nodes.forEach((n) => {
     const el = byId(`node-${n}`);
     if (el) {
       if (n === nodeId) {
         el.setAttribute("stroke-width", "4");
         if (isBlocked) {
-          el.setAttribute("fill", "rgba(255, 94, 58, 0.25)");
+          el.setAttribute("fill", "rgba(255, 69, 58, 0.25)");
           el.setAttribute("stroke", "var(--color-error)");
         } else {
-          el.setAttribute("fill", "rgba(0, 242, 254, 0.2)");
-          let origStroke = "#00f2fe";
-          if (n === "router" || n === "wan" || n === "r-branch" || n === "hq-core" || n === "hq-server") {
-            origStroke = "var(--color-ok)";
-          } else if (n === "firewall" || n === "fw-branch") {
-            origStroke = "var(--color-error)";
-          }
-          el.setAttribute("stroke", origStroke);
+          el.setAttribute("fill", "rgba(56, 189, 248, 0.2)");
+          el.setAttribute("stroke", getDefaultStroke(n));
         }
       } else {
         el.setAttribute("stroke-width", "2");
-        el.setAttribute("fill", "#060913");
-        let origStroke = "#00f2fe";
-        if (n === "router" || n === "wan" || n === "r-branch" || n === "hq-core" || n === "hq-server") {
-          origStroke = "var(--color-ok)";
-        } else if (n === "firewall" || n === "fw-branch") {
-          origStroke = "var(--color-error)";
-        }
-        el.setAttribute("stroke", origStroke);
+        el.setAttribute("fill", "#0d111a");
+        el.setAttribute("stroke", getDefaultStroke(n));
       }
     }
   });
@@ -271,33 +283,37 @@ export function renderCLI(nodeName) {
   const isTrouble = byId("chkTroubleshooting")?.checked;
   const currentPacketType = byId("simPacketType")?.value;
   const bug = bugsData[currentPacketType];
+  const nodeLabel = NODE_META[nodeName] || nodeName.toUpperCase();
 
   if (isTrouble && bug && bug.node === nodeName && !state.simBugsFixed[currentPacketType]) {
-    let optionsHtml = bug.options.map((opt, idx) => `
-      <option value="${idx}">${opt.label}</option>
+    const optionsHtml = bug.options.map((opt, idx) => `
+      <option value="${idx}">${safeHTML(opt.label)}</option>
     `).join("");
 
     container.innerHTML = `
-      <div style="background:#090d16; border:1px solid #ff5e3a; padding:12px; border-radius:8px;">
-        <div style="color:#ff5e3a; font-weight:bold; margin-bottom:6px; font-size:13px; text-transform:uppercase;">⚠ TROUBLESHOOTING INJECTOR - ${nodeName.toUpperCase()}</div>
-        <p style="margin:0 0 10px 0; color:#cbd5e1; font-size:12.5px;">${bug.desc}</p>
-        <div style="background:#000; padding:8px; border-radius:4px; font-family:var(--font-mono); color:#f87171; font-size:11px; margin-bottom:12px; white-space:pre-wrap;">% Error Log: ${bug.errorLog}</div>
-        
-        <div style="display:flex; flex-direction:column; gap:8px;">
-          <label style="font-size:11px; color:#94a3b8; font-weight:bold;">Select correct Cisco configuration to apply:</label>
-          <select id="cliTroubleFixSelect" style="width:100%; font-family:var(--font-mono); font-size:11px; background:#111827; border:1px solid #374151; color:#fff; padding:6px; border-radius:6px;">
+      <div class="noc-trouble-panel">
+        <div class="noc-trouble-header">
+          <span class="noc-trouble-badge">FAULT DETECTED</span>
+          <strong>Troubleshooting Injector — ${safeHTML(nodeLabel)}</strong>
+        </div>
+        <p class="noc-trouble-desc">${safeHTML(bug.desc)}</p>
+        <div class="noc-trouble-errorlog">% Error Log: ${safeHTML(bug.errorLog)}</div>
+
+        <div class="noc-trouble-block">
+          <label for="cliTroubleFixSelect">Select corrective Cisco IOS configuration:</label>
+          <select id="cliTroubleFixSelect">
             ${optionsHtml}
           </select>
-          <button id="btnApplyTroubleFix" class="primary" style="align-self:flex-start; margin-top:4px; padding:6px 14px; font-size:11.5px; border-radius:6px;">Apply Configuration</button>
+          <button type="button" id="btnApplyTroubleFix" class="primary">Apply Configuration</button>
         </div>
-        
-        <div style="display:flex; flex-direction:column; gap:8px; margin-top:14px; border-top:1px dashed rgba(255,255,255,0.1); padding-top:12px;">
-          <label style="font-size:11px; color:#94a3b8; font-weight:bold;">Or type the exact Cisco configuration command manually (supports aliases like "int gi0/0"):</label>
-          <input type="text" id="cliTroubleTypedInput" placeholder="e.g. interface GigabitEthernet0/0/0" style="width:100%; font-family:var(--font-mono); font-size:11px; background:#111827; border:1px solid #374151; color:#fff; padding:6px; border-radius:6px;" />
-          <button id="btnApplyTypedTroubleFix" class="secondary" style="align-self:flex-start; padding:6px 14px; font-size:11.5px; border-radius:6px;">Submit Command</button>
+
+        <div class="noc-trouble-block noc-trouble-manual">
+          <label for="cliTroubleTypedInput">Or enter Cisco configuration command manually (aliases supported, e.g. <code>int gi0/0</code>):</label>
+          <input type="text" id="cliTroubleTypedInput" placeholder="e.g. interface GigabitEthernet0/0/0" />
+          <button type="button" id="btnApplyTypedTroubleFix" class="secondary">Submit Command</button>
         </div>
-        
-        <div id="cliTroubleResult" style="margin-top:12px; font-family:var(--font-mono); font-size:11px; white-space:pre-wrap; display:none;"></div>
+
+        <div id="cliTroubleResult" class="noc-trouble-result" style="display:none;"></div>
       </div>
     `;
 
@@ -312,41 +328,39 @@ export function renderCLI(nodeName) {
         if (option.correct) {
           playNetSound("success");
           state.simBugsFixed[currentPacketType] = true;
-          
+          document.querySelectorAll(`.topo-node[data-node="${CSS.escape(nodeName)}"]`).forEach((el) => el.classList.remove("faulted"));
+          syncTroubleBanner();
+
           if (resultDiv) {
             resultDiv.style.display = "block";
-            resultDiv.style.color = "#10b981";
-            resultDiv.innerHTML = `
-${nodeName.toUpperCase()}# configure terminal
+            resultDiv.className = "noc-trouble-result is-ok";
+            resultDiv.innerHTML = `${nodeName.toUpperCase()}# configure terminal
 Enter configuration commands, one per line. End with CNTL/Z.
-${nodeName.toUpperCase()}(config)# ${option.cmd.trim().replace(/\n/g, '\n' + nodeName.toUpperCase() + '(config)# ')}
+${nodeName.toUpperCase()}(config)# ${safeHTML(option.cmd.trim()).replace(/\n/g, "\n" + nodeName.toUpperCase() + "(config)# ")}
 ${nodeName.toUpperCase()}(config)# end
 ${nodeName.toUpperCase()}# write memory
 % Building configuration...
 % [OK] Configuration applied successfully. Status: synchronized.
-✔ Bug resolved! +30 XP rewarded.
-            `;
+Bug resolved. +30 XP awarded.`;
           }
-          
+
           gainXP(30);
-          
+
           setTimeout(() => {
             renderCLI(nodeName);
-      if (window.innerWidth <= 768) {
-        const cfgPanel = byId("nodeConfigPanel");
-        if (cfgPanel) cfgPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }
+            if (window.innerWidth <= 768) {
+              const cfgPanel = byId("nodeConfigPanel");
+              if (cfgPanel) cfgPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
           }, 2500);
         } else {
           playNetSound("block");
           if (resultDiv) {
             resultDiv.style.display = "block";
-            resultDiv.style.color = "#ff5e3a";
-            resultDiv.innerHTML = `
-${nodeName.toUpperCase()}# configure terminal
-${nodeName.toUpperCase()}(config)# ${option.cmd.trim().replace(/\n/g, '\n' + nodeName.toUpperCase() + '(config)# ')}
-% Invalid command configuration. Rejected by Cisco IOS CLI syntax analyzer.
-            `;
+            resultDiv.className = "noc-trouble-result is-err";
+            resultDiv.innerHTML = `${nodeName.toUpperCase()}# configure terminal
+${nodeName.toUpperCase()}(config)# ${safeHTML(option.cmd.trim()).replace(/\n/g, "\n" + nodeName.toUpperCase() + "(config)# ")}
+% Invalid command configuration. Rejected by Cisco IOS CLI syntax analyzer.`;
           }
         }
       });
@@ -359,10 +373,10 @@ ${nodeName.toUpperCase()}(config)# ${option.cmd.trim().replace(/\n/g, '\n' + nod
         const val = typedInput.value.trim().toLowerCase();
         const resultDiv = byId("cliTroubleResult");
         if (!val) return;
-        
-        const correctOption = bug.options.find(o => o.correct);
+
+        const correctOption = bug.options.find((o) => o.correct);
         if (!correctOption) return;
-        
+
         const normalizeCiscoCmd = (str) => {
           return str.trim().toLowerCase()
             .replace(/\bgigabitethernet\b/g, "gi")
@@ -372,30 +386,28 @@ ${nodeName.toUpperCase()}(config)# ${option.cmd.trim().replace(/\n/g, '\n' + nod
             .replace(/\bshutdown\b/g, "shut")
             .replace(/\s+/g, " ");
         };
-                            
+
         const typedLines = typedInput.value.split(/[\r\n]+/).map(normalizeCiscoCmd).filter(Boolean);
         const correctLines = correctOption.cmd.split(/[\r\n]+/).map(normalizeCiscoCmd).filter(Boolean);
-        
-        let allMatch = typedLines.length === correctLines.length && typedLines.every((line, idx) => {
-          return line === correctLines[idx];
-        });
-        
+
+        const allMatch = typedLines.length === correctLines.length && typedLines.every((line, idx) => line === correctLines[idx]);
+
         if (allMatch) {
           playNetSound("success");
           state.simBugsFixed[currentPacketType] = true;
+          document.querySelectorAll(`.topo-node[data-node="${CSS.escape(nodeName)}"]`).forEach((el) => el.classList.remove("faulted"));
+          syncTroubleBanner();
           if (resultDiv) {
             resultDiv.style.display = "block";
-            resultDiv.style.color = "#10b981";
-            resultDiv.innerHTML = `
-${nodeName.toUpperCase()}# configure terminal
+            resultDiv.className = "noc-trouble-result is-ok";
+            resultDiv.innerHTML = `${nodeName.toUpperCase()}# configure terminal
 Enter configuration commands, one per line. End with CNTL/Z.
-${nodeName.toUpperCase()}(config)# ${correctOption.cmd.trim().replace(/\n/g, '\n' + nodeName.toUpperCase() + '(config)# ')}
+${nodeName.toUpperCase()}(config)# ${safeHTML(correctOption.cmd.trim()).replace(/\n/g, "\n" + nodeName.toUpperCase() + "(config)# ")}
 ${nodeName.toUpperCase()}(config)# end
 ${nodeName.toUpperCase()}# write memory
 % Building configuration...
 % [OK] Configuration applied successfully. Status: synchronized.
-✔ Bug resolved! +30 XP rewarded.
-            `;
+Bug resolved. +30 XP awarded.`;
           }
           gainXP(30);
           setTimeout(() => { renderCLI(nodeName); }, 2500);
@@ -403,8 +415,8 @@ ${nodeName.toUpperCase()}# write memory
           playNetSound("block");
           if (resultDiv) {
             resultDiv.style.display = "block";
-            resultDiv.style.color = "#ff5e3a";
-            resultDiv.innerHTML = `% Invalid command: "${safeHTML(typedInput.value)}"\nRejected by Cisco IOS CLI parser. (Hint: check correct command syntax/options)`;
+            resultDiv.className = "noc-trouble-result is-err";
+            resultDiv.innerHTML = `% Invalid command: "${safeHTML(typedInput.value)}"\nRejected by Cisco IOS CLI parser. (Check command syntax or device config hints.)`;
           }
         }
       });
@@ -413,45 +425,37 @@ ${nodeName.toUpperCase()}# write memory
     const cmdList = cliOutputs[nodeName];
     if (!cmdList) {
       container.innerHTML = `
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
-          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); padding:12px; border-radius:8px;">
-            ${deviceConfigs[nodeName] || 'No configuration data available.'}
-          </div>
-          <div style="background:#090d16; border:1px solid rgba(255,255,255,0.08); padding:12px; border-radius:8px; display:flex; justify-content:center; align-items:center; color:var(--text-muted); font-style:italic; font-size:11.5px;">
-            CLI terminal access disabled / not supported on WAN endpoints.
-          </div>
+        <div class="noc-cli-grid">
+          <div class="noc-cli-info-box">${deviceConfigs[nodeName] || "No configuration data available."}</div>
+          <div class="noc-cli-terminal-card noc-cli-disabled">CLI terminal access not supported on passive WAN endpoints.</div>
         </div>
       `;
       return;
     }
 
-    const commandOptions = Object.keys(cmdList).map(cmd => `
-      <option value="${cmd}">${cmd}</option>
+    const commandOptions = Object.keys(cmdList).map((cmd) => `
+      <option value="${safeHTML(cmd)}">${safeHTML(cmd)}</option>
     `).join("");
 
     container.innerHTML = `
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
-        <!-- Left: Static Config Info -->
-        <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); padding:12px; border-radius:8px; font-size:11.5px; line-height:1.5; color:#94a3b8;">
-          ${deviceConfigs[nodeName] || 'No configuration data available.'}
-        </div>
-        
-        <!-- Right: Interactive CLI Console -->
-        <div style="background:#090d16; border:1px solid rgba(255,255,255,0.08); padding:12px; border-radius:8px; display:flex; flex-direction:column; gap:10px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <strong style="color:#00f2fe; font-size:12px;">Cisco IOS CLI - ${nodeName.toUpperCase()}</strong>
-            <span style="font-family:var(--font-mono); font-size:10.5px; color:#10b981;">STATUS: Online</span>
+      <div class="noc-cli-grid">
+        <div class="noc-cli-info-box">${deviceConfigs[nodeName] || "No configuration data available."}</div>
+
+        <div class="noc-cli-terminal-card">
+          <div class="noc-cli-terminal-head">
+            <strong>Simulated CLI — ${safeHTML(nodeLabel)}</strong>
+            <span class="noc-cli-status-online">ONLINE</span>
           </div>
-          
-          <div style="display:flex; gap:8px; align-items:center;">
-            <span style="font-family:var(--font-mono); font-size:11px; color:#cbd5e1;">${nodeName.toUpperCase()}#</span>
-            <select id="cliCommandSelect" style="flex:1; font-family:var(--font-mono); font-size:11px; background:#111827; border:1px solid #374151; color:#fff; padding:6px; border-radius:6px;">
-              <option value="">-- Run show command --</option>
+
+          <div class="noc-cli-prompt-row">
+            <label for="cliCommandSelect" class="noc-cli-prompt">${safeHTML(nodeName.toUpperCase())}#</label>
+            <select id="cliCommandSelect">
+              <option value="">-- Run IOS show command --</option>
               ${commandOptions}
             </select>
           </div>
 
-          <div id="cliOutputTerminal" style="background:#000; border:1px solid rgba(255,255,255,0.05); padding:10px; border-radius:6px; font-family:var(--font-mono); color:#a7f3d0; font-size:11px; height:120px; overflow-y:auto; white-space:pre-wrap;">${nodeName.toUpperCase()}# </div>
+          <div id="cliOutputTerminal" class="noc-cli-terminal-output">${safeHTML(nodeName.toUpperCase())}# </div>
         </div>
       </div>
     `;
@@ -462,12 +466,12 @@ ${nodeName.toUpperCase()}# write memory
       select.addEventListener("change", () => {
         const cmd = select.value;
         if (!cmd) {
-          terminal.innerHTML = `${nodeName.toUpperCase()}# `;
+          terminal.textContent = `${nodeName.toUpperCase()}# `;
           return;
         }
         playNetSound("click");
         const output = cmdList[cmd];
-        terminal.innerHTML = `${nodeName.toUpperCase()}# ${cmd}\n${output}`;
+        terminal.textContent = `${nodeName.toUpperCase()}# ${cmd}\n${output}`;
         terminal.scrollTop = terminal.scrollHeight;
       });
     }
@@ -478,24 +482,34 @@ export function setupNodeConfigInspector() {
   const nodes = document.querySelectorAll(".topo-node");
   if (!nodes) return;
 
-  nodes.forEach(node => {
-    node.addEventListener("click", () => {
-      playNetSound("click");
-      const nodeName = node.getAttribute("data-node");
-      state.inspectedNode = nodeName;
-      
-      document.querySelectorAll(".topo-node").forEach(el => {
-        el.classList.remove("inspected");
-      });
-      node.classList.add("inspected");
-      setTimeout(() => {
-        node.classList.remove("inspected");
-      }, 1500);
+  const activateNode = (node) => {
+    playNetSound("click");
+    const nodeName = node.getAttribute("data-node");
+    state.inspectedNode = nodeName;
 
-      renderCLI(nodeName);
-      if (window.innerWidth <= 768) {
-        const cfgPanel = byId("nodeConfigPanel");
-        if (cfgPanel) cfgPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    document.querySelectorAll(".topo-node").forEach((el) => {
+      el.classList.remove("inspected", "selected");
+      el.setAttribute("aria-pressed", "false");
+    });
+    node.classList.add("selected", "inspected");
+    node.setAttribute("aria-pressed", "true");
+    setTimeout(() => {
+      node.classList.remove("inspected");
+    }, 1500);
+
+    renderCLI(nodeName);
+    if (window.innerWidth <= 768) {
+      const cfgPanel = byId("nodeConfigPanel");
+      if (cfgPanel) cfgPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  };
+
+  nodes.forEach((node) => {
+    node.addEventListener("click", () => activateNode(node));
+    node.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        activateNode(node);
       }
     });
   });
@@ -505,23 +519,29 @@ export function resetTopology2Links() {
   const link1 = byId("link-rbranch-hq1");
   const link2 = byId("link-rbranch-hq2");
   if (link1) {
-    link1.setAttribute("stroke", "#10b981");
+    link1.setAttribute("stroke", "#30d158");
     link1.setAttribute("stroke-width", "2");
   }
   if (link2) {
-    link2.setAttribute("stroke", "#10b981");
+    link2.setAttribute("stroke", "#30d158");
     link2.setAttribute("stroke-width", "2");
   }
   const statusLink1 = byId("status-lacp-link1");
   if (statusLink1) {
-    statusLink1.setAttribute("fill", "#10b981");
+    statusLink1.setAttribute("fill", "#30d158");
   }
+}
+
+function clearTraversedLinks() {
+  document.querySelectorAll(".cable-link").forEach((el) => {
+    el.classList.remove("link-traversed", "link-blocked");
+  });
 }
 
 export function switchTopology(topoNum) {
   activeTopology = topoNum;
   playNetSound("click");
-  
+
   const btnStart = byId("btnStartSim");
   const btnTopo1 = byId("btnTopo1");
   const btnTopo2 = byId("btnTopo2");
@@ -534,20 +554,28 @@ export function switchTopology(topoNum) {
   const pkt2 = byId("simPacket2");
   if (pkt1) pkt1.style.opacity = "0";
   if (pkt2) pkt2.style.opacity = "0";
-  
-  if (logContent) logContent.innerHTML = "<div>System Ready. Select a packet simulation and click 'Run Simulation'.</div>";
+
+  if (logContent) logContent.innerHTML = "<div>System Ready. Select a packet simulation and click 'Run Simulation' to trace live hops.</div>";
   window.currentOsiData = null;
   window.updateOsiLabels?.(null);
+  setOsiLayerStates(null, 0, false);
+  const hopBadge = byId("simActiveHopBadge");
+  if (hopBadge) hopBadge.textContent = "Idle";
+
   const descBox = byId("osiLayerDescBox");
   if (descBox) {
-    descBox.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">Run a simulation and click any OSI layer tab above to inspect the active hop encapsulation details.</span>`;
+    descBox.innerHTML = `<span class="noc-muted-italic">Run a simulation and click any OSI layer tab above to inspect the active hop encapsulation details.</span>`;
   }
-  document.querySelectorAll(".osi-layer").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".topo-node").forEach((el) => {
+    el.classList.remove("selected", "inspected", "faulted");
+    el.setAttribute("aria-pressed", "false");
+  });
   highlightNode(null);
+  clearTraversedLinks();
   state.inspectedNode = null;
   const nodeCfg = byId("nodeConfigContent");
   if (nodeCfg) {
-    nodeCfg.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">Click on any network device above to inspect its active running configuration, IP/MAC tables, and VLAN status.</span>`;
+    nodeCfg.innerHTML = `<span class="noc-muted-italic">Select any network device in the topology diagram to inspect its running configuration, IP/MAC tables, and IOS show commands.</span>`;
   }
   resetTopology2Links();
 
@@ -556,21 +584,24 @@ export function switchTopology(topoNum) {
     if (svg2) svg2.style.display = "none";
     if (btnTopo1) { btnTopo1.className = "primary"; }
     if (btnTopo2) { btnTopo2.className = "secondary"; }
+    updateSimStatus({ badgeClass: "idle", badgeText: "READY", routeText: "Branch Gateway NOC · Ready", hopText: "Hop 0 / 0", pct: 0 });
   } else {
     if (svg1) svg1.style.display = "none";
     if (svg2) svg2.style.display = "block";
     if (btnTopo1) { btnTopo1.className = "secondary"; }
     if (btnTopo2) { btnTopo2.className = "primary"; }
+    updateSimStatus({ badgeClass: "idle", badgeText: "READY", routeText: "Enterprise ROAS & VPN · Ready", hopText: "Hop 0 / 0", pct: 0 });
   }
-  
+
   updatePacketTypeSelect();
+  syncTroubleBanner();
 }
 
 function updatePacketTypeSelect() {
   const select = byId("simPacketType");
   if (!select) return;
   select.innerHTML = "";
-  
+
   if (activeTopology === 1) {
     select.innerHTML = `
       <option value="dhcp">DHCP Request (Broadcast Drill)</option>
@@ -594,23 +625,26 @@ export function setupTraversalSimulator() {
   const btnStart = byId("btnStartSim");
   const btnReset = byId("btnResetSim");
   const logContent = byId("simLogContent");
-  
+
   const btnTopo1 = byId("btnTopo1");
   const btnTopo2 = byId("btnTopo2");
-  const svg1 = byId("topoSvg");
-  const svg2 = byId("topoSvg2");
 
   if (!btnStart || !btnReset || !logContent) return;
 
-  const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+  const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
 
   setupNodeConfigInspector();
 
+  const chkTrouble = byId("chkTroubleshooting");
+  const pktSelect = byId("simPacketType");
+  if (chkTrouble) chkTrouble.addEventListener("change", syncTroubleBanner);
+  if (pktSelect) pktSelect.addEventListener("change", syncTroubleBanner);
+
   // OSI Stack click handlers
-  document.querySelectorAll(".osi-layer").forEach(layerEl => {
+  document.querySelectorAll(".osi-layer").forEach((layerEl) => {
     layerEl.addEventListener("click", () => {
       playNetSound("click");
-      document.querySelectorAll(".osi-layer").forEach(el => el.classList.remove("active"));
+      document.querySelectorAll(".osi-layer").forEach((el) => el.classList.remove("active"));
       layerEl.classList.add("active");
       const layerNum = layerEl.getAttribute("data-layer");
       if (window.showOsiLayerDetail) window.showOsiLayerDetail(layerNum);
@@ -624,6 +658,8 @@ export function setupTraversalSimulator() {
     btnStart.disabled = true;
     const drawer = byId("nocConsoleDrawer");
     if (drawer) drawer.open = true;
+    clearTraversedLinks();
+    document.querySelectorAll(".topo-node.faulted").forEach((el) => el.classList.remove("faulted"));
     try {
       const type = byId("simPacketType").value;
       const activePkt = activeTopology === 1 ? byId("simPacket") : byId("simPacket2");
@@ -1089,15 +1125,51 @@ export function setupTraversalSimulator() {
     activePkt.style.opacity = "1";
     logContent.innerHTML = "";
     let blocked = false;
+    const totalHops = path.length;
+    const originName = path[0]?.name || "Origin";
+    const destName = path[totalHops - 1]?.name || "Destination";
+
+    const edgeToLinkMap = {
+      "pc>switch": "link-pc-sw",
+      "switch>pc": "link-pc-sw",
+      "switch>router": "link-sw-r1",
+      "router>switch": "link-sw-r1",
+      "switch>firewall": "link-sw-fw",
+      "firewall>switch": "link-sw-fw",
+      "router>wan": "link-r1-wan",
+      "wan>router": "link-r1-wan",
+      "firewall>wan": "link-fw-wan",
+      "wan>firewall": "link-fw-wan",
+      "pc-sales>sw-branch": "link-sales-sw",
+      "ip-phone>sw-branch": "link-phone-sw",
+      "sw-branch>ip-phone": "link-phone-sw",
+      "sw-branch>r-branch": "link-sw-rbranch",
+      "r-branch>sw-branch": "link-sw-rbranch",
+      "r-branch>hq-core": "link-rbranch-hq1",
+      "r-branch>fw-branch": "link-rbranch-fwbranch",
+      "fw-branch>r-branch": "link-rbranch-fwbranch",
+      "hq-core>hq-server": "link-hq-server",
+      "fw-branch>hq-server": "link-hq-server"
+    };
 
     for (let i = 0; i < path.length; i++) {
       const step = path[i];
-      
+
       const isBlockedHop = isBugActive && (i === bug.failureHopIndex);
       if (isBlockedHop) {
         step.isBlocked = true;
         step.headers = `L3: ERROR | ${bug.errorLog}`;
         step.desc = `<strong>[DROPPED]</strong> Packet dropped at ${step.name}. Reason: ${bug.desc}`;
+        document.querySelectorAll(`.topo-node[data-node="${CSS.escape(step.node)}"]`).forEach((el) => el.classList.add("faulted"));
+      }
+
+      if (i > 0) {
+        const edgeKey = `${path[i - 1].node}>${step.node}`;
+        const linkId = edgeToLinkMap[edgeKey];
+        const linkEl = linkId ? byId(linkId) : null;
+        if (linkEl) {
+          linkEl.classList.add(step.isBlocked ? "link-blocked" : "link-traversed");
+        }
       }
 
       window.currentOsiData = step.osi || null;
@@ -1109,15 +1181,21 @@ export function setupTraversalSimulator() {
         else if (step.osi.l3 && step.osi.l3.val !== "-") highestLayer = 3;
         else if (step.osi.l2 && step.osi.l2.val !== "-") highestLayer = 2;
       }
-      
-      document.querySelectorAll(".osi-layer").forEach(el => {
-        if (el.getAttribute("data-layer") == highestLayer) {
-          el.classList.add("active");
-        } else {
-          el.classList.remove("active");
-        }
-      });
+
+      setOsiLayerStates(step.osi, highestLayer, Boolean(step.isBlocked));
       showOsiLayerDetail(highestLayer);
+
+      const hopBadge = byId("simActiveHopBadge");
+      if (hopBadge) hopBadge.textContent = step.name;
+
+      const pct = totalHops > 0 ? Math.round(((i + 1) / totalHops) * 100) : 0;
+      updateSimStatus({
+        badgeClass: step.isBlocked ? "blocked" : "running",
+        badgeText: step.isBlocked ? "DROPPED" : "TRANSIT",
+        routeText: `${originName} → ${step.name} → ${destName}`,
+        hopText: `Hop ${i + 1} / ${totalHops}`,
+        pct
+      });
 
       highlightNode(step.node, step.isBlocked);
 
@@ -1145,22 +1223,21 @@ export function setupTraversalSimulator() {
       activePkt.setAttribute("cy", step.y);
       if (step.isBlocked) {
         activePkt.setAttribute("fill", "var(--color-error)");
-        activePkt.style.filter = "drop-shadow(0 0 8px #ff5e3a)";
+        activePkt.style.filter = "drop-shadow(0 0 8px var(--color-error))";
         playNetSound("block");
       } else {
-        activePkt.setAttribute("fill", step.color || "#00f2fe");
-        activePkt.style.filter = `drop-shadow(0 0 8px ${step.color || "#00f2fe"})`;
+        const hopColor = step.color === "#00f2fe" ? "#38bdf8" : (step.color || "#38bdf8");
+        activePkt.setAttribute("fill", hopColor);
+        activePkt.style.filter = `drop-shadow(0 0 8px ${hopColor})`;
         playNetSound("hop");
       }
 
       const stepDiv = document.createElement("div");
-      stepDiv.style.borderLeft = `3px solid ${step.isBlocked ? "var(--color-error)" : step.color}`;
-      stepDiv.style.paddingLeft = "8px";
-      stepDiv.style.marginBottom = "6px";
+      stepDiv.className = `noc-log-entry${step.isBlocked ? " is-blocked" : ""}`;
       stepDiv.innerHTML = `
-        <strong style="color:${step.isBlocked ? "var(--color-error)" : step.color};">[HOP ${i + 1}: ${step.name}]</strong><br/>
-        <span style="font-size:11px; color:#94a3b8; font-family:var(--font-mono);">${step.headers}</span><br/>
-        <span>${step.desc}</span>
+        <div class="noc-log-hop">[HOP ${i + 1}: ${safeHTML(step.name)}]</div>
+        <div class="noc-log-headers">${safeHTML(step.headers)}</div>
+        <div class="noc-log-desc">${step.desc}</div>
       `;
       logContent.appendChild(stepDiv);
 
@@ -1177,21 +1254,31 @@ export function setupTraversalSimulator() {
     }
 
     if (blocked) {
+      updateSimStatus({
+        badgeClass: "blocked",
+        badgeText: "BLOCKED",
+        routeText: isBugActive ? "Packet dropped — click the highlighted fault node in CLI drawer to resolve" : "Traversal blocked by active security ACL policy",
+        hopText: "Fault / ACL Drop",
+        pct: 100
+      });
       const finishDiv = document.createElement("div");
-      finishDiv.style.textAlign = "center";
-      finishDiv.style.marginTop = "8px";
-      finishDiv.style.color = "var(--color-error)";
-      finishDiv.style.fontWeight = "bold";
-      finishDiv.innerHTML = `❌ Traversal Blocked by Security Policy.`;
+      finishDiv.className = "noc-log-summary is-blocked";
+      finishDiv.textContent = isBugActive
+        ? "Traversal Dropped by Configuration Fault. Inspect the failing node to remediate."
+        : "Traversal Blocked by Security Policy.";
       logContent.appendChild(finishDiv);
     } else {
       playNetSound("success");
+      updateSimStatus({
+        badgeClass: "success",
+        badgeText: "DELIVERED",
+        routeText: `${originName} → ${destName} · Traversal Verified`,
+        hopText: `${totalHops} / ${totalHops} Hops`,
+        pct: 100
+      });
       const finishDiv = document.createElement("div");
-      finishDiv.style.textAlign = "center";
-      finishDiv.style.marginTop = "8px";
-      finishDiv.style.color = "var(--color-ok)";
-      finishDiv.style.fontWeight = "bold";
-      finishDiv.innerHTML = `✔ Traversal Completed Successfully.`;
+      finishDiv.className = "noc-log-summary is-ok";
+      finishDiv.textContent = "Traversal Completed Successfully.";
       logContent.appendChild(finishDiv);
 
       if (type === "ospf" || type === "roas") {
@@ -1205,11 +1292,11 @@ export function setupTraversalSimulator() {
       await sleep(1000);
     } finally {
       highlightNode(null);
-  state.inspectedNode = null;
-  const nodeCfg = byId("nodeConfigContent");
-  if (nodeCfg) {
-    nodeCfg.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">Click on any network device above to inspect its active running configuration, IP/MAC tables, and VLAN status.</span>`;
-  }
+      state.inspectedNode = null;
+      const nodeCfg = byId("nodeConfigContent");
+      if (nodeCfg && (!nodeCfg.querySelector(".noc-trouble-panel"))) {
+        nodeCfg.innerHTML = `<span class="noc-muted-italic">Select any network device in the topology diagram to inspect its active running configuration, IP/MAC tables, and IOS show commands.</span>`;
+      }
       btnStart.disabled = false;
     }
   });
@@ -1228,20 +1315,35 @@ export function setupTraversalSimulator() {
       pkt2.setAttribute("cx", "60");
       pkt2.setAttribute("cy", "180");
     }
-    logContent.innerHTML = "<div>System Ready. Select a packet simulation and click 'Run Simulation'.</div>";
+    logContent.innerHTML = "<div>System Ready. Select a packet simulation and click 'Run Simulation' to trace live hops.</div>";
     window.currentOsiData = null;
     updateOsiLabels(null);
+    setOsiLayerStates(null, 0, false);
+    const hopBadge = byId("simActiveHopBadge");
+    if (hopBadge) hopBadge.textContent = "Idle";
+    updateSimStatus({
+      badgeClass: "idle",
+      badgeText: "READY",
+      routeText: activeTopology === 1 ? "Branch Gateway NOC · Ready" : "Enterprise ROAS & VPN · Ready",
+      hopText: "Hop 0 / 0",
+      pct: 0
+    });
     const descBox = byId("osiLayerDescBox");
     if (descBox) {
-      descBox.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">Run a simulation and click any OSI layer tab above to inspect the active hop encapsulation details.</span>`;
+      descBox.innerHTML = `<span class="noc-muted-italic">Run a simulation and click any OSI layer tab above to inspect the active hop encapsulation details.</span>`;
     }
-    document.querySelectorAll(".osi-layer").forEach(el => el.classList.remove("active"));
+    document.querySelectorAll(".topo-node").forEach((el) => {
+      el.classList.remove("selected", "inspected", "faulted");
+      el.setAttribute("aria-pressed", "false");
+    });
     highlightNode(null);
-  state.inspectedNode = null;
-  const nodeCfg = byId("nodeConfigContent");
-  if (nodeCfg) {
-    nodeCfg.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">Click on any network device above to inspect its active running configuration, IP/MAC tables, and VLAN status.</span>`;
-  }
+    clearTraversedLinks();
+    state.inspectedNode = null;
+    const nodeCfg = byId("nodeConfigContent");
+    if (nodeCfg) {
+      nodeCfg.innerHTML = `<span class="noc-muted-italic">Select any network device in the topology diagram to inspect its running configuration, IP/MAC tables, and IOS show commands.</span>`;
+    }
     resetTopology2Links();
+    syncTroubleBanner();
   });
 }

@@ -259,7 +259,10 @@ export function ensureVideosInit() {
 }
 
 export function ensureLabsInit() {
-  if (_labsInitialized) return;
+  if (_labsInitialized) {
+    renderLabCatalogue();
+    return;
+  }
   _labsInitialized = true;
   initLabSelector();
   initLabModes();
@@ -801,7 +804,7 @@ function wireEvents() {
     });
   });
 
-  // Mobile Topology Fit View / Pan 1.5x Toolbar
+  // Topology Fit View / Pan 1.5x Toolbar
   const btnTopoZoomFit = byId("btnTopoZoomFit");
   const btnTopoZoomPan = byId("btnTopoZoomPan");
   const topoMainEl = document.querySelector(".topology-main");
@@ -809,6 +812,8 @@ function wireEvents() {
     btnTopoZoomFit.addEventListener("click", () => {
       playNetSound("click");
       topoMainEl.classList.remove("pan-zoom-mode");
+      topoMainEl.scrollLeft = 0;
+      topoMainEl.scrollTop = 0;
       btnTopoZoomFit.classList.add("active");
       btnTopoZoomPan.classList.remove("active");
     });
@@ -820,7 +825,7 @@ function wireEvents() {
     });
   }
 
-  // Mobile Lab Manual CLI Input & Hint Controls
+  // Virtual Lab Manual CLI Input, Up/Down History & Hint Controls
   const labManualInput = byId("labManualCliInput");
   const btnLabRunManual = byId("btnLabRunManual");
   const btnLabHint = byId("btnLabHint");
@@ -835,10 +840,17 @@ function wireEvents() {
       .replace(/\bno\s+shutdown\b/g, "no shut")
       .replace(/\s+/g, " ");
 
+  const labCmdHistory = [];
+  let labHistoryIdx = -1;
+
   const submitManualLabCmd = () => {
     if (!labManualInput) return;
     const raw = labManualInput.value.trim();
     if (!raw) return;
+    if (labCmdHistory[labCmdHistory.length - 1] !== raw) {
+      labCmdHistory.push(raw);
+    }
+    labHistoryIdx = labCmdHistory.length;
     const lab = labs.find((l) => l.id === state.lab.currentLabId) || labs[0];
     if (!lab || !lab.commands) return;
     const nextIdx = state.lab.userCommands.length;
@@ -859,6 +871,18 @@ function wireEvents() {
       if (e.key === "Enter") {
         e.preventDefault();
         submitManualLabCmd();
+      } else if (e.key === "ArrowUp") {
+        if (labCmdHistory.length > 0) {
+          e.preventDefault();
+          labHistoryIdx = Math.max(0, labHistoryIdx - 1);
+          labManualInput.value = labCmdHistory[labHistoryIdx] || "";
+        }
+      } else if (e.key === "ArrowDown") {
+        if (labCmdHistory.length > 0) {
+          e.preventDefault();
+          labHistoryIdx = Math.min(labCmdHistory.length, labHistoryIdx + 1);
+          labManualInput.value = labCmdHistory[labHistoryIdx] || "";
+        }
       }
     });
   }
@@ -876,9 +900,8 @@ function wireEvents() {
       const feedback = byId("labFeedbackBox");
       if (feedback) {
         feedback.style.display = "block";
-        feedback.style.background = "rgba(0, 242, 254, 0.14)";
-        feedback.style.color = "#e2e8f0";
-        feedback.textContent = `💡 Hint (Step ${nextIdx + 1}/${lab.commands.length}): ${nextStep.desc} → ${nextStep.cmd}`;
+        feedback.className = "lab-feedback-box is-hint";
+        feedback.textContent = `Hint (Step ${nextIdx + 1}/${lab.commands.length}): ${nextStep.desc} — ${nextStep.cmd}`;
       }
     });
   }
@@ -1056,14 +1079,192 @@ const distractorCommands = {
   10: ["crypto isakmp policy 1", "encryption aes 128", "crypto ipsec transform-set MY_SET esp-3des esp-sha-hmac", "crypto isakmp key WrongKey address 198.51.100.1"]
 };
 
+const LAB_CATALOGUE_GROUPS = [
+  {
+    key: "access",
+    title: "Network Access & Switching",
+    subtitle: "Layer 2 segmentation, ROAS trunking, Rapid PVST+, and LACP bundling",
+    labIds: [1, 2, 7, 8]
+  },
+  {
+    key: "routing",
+    title: "Routing & IP Services",
+    subtitle: "OSPFv2 dynamic adjacencies, DHCP pools, and NAT Overload (PAT)",
+    labIds: [3, 5, 6]
+  },
+  {
+    key: "security",
+    title: "Security & Wireless",
+    subtitle: "Standard ACL filtering, WPA2 Wireless LANs, and IPSec VPN tunnels",
+    labIds: [4, 9, 10]
+  }
+];
+
+function getLabMiniGraphicSvg(lab) {
+  const accent =
+    lab.domain === "IP Connectivity"
+      ? "#5e5ce6"
+      : lab.domain === "IP Services"
+      ? "#38bdf8"
+      : lab.domain === "Security Fundamentals"
+      ? "#ff9f0a"
+      : "#30d158";
+  if (lab.id === 1 || lab.id === 7 || lab.id === 8) {
+    return `<svg class="lab-card-thumb" viewBox="0 0 120 44" aria-hidden="true">
+      <line x1="22" y1="22" x2="60" y2="22" stroke="${accent}" stroke-width="1.5" stroke-opacity="0.6"/>
+      <line x1="60" y1="22" x2="98" y2="22" stroke="${accent}" stroke-width="1.5" stroke-opacity="0.6"${lab.id === 8 ? ' stroke-dasharray="3 2"' : ""}/>
+      <circle cx="22" cy="22" r="7" fill="#0d111a" stroke="${accent}" stroke-width="1.5"/>
+      <rect x="48" y="13" width="24" height="18" rx="4" fill="#0d111a" stroke="${accent}" stroke-width="1.5"/>
+      <circle cx="98" cy="22" r="7" fill="#0d111a" stroke="#38bdf8" stroke-width="1.5"/>
+    </svg>`;
+  }
+  if (lab.id === 4 || lab.id === 10) {
+    return `<svg class="lab-card-thumb" viewBox="0 0 120 44" aria-hidden="true">
+      <line x1="20" y1="22" x2="60" y2="22" stroke="${accent}" stroke-width="1.5" stroke-opacity="0.6"/>
+      <line x1="60" y1="22" x2="100" y2="22" stroke="#30d158" stroke-width="1.5" stroke-opacity="0.6"/>
+      <circle cx="20" cy="22" r="6" fill="#0d111a" stroke="#38bdf8" stroke-width="1.5"/>
+      <path d="M60 9l11 4v9c0 7-5 11-11 13-6-2-11-6-11-13v-9l11-4z" fill="#0d111a" stroke="${accent}" stroke-width="1.5"/>
+      <rect x="92" y="14" width="16" height="16" rx="4" fill="#0d111a" stroke="#30d158" stroke-width="1.5"/>
+    </svg>`;
+  }
+  return `<svg class="lab-card-thumb" viewBox="0 0 120 44" aria-hidden="true">
+    <line x1="20" y1="22" x2="60" y2="22" stroke="#38bdf8" stroke-width="1.5" stroke-opacity="0.6"/>
+    <line x1="60" y1="22" x2="100" y2="22" stroke="${accent}" stroke-width="1.5" stroke-opacity="0.6"/>
+    <circle cx="20" cy="22" r="7" fill="#0d111a" stroke="#38bdf8" stroke-width="1.5"/>
+    <circle cx="60" cy="22" r="10" fill="#0d111a" stroke="${accent}" stroke-width="1.5"/>
+    <circle cx="100" cy="22" r="7" fill="#0d111a" stroke="#30d158" stroke-width="1.5"/>
+  </svg>`;
+}
+
+function updateLabSummaryMetrics() {
+  const completedIds = Array.isArray(state.analytics.completedLabIds) ? state.analytics.completedLabIds : [];
+  const completedCount = state.analytics.labsCompleted || completedIds.length || 0;
+  const pct = Math.round((Math.min(labs.length, completedCount) / labs.length) * 100);
+  const modeMap = { step: "Step-by-Step", challenge: "Challenge", exam: "Exam Match" };
+
+  const elAvail = byId("labStatAvailable");
+  const elComp = byId("labStatCompleted");
+  const elXP = byId("labStatXP");
+  const elProg = byId("labStatProgress");
+  const elMode = byId("labStatMode");
+  const elModeTag = byId("labTerminalModeTag");
+
+  if (elAvail) elAvail.textContent = `${labs.length} Labs`;
+  if (elComp) elComp.textContent = `${completedCount} / ${labs.length}`;
+  if (elXP) elXP.textContent = `${state.analytics.xp || 0} XP`;
+  if (elProg) elProg.textContent = `${pct}% Complete`;
+  if (elMode) elMode.textContent = modeMap[state.lab.mode] || "Step-by-Step";
+  if (elModeTag) elModeTag.textContent = state.lab.mode === "step" ? "GUIDED" : state.lab.mode === "challenge" ? "CHALLENGE" : "EXAM";
+}
+
+function renderLabCatalogue() {
+  const grid = byId("labCatalogueGrid");
+  if (!grid) return;
+
+  const completedIds = new Set(Array.isArray(state.analytics.completedLabIds) ? state.analytics.completedLabIds : []);
+  const activeId = state.lab.currentLabId || 1;
+
+  grid.innerHTML = LAB_CATALOGUE_GROUPS.map((group) => {
+    const groupLabs = group.labIds.map((id) => labs.find((l) => l.id === id)).filter(Boolean);
+    return `
+      <div class="lab-cat-group">
+        <div class="lab-cat-group-head">
+          <h4>${safeHTML(group.title)}</h4>
+          <span>${safeHTML(group.subtitle)}</span>
+        </div>
+        <div class="lab-cat-cards">
+          ${groupLabs.map((l) => {
+            const isCompleted = completedIds.has(l.id);
+            const isCurrent = l.id === activeId;
+            const summary = l.objectives && l.objectives.length > 0 ? l.objectives.slice(0, 2).join(" · ") : l.scenario;
+            return `
+              <button type="button" class="lab-cat-card${isCurrent ? " active" : ""}${isCompleted ? " is-completed" : ""}" data-lab-card="${l.id}" aria-pressed="${isCurrent ? "true" : "false"}">
+                <div class="lab-cat-card-top">
+                  <span class="lab-cat-num">LAB ${String(l.id).padStart(2, "0")}</span>
+                  <span class="lab-cat-status ${isCompleted ? "done" : "todo"}">${isCompleted ? "Completed" : safeHTML(l.difficulty)}</span>
+                </div>
+                ${getLabMiniGraphicSvg(l)}
+                <div class="lab-cat-name">${safeHTML(l.title)}</div>
+                <p class="lab-cat-desc">${safeHTML(summary)}</p>
+                <div class="lab-cat-foot">
+                  <span class="lab-cat-domain">${safeHTML(l.domain)}</span>
+                  <span class="lab-cat-modes">Guided · Challenge · Exam</span>
+                </div>
+              </button>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  grid.querySelectorAll("[data-lab-card]").forEach((card) => {
+    card.addEventListener("click", () => {
+      const id = Number(card.dataset.labCard);
+      const sel = byId("labSelector");
+      if (sel) sel.value = String(id);
+      loadLab(id);
+      const ws = byId("labWorkspace");
+      if (ws) ws.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  updateLabSummaryMetrics();
+}
+
 function initLabSelector() {
   const sel = byId("labSelector");
-  if (!sel) return;
-  sel.innerHTML = labs.map((l) => `<option value="${l.id}">Lab ${l.id}: ${l.title}</option>`).join("");
-  sel.addEventListener("change", () => {
-    state.lab.currentLabId = Number(sel.value);
-    loadLab(state.lab.currentLabId);
-  });
+  if (sel) {
+    sel.innerHTML = labs.map((l) => `<option value="${l.id}">Lab ${l.id}: ${l.title}</option>`).join("");
+    sel.addEventListener("change", () => {
+      state.lab.currentLabId = Number(sel.value);
+      loadLab(state.lab.currentLabId);
+    });
+  }
+
+  const toggleCatBtn = byId("btnToggleLabCatalogue");
+  const catSection = byId("labCatalogueSection");
+  if (toggleCatBtn && catSection) {
+    toggleCatBtn.addEventListener("click", () => {
+      const hidden = catSection.classList.toggle("is-collapsed");
+      toggleCatBtn.setAttribute("aria-expanded", hidden ? "false" : "true");
+      toggleCatBtn.textContent = hidden ? "Show 10-Lab Catalogue" : "Hide Catalogue";
+    });
+  }
+
+  const prevBtn = byId("btnPrevLab");
+  const nextBtn = byId("btnNextLab");
+  const retryTopBtn = byId("btnRetryLabTop");
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      const prevId = Math.max(1, (state.lab.currentLabId || 1) - 1);
+      if (sel) sel.value = String(prevId);
+      loadLab(prevId);
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      const nextId = Math.min(labs.length, (state.lab.currentLabId || 1) + 1);
+      if (sel) sel.value = String(nextId);
+      loadLab(nextId);
+    });
+  }
+  if (retryTopBtn) {
+    retryTopBtn.addEventListener("click", () => {
+      loadLab(state.lab.currentLabId || 1);
+    });
+  }
+
+  const inspectorToggle = byId("btnToggleLabInspector");
+  const inspectorBody = byId("labInspectorBody");
+  if (inspectorToggle && inspectorBody) {
+    inspectorToggle.addEventListener("click", () => {
+      const collapsed = inspectorBody.classList.toggle("is-collapsed");
+      inspectorToggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    });
+  }
+
+  renderLabCatalogue();
 }
 
 function initLabModes() {
@@ -1072,12 +1273,12 @@ function initLabModes() {
     { id: "btnModeChallenge", mode: "challenge" },
     { id: "btnModeExam", mode: "exam" }
   ];
-  modes.forEach(m => {
+  modes.forEach((m) => {
     const btn = byId(m.id);
     if (btn) {
       btn.addEventListener("click", () => {
         playNetSound("click");
-        modes.forEach(o => {
+        modes.forEach((o) => {
           const b = byId(o.id);
           if (b) b.className = "ghost";
         });
@@ -1092,109 +1293,276 @@ function initLabModes() {
 function drawLabTopology(lab) {
   const container = byId("labTopologyContainer");
   if (!container) return;
-  
-  let svg = `
-    <svg viewBox="0 0 500 160" width="100%" height="100%" style="background: rgba(0,0,0,0.2); border-radius: 8px;">
-      <line x1="100" y1="80" x2="250" y2="80" stroke="#00f2fe" stroke-width="2" />
-      <line x1="250" y1="80" x2="400" y2="80" stroke="var(--color-ok)" stroke-width="2" />
-      
-      <g transform="translate(100, 80)">
-        <circle r="16" fill="#060913" stroke="#00f2fe" stroke-width="2" />
-        <text y="4" font-family="Space Grotesk" font-size="8" fill="#fff" text-anchor="middle">💻 Host</text>
+
+  const topologies = {
+    1: { left: "Host PC", leftSub: "VLAN 10/20", mid: "SW-1", midSub: "Access Ports", right: "Sales/Fin", rightSub: "Fa0/1 - Fa0/2" },
+    2: { left: "VLAN 10/20", leftSub: "802.1Q Trunk", mid: "SW-1", midSub: "Trunk Gi0/1", right: "R-1 ROAS", rightSub: "Gi0/0.10 / .20" },
+    3: { left: "LAN 192.168.1.0", leftSub: "Area 0", mid: "R-1 OSPF", midSub: "ID 1.1.1.1", right: "WAN 10.10.10.0", rightSub: "/30 Area 0" },
+    4: { left: "Src 192.168.20.0", leftSub: "Inbound Gi0/0", mid: "R-1 ACL 10", midSub: "Deny / Permit", right: "Core LAN", rightSub: "Filtered" },
+    5: { left: "VLAN 10 Hosts", leftSub: "DHCP Clients", mid: "SW-1", midSub: "Relay Path", right: "R-1 DHCP", rightSub: "LAN_POOL" },
+    6: { left: "Inside 192.168.1.0", leftSub: "Gi0/0 Inside", mid: "R-1 PAT", midSub: "ACL 1 Overload", right: "Outside Gi0/1", rightSub: "Public IP" },
+    7: { left: "SW-2", leftSub: "Priority 32768", mid: "SW-1 Root", midSub: "Rapid-PVST 4096", right: "VLAN 10", rightSub: "Primary Root" },
+    8: { left: "R-Branch", leftSub: "Gi0/1 + Gi0/2", mid: "Po1 LACP", midSub: "Active Mode", right: "HQ-Core", rightSub: "Bundled Link" },
+    9: { left: "Wireless Client", leftSub: "Corporate_WiFi", mid: "Campus WLC", midSub: "WLAN ID 2", right: "WPA2 AES-PSK", rightSub: "RADIUS/PSK" },
+    10: { left: "Branch LAN", leftSub: "AES-256 ISAKMP", mid: "R-Branch", midSub: "Policy 10", right: "198.51.100.1", rightSub: "IPSec VPN_SET" }
+  };
+  const t = topologies[lab.id] || topologies[1];
+
+  const svg = `
+    <svg viewBox="0 0 540 160" width="100%" height="100%" role="img" aria-label="Topology diagram for ${safeHTML(lab.title)}">
+      <rect width="540" height="160" rx="10" fill="#090c14" />
+      <line x1="115" y1="78" x2="270" y2="78" stroke="#38bdf8" stroke-width="2" stroke-dasharray="5 3" />
+      <line x1="270" y1="78" x2="425" y2="78" stroke="#30d158" stroke-width="2" stroke-dasharray="5 3" />
+
+      <g transform="translate(115, 78)">
+        <circle r="20" fill="#0d111a" stroke="#38bdf8" stroke-width="2" />
+        <rect x="-7" y="-8" width="14" height="9" rx="1.5" fill="none" stroke="#e2e8f0" stroke-width="1.2" />
+        <path d="M-9 4h18" stroke="#e2e8f0" stroke-width="1.2" stroke-linecap="round" />
+        <text y="34" font-family="var(--font-sans)" font-size="10" font-weight="600" fill="#f8fafc" text-anchor="middle">${safeHTML(t.left)}</text>
+        <text y="46" font-family="var(--font-mono)" font-size="8.5" fill="#94a3b8" text-anchor="middle">${safeHTML(t.leftSub)}</text>
       </g>
-      
-      <g transform="translate(250, 80)">
-        <rect x="-18" y="-12" width="36" height="24" rx="4" fill="#060913" stroke="#00f2fe" stroke-width="2" />
-        <text y="4" font-family="Space Grotesk" font-size="8" fill="#fff" text-anchor="middle">🎛️ SW-1</text>
+
+      <g transform="translate(270, 78)">
+        <rect x="-24" y="-16" width="48" height="32" rx="6" fill="#0d111a" stroke="#0a84ff" stroke-width="2" />
+        <path d="M-12 -3h24M9 -6l3 3-3 3M-12 3h24M-9 0l-3 3 3 3" fill="none" stroke="#e2e8f0" stroke-width="1.2" stroke-linecap="round" />
+        <text y="32" font-family="var(--font-sans)" font-size="10" font-weight="600" fill="#f8fafc" text-anchor="middle">${safeHTML(t.mid)}</text>
+        <text y="44" font-family="var(--font-mono)" font-size="8.5" fill="#94a3b8" text-anchor="middle">${safeHTML(t.midSub)}</text>
       </g>
-      
-      <g transform="translate(400, 80)">
-        <circle r="16" fill="#060913" stroke="var(--color-ok)" stroke-width="2" />
-        <text y="4" font-family="Space Grotesk" font-size="8" fill="#fff" text-anchor="middle">🌐 R-1</text>
+
+      <g transform="translate(425, 78)">
+        <circle r="20" fill="#0d111a" stroke="#30d158" stroke-width="2" />
+        <path d="M-8 0h16M0 -8v16" fill="none" stroke="#e2e8f0" stroke-width="1.3" stroke-linecap="round" />
+        <text y="34" font-family="var(--font-sans)" font-size="10" font-weight="600" fill="#f8fafc" text-anchor="middle">${safeHTML(t.right)}</text>
+        <text y="46" font-family="var(--font-mono)" font-size="8.5" fill="#94a3b8" text-anchor="middle">${safeHTML(t.rightSub)}</text>
       </g>
     </svg>
   `;
   container.innerHTML = svg;
 }
 
+function renderLabInspector(lab, statusType = "ready", statusMsg = "Awaiting configuration command") {
+  const body = byId("labInspectorBody");
+  if (!body || !lab) return;
+
+  const totalSteps = lab.commands.length;
+  const doneSteps = state.lab.userCommands.length;
+  const pct = totalSteps > 0 ? Math.round((doneSteps / totalSteps) * 100) : 0;
+  const currentStep = lab.commands[doneSteps] || null;
+  const verifHtml = (lab.verification || []).map((v) => `<code>${safeHTML(v)}</code>`).join("");
+
+  let taskGuidanceHtml = "";
+  if (state.lab.mode === "exam") {
+    const matchedCount = Object.keys(state.lab.matches || {}).length;
+    taskGuidanceHtml = `
+      <div class="lab-insp-block">
+        <div class="lab-insp-label">Exam Mode Instructions</div>
+        <p class="lab-insp-text">Select an objective statement, then match its exact Cisco IOS command. Matches entered: <strong>${matchedCount} / ${totalSteps}</strong>.</p>
+      </div>
+    `;
+  } else if (doneSteps >= totalSteps) {
+    taskGuidanceHtml = `
+      <div class="lab-insp-block is-complete">
+        <div class="lab-insp-label">All Steps Verified</div>
+        <p class="lab-insp-text">Every required configuration command has been accepted by the IOS interpreter.</p>
+      </div>
+    `;
+  } else if (state.lab.mode === "step" && currentStep) {
+    taskGuidanceHtml = `
+      <div class="lab-insp-block">
+        <div class="lab-insp-label">Current Step (${doneSteps + 1} of ${totalSteps})</div>
+        <p class="lab-insp-text">${safeHTML(currentStep.desc)}</p>
+        <div class="lab-insp-expected">
+          <span>Expected Syntax</span>
+          <code>${safeHTML(currentStep.cmd)}</code>
+        </div>
+      </div>
+    `;
+  } else if (state.lab.mode === "challenge") {
+    const curObjIdx = Math.min(
+      lab.objectives.length - 1,
+      Math.floor((doneSteps / Math.max(1, totalSteps)) * lab.objectives.length)
+    );
+    taskGuidanceHtml = `
+      <div class="lab-insp-block is-challenge">
+        <div class="lab-insp-label">Challenge Task (${doneSteps + 1} of ${totalSteps})</div>
+        <p class="lab-insp-text">${safeHTML(lab.objectives[curObjIdx] || lab.scenario)}</p>
+        <p class="lab-insp-muted">Guided command preview is hidden in Challenge Mode. Type commands or filter out distractors carefully.</p>
+      </div>
+    `;
+  }
+
+  body.innerHTML = `
+    <div class="lab-insp-progress">
+      <div class="lab-insp-progress-row">
+        <span>Completion</span>
+        <strong>${doneSteps} / ${totalSteps} (${pct}%)</strong>
+      </div>
+      <div class="lab-insp-track"><div style="width:${pct}%"></div></div>
+    </div>
+
+    <div class="lab-insp-status is-${statusType}">
+      <span>Validation Status</span>
+      <strong>${safeHTML(statusMsg)}</strong>
+    </div>
+
+    ${taskGuidanceHtml}
+
+    <div class="lab-insp-block">
+      <div class="lab-insp-label">Verification Commands</div>
+      <div class="lab-insp-chips">${verifHtml}</div>
+    </div>
+
+    <div class="lab-insp-block">
+      <div class="lab-insp-label">IOS Shorthand Supported</div>
+      <div class="lab-insp-shorthand">
+        <code>int gi0/0</code> <code>fa0/1</code> <code>sw</code> <code>no shut</code> <code>↑ / ↓ history</code>
+      </div>
+    </div>
+  `;
+}
+
+function renderLabCompletionBanner(lab, detailText) {
+  const banner = byId("labCompletionBanner");
+  if (!banner || !lab) return;
+  const hasNext = lab.id < labs.length;
+  banner.classList.remove("hidden");
+  banner.innerHTML = `
+    <div class="lab-complete-head">
+      <span class="lab-complete-badge">LAB COMPLETED · +50 XP EARNED</span>
+      <h4>${safeHTML(lab.title)}</h4>
+      <p class="lab-complete-meta">${safeHTML(detailText)}</p>
+    </div>
+    <div class="lab-complete-concept">
+      <strong>Relevant Networking Concepts:</strong>
+      <p>${safeHTML(lab.explanation)}</p>
+    </div>
+    <div class="lab-complete-actions">
+      <button type="button" class="secondary" id="btnCompleteRetryLab">Retry Lab</button>
+      ${hasNext ? `<button type="button" class="primary" id="btnCompleteNextLab">Next Lab →</button>` : ""}
+      <button type="button" class="secondary" id="btnCompleteCatalogue">Return to Catalogue</button>
+    </div>
+  `;
+
+  const retryBtn = byId("btnCompleteRetryLab");
+  const nextBtn = byId("btnCompleteNextLab");
+  const catBtn = byId("btnCompleteCatalogue");
+  const sel = byId("labSelector");
+
+  if (retryBtn) retryBtn.addEventListener("click", () => loadLab(lab.id));
+  if (nextBtn && hasNext) {
+    nextBtn.addEventListener("click", () => {
+      const nextId = lab.id + 1;
+      if (sel) sel.value = String(nextId);
+      loadLab(nextId);
+    });
+  }
+  if (catBtn) {
+    catBtn.addEventListener("click", () => {
+      const cat = byId("labCatalogueSection");
+      if (cat) {
+        cat.classList.remove("is-collapsed");
+        cat.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }
+}
+
 function renderLabObjectives(lab) {
   const list = byId("labObjectivesList");
   if (!list) return;
-  
+
+  const doneCount = lab.objectives.filter((_, idx) => Boolean(state.lab.completedSteps[idx])).length;
+  const badge = byId("labStepProgressBadge");
+  if (badge) badge.textContent = `${doneCount} / ${lab.objectives.length} Objectives`;
+
   list.innerHTML = lab.objectives.map((obj, idx) => {
-    const done = state.lab.completedSteps[idx];
-    const icon = done ? "✔" : "⏳";
-    const color = done ? "var(--color-ok)" : "var(--text-muted)";
+    const done = Boolean(state.lab.completedSteps[idx]);
     return `
-      <div style="display: flex; align-items: flex-start; gap: 8px; color: ${color};">
-        <span>${icon}</span>
-        <span>${obj}</span>
+      <div class="lab-obj-item${done ? " is-done" : ""}">
+        <span class="lab-obj-marker" aria-hidden="true">${done ? "✓" : String(idx + 1).padStart(2, "0")}</span>
+        <span class="lab-obj-text">${safeHTML(obj)}</span>
       </div>
     `;
   }).join("");
 }
 
 function loadLab(labId) {
-  const lab = labs.find(l => l.id === labId);
+  const lab = labs.find((l) => l.id === labId);
   if (!lab) return;
-  
+
   state.lab.currentLabId = labId;
   state.lab.completedSteps = {};
   state.lab.userCommands = [];
   state.lab.currentPrompt = (labId === 1 || labId === 7 || labId === 8) ? "Switch(config)#" : "Router(config)#";
-  
+
   const labTitleEl = byId("labTitle");
   const labScenarioEl = byId("labScenario");
   if (labTitleEl) labTitleEl.textContent = `Lab ${lab.id}: ${lab.title} (${lab.difficulty})`;
   if (labScenarioEl) labScenarioEl.textContent = lab.scenario;
 
+  const compBanner = byId("labCompletionBanner");
+  if (compBanner) {
+    compBanner.classList.add("hidden");
+    compBanner.innerHTML = "";
+  }
+
+  const prevBtn = byId("btnPrevLab");
+  const nextBtn = byId("btnNextLab");
+  if (prevBtn) prevBtn.disabled = labId <= 1;
+  if (nextBtn) nextBtn.disabled = labId >= labs.length;
+
   drawLabTopology(lab);
   renderLabObjectives(lab);
-  
+  renderLabCatalogue();
+
   const output = byId("labCliOutput");
   const prompt = byId("labCliPrompt");
   const inputs = byId("labInteractiveInputs");
   const feedback = byId("labFeedbackBox");
-  
-  if (feedback) feedback.style.display = "none";
-  const btnLabAskAI = byId("btnLabAskAI");
-  if (btnLabAskAI) btnLabAskAI.style.display = "block";
-  
+  const termCard = document.querySelector(".lab-terminal-card");
+
+  if (feedback) {
+    feedback.style.display = "none";
+    feedback.className = "lab-feedback-box";
+  }
+
   const initialHost = (labId === 1 || labId === 7 || labId === 8) ? "Switch" : "Router";
-  
+
   if (state.lab.mode === "step" || state.lab.mode === "challenge") {
     if (output) {
-      output.textContent = `Cisco IOS Software, Catalyst L3 Switch Software, Version 15.2...\n\n${initialHost}# configure terminal\nEnter configuration commands, one per line. End with CNTL/Z.\n`;
+      output.classList.remove("is-exam-mode");
+      output.textContent = `Cisco IOS Software, Catalyst L3 Switch Software, Version 15.2\n\n${initialHost}# configure terminal\nEnter configuration commands, one per line. End with CNTL/Z.\n`;
     }
+    if (termCard) termCard.classList.remove("is-exam-mode");
     if (prompt) prompt.textContent = `${initialHost}(config)#`;
-    
+
     let cmds = lab.commands.map((c, i) => ({ cmd: c.cmd, idx: i, correct: true }));
     if (state.lab.mode === "challenge") {
       const dists = distractorCommands[lab.id] || [];
-      dists.forEach(d => {
+      dists.forEach((d) => {
         cmds.push({ cmd: d, idx: -1, correct: false });
       });
     }
     cmds = shuffle(cmds);
-    
+
     if (inputs) {
-      inputs.innerHTML = cmds.map(c => `
-        <button class="secondary btn-lab-cmd" data-cmd="${c.cmd}" style="padding: 4px 8px; font-size: 11px; font-family: var(--font-mono); text-transform: none; margin: 2px;">${c.cmd}</button>
+      inputs.innerHTML = cmds.map((c) => `
+        <button type="button" class="secondary btn-lab-cmd" data-cmd="${safeHTML(c.cmd)}">${safeHTML(c.cmd)}</button>
       `).join("");
-      
-      inputs.querySelectorAll(".btn-lab-cmd").forEach(btn => {
+
+      inputs.querySelectorAll(".btn-lab-cmd").forEach((btn) => {
         btn.addEventListener("click", () => {
           handleLabCommandClick(btn.dataset.cmd, lab);
         });
       });
     }
+    renderLabInspector(lab, "ready", "Ready for configuration");
   } else if (state.lab.mode === "exam") {
-    if (output) {
-      output.innerHTML = `<div style="font-size:12px; color:#fff; font-style:italic; margin-bottom:8px;">Match each configuration objective to its correct Cisco IOS command. Click an objective, then click its matching command below.</div>`;
-    }
+    if (output) output.classList.add("is-exam-mode");
+    if (termCard) termCard.classList.add("is-exam-mode");
     if (prompt) prompt.textContent = "Exam Mode";
-    
     renderExamMatchInterface(lab);
+    renderLabInspector(lab, "ready", "Match all objectives cleanly");
   }
 }
 
@@ -1205,15 +1573,18 @@ function handleLabCommandClick(cmd, lab) {
   const output = byId("labCliOutput");
   const prompt = byId("labCliPrompt");
   const feedback = byId("labFeedbackBox");
-  
-  if (feedback) feedback.style.display = "none";
-  
+
+  if (feedback) {
+    feedback.style.display = "none";
+    feedback.className = "lab-feedback-box";
+  }
+
   const currentHost = (lab.id === 1 || lab.id === 7 || lab.id === 8) ? "Switch" : "Router";
-  
+
   if (cmd === nextExpectedCmd) {
     playNetSound("hop");
     state.lab.userCommands.push(cmd);
-    
+
     if (cmd.startsWith("interface") || cmd.startsWith("int ")) {
       state.lab.currentPrompt = `${currentHost}(config-if)#`;
     } else if (cmd.startsWith("router ospf") || cmd.startsWith("router rip")) {
@@ -1227,13 +1598,13 @@ function handleLabCommandClick(cmd, lab) {
     } else if (cmd.startsWith("exit")) {
       state.lab.currentPrompt = `${currentHost}(config)#`;
     }
-    
+
     if (output) {
       output.textContent += `${prompt.textContent} ${cmd}\n`;
       output.scrollTop = output.scrollHeight;
     }
     if (prompt) prompt.textContent = state.lab.currentPrompt;
-    
+
     const completedCount = state.lab.userCommands.length;
     lab.objectives.forEach((obj, idx) => {
       const threshold = Math.min(lab.commands.length, Math.ceil((idx + 1) * (lab.commands.length / lab.objectives.length)));
@@ -1244,9 +1615,9 @@ function handleLabCommandClick(cmd, lab) {
         }
       }
     });
-    
+
     renderLabObjectives(lab);
-    
+
     if (state.lab.userCommands.length === lab.commands.length) {
       playNetSound("success");
       if (output) {
@@ -1255,9 +1626,8 @@ function handleLabCommandClick(cmd, lab) {
       }
       if (feedback) {
         feedback.style.display = "block";
-        feedback.style.background = "var(--color-ok)";
-        feedback.style.color = "#000";
-        feedback.textContent = `✔ Lab Completed! +50 XP Awarded.`;
+        feedback.className = "lab-feedback-box is-success";
+        feedback.textContent = "Lab Completed. +50 XP Awarded.";
       }
       gainXP(50);
       state.analytics.completedLabIds = Array.isArray(state.analytics.completedLabIds) ? state.analytics.completedLabIds : [];
@@ -1267,9 +1637,14 @@ function handleLabCommandClick(cmd, lab) {
       state.analytics.labsCompleted = Math.min(10, state.analytics.completedLabIds.length);
       saveAnalytics();
       renderHome();
-      
+      renderLabCatalogue();
+      renderLabInspector(lab, "success", `Completed (${lab.commands.length}/${lab.commands.length} commands verified)`);
+      renderLabCompletionBanner(lab, `${lab.objectives.length}/${lab.objectives.length} objectives completed via CLI sequence.`);
+
       const inputs = byId("labInteractiveInputs");
-      if (inputs) inputs.innerHTML = `<span style="color:var(--color-ok); font-weight:bold;">✔ Lab Passed!</span>`;
+      if (inputs) inputs.innerHTML = `<span class="lab-cli-passed-badge">Configuration Complete</span>`;
+    } else {
+      renderLabInspector(lab, "ok", `Accepted: ${cmd}`);
     }
   } else {
     playNetSound("block");
@@ -1279,10 +1654,10 @@ function handleLabCommandClick(cmd, lab) {
     }
     if (feedback) {
       feedback.style.display = "block";
-      feedback.style.background = "var(--color-error)";
-      feedback.style.color = "#fff";
-      feedback.textContent = `❌ Incorrect command sequence. Try again.`;
+      feedback.className = "lab-feedback-box is-error";
+      feedback.textContent = "Incorrect command or step order. Verify current objective and try again.";
     }
+    renderLabInspector(lab, "error", `Rejected: ${cmd}`);
   }
 }
 
@@ -1290,87 +1665,89 @@ function renderExamMatchInterface(lab) {
   const output = byId("labCliOutput");
   const inputs = byId("labInteractiveInputs");
   if (!output || !inputs) return;
-  
+
   state.lab.selectedObjIdx = null;
   state.lab.selectedCmdText = null;
   state.lab.matches = {};
-  
+
   const shuffledCmds = shuffle(lab.commands.map((c, i) => ({ text: c.cmd, originalIdx: i })));
-  
+
   output.innerHTML = `
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;">
+    <div class="lab-exam-prompt">Match each configuration objective to its exact Cisco IOS command. Select an objective, then select its command.</div>
+    <div class="lab-exam-grid">
       <div>
-        <h5 style="color: #00f2fe; margin-top: 0; margin-bottom: 6px;">Objectives / Steps</h5>
-        <div id="examObjColumn" style="display: flex; flex-direction: column; gap: 4px; overflow-y:auto; max-height:160px;">
+        <h5 class="lab-exam-col-title">Objectives / Steps</h5>
+        <div id="examObjColumn" class="lab-exam-col">
           ${lab.commands.map((c, i) => `
-            <div class="exam-item exam-obj-item" data-obj-idx="${i}" style="border: 1px solid var(--border-color); padding: 4px; border-radius: 4px; font-size: 10px; cursor: pointer; background: rgba(255,255,255,0.02); min-height: 36px;">
-              ${i+1}. ${c.desc}
-              <div class="matched-val" id="matchedVal-${i}" style="color: var(--color-ok); font-weight: bold; font-family: var(--font-mono); font-size: 9.5px; margin-top: 2px;"></div>
-            </div>
+            <button type="button" class="exam-item exam-obj-item" data-obj-idx="${i}">
+              <span>${i + 1}. ${safeHTML(c.desc)}</span>
+              <span class="matched-val" id="matchedVal-${i}"></span>
+            </button>
           `).join("")}
         </div>
       </div>
       <div>
-        <h5 style="color: #00f2fe; margin-top: 0; margin-bottom: 6px;">IOS Commands</h5>
-        <div id="examCmdColumn" style="display: flex; flex-direction: column; gap: 4px; overflow-y:auto; max-height:160px;">
-          ${shuffledCmds.map((c, i) => `
-            <div class="exam-item exam-cmd-item" data-cmd-text="${c.text}" style="border: 1px solid var(--border-color); padding: 4px; border-radius: 4px; font-size: 10px; cursor: pointer; font-family: var(--font-mono); background: rgba(255,255,255,0.02); min-height: 36px; display:flex; align-items:center;">
-              ${c.text}
-            </div>
+        <h5 class="lab-exam-col-title">IOS Commands</h5>
+        <div id="examCmdColumn" class="lab-exam-col">
+          ${shuffledCmds.map((c) => `
+            <button type="button" class="exam-item exam-cmd-item" data-cmd-text="${safeHTML(c.text)}">
+              <code>${safeHTML(c.text)}</code>
+            </button>
           `).join("")}
         </div>
       </div>
     </div>
   `;
-  
+
   inputs.innerHTML = `
-    <button id="btnSubmitExamMatches" class="primary" style="width: 100%; height: 32px; font-size: 12px;">Submit Configuration Matches</button>
+    <button type="button" id="btnSubmitExamMatches" class="primary">Submit Configuration Matches</button>
   `;
-  
+
   const objItems = output.querySelectorAll(".exam-obj-item");
   const cmdItems = output.querySelectorAll(".exam-cmd-item");
-  
-  objItems.forEach(item => {
+
+  objItems.forEach((item) => {
     item.addEventListener("click", () => {
       playNetSound("click");
-      objItems.forEach(el => el.style.borderColor = "var(--border-color)");
-      item.style.borderColor = "#00f2fe";
+      objItems.forEach((el) => el.classList.remove("selected"));
+      item.classList.add("selected");
       state.lab.selectedObjIdx = Number(item.dataset.objIdx);
       checkAndApplyMatch();
     });
   });
-  
+
   const handleCmdClick = (item) => {
     playNetSound("click");
-    cmdItems.forEach(el => el.style.borderColor = "var(--border-color)");
-    item.style.borderColor = "#00f2fe";
+    cmdItems.forEach((el) => el.classList.remove("selected"));
+    item.classList.add("selected");
     state.lab.selectedCmdText = item.dataset.cmdText;
     checkAndApplyMatch();
   };
 
-  cmdItems.forEach(item => {
+  cmdItems.forEach((item) => {
     item.addEventListener("click", () => handleCmdClick(item));
   });
-  
+
   function checkAndApplyMatch() {
     if (state.lab.selectedObjIdx !== null && state.lab.selectedCmdText !== null) {
       const objIdx = state.lab.selectedObjIdx;
       const cmdText = state.lab.selectedCmdText;
-      
+
       state.lab.matches[objIdx] = cmdText;
-      
+
       const matchLabel = byId(`matchedVal-${objIdx}`);
       if (matchLabel) {
         matchLabel.textContent = `Matched: ${cmdText}`;
       }
-      
-      objItems.forEach(el => el.style.borderColor = "var(--border-color)");
-      cmdItems.forEach(el => el.style.borderColor = "var(--border-color)");
+
+      objItems.forEach((el) => el.classList.remove("selected"));
+      cmdItems.forEach((el) => el.classList.remove("selected"));
       state.lab.selectedObjIdx = null;
       state.lab.selectedCmdText = null;
+      renderLabInspector(lab, "ok", `${Object.keys(state.lab.matches).length}/${lab.commands.length} objectives paired`);
     }
   }
-  
+
   const btnSubmit = byId("btnSubmitExamMatches");
   if (btnSubmit) {
     btnSubmit.addEventListener("click", () => {
@@ -1380,25 +1757,24 @@ function renderExamMatchInterface(lab) {
           correctCount++;
         }
       });
-      
+
       const total = lab.commands.length;
       const feedback = byId("labFeedbackBox");
-      
+
       if (correctCount === total) {
         playNetSound("success");
         if (feedback) {
           feedback.style.display = "block";
-          feedback.style.background = "var(--color-ok)";
-          feedback.style.color = "#000";
-          feedback.textContent = `✔ Exam passed! ${correctCount}/${total} correct matches. +50 XP Awarded.`;
+          feedback.className = "lab-feedback-box is-success";
+          feedback.textContent = `Exam passed: ${correctCount}/${total} correct matches. +50 XP Awarded.`;
         }
         gainXP(50);
-        
+
         lab.objectives.forEach((_, i) => {
           state.lab.completedSteps[i] = true;
         });
         renderLabObjectives(lab);
-        
+
         state.analytics.completedLabIds = Array.isArray(state.analytics.completedLabIds) ? state.analytics.completedLabIds : [];
         if (!state.analytics.completedLabIds.includes(lab.id)) {
           state.analytics.completedLabIds.push(lab.id);
@@ -1406,16 +1782,19 @@ function renderExamMatchInterface(lab) {
         state.analytics.labsCompleted = Math.min(10, state.analytics.completedLabIds.length);
         saveAnalytics();
         renderHome();
-        
-        inputs.innerHTML = `<span style="color:var(--color-ok); font-weight:bold;">✔ Lab Passed!</span>`;
+        renderLabCatalogue();
+        renderLabInspector(lab, "success", `Exam Passed (${correctCount}/${total})`);
+        renderLabCompletionBanner(lab, `Exam Mode matched ${correctCount}/${total} IOS configuration commands.`);
+
+        inputs.innerHTML = `<span class="lab-cli-passed-badge">Exam Mode Passed</span>`;
       } else {
         playNetSound("block");
         if (feedback) {
           feedback.style.display = "block";
-          feedback.style.background = "var(--color-error)";
-          feedback.style.color = "#fff";
-          feedback.textContent = `❌ Exam failed. ${correctCount}/${total} correct matches. Try again.`;
+          feedback.className = "lab-feedback-box is-error";
+          feedback.textContent = `Exam verification failed: ${correctCount}/${total} correct matches. Adjust mismatches and resubmit.`;
         }
+        renderLabInspector(lab, "error", `${correctCount}/${total} matched correctly`);
       }
     });
   }

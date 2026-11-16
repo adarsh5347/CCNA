@@ -415,11 +415,16 @@ html[data-theme="light"] body:not(.high-contrast) .nav-util-btn:hover {
   background: rgba(0, 0, 0, 0.04) !important;
 }
 
-html[data-theme="light"] body:not(.high-contrast) .terminal-box button.secondary,
-html[data-theme="light"] body:not(.high-contrast) .terminal-box .btn-lab-cmd {
-  color: #ecfdf5 !important;
-  background: rgba(16, 185, 129, 0.15) !important;
-  border-color: rgba(16, 185, 129, 0.42) !important;
+html[data-theme="light"] body:not(.high-contrast) .lab-terminal-card .btn-lab-cmd {
+  color: #e2e8f0 !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .lab-terminal-card button.secondary:not(.btn-lab-cmd) {
+  color: #e2e8f0 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
 }
 
 html[data-theme="light"] body:not(.high-contrast) .checks {

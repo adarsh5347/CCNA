@@ -237,9 +237,7 @@
 .mobile-bottom-nav,
 .mobile-more-backdrop,
 .mobile-more-sheet,
-.mobile-topo-toolbar,
 .mobile-guide-toc-controls,
-.mobile-lab-cli-bar,
 .mobile-exam-backdrop {
   display: none;
 }
@@ -824,44 +822,6 @@
     text-align: center !important;
   }
 
-  .mobile-topo-toolbar {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    flex-wrap: wrap !important;
-    gap: 8px !important;
-    margin-bottom: 10px !important;
-    padding: 8px 10px !important;
-    border-radius: 10px !important;
-    background: rgba(0, 242, 254, 0.05) !important;
-    border: 1px solid rgba(0, 242, 254, 0.16) !important;
-  }
-
-  .mobile-topo-hint {
-    font-size: 11.5px !important;
-    color: #cbd5e1 !important;
-    flex: 1 1 180px !important;
-  }
-
-  .mobile-topo-zoom-btns {
-    display: inline-flex !important;
-    gap: 4px !important;
-  }
-
-  .mobile-topo-zoom-btns button {
-    min-height: 36px !important;
-    height: 36px !important;
-    padding: 4px 10px !important;
-    font-size: 11px !important;
-    border-radius: 6px !important;
-  }
-
-  .mobile-topo-zoom-btns button.active {
-    background: rgba(0, 242, 254, 0.16) !important;
-    color: #00f2fe !important;
-    border-color: rgba(0, 242, 254, 0.4) !important;
-  }
-
   /* Default Fit-View mode scales SVG cleanly to viewport width */
   .topology-main:not(.pan-zoom-mode) {
     width: 100% !important;
@@ -879,7 +839,6 @@
     height: 100% !important;
   }
 
-  /* Pan/Zoom 1.5x mode allows horizontal touch panning at larger scale */
   .topology-main.pan-zoom-mode {
     width: 100% !important;
     height: 250px !important;
@@ -897,52 +856,11 @@
     height: 240px !important;
   }
 
-  /* Device Config & CLI Inspector on mobile */
-  #nodeConfigPanel {
-    padding: 14px !important;
-  }
-
-  #nodeConfigContent > div {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-  }
-
-  #cliOutputTerminal {
-    overflow-x: auto !important;
-    max-width: 100% !important;
-    font-size: 11.5px !important;
-    height: 150px !important;
-  }
-
   #btnApplyTroubleFix,
   #btnApplyTypedTroubleFix {
     width: 100% !important;
     min-height: 44px !important;
     justify-content: center !important;
-  }
-
-  /* OSI Stack Inspector: 2x2 grid on mobile for instant tap access */
-  .osi-stack {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
-    overflow: visible !important;
-    white-space: normal !important;
-  }
-
-  .osi-layer {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
-    min-height: 54px !important;
-    padding: 8px 10px !important;
-    gap: 2px !important;
-  }
-
-  .osi-layer-val {
-    max-width: 100% !important;
-    font-size: 11px !important;
   }
 
   /* ─── 6. 48-CHAPTER OFFICIAL CERT GUIDE STUDY HUB (#guide) ─── */
@@ -1045,21 +963,10 @@
   }
 
   /* ─── 8. CISCO VIRTUAL LAB CENTER & IOS TERMINAL (#labs) ─── */
-  #labs .lab-shell {
-    grid-template-columns: 1fr !important;
-    gap: 14px !important;
-  }
-
   #labConsoleInputArea {
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 8px !important;
-  }
-
-  #labInteractiveInputs {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 6px !important;
   }
 
   .btn-lab-cmd {
@@ -1071,40 +978,9 @@
     margin: 0 !important;
   }
 
-  .mobile-lab-cli-bar {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 8px !important;
-    margin-top: 8px !important;
-    padding-top: 10px !important;
-    border-top: 1px dashed rgba(16, 185, 129, 0.25) !important;
-  }
-
-  #labManualCliInput {
-    width: 100% !important;
-    font-family: var(--font-mono) !important;
-    background: #060d1a !important;
-    border: 1px solid rgba(16, 185, 129, 0.35) !important;
-    color: #34d399 !important;
-    padding: 10px 12px !important;
-    border-radius: 8px !important;
-  }
-
-  .mobile-lab-cli-actions {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 8px !important;
-  }
-
   .mobile-lab-cli-actions button {
     width: 100% !important;
     min-height: 44px !important;
-  }
-
-  /* Lab Exam Match Mode stacked cleanly on mobile */
-  #labCliOutput > div[style*="grid-template-columns: 1fr 1fr"] {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
   }
 
   .exam-item {

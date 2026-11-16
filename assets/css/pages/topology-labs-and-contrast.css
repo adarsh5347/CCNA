@@ -40,28 +40,11 @@
 .topo-node {
   cursor: pointer;
 }
-.topo-node:hover {
-  filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.7));
-}
 .topo-node circle, .topo-node rect {
-  transition: fill var(--dur-base) var(--ease-std), stroke var(--dur-base) var(--ease-std), stroke-width var(--dur-base) var(--ease-std), filter var(--dur-base) var(--ease-std);
-}
-.topo-node:hover circle, .topo-node:hover rect {
-  fill: rgba(0, 242, 254, 0.15) !important;
-  stroke: #00f2fe !important;
-  stroke-width: 3px !important;
+  transition: fill var(--dur-base) var(--ease-std), stroke var(--dur-base) var(--ease-std), stroke-width var(--dur-base) var(--ease-std);
 }
 .cable-link {
   stroke-dasharray: 8, 4;
-  animation: linkFlow 25s linear infinite;
-}
-.secondary-link {
-  animation: linkFlow 12s linear infinite reverse;
-}
-@keyframes linkFlow {
-  to {
-    stroke-dashoffset: -100;
-  }
 }
 
 /* Background Constellation Canvas */
@@ -208,50 +191,10 @@ nav button.active {
 }
 
 /* Smooth Inspections (No-vibrate node styles) */
-.topo-node.inspected circle,
-.topo-node.inspected rect {
-  stroke: #00f2fe !important;
-  stroke-width: 4px !important;
-  filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.85));
-}
-
-/* Radar Orbits rotate and pulse animations */
-.topo-orbit {
-}
-circle.topo-orbit {
-  animation: rotateOrbit 22s linear infinite;
-}
-rect.topo-orbit {
-  animation: pulseOrbit 4s ease-in-out infinite;
-}
-
-@keyframes rotateOrbit {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-@keyframes pulseOrbit {
-  0%, 100% { transform: scale(1); opacity: 0.65; }
-  50% { transform: scale(1.03); opacity: 0.95; }
-}
-
-/* Link Glow and status triangle pulsing indicators */
-.cable-link {
-  filter: drop-shadow(0 0 3px currentColor);
-}
-svg polygon[fill="#10b981"] {
-  animation: statusPulseGreen 2.5s infinite ease-in-out;
-}
-svg polygon[fill="#ff5e3a"] {
-  animation: statusPulseRed 1.8s infinite ease-in-out;
-}
-
-@keyframes statusPulseGreen {
-  0%, 100% { opacity: 0.8; filter: drop-shadow(0 0 1px #10b981); }
-  50% { opacity: 1; filter: drop-shadow(0 0 4px #10b981); }
-}
-@keyframes statusPulseRed {
-  0%, 100% { opacity: 0.8; filter: drop-shadow(0 0 1px #ff5e3a); }
-  50% { opacity: 1; filter: drop-shadow(0 0 5px #ff5e3a); }
+.topo-node.inspected circle:nth-of-type(2),
+.topo-node.inspected rect:nth-of-type(2) {
+  stroke: #38bdf8 !important;
+  stroke-width: 3.5px !important;
 }
 
 /* Retro green-on-black terminal design for Subnetting Practice */
@@ -395,8 +338,8 @@ body.high-contrast svg line {
 }
 
 /* Focus and accessibility outlines */
-button:focus, select:focus, input:focus, textarea:focus {
-  outline: 2px solid #00f2fe !important;
+button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--color-tint, #0a84ff) !important;
   outline-offset: 2px;
 }
 
