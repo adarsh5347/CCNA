@@ -24,7 +24,7 @@ select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible,
 label.opt:has(input:focus-visible) {
-  outline: 2px solid #00f2fe !important;
+  outline: 2px solid var(--color-tint, #0ea5e9) !important;
   outline-offset: 2px !important;
 }
 

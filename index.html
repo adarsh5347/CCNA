@@ -319,15 +319,15 @@
           <!-- 1. Study Mode -->
           <article class="card mode-card mode-card-study">
             <div class="mode-card-header">
-              <div class="mode-card-icon">⚡</div>
-              <span class="badge badge-accent">Immediate Feedback</span>
+              <div class="mode-card-icon" aria-hidden="true">⚡</div>
+              <span class="badge badge-accent">Guided Learning</span>
             </div>
             <h4 class="mode-card-title">Study Mode</h4>
-            <p class="mode-card-desc">Instant feedback with explanations, exam tips, memory tricks, and command-focused guidance.</p>
+            <p class="mode-card-desc">Learn with instant answer verification, detailed explanations, IOS command syntax, and OCG chapter references.</p>
             <ul class="mode-spec-list">
-              <li><span class="spec-dot spec-dot-blue"></span>Instant answer verification &amp; RFC rationales</li>
-              <li><span class="spec-dot spec-dot-cyan"></span>Cisco IOS CLI syntax hints &amp; memory aids</li>
-              <li><span class="spec-dot spec-dot-green"></span>Untimed conceptual &amp; packet-flow mastery</li>
+              <li><span class="spec-dot spec-dot-blue"></span>40 adaptive questions · 45 min pacing</li>
+              <li><span class="spec-dot spec-dot-cyan"></span>Immediate distractor rationales &amp; exam tips</li>
+              <li><span class="spec-dot spec-dot-green"></span>Show Answer reveal &amp; video lesson links</li>
             </ul>
             <button id="startStudy" class="btn btn-primary" style="width: 100%;">Start Study Mode →</button>
           </article>
@@ -335,11 +335,11 @@
           <!-- 2. Section Quiz Mode -->
           <article class="card mode-card mode-card-custom">
             <div class="mode-card-header">
-              <div class="mode-card-icon">📝</div>
-              <span class="badge">Custom Constraints</span>
+              <div class="mode-card-icon" aria-hidden="true">📝</div>
+              <span class="badge">Configurable Drill</span>
             </div>
-            <h4 class="mode-card-title">Section Quiz Mode</h4>
-            <p class="mode-card-desc">Target specific learning objectives and domains with custom duration constraints.</p>
+            <h4 class="mode-card-title">Section Quiz</h4>
+            <p class="mode-card-desc">Select exact question count, time limit, and one or more official CCNA 200-301 blueprint domains.</p>
             <div class="row row-compact" style="margin-bottom: 10px;">
               <label>Duration
                 <select id="quizDuration">
@@ -350,11 +350,15 @@
               </label>
               <label>Questions
                 <select id="quizCount">
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                  <option value="20">20</option>
+                  <option value="10">10 questions</option>
+                  <option value="15">15 questions</option>
+                  <option value="20">20 questions</option>
                 </select>
               </label>
+            </div>
+            <div class="section-domain-toolbar">
+              <span id="sectionQuizSummary" class="section-quiz-summary">10 Qs · 10 mins · 1 domain</span>
+              <button type="button" id="btnSelectAllDomains" class="btn-domain-toggle">Select All</button>
             </div>
             <div id="domainChecks" class="checks checks-compact-grid" style="margin-bottom: 14px;"><label><input class="qdomain" type="checkbox" value="Network Fundamentals" checked /> Network Fundamentals (20%)</label><label><input class="qdomain" type="checkbox" value="Network Access" /> Network Access (20%)</label><label><input class="qdomain" type="checkbox" value="IP Connectivity" /> IP Connectivity (25%)</label><label><input class="qdomain" type="checkbox" value="IP Services" /> IP Services (10%)</label><label><input class="qdomain" type="checkbox" value="Security Fundamentals" /> Security Fundamentals (15%)</label><label><input class="qdomain" type="checkbox" value="Automation and Programmability" /> Automation and Programmability (10%)</label></div>
             <button id="startQuiz" class="btn btn-secondary" style="width: 100%;">Start Section Quiz →</button>
@@ -363,27 +367,27 @@
           <!-- 3. Real Exam Mode -->
           <article class="card mode-card mode-card-featured">
             <div class="mode-card-header">
-              <div class="mode-card-icon">🏆</div>
-              <span class="badge badge-accent">Official Format: 120 Min • Timed</span>
+              <div class="mode-card-icon" aria-hidden="true">🏛️</div>
+              <span class="badge badge-accent">120 Questions · 120 Mins</span>
             </div>
             <h4 class="mode-card-title">Real Exam Mode</h4>
-            <p class="mode-card-desc">Simulate the actual Pearson VUE exam environment with full constraints, timed pressure, and comprehensive domain distribution.</p>
+            <p class="mode-card-desc">Full computer-based CCNA 200-301 certification simulation with weighted domain allocation and locked answer keys.</p>
             <ul class="mode-spec-list">
-              <li><span class="spec-dot spec-dot-amber"></span>Strict 120-minute Pearson VUE countdown lock</li>
-              <li><span class="spec-dot spec-dot-blue"></span>Weighted 6-domain distribution (100–120 Qs)</li>
-              <li><span class="spec-dot spec-dot-green"></span>825 / 1000 passing benchmark &amp; domain audit</li>
+              <li><span class="spec-dot spec-dot-amber"></span>Strict 120-minute countdown timer</li>
+              <li><span class="spec-dot spec-dot-blue"></span>Official 6-domain exam weighting (120 Qs)</li>
+              <li><span class="spec-dot spec-dot-green"></span>Flagging, review screen &amp; post-exam breakdown</li>
             </ul>
-            <button id="startExam" class="btn btn-primary" style="width: 100%;">Start Real Exam →</button>
+            <button id="startExam" class="btn btn-primary" style="width: 100%;">Configure &amp; Start Exam →</button>
           </article>
 
           <!-- 4. Smart Adaptive Quiz -->
           <article class="card mode-card mode-card-adaptive">
             <div class="mode-card-header">
-              <div class="mode-card-icon">🧠</div>
-              <span class="badge">Adaptive AI</span>
+              <div class="mode-card-icon" aria-hidden="true">🧠</div>
+              <span class="badge">Weakest 2 Domains</span>
             </div>
             <h4 class="mode-card-title">Smart Adaptive Quiz</h4>
-            <p class="mode-card-desc">Target your weaknesses. The system automatically finds your two weakest domains and builds a focused custom quiz.</p>
+            <p class="mode-card-desc">Automatically targets your two lowest-accuracy blueprint domains using weighted difficulty scaling.</p>
             <div id="smartQuizInfo" class="quiz-info-text mode-Status-box" style="margin-bottom: 12px;"><strong>Current Focus Areas:</strong><br />
           Cross-domain random fallback (fewer than 2 domains with &ge; 5 attempts)</div>
             <div class="row row-compact" style="margin-bottom: 14px;">
@@ -400,11 +404,11 @@
           <!-- 5. Spaced Repetition Quiz -->
           <article class="card mode-card mode-card-spaced">
             <div class="mode-card-header">
-              <div class="mode-card-icon">🔁</div>
-              <span class="badge">Spaced Repetition</span>
+              <div class="mode-card-icon" aria-hidden="true">🔁</div>
+              <span class="badge">Missed Queue</span>
             </div>
             <h4 class="mode-card-title">Spaced Repetition Quiz</h4>
-            <p class="mode-card-desc">Review and master your weak spots. This mode targets only the questions you have previously answered incorrectly.</p>
+            <p class="mode-card-desc">Revisit questions previously answered incorrectly until mastery clears them from your review queue.</p>
             <div id="missedQuizInfo" class="quiz-info-text mode-Status-box" style="margin-bottom: 12px;"><strong>Status:</strong> Clear!<br />You have 0 incorrect questions to review. Great job!</div>
             <div class="row row-compact" style="margin-bottom: 14px;">
               <label>Questions
@@ -1922,23 +1926,26 @@
 
     <!-- EXAM ENGINE PAGE -->
     <section id="engine" class="page">
-      <div class="exam-shell" style="grid-template-columns: 1fr; border-top: 5px solid #0284c7; background: rgba(13, 19, 36, 0.45); backdrop-filter: blur(20px);">
-        <header class="exam-header" style="background: rgba(30, 41, 59, 0.45); backdrop-filter: blur(12px); padding: 12px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; border-radius: 0;">
-          <div style="display: flex; align-items: center; gap: 16px;">
-            <button id="btnToggleSidebar" class="ghost" style="padding: 8px; border: 1px solid var(--border-color);"><span aria-hidden="true">☰</span> <span>Navigator</span></button>
-            <h2 id="modeTitle" style="font-family: var(--font-mono); font-size: 14px; margin-bottom: 0; color: #38bdf8;">Pearson VUE Exam Simulator</h2>
-          </div>
-          
-          <!-- Progress & Question Counter -->
-          <div style="display: flex; align-items: center; gap: 12px; flex: 1; justify-content: center; max-width: 400px; margin: 0 20px;">
-            <strong id="qCounter" style="font-size: 12px; white-space: nowrap; color: var(--text-main);">Q 1 / 120</strong>
-            <div class="progress" style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; flex: 1; overflow: hidden; border: 1px solid var(--border-color); margin: 0;">
-              <div id="progressFill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #00f2fe, #4facfe); transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+      <div class="exam-shell">
+        <header class="exam-header">
+          <div class="exam-header-left">
+            <button id="btnToggleSidebar" type="button" class="ghost exam-nav-trigger" aria-controls="examNavigator" aria-expanded="false"><span aria-hidden="true">☰</span> <span>Navigator</span></button>
+            <div class="exam-title-group">
+              <h2 id="modeTitle">CCNA Examination Simulator</h2>
+              <span id="engineModeSubtitle" class="exam-mode-kicker">CCNA 200-301</span>
             </div>
-            <span id="progressPct" style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">0%</span>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 12px;">
+          <!-- Progress & Question Counter -->
+          <div class="exam-header-progress">
+            <strong id="qCounter">Q 1 / 120</strong>
+            <div class="progress">
+              <div id="progressFill" style="width: 0%;"></div>
+            </div>
+            <span id="progressPct">0%</span>
+          </div>
+
+          <div class="exam-header-right">
             <div id="timer" class="timer timer-circular" role="timer" aria-label="Session timer">
               <svg class="timer-ring" viewBox="0 0 36 36" width="34" height="34" aria-hidden="true">
                 <circle class="timer-ring-bg" cx="18" cy="18" r="15" fill="none" stroke-width="3"></circle>
@@ -1948,39 +1955,48 @@
               <span id="timerPauseTag" class="timer-pause-tag hidden">PAUSED</span>
             </div>
             <div id="timerLiveRegion" class="sr-only" aria-live="polite" aria-atomic="true"></div>
-            <button id="btnToggleFullScreen" class="ghost" style="padding: 6px 12px; border: 1px solid var(--border-color); font-size: 11px;">Fullscreen</button>
-            <button id="exitSession" class="ghost" style="padding: 6px 12px; border: 1px solid var(--border-color); font-size: 11px; background: rgba(239, 68, 68, 0.08); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">Exit</button>
+            <button id="btnToggleFullScreen" type="button" class="ghost exam-util-btn">Fullscreen</button>
+            <button id="exitSession" type="button" class="ghost exam-exit-btn">Exit</button>
           </div>
         </header>
 
-        <div style="display: flex; min-height: 70vh; position: relative; overflow: hidden;">
+        <div class="exam-workspace-body">
           <!-- Left Navigator Drawer Panel -->
           <div id="examNavBackdrop" class="mobile-exam-backdrop" aria-hidden="true"></div>
-          <aside id="examNavigator" class="left" style="position: absolute; left: -320px; top: 0; bottom: 0; width: 300px; z-index: 50; transition: left 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); box-shadow: 10px 0 20px rgba(0,0,0,0.5); border-radius: 0;">
-            <div class="drawer-header" style="padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-              <h3 style="font-size: 13px; text-transform: uppercase; margin-bottom: 0; color: #94a3b8;">Question Navigator</h3>
-              <button id="btnCloseSidebar" class="ghost" aria-label="Close question navigator" style="padding: 10px 14px; min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center;">✕</button>
+          <aside id="examNavigator" class="left" aria-label="Question navigator drawer">
+            <div class="drawer-header">
+              <div>
+                <span class="exam-drawer-eyebrow">NAVIGATION GRID</span>
+                <h3>Question Navigator</h3>
+              </div>
+              <button id="btnCloseSidebar" type="button" class="ghost" aria-label="Close question navigator">✕</button>
             </div>
-            <div style="padding: 16px; overflow-y: auto; flex: 1;">
-              <p id="modeDesc" style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;"></p>
-              <div id="qNav" class="qnav" style="grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px;"></div>
-              <div id="navMeta" style="font-size: 11.5px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 12px;"></div>
+            <div class="exam-drawer-scroll">
+              <p id="modeDesc" class="exam-drawer-desc"></p>
+              <div class="navigator-legend" aria-label="Question status legend">
+                <span class="nav-legend-item"><i class="leg-dot leg-current"></i>Current</span>
+                <span class="nav-legend-item"><i class="leg-dot leg-answered"></i>Answered</span>
+                <span class="nav-legend-item"><i class="leg-dot leg-flagged"></i>Flagged</span>
+                <span class="nav-legend-item"><i class="leg-dot leg-unanswered"></i>Unanswered</span>
+              </div>
+              <div id="qNav" class="qnav"></div>
+              <div id="navMeta" class="exam-nav-meta"></div>
             </div>
           </aside>
 
           <!-- Main Content Area -->
-          <div style="flex: 1; display: flex; flex-direction: column; background: rgba(11, 15, 25, 0.3); backdrop-filter: blur(8px);">
-            <div id="questionArea" class="scroll" style="flex: 1; padding: 24px; min-height: auto;"></div>
-            <div id="reviewArea" class="scroll hidden" style="flex: 1; padding: 24px; min-height: auto;"></div>
-            <div id="resultArea" class="scroll hidden" style="flex: 1; padding: 24px; min-height: auto;"></div>
+          <div class="exam-main-column">
+            <div id="questionArea" class="scroll"></div>
+            <div id="reviewArea" class="scroll hidden"></div>
+            <div id="resultArea" class="scroll hidden"></div>
 
-            <footer id="examFooter" class="exam-footer" style="padding: 12px 24px; background: rgba(30, 41, 59, 0.45); backdrop-filter: blur(12px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; border-radius: 0;">
-              <button id="prevQ" class="ghost" style="border: 1px solid var(--border-color);"><span class="btn-full-text">⬅️ Previous</span><span class="btn-mobile-text">⬅️ Prev</span></button>
-              <div class="exam-footer-actions" style="display: flex; gap: 8px;">
-                <button id="toggleMark" class="ghost" style="border: 1px solid var(--border-color);"><span class="btn-full-text">🚩 Mark For Review</span><span class="btn-mobile-text">🚩 Mark</span></button>
-                <button id="openReview" class="secondary" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);"><span class="btn-full-text">📋 Review Screen</span><span class="btn-mobile-text">📋 Review</span></button>
-                <button id="saveNext" class="primary"><span class="btn-full-text">Next ➡️</span><span class="btn-mobile-text">Next ➡️</span></button>
-                <button id="submitSession" class="primary" style="background: var(--accent-orange); color: #060913; border: none; display: none;"><span class="btn-full-text">Submit Exam</span><span class="btn-mobile-text">Submit</span></button>
+            <footer id="examFooter" class="exam-footer">
+              <button id="prevQ" type="button" class="ghost"><span class="btn-full-text">⬅️ Previous</span><span class="btn-mobile-text">⬅️ Prev</span></button>
+              <div class="exam-footer-actions">
+                <button id="toggleMark" type="button" class="ghost" aria-pressed="false"><span class="btn-full-text">🚩 Mark For Review</span><span class="btn-mobile-text">🚩 Mark</span></button>
+                <button id="openReview" type="button" class="secondary"><span class="btn-full-text">📋 Review Screen</span><span class="btn-mobile-text">📋 Review</span></button>
+                <button id="saveNext" type="button" class="primary"><span class="btn-full-text">Next ➡️</span><span class="btn-mobile-text">Next ➡️</span></button>
+                <button id="submitSession" type="button" class="primary exam-submit-btn" style="display: none;"><span class="btn-full-text">Submit Exam</span><span class="btn-mobile-text">Submit</span></button>
               </div>
             </footer>
           </div>
@@ -2121,6 +2137,64 @@
       
       <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
         <button id="btnOnboardingDismiss" class="primary" style="padding: 10px 20px; font-size: 13px; border-radius: 8px;">Acknowledge & Begin</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pre-Examination Briefing & Confirmation Modal -->
+  <div id="examBriefModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="examBriefTitle">
+    <div class="card exam-brief-card">
+      <div class="exam-brief-head">
+        <div>
+          <span class="exam-brief-eyebrow">CERTIFICATION EXAMINATION BRIEFING // 200-301</span>
+          <h2 id="examBriefTitle">Cisco CCNA 200-301 Practice Examination</h2>
+        </div>
+        <button type="button" id="btnCloseExamBrief" class="ghost exam-brief-close" aria-label="Close examination briefing">✕</button>
+      </div>
+
+      <div class="exam-brief-specs">
+        <div class="exam-spec-pill"><span>Total Questions</span><strong>120 Questions</strong></div>
+        <div class="exam-spec-pill"><span>Time Allocation</span><strong>120 Minutes</strong></div>
+        <div class="exam-spec-pill"><span>Answer Keys</span><strong>Locked Until Submit</strong></div>
+        <div class="exam-spec-pill"><span>Selection</span><strong>Weighted Blueprint</strong></div>
+      </div>
+
+      <div class="exam-brief-section">
+        <h3>Official Six-Domain Blueprint Weighting</h3>
+        <div class="exam-brief-domains">
+          <div><span>1.0 Network Fundamentals</span><strong>20%</strong></div>
+          <div><span>2.0 Network Access</span><strong>20%</strong></div>
+          <div><span>3.0 IP Connectivity</span><strong>25%</strong></div>
+          <div><span>4.0 IP Services</span><strong>10%</strong></div>
+          <div><span>5.0 Security Fundamentals</span><strong>15%</strong></div>
+          <div><span>6.0 Automation &amp; Programmability</span><strong>10%</strong></div>
+        </div>
+      </div>
+
+      <div class="exam-brief-columns">
+        <div class="exam-brief-section">
+          <h3>Examination Rules &amp; Workflow</h3>
+          <ul class="exam-brief-list">
+            <li><strong>Navigation:</strong> Move sequentially with <em>Previous / Next</em> or jump directly using the <em>Question Navigator</em> grid.</li>
+            <li><strong>Flagging:</strong> Mark uncertain questions with <em>Flag for Review</em> to filter them before final submission.</li>
+            <li><strong>Timer &amp; Pause:</strong> Your 120:00 circular countdown turns amber under 25% and red under 10%. Pause halts time without drift.</li>
+            <li><strong>Submission &amp; Review:</strong> Submitting opens a pre-submit summary first for confirmation, followed by full score &amp; domain review.</li>
+          </ul>
+        </div>
+        <div class="exam-brief-section">
+          <h3>Keyboard Shortcuts</h3>
+          <div class="exam-brief-shortcuts">
+            <div><kbd>A</kbd> – <kbd>D</kbd><span>Select option A through D</span></div>
+            <div><kbd>←</kbd> / <kbd>→</kbd> / <kbd>N</kbd><span>Previous / Next question</span></div>
+            <div><kbd>F</kbd><span>Toggle Flag for Review</span></div>
+            <div><kbd>P</kbd><span>Pause or resume timer</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exam-brief-actions">
+        <button type="button" id="btnCancelExamBrief" class="secondary">Cancel</button>
+        <button type="button" id="btnConfirmStartExam" class="primary">Begin 120-Minute Examination →</button>
       </div>
     </div>
   </div>

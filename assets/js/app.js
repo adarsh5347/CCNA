@@ -180,10 +180,32 @@ window.applyTheme = applyTheme;
 window.toggleTheme = toggleTheme;
 
 function handleEngineKeyDown(e) {
+  const briefModal = byId("examBriefModal");
+  if (briefModal && !briefModal.classList.contains("hidden")) {
+    if (e.code === "Escape") {
+      e.preventDefault();
+      briefModal.classList.add("hidden");
+      byId("startExam")?.focus();
+    }
+    return;
+  }
   if (!state.session || state.session.submitted) return;
+  if (!byId("engine")?.classList.contains("active")) return;
   const tag = document.activeElement ? document.activeElement.tagName : "";
   if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
   if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+  if (e.code === "Escape") {
+    const navEl = byId("examNavigator");
+    if (navEl && navEl.classList.contains("active")) {
+      e.preventDefault();
+      navEl.classList.remove("active");
+      byId("examNavBackdrop")?.classList.remove("active");
+      byId("btnToggleSidebar")?.setAttribute("aria-expanded", "false");
+      byId("btnToggleSidebar")?.focus();
+      return;
+    }
+  }
 
   // KeyP toggles timer pause/resume
   if (e.code === "KeyP") {
@@ -476,13 +498,68 @@ function updateContrastButton() {
   }
 }
 
+function openExamBriefingModal() {
+  const modal = byId("examBriefModal");
+  if (!modal) {
+    startSession("exam");
+    return;
+  }
+  modal.classList.remove("hidden");
+  byId("btnConfirmStartExam")?.focus();
+}
+
+function closeExamBriefingModal() {
+  const modal = byId("examBriefModal");
+  if (modal) modal.classList.add("hidden");
+}
+
+function updateSectionQuizSummary() {
+  const summaryEl = byId("sectionQuizSummary");
+  const toggleBtn = byId("btnSelectAllDomains");
+  const dur = byId("quizDuration")?.value || "10";
+  const cnt = byId("quizCount")?.value || "10";
+  const allBoxes = [...document.querySelectorAll("#domainChecks .qdomain")];
+  const checkedCount = allBoxes.filter((el) => el.checked).length;
+
+  if (summaryEl) {
+    summaryEl.textContent = checkedCount > 0
+      ? `${cnt} Qs · ${dur} mins · ${checkedCount} ${checkedCount === 1 ? "domain" : "domains"}`
+      : `${cnt} Qs · ${dur} mins · Select >= 1 domain`;
+    summaryEl.classList.toggle("is-empty", checkedCount === 0);
+  }
+  if (toggleBtn && allBoxes.length > 0) {
+    toggleBtn.textContent = checkedCount === allBoxes.length ? "Reset Default" : "Select All";
+  }
+}
+
 function wireEvents() {
   byId("startStudy").addEventListener("click", () => startSession("study"));
   byId("startQuiz").addEventListener("click", () => startSession("quiz"));
   byId("startSmartQuiz").addEventListener("click", () => startSession("smart"));
-  byId("startExam").addEventListener("click", () => {
+  byId("startExam").addEventListener("click", openExamBriefingModal);
+
+  byId("btnConfirmStartExam")?.addEventListener("click", () => {
+    closeExamBriefingModal();
     startSession("exam");
   });
+  byId("btnCancelExamBrief")?.addEventListener("click", closeExamBriefingModal);
+  byId("btnCloseExamBrief")?.addEventListener("click", closeExamBriefingModal);
+  byId("examBriefModal")?.addEventListener("click", (e) => {
+    if (e.target.id === "examBriefModal") closeExamBriefingModal();
+  });
+
+  byId("quizDuration")?.addEventListener("change", updateSectionQuizSummary);
+  byId("quizCount")?.addEventListener("change", updateSectionQuizSummary);
+  byId("domainChecks")?.addEventListener("change", updateSectionQuizSummary);
+  byId("btnSelectAllDomains")?.addEventListener("click", () => {
+    const boxes = [...document.querySelectorAll("#domainChecks .qdomain")];
+    const allChecked = boxes.length > 0 && boxes.every((b) => b.checked);
+    boxes.forEach((b, idx) => {
+      b.checked = allChecked ? idx === 0 : true;
+    });
+    updateSectionQuizSummary();
+  });
+  updateSectionQuizSummary();
 
   const btnLaunchStudy = byId("btnLaunchStudy");
   const btnLaunchExam = byId("btnLaunchExam");
@@ -495,10 +572,7 @@ function wireEvents() {
     });
   }
   if (btnLaunchExam) {
-    btnLaunchExam.addEventListener("click", () => {
-      setPage("engine");
-      startSession("exam");
-    });
+    btnLaunchExam.addEventListener("click", openExamBriefingModal);
   }
   if (btnLaunchLabs) {
     btnLaunchLabs.addEventListener("click", () => {
@@ -702,10 +776,12 @@ function wireEvents() {
     btnToggleNav.addEventListener("click", () => {
       const isOpen = sidebarNav.classList.toggle("active");
       byId("examNavBackdrop")?.classList.toggle("active", isOpen);
+      btnToggleNav.setAttribute("aria-expanded", String(isOpen));
     });
     btnCloseNav.addEventListener("click", () => {
       sidebarNav.classList.remove("active");
       byId("examNavBackdrop")?.classList.remove("active");
+      btnToggleNav.setAttribute("aria-expanded", "false");
     });
   }
 
@@ -714,6 +790,7 @@ function wireEvents() {
     examNavBackdrop.addEventListener("click", () => {
       sidebarNav.classList.remove("active");
       examNavBackdrop.classList.remove("active");
+      btnToggleNav?.setAttribute("aria-expanded", "false");
     });
   }
   const qNavEl = byId("qNav");
@@ -722,6 +799,7 @@ function wireEvents() {
       if (e.target.closest("button")) {
         sidebarNav.classList.remove("active");
         byId("examNavBackdrop")?.classList.remove("active");
+        btnToggleNav?.setAttribute("aria-expanded", "false");
       }
     });
   }
@@ -1827,7 +1905,6 @@ function syncHeaderHeight() {
 }
 
 function watchHeaderHeight() {
-  if (window.innerWidth > 768) return;
   const header = document.querySelector(".exam-header");
   if (!header) return;
   if (_headerResizeObserver) _headerResizeObserver.disconnect();

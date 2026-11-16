@@ -111,32 +111,101 @@ export function closeReview() {
   }
 }
 
+function formatReviewChapter(ch) {
+  if (!ch) return "";
+  const m = /^v(\d+)c(\d+)$/i.exec(ch);
+  return m ? `OCG Vol ${m[1]} Ch ${Number(m[2])}` : String(ch).toUpperCase();
+}
+
 export function openReview() {
   const s = state.session;
   if (!s) return;
 
+  const totalQ = s.questions.length;
   const unanswered = s.questions.filter((q, i) => !isQuestionAnswered(q, s.answers[i])).length;
+  const answeredCount = totalQ - unanswered;
   const flaggedCount = Object.values(s.flagged || {}).filter(Boolean).length;
   const revealedCount = Object.values(s.revealed || {}).filter(Boolean).length;
+  const isExam = s.mode === "exam";
 
-  let html = `<h3>Review Screen</h3><p>Unanswered: ${unanswered} | Flagged: ${flaggedCount}${revealedCount ? ` | Revealed: ${revealedCount}` : ""}</p>`;
-  html += `<div style="margin-bottom: 16px;"><button class="secondary" id="backToQuizFromReview" style="padding: 10px 20px; font-size: 13px; min-height: 44px;">⬅️ Back to Quiz</button></div>`;
-  html += `<div class="review-table">`;
-  s.questions.forEach((q, i) => {
-    const isAns = isQuestionAnswered(q, s.answers[i]);
-    const isFlag = Boolean(s.flagged && s.flagged[i]);
-    const isRev = Boolean(s.revealed && s.revealed[i]);
-    const statusLabel = isRev
-      ? "Revealed 👁️"
-      : isAns
-      ? "Answered ✅"
-      : "Pending";
-    html += `<div class="review-row"><div>Q${i + 1}${isFlag ? " 🚩" : ""}</div><div>${safeHTML(q.domain)} - ${safeHTML(q.topic)}</div><div>${statusLabel}</div><div><button class="ghost" data-jump="${i}" aria-label="Jump to question ${i + 1}">Open</button></div></div>`;
-  });
-  html += "</div>";
-  if (s.mode === "exam") {
-    html += `<div class="inline"><button class="primary" id="finalizeFromReview">Finalize Exam</button></div>`;
-  }
+  let html = `
+    <div class="exam-review-screen">
+      <div class="exam-review-top">
+        <div>
+          <span class="exam-sub-kicker">${isExam ? "FINAL CONFIRMATION // PRE-SUBMISSION" : "SESSION OVERVIEW // QUESTION ROSTER"}</span>
+          <h3>${isExam ? "Review & Confirm Submission" : "Review Screen"}</h3>
+          <p class="exam-review-sub">Inspect answered, pending, or flagged items below before submitting.</p>
+        </div>
+        <button type="button" class="secondary" id="backToQuizFromReview">⬅️ Back to Quiz</button>
+      </div>
+
+      <div class="exam-review-metrics">
+        <div class="erm-cell"><span>Total</span><strong>${totalQ}</strong></div>
+        <div class="erm-cell is-answered"><span>Answered</span><strong>${answeredCount}</strong></div>
+        <div class="erm-cell is-unanswered"><span>Unanswered</span><strong>${unanswered}</strong></div>
+        <div class="erm-cell is-flagged"><span>Flagged</span><strong>${flaggedCount}</strong></div>
+        ${revealedCount ? `<div class="erm-cell is-revealed"><span>Revealed</span><strong>${revealedCount}</strong></div>` : ""}
+      </div>
+
+      ${
+        isExam
+          ? `<div id="examSubmitConfirmPanel" class="exam-submit-confirm-panel" role="region" aria-label="Final Exam Submission Confirmation">
+              <div class="exam-confirm-copy">
+                <strong>Ready to finalize your examination?</strong>
+                <p>${
+                  unanswered > 0
+                    ? `You still have <strong>${unanswered}</strong> unanswered question${unanswered === 1 ? "" : "s"}${flaggedCount > 0 ? ` and <strong>${flaggedCount}</strong> flagged for review` : ""}. Submitting locks answers and generates your domain score report.`
+                    : `All ${totalQ} questions answered${flaggedCount > 0 ? ` (${flaggedCount} flagged)` : ""}. Confirm below to submit for grading.`
+                }</p>
+              </div>
+              <div class="exam-confirm-actions">
+                <button type="button" class="primary" id="finalizeFromReview">Finalize &amp; Submit Exam →</button>
+              </div>
+            </div>`
+          : ""
+      }
+
+      <div class="exam-pre-filters" role="group" aria-label="Filter pre-submit question roster">
+        <button type="button" class="pre-filter-btn active" data-pre-filter="all" aria-pressed="true">All (${totalQ})</button>
+        <button type="button" class="pre-filter-btn" data-pre-filter="unanswered" aria-pressed="false">Unanswered (${unanswered})</button>
+        <button type="button" class="pre-filter-btn" data-pre-filter="flagged" aria-pressed="false">Flagged (${flaggedCount})</button>
+      </div>
+
+      <div class="review-table">
+        ${s.questions
+          .map((q, i) => {
+            const isAns = isQuestionAnswered(q, s.answers[i]);
+            const isFlag = Boolean(s.flagged && s.flagged[i]);
+            const isRev = Boolean(s.revealed && s.revealed[i]);
+            const statusClass = isRev ? "is-rev" : isAns ? "is-ans" : "is-pend";
+            const statusLabel = isRev
+              ? "Revealed"
+              : isAns
+              ? "Answered"
+              : "Unanswered";
+            return `
+              <div class="review-row ${statusClass}" data-answered="${isAns ? "true" : "false"}" data-flagged="${isFlag ? "true" : "false"}">
+                <div class="review-row-num">
+                  <strong>Q${i + 1}</strong>
+                  ${isFlag ? `<span class="review-flag-tag" title="Flagged for review">🚩 Flagged</span>` : ""}
+                </div>
+                <div class="review-row-topic">
+                  <span class="review-row-domain">${safeHTML(q.domain)}</span>
+                  <span class="review-row-subtopic">${safeHTML(q.topic)}</span>
+                </div>
+                <div class="review-row-status">
+                  <span class="review-pill ${statusClass}">${statusLabel}</span>
+                </div>
+                <div class="review-row-cta">
+                  <button type="button" class="ghost" data-jump="${i}" aria-label="Jump to question ${i + 1}">Open</button>
+                </div>
+              </div>
+            `;
+          })
+          .join("")}
+      </div>
+    </div>
+  `;
 
   const ra = byId("reviewArea");
   if (!ra) return;
@@ -152,6 +221,23 @@ export function openReview() {
   if (backBtn) {
     backBtn.addEventListener("click", closeReview);
   }
+
+  ra.querySelectorAll(".pre-filter-btn[data-pre-filter]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const mode = btn.dataset.preFilter || "all";
+      ra.querySelectorAll(".pre-filter-btn").forEach((b) => {
+        const active = b === btn;
+        b.classList.toggle("active", active);
+        b.setAttribute("aria-pressed", String(active));
+      });
+      ra.querySelectorAll(".review-table .review-row").forEach((row) => {
+        const ans = row.dataset.answered === "true";
+        const flg = row.dataset.flagged === "true";
+        const show = mode === "all" || (mode === "unanswered" && !ans) || (mode === "flagged" && flg);
+        row.classList.toggle("hidden", !show);
+      });
+    });
+  });
 
   ra.querySelectorAll("[data-jump]").forEach((b) => {
     b.addEventListener("click", () => {
@@ -229,20 +315,22 @@ export function buildFinishReviewHTML(session, { answerEqualsFn } = {}) {
         : "review-item-incorrect";
 
       const statusBadge = isRevealed
-        ? `<span class="review-status-pill revealed" title="Revealed during quiz — excluded from score">❌ Revealed (Excluded from Score)</span>`
+        ? `<span class="review-status-pill revealed" title="Revealed during quiz — excluded from score">Revealed (Excluded from Score)</span>`
         : isScoredCorrect
-        ? `<span class="review-status-pill correct">✅ Correct</span>`
-        : `<span class="review-status-pill incorrect">❌ Incorrect</span>`;
+        ? `<span class="review-status-pill correct">Correct</span>`
+        : `<span class="review-status-pill incorrect">Incorrect</span>`;
 
       const flagBadge = isFlagged
         ? `<span class="review-status-pill flagged">🚩 Flagged</span>`
         : "";
 
+      const chText = formatReviewChapter(q.chapter);
       const userAnsHTML = formatQuestionAnswer(q, userAns, true);
       const correctAnsHTML = formatQuestionAnswer(q, null, false);
 
       const explText = q.expl ? (q.expl.why || q.expl.text || "") : "";
       const tipText = q.expl && q.expl.tip ? q.expl.tip : "";
+      const cmds = q.expl && Array.isArray(q.expl.commands) && q.expl.commands.length > 0 ? q.expl.commands : [];
 
       return `
         <article class="review-card-item ${statusClass}" data-review-idx="${idx}" data-correct="${isScoredCorrect ? "true" : "false"}" data-flagged="${isFlagged ? "true" : "false"}" data-revealed="${isRevealed ? "true" : "false"}">
@@ -250,30 +338,33 @@ export function buildFinishReviewHTML(session, { answerEqualsFn } = {}) {
             <div class="review-card-meta">
               <span class="badge">Q${idx + 1}</span>
               <span class="badge">${safeHTML(q.domain || "General")}</span>
-              ${q.topic ? `<span class="badge">${safeHTML(q.topic)}</span>` : ""}
+              ${q.topic ? `<span class="badge badge-neutral">${safeHTML(q.topic)}</span>` : ""}
+              ${q.difficulty ? `<span class="badge badge-neutral">${safeHTML(q.difficulty)}</span>` : ""}
+              ${chText ? `<span class="badge badge-neutral">${safeHTML(chText)}</span>` : ""}
               ${statusBadge}
               ${flagBadge}
             </div>
             <button type="button" class="secondary btn-jump-question" data-jump-idx="${idx}" aria-label="Jump to question ${idx + 1}">
-              Jump to question ↗
+              Inspect Question ↗
             </button>
           </div>
           <div class="review-card-prompt">${md(q.text)}</div>
           <div class="review-card-answers">
             <div class="review-answer-row ${isScoredCorrect ? "ans-ok" : "ans-bad"}">
-              <span class="review-answer-label">${isScoredCorrect ? "✅" : "❌"} Your Answer:</span>
+              <span class="review-answer-label">Your Answer</span>
               <div class="review-answer-val">${userAnsHTML}</div>
             </div>
             <div class="review-answer-row ans-correct">
-              <span class="review-answer-label">🎯 Correct Answer:</span>
+              <span class="review-answer-label">Correct Answer</span>
               <div class="review-answer-val">${correctAnsHTML}</div>
             </div>
           </div>
           ${
-            explText || tipText
+            explText || tipText || cmds.length > 0
               ? `<div class="review-card-exp">
-                  ${explText ? `<div><strong>Explanation:</strong> ${md(explText)}</div>` : ""}
-                  ${tipText ? `<div class="review-card-tip"><strong>💡 Cisco Exam Tip:</strong> ${md(tipText)}</div>` : ""}
+                  ${explText ? `<div class="review-exp-body"><strong>Explanation:</strong> ${md(explText)}</div>` : ""}
+                  ${tipText ? `<div class="review-card-tip"><strong>Exam Tip:</strong> ${md(tipText)}</div>` : ""}
+                  ${cmds.length > 0 ? `<div class="review-card-cmds"><strong>IOS Commands:</strong> ${cmds.map((c) => `<code>${safeHTML(c)}</code>`).join(" ")}</div>` : ""}
                 </div>`
               : ""
           }
@@ -288,8 +379,9 @@ export function buildFinishReviewHTML(session, { answerEqualsFn } = {}) {
     <div class="card finish-review-section" role="region" aria-label="Detailed Answer Review">
       <div class="finish-review-header">
         <div>
-          <h3 style="margin:0 0 4px 0;">Answer Review (${totalCount} Questions)</h3>
-          <p class="muted" style="margin:0; font-size:13px;">Filter by status or click "Jump to question" to inspect any question card.</p>
+          <span class="exam-sub-kicker">DETAILED BREAKDOWN // ${totalCount} ITEMS</span>
+          <h3>Answer Review</h3>
+          <p class="finish-review-sub">Filter by correctness or flagged status, or open any question card directly.</p>
         </div>
         <div class="review-filters" role="group" aria-label="Filter reviewed questions">
           <button type="button" class="review-filter-btn active" data-review-filter="all" aria-pressed="true">
