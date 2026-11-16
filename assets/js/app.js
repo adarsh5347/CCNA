@@ -1708,18 +1708,143 @@ function setupSupportDesk() {
   });
 }
 
+const VIDEO_DOMAIN_THEMES = {
+  "Network Fundamentals": { slug: "fundamentals", short: "Fundamentals", accent: "#0a84ff" },
+  "Network Access": { slug: "access", short: "Network Access", accent: "#30d158" },
+  "IP Connectivity": { slug: "connectivity", short: "IP Connectivity", accent: "#5e5ce6" },
+  "IP Services": { slug: "services", short: "IP Services", accent: "#64d2ff" },
+  "Security Fundamentals": { slug: "security", short: "Security", accent: "#ff9f0a" },
+  "Automation and Programmability": { slug: "automation", short: "Automation", accent: "#bf5af2" }
+};
+
+let currentVideoSearch = "";
+let currentVideoStatus = "all"; // "all" | "unwatched" | "watched"
+let activeModalVideoId = null;
+
+function getEpisodeStamp(title) {
+  const m = String(title || "").match(/^(Day\s+\d+(?:\s+(?:Lab|Extra))?)/i);
+  if (m) return m[1].toUpperCase();
+  return "CCNA LESSON";
+}
+
+function getDomainPosterSvg(domain, vidId) {
+  const theme = VIDEO_DOMAIN_THEMES[domain] || VIDEO_DOMAIN_THEMES["Network Fundamentals"];
+  const c = theme.accent;
+  const uid = `vp-${theme.slug}-${vidId}`;
+  switch (theme.slug) {
+    case "access":
+      return `<svg class="video-poster-svg" viewBox="0 0 320 180" aria-hidden="true">
+        <defs><linearGradient id="${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c}" stop-opacity="0.22"/><stop offset="100%" stop-color="#050811" stop-opacity="0.95"/></linearGradient></defs>
+        <rect width="320" height="180" fill="#070b14"/><rect width="320" height="180" fill="url(#${uid})"/>
+        <g stroke="${c}" stroke-opacity="0.24" stroke-width="1" fill="none">
+          <rect x="44" y="34" width="66" height="44" rx="8"/><rect x="127" y="34" width="66" height="44" rx="8"/><rect x="210" y="34" width="66" height="44" rx="8"/>
+          <path d="M77 78v26h166V78M160 78v58" stroke-width="1.3"/><rect x="116" y="120" width="88" height="28" rx="6"/>
+        </g>
+        <g fill="${c}" fill-opacity="0.65"><circle cx="77" cy="56" r="3"/><circle cx="160" cy="56" r="3"/><circle cx="243" cy="56" r="3"/></g>
+      </svg>`;
+    case "connectivity":
+      return `<svg class="video-poster-svg" viewBox="0 0 320 180" aria-hidden="true">
+        <defs><linearGradient id="${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c}" stop-opacity="0.26"/><stop offset="100%" stop-color="#050811" stop-opacity="0.96"/></linearGradient></defs>
+        <rect width="320" height="180" fill="#070b14"/><rect width="320" height="180" fill="url(#${uid})"/>
+        <g stroke="${c}" stroke-opacity="0.28" stroke-width="1.4" fill="none">
+          <path d="M46 128 C100 42, 180 132, 274 52"/>
+          <path d="M46 66 C118 118, 210 38, 274 122" stroke-dasharray="4 4" stroke-opacity="0.22"/>
+          <circle cx="46" cy="128" r="10"/><circle cx="160" cy="86" r="14"/><circle cx="274" cy="52" r="10"/>
+        </g>
+        <g fill="${c}" fill-opacity="0.7"><circle cx="46" cy="128" r="3.5"/><circle cx="160" cy="86" r="4"/><circle cx="274" cy="52" r="3.5"/></g>
+      </svg>`;
+    case "services":
+      return `<svg class="video-poster-svg" viewBox="0 0 320 180" aria-hidden="true">
+        <defs><linearGradient id="${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c}" stop-opacity="0.2"/><stop offset="100%" stop-color="#050811" stop-opacity="0.96"/></linearGradient></defs>
+        <rect width="320" height="180" fill="#070b14"/><rect width="320" height="180" fill="url(#${uid})"/>
+        <g stroke="${c}" stroke-opacity="0.24" stroke-width="1.2" fill="none">
+          <path d="M36 56h248M36 90h248M36 124h248"/>
+          <rect x="64" y="46" width="38" height="20" rx="10" fill="#070b14"/><rect x="148" y="80" width="48" height="20" rx="10" fill="#070b14"/><rect x="208" y="114" width="44" height="20" rx="10" fill="#070b14"/>
+        </g>
+      </svg>`;
+    case "security":
+      return `<svg class="video-poster-svg" viewBox="0 0 320 180" aria-hidden="true">
+        <defs><linearGradient id="${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c}" stop-opacity="0.22"/><stop offset="100%" stop-color="#050811" stop-opacity="0.96"/></linearGradient></defs>
+        <rect width="320" height="180" fill="#070b14"/><rect width="320" height="180" fill="url(#${uid})"/>
+        <g stroke="${c}" stroke-opacity="0.28" stroke-width="1.4" fill="none">
+          <path d="M160 28l48 20v38c0 34-21 58-48 68-27-10-48-34-48-68V48l48-20z"/>
+          <circle cx="160" cy="88" r="24" stroke-opacity="0.2"/>
+          <path d="M48 90h44M228 90h44" stroke-dasharray="3 4"/>
+        </g>
+      </svg>`;
+    case "automation":
+      return `<svg class="video-poster-svg" viewBox="0 0 320 180" aria-hidden="true">
+        <defs><linearGradient id="${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c}" stop-opacity="0.24"/><stop offset="100%" stop-color="#050811" stop-opacity="0.96"/></linearGradient></defs>
+        <rect width="320" height="180" fill="#070b14"/><rect width="320" height="180" fill="url(#${uid})"/>
+        <g stroke="${c}" stroke-opacity="0.28" stroke-width="1.3" fill="none">
+          <rect x="46" y="64" width="54" height="52" rx="10"/><rect x="133" y="44" width="54" height="92" rx="10"/><rect x="220" y="64" width="54" height="52" rx="10"/>
+          <path d="M100 90h33M187 90h33"/>
+        </g>
+        <g fill="${c}" fill-opacity="0.65"><circle cx="160" cy="70" r="3"/><circle cx="160" cy="90" r="3"/><circle cx="160" cy="110" r="3"/></g>
+      </svg>`;
+    default:
+      return `<svg class="video-poster-svg" viewBox="0 0 320 180" aria-hidden="true">
+        <defs><linearGradient id="${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c}" stop-opacity="0.24"/><stop offset="100%" stop-color="#050811" stop-opacity="0.96"/></linearGradient></defs>
+        <rect width="320" height="180" fill="#070b14"/><rect width="320" height="180" fill="url(#${uid})"/>
+        <g stroke="${c}" stroke-opacity="0.24" stroke-width="1.2" fill="none">
+          <line x1="68" y1="54" x2="160" y2="90"/><line x1="252" y1="54" x2="160" y2="90"/><line x1="88" y1="134" x2="160" y2="90"/><line x1="232" y1="134" x2="160" y2="90"/>
+          <circle cx="68" cy="54" r="12"/><circle cx="252" cy="54" r="12"/><circle cx="88" cy="134" r="12"/><circle cx="232" cy="134" r="12"/><circle cx="160" cy="90" r="18"/>
+        </g>
+        <g fill="${c}" fill-opacity="0.7"><circle cx="68" cy="54" r="3"/><circle cx="252" cy="54" r="3"/><circle cx="88" cy="134" r="3"/><circle cx="232" cy="134" r="3"/></g>
+      </svg>`;
+  }
+}
+
+function getFilteredVideos() {
+  const currentDomain = document.querySelector(".video-filter-btn.active")?.dataset.domain || "all";
+  const watchedSet = new Set(state.analytics.watchedVideos || []);
+  const q = currentVideoSearch.trim().toLowerCase();
+
+  return ccnaVideos.filter((v) => {
+    if (currentDomain !== "all" && v.domain !== currentDomain) return false;
+    const isWatched = watchedSet.has(v.id);
+    if (currentVideoStatus === "watched" && !isWatched) return false;
+    if (currentVideoStatus === "unwatched" && isWatched) return false;
+    if (!q) return true;
+    return (
+      v.title.toLowerCase().includes(q) ||
+      v.topic.toLowerCase().includes(q) ||
+      v.domain.toLowerCase().includes(q) ||
+      v.description.toLowerCase().includes(q)
+    );
+  });
+}
+
 function initVideos() {
   const filtersContainer = byId("videoFiltersContainer");
   if (filtersContainer) {
-    filtersContainer.querySelectorAll(".video-filter-btn").forEach(btn => {
+    filtersContainer.querySelectorAll(".video-filter-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        filtersContainer.querySelectorAll(".video-filter-btn").forEach(b => b.classList.remove("active"));
+        filtersContainer.querySelectorAll(".video-filter-btn").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         playNetSound("click");
         renderVideos();
       });
     });
   }
+
+  const searchInput = byId("videoSearchInput");
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      currentVideoSearch = searchInput.value || "";
+      renderVideos();
+    });
+  }
+
+  document.querySelectorAll("[data-video-status]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-video-status]").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentVideoStatus = btn.dataset.videoStatus || "all";
+      playNetSound("click");
+      renderVideos();
+    });
+  });
 
   const btnCloseVideo = byId("btnCloseVideoModal");
   if (btnCloseVideo) {
@@ -1731,63 +1856,177 @@ function initVideos() {
       if (e.target === videoModal) closeVideoPlayer();
     });
   }
+
+  const btnPrevModal = byId("btnPrevVideoModal");
+  const btnNextModal = byId("btnNextVideoModal");
+  const btnToggleWatched = byId("btnToggleWatchedModal");
+
+  if (btnPrevModal) {
+    btnPrevModal.addEventListener("click", () => stepModalVideo(-1));
+  }
+  if (btnNextModal) {
+    btnNextModal.addEventListener("click", () => stepModalVideo(1));
+  }
+  if (btnToggleWatched) {
+    btnToggleWatched.addEventListener("click", () => {
+      if (!activeModalVideoId) return;
+      const watched = (state.analytics.watchedVideos || []).includes(activeModalVideoId);
+      toggleVideoWatchedState(activeModalVideoId, !watched);
+      syncModalControls();
+    });
+  }
+
+  document.addEventListener("keydown", (e) => {
+    const modal = byId("videoModal");
+    if (!modal || modal.classList.contains("hidden")) return;
+    if (e.key === "Escape") {
+      closeVideoPlayer();
+    }
+  });
+}
+
+function stepModalVideo(delta) {
+  if (!activeModalVideoId) return;
+  const list = getFilteredVideos();
+  const pool = list.length > 0 ? list : ccnaVideos;
+  let idx = pool.findIndex((v) => v.id === activeModalVideoId);
+  if (idx === -1) idx = ccnaVideos.findIndex((v) => v.id === activeModalVideoId);
+  const next = pool[idx + delta];
+  if (!next) return;
+  playVideo(next.youtubeId, next.title, next.id);
+}
+
+function syncModalControls() {
+  const modal = byId("videoModal");
+  if (!modal || modal.classList.contains("hidden") || !activeModalVideoId) return;
+  const current = ccnaVideos.find((v) => v.id === activeModalVideoId);
+  const list = getFilteredVideos();
+  const pool = list.length > 0 ? list : ccnaVideos;
+  const idx = pool.findIndex((v) => v.id === activeModalVideoId);
+
+  const metaEl = byId("videoModalMeta");
+  if (metaEl && current) {
+    const offlineSuffix = navigator.onLine === false ? " · Offline (connect to stream embed)" : "";
+    metaEl.textContent = `${current.domain} · ${current.topic} · ${current.duration}${offlineSuffix}`;
+  }
+
+  const btnPrev = byId("btnPrevVideoModal");
+  const btnNext = byId("btnNextVideoModal");
+  if (btnPrev) btnPrev.disabled = idx <= 0;
+  if (btnNext) btnNext.disabled = idx === -1 || idx >= pool.length - 1;
+
+  const btnWatched = byId("btnToggleWatchedModal");
+  if (btnWatched) {
+    const isWatched = (state.analytics.watchedVideos || []).includes(activeModalVideoId);
+    btnWatched.textContent = isWatched ? "Watched" : "Mark Watched";
+    btnWatched.className = isWatched ? "primary" : "secondary";
+  }
 }
 
 function renderVideos() {
   const container = byId("videoLessonsGrid");
   if (!container) return;
 
-  const currentDomain = document.querySelector(".video-filter-btn.active")?.dataset.domain || "all";
-  
   if (!state.analytics.watchedVideos) {
     state.analytics.watchedVideos = [];
   }
 
-  const filtered = ccnaVideos.filter(v => currentDomain === "all" || v.domain === currentDomain);
+  const currentDomain = document.querySelector(".video-filter-btn.active")?.dataset.domain || "all";
+  const filtered = getFilteredVideos();
+  const watchedSet = new Set(state.analytics.watchedVideos);
 
-  container.innerHTML = filtered.map(v => {
-    const isWatched = state.analytics.watchedVideos.includes(v.id);
+  const headingEl = byId("videoCatalogHeading");
+  const subEl = byId("videoCatalogSub");
+  const badgeEl = byId("videoFilteredBadge");
+  const activeDomainStat = byId("videoActiveDomainStat");
+
+  if (headingEl) {
+    headingEl.textContent = currentDomain === "all" ? "All Video Lessons" : currentDomain;
+  }
+  if (subEl) {
+    subEl.textContent = `Showing ${filtered.length} of ${ccnaVideos.length} curated CCNA lessons`;
+  }
+  if (badgeEl) {
+    badgeEl.textContent = String(filtered.length);
+  }
+  if (activeDomainStat) {
+    const t = VIDEO_DOMAIN_THEMES[currentDomain];
+    activeDomainStat.textContent = currentDomain === "all" ? "All 6 Domains" : (t ? t.short : currentDomain);
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="card videos-empty-state">No lessons match your current domain, status, or search filter.</div>`;
+    updateVideoProgress();
+    return;
+  }
+
+  container.innerHTML = filtered.map((v) => {
+    const isWatched = watchedSet.has(v.id);
     const safeYid = /^[a-zA-Z0-9_-]{11}$/.test(v.youtubeId) ? v.youtubeId : "";
     const safeTitle = safeHTML(v.title);
     const safeTopic = safeHTML(v.topic);
+    const safeDomain = safeHTML(v.domain);
     const safeDesc = safeHTML(v.description);
     const safeDur = safeHTML(v.duration);
+    const theme = VIDEO_DOMAIN_THEMES[v.domain] || VIDEO_DOMAIN_THEMES["Network Fundamentals"];
+    const stamp = safeHTML(getEpisodeStamp(v.title));
+
     return `
-      <article class="card video-card" style="display: flex; flex-direction: column; justify-content: space-between; padding: 16px; border: 1.5px solid ${isWatched ? "rgba(16, 185, 129, 0.3)" : "var(--border-color)"}; background: var(--bg-card, rgba(13, 19, 36, 0.4)); position: relative; transition: border-color 0.2s;">
-        <div>
-          <div class="video-thumbnail-container" data-video-id="${v.id}" style="position: relative; width: 100%; padding-bottom: 56.25%; background: rgba(0,0,0,0.6); border-radius: 8px; margin-bottom: 12px; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; display: flex; align-items: center; justify-content: center;">
-            <img src="https://img.youtube.com/vi/${safeYid}/mqdefault.jpg" alt="${safeTitle}" loading="lazy" decoding="async" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.75; transition: transform 0.3s;" />
-            <div class="play-icon-overlay" style="position: absolute; font-size: 32px; color: var(--accent-color); opacity: 0.85; filter: drop-shadow(0 0 10px rgba(0,242,254,0.5)); transition: transform 0.2s;">▶</div>
-            <span style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.85); color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono);">${safeDur}</span>
+      <article class="card video-card${isWatched ? " is-watched" : ""}" data-domain-accent="${theme.slug}">
+        <div class="video-card-top">
+          <div class="video-thumbnail-container" data-video-id="${v.id}" role="button" tabindex="0" aria-label="Play ${safeTitle}">
+            ${getDomainPosterSvg(v.domain, v.id)}
+            <div class="video-poster-overlay">
+              <span class="video-episode-pill">${stamp}</span>
+              ${isWatched ? `<span class="video-watched-pill">Watched</span>` : ""}
+            </div>
+            <div class="play-icon-overlay" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M8 5.5v13l10-6.5-10-6.5z"/></svg>
+            </div>
+            <span class="video-duration-pill">${safeDur}</span>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-            <span style="font-size: 11px; color: var(--accent-color); font-weight: bold; background: rgba(0, 242, 254, 0.08); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(0,242,254,0.15);">${safeTopic}</span>
-            <label style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-muted); cursor: pointer;">
-              <input type="checkbox" class="video-watch-checkbox" data-video-id="${v.id}" ${isWatched ? "checked" : ""} style="cursor: pointer;" />
-              Watched
+          <div class="video-card-meta-row">
+            <span class="video-domain-tag">${safeTopic}</span>
+            <label class="video-watch-toggle">
+              <input type="checkbox" class="video-watch-checkbox" data-video-id="${v.id}" ${isWatched ? "checked" : ""} />
+              <span>Watched</span>
             </label>
           </div>
-          <h4 style="margin: 6px 0 8px 0; font-size: 14px; line-height: 1.4; color: var(--text);">${safeTitle}</h4>
-          <p style="margin: 0 0 12px 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">${safeDesc}</p>
+          <div class="video-card-domain-label">${safeDomain}</div>
+          <h4 class="video-card-title">${safeTitle}</h4>
+          <p class="video-card-desc">${safeDesc}</p>
         </div>
-        <button class="primary btn-watch-video" data-youtube-id="${safeYid}" data-video-title="${safeTitle}" data-video-id="${v.id}" style="width: 100%; font-size: 12px; padding: 8px;">Watch Lesson</button>
+        <button type="button" class="primary btn-watch-video" data-youtube-id="${safeYid}" data-video-title="${safeTitle}" data-video-id="${v.id}">
+          ${isWatched ? "Rewatch Lesson" : "Watch Lesson"}
+        </button>
       </article>
     `;
   }).join("");
 
   updateVideoProgress();
 
-  container.querySelectorAll(".btn-watch-video, .video-thumbnail-container").forEach(el => {
-    el.addEventListener("click", () => {
-      const yid = el.dataset.youtubeId || el.closest(".video-card").querySelector(".btn-watch-video").dataset.youtubeId;
-      const title = el.dataset.videoTitle || el.closest(".video-card").querySelector(".btn-watch-video").dataset.videoTitle;
-      const vidId = el.dataset.videoId || el.closest(".video-card").querySelector(".btn-watch-video").dataset.videoId;
+  container.querySelectorAll(".btn-watch-video, .video-thumbnail-container").forEach((el) => {
+    const launch = () => {
+      const card = el.closest(".video-card");
+      const watchBtn = card ? card.querySelector(".btn-watch-video") : null;
+      const yid = el.dataset.youtubeId || watchBtn?.dataset.youtubeId;
+      const title = el.dataset.videoTitle || watchBtn?.dataset.videoTitle;
+      const vidId = el.dataset.videoId || watchBtn?.dataset.videoId;
       playVideo(yid, title, Number(vidId));
-    });
+    };
+    el.addEventListener("click", launch);
+    if (el.classList.contains("video-thumbnail-container")) {
+      el.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          launch();
+        }
+      });
+    }
   });
 
-  container.querySelectorAll(".video-watch-checkbox").forEach(chk => {
+  container.querySelectorAll(".video-watch-checkbox").forEach((chk) => {
     chk.addEventListener("change", () => {
       const vidId = Number(chk.dataset.videoId);
       toggleVideoWatchedState(vidId, chk.checked);
@@ -1799,14 +2038,14 @@ function toggleVideoWatchedState(vidId, isWatched) {
   if (!state.analytics.watchedVideos) {
     state.analytics.watchedVideos = [];
   }
-  
+
   if (isWatched) {
     if (!state.analytics.watchedVideos.includes(vidId)) {
       state.analytics.watchedVideos.push(vidId);
       playNetSound("success");
     }
   } else {
-    state.analytics.watchedVideos = state.analytics.watchedVideos.filter(id => id !== vidId);
+    state.analytics.watchedVideos = state.analytics.watchedVideos.filter((id) => id !== vidId);
     playNetSound("click");
   }
 
@@ -1822,12 +2061,44 @@ function updateVideoProgress() {
   if (!progressPercentBar) return;
 
   const total = ccnaVideos.length;
-  const watched = state.analytics.watchedVideos ? state.analytics.watchedVideos.length : 0;
+  const watchedList = state.analytics.watchedVideos || [];
+  const watchedSet = new Set(watchedList);
+  const watched = watchedList.length;
   const pct = total > 0 ? Math.round((watched / total) * 100) : 0;
 
   progressPercentBar.style.width = `${pct}%`;
   if (progressLabel) progressLabel.textContent = `${watched}/${total} Watched`;
   if (progressPercentage) progressPercentage.textContent = `${pct}%`;
+
+  const domains = Object.keys(VIDEO_DOMAIN_THEMES);
+  const allCountEl = document.querySelector('[data-domain-count="all"]');
+  if (allCountEl) allCountEl.textContent = `${watched}/${total}`;
+
+  const breakdownEl = byId("videoDomainBreakdown");
+  const breakdownRows = [];
+  for (const dom of domains) {
+    const domVideos = ccnaVideos.filter((v) => v.domain === dom);
+    const domWatched = domVideos.filter((v) => watchedSet.has(v.id)).length;
+    const domTotal = domVideos.length;
+    const domPct = domTotal > 0 ? Math.round((domWatched / domTotal) * 100) : 0;
+    const badge = document.querySelector(`[data-domain-count="${CSS.escape(dom)}"]`);
+    if (badge) badge.textContent = `${domWatched}/${domTotal}`;
+    const theme = VIDEO_DOMAIN_THEMES[dom];
+    breakdownRows.push(`
+      <div class="video-breakdown-row">
+        <div class="video-breakdown-meta">
+          <span>${safeHTML(theme.short)}</span>
+          <strong>${domWatched}/${domTotal}</strong>
+        </div>
+        <div class="video-breakdown-track">
+          <div class="video-breakdown-fill" style="width:${domPct}%;background:${theme.accent};"></div>
+        </div>
+      </div>
+    `);
+  }
+  if (breakdownEl) {
+    breakdownEl.innerHTML = breakdownRows.join("");
+  }
 }
 
 function playVideo(youtubeId, title, vidId) {
@@ -1837,6 +2108,7 @@ function playVideo(youtubeId, title, vidId) {
 
   if (!modal || !iframe || !/^[a-zA-Z0-9_-]{11}$/.test(youtubeId)) return;
 
+  activeModalVideoId = vidId || null;
   modalTitle.textContent = title;
   iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
   modal.classList.remove("hidden");
@@ -1850,6 +2122,7 @@ function playVideo(youtubeId, title, vidId) {
       saveAnalytics();
     }
   }
+  syncModalControls();
 }
 
 function closeVideoPlayer() {
@@ -1858,6 +2131,7 @@ function closeVideoPlayer() {
   if (!modal || !iframe) return;
 
   iframe.src = "";
+  activeModalVideoId = null;
   modal.classList.add("hidden");
   playNetSound("click");
 }

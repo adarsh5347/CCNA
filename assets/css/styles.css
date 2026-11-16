@@ -13,4 +13,5 @@
 @import "./responsive/mobile-architecture.css";
 @import "./components/quiz-features-and-review.css";
 @import "./themes/light-theme.css";
+@import "./pages/guide-and-videos.css";
 @import "./responsive/mobile-and-desktop-polish.css";

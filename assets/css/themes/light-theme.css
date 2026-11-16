@@ -524,74 +524,8 @@ html[data-theme="light"] body:not(.high-contrast) #flashcardAnswer {
   color: #047857 !important;
 }
 
-html[data-theme="light"] body:not(.high-contrast) #guide aside h3,
 html[data-theme="light"] body:not(.high-contrast) #labs aside h4 {
   color: #0369a1 !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .guide-ch-item {
-  background: #f8fafc !important;
-  border-color: rgba(15, 23, 42, 0.12) !important;
-  color: #0f172a !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .guide-ch-item.active {
-  background: #e0f2fe !important;
-  border-color: #0284c7 !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .guide-ch-item .guide-ch-vol {
-  color: #0369a1 !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .guide-ch-item .guide-ch-title {
-  color: #0f172a !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .guide-kp-item {
-  background: #f8fafc !important;
-  border-color: rgba(15, 23, 42, 0.12) !important;
-  border-left: 3px solid #0284c7 !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .guide-kp-num {
-  color: #0369a1 !important;
-  background: #e0f2fe !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .guide-cmd-table-wrap {
-  background: #ffffff !important;
-  border-color: rgba(16, 185, 129, 0.35) !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .guide-cmd-table-wrap th {
-  color: #047857 !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .guide-cmd-syntax {
-  color: #047857 !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .guide-term-card {
-  background: #f8fafc !important;
-  border-color: rgba(15, 23, 42, 0.12) !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .guide-term-title {
-  color: #0369a1 !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .guide-tip-card {
-  background: #fffbeb !important;
-  border-color: #f59e0b !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .guide-tip-text {
-  color: #78350f !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) #guideReaderPanel h4 {
-  color: #0f172a !important;
 }
 
 html[data-theme="light"] body:not(.high-contrast) #subnetXPDisplay,

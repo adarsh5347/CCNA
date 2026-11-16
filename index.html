@@ -1393,40 +1393,101 @@
 
     <!-- VIDEO LESSONS PAGE -->
     <section id="videos" class="page">
-      <article class="hero" style="position: relative; overflow: hidden;">
-        <div class="cyber-grid" aria-hidden="true"></div>
-        <h2 class="reveal-text glow-accent" style="position: relative; z-index: 1;">Jeremy's IT Lab Video Library</h2>
-        <p style="position: relative; z-index: 1; color: var(--text-muted); margin-bottom: 0;">Watch curated video lessons mapped to official CCNA blueprint domains and topics.</p>
+      <article class="hero videos-hero">
+        <div class="videos-hero-copy">
+          <span class="videos-eyebrow">Precision Engineering · Curated Video Library</span>
+          <h2 class="videos-hero-title">See networking in action.</h2>
+          <p class="videos-hero-desc">Curated video lessons to strengthen your CCNA concepts, configuration skills and troubleshooting knowledge.</p>
+        </div>
+        <div class="videos-hero-metrics" aria-label="Video completion summary">
+          <div class="videos-metric-item">
+            <span class="videos-metric-label">Library Progress</span>
+            <strong class="videos-metric-value" id="videoProgressLabel">0/126 Watched</strong>
+          </div>
+          <div class="videos-metric-divider" aria-hidden="true"></div>
+          <div class="videos-metric-item">
+            <span class="videos-metric-label">Completion</span>
+            <strong class="videos-metric-value" id="videoProgressPercentage">0%</strong>
+          </div>
+          <div class="videos-metric-divider" aria-hidden="true"></div>
+          <div class="videos-metric-item">
+            <span class="videos-metric-label">Active Domain</span>
+            <strong class="videos-metric-value" id="videoActiveDomainStat">All 6 Domains</strong>
+          </div>
+          <div class="videos-hero-track" aria-hidden="true">
+            <div id="videoProgressPercentageBar" class="videos-hero-track-fill" style="width: 0%;"></div>
+          </div>
+        </div>
       </article>
 
-      <div class="lab-shell" style="display: grid; grid-template-columns: 280px 1fr; gap: 20px; min-height: 60vh;">
-        <!-- Left Panel: Video Filter Categories -->
-        <aside class="card" style="padding: 16px; display: flex; flex-direction: column; gap: 16px; height: fit-content; position: sticky; top: 90px; z-index: 10;">
-          <h3 style="margin-top: 0; margin-bottom: 12px; font-size: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Blueprint Filter</h3>
-          <div id="videoFiltersContainer" style="display: flex; flex-direction: column; gap: 8px;">
-            <button class="ghost video-filter-btn active" data-domain="all" style="width: 100%; text-align: left; font-size: 13.5px; padding: 8px 12px; justify-content: flex-start; display: flex;">All Lessons</button>
-            <button class="ghost video-filter-btn" data-domain="Network Fundamentals" style="width: 100%; text-align: left; font-size: 13.5px; padding: 8px 12px; justify-content: flex-start; display: flex;">Network Fundamentals</button>
-            <button class="ghost video-filter-btn" data-domain="Network Access" style="width: 100%; text-align: left; font-size: 13.5px; padding: 8px 12px; justify-content: flex-start; display: flex;">Network Access</button>
-            <button class="ghost video-filter-btn" data-domain="IP Connectivity" style="width: 100%; text-align: left; font-size: 13.5px; padding: 8px 12px; justify-content: flex-start; display: flex;">IP Connectivity</button>
-            <button class="ghost video-filter-btn" data-domain="IP Services" style="width: 100%; text-align: left; font-size: 13.5px; padding: 8px 12px; justify-content: flex-start; display: flex;">IP Services</button>
-            <button class="ghost video-filter-btn" data-domain="Security Fundamentals" style="width: 100%; text-align: left; font-size: 13.5px; padding: 8px 12px; justify-content: flex-start; display: flex;">Security Fundamentals</button>
-            <button class="ghost video-filter-btn" data-domain="Automation and Programmability" style="width: 100%; text-align: left; font-size: 13.5px; padding: 8px 12px; justify-content: flex-start; display: flex;">Automation & Programmability</button>
+      <div class="lab-shell videos-workspace">
+        <!-- Left Panel: Blueprint Domain Filter & Domain Breakdown -->
+        <aside class="card videos-sidebar">
+          <div class="videos-sidebar-section">
+            <label for="videoSearchInput" class="videos-sidebar-heading">Find a lesson</label>
+            <div class="videos-search-wrap">
+              <svg class="videos-search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5" stroke-linecap="round"/></svg>
+              <input id="videoSearchInput" type="search" placeholder="Search 126 lessons or topics..." aria-label="Search video lessons" />
+            </div>
           </div>
-          <div style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 8px;">
-            <h4 style="margin: 0 0 8px 0; font-size: 13px; color: var(--text-muted);">Watch Progress</h4>
-            <div style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 6px;">
-              <div id="videoProgressPercentageBar" style="width: 0%; height: 100%; background: var(--accent-color); transition: width 0.3s;"></div>
+
+          <div class="videos-sidebar-section">
+            <div class="videos-sidebar-heading-row">
+              <h3 class="videos-sidebar-heading">Blueprint Domains</h3>
+              <span class="videos-sidebar-sub" id="videoFilteredBadge">126</span>
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
-              <span id="videoProgressLabel">0/126 Watched</span>
-              <span id="videoProgressPercentage">0%</span>
+            <div id="videoFiltersContainer" class="videos-filter-list">
+              <button type="button" class="ghost video-filter-btn active" data-domain="all">
+                <span class="video-filter-name">All Lessons</span>
+                <span class="video-filter-count" data-domain-count="all">0/126</span>
+              </button>
+              <button type="button" class="ghost video-filter-btn" data-domain="Network Fundamentals">
+                <span class="video-filter-name">Network Fundamentals</span>
+                <span class="video-filter-count" data-domain-count="Network Fundamentals">0/40</span>
+              </button>
+              <button type="button" class="ghost video-filter-btn" data-domain="Network Access">
+                <span class="video-filter-name">Network Access</span>
+                <span class="video-filter-count" data-domain-count="Network Access">0/26</span>
+              </button>
+              <button type="button" class="ghost video-filter-btn" data-domain="IP Connectivity">
+                <span class="video-filter-name">IP Connectivity</span>
+                <span class="video-filter-count" data-domain-count="IP Connectivity">0/14</span>
+              </button>
+              <button type="button" class="ghost video-filter-btn" data-domain="IP Services">
+                <span class="video-filter-name">IP Services</span>
+                <span class="video-filter-count" data-domain-count="IP Services">0/22</span>
+              </button>
+              <button type="button" class="ghost video-filter-btn" data-domain="Security Fundamentals">
+                <span class="video-filter-name">Security Fundamentals</span>
+                <span class="video-filter-count" data-domain-count="Security Fundamentals">0/16</span>
+              </button>
+              <button type="button" class="ghost video-filter-btn" data-domain="Automation and Programmability">
+                <span class="video-filter-name">Automation &amp; Programmability</span>
+                <span class="video-filter-count" data-domain-count="Automation and Programmability">0/8</span>
+              </button>
             </div>
+          </div>
+
+          <div class="videos-sidebar-section videos-breakdown-card">
+            <h4 class="videos-sidebar-heading">Domain Progress</h4>
+            <div id="videoDomainBreakdown" class="videos-domain-breakdown"></div>
           </div>
         </aside>
 
         <!-- Right Panel: Video Grid -->
-        <div>
-          <div id="videoLessonsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px;">
+        <div class="videos-catalog-col">
+          <div class="videos-catalog-toolbar">
+            <div class="videos-catalog-summary">
+              <h3 id="videoCatalogHeading" class="videos-catalog-heading">All Video Lessons</h3>
+              <span id="videoCatalogSub" class="videos-catalog-sub">126 lessons across 6 Cisco 200-301 domains</span>
+            </div>
+            <div class="videos-status-pills" role="group" aria-label="Filter by watch status">
+              <button type="button" class="video-status-btn active" data-video-status="all">All</button>
+              <button type="button" class="video-status-btn" data-video-status="unwatched">Up Next</button>
+              <button type="button" class="video-status-btn" data-video-status="watched">Watched</button>
+            </div>
+          </div>
+          <div id="videoLessonsGrid" class="videos-grid">
             <!-- Rendered dynamically -->
           </div>
         </div>
@@ -1435,13 +1496,24 @@
 
     <!-- OFFICIAL CERT GUIDE STUDY HUB & CLI REFERENCE PAGE -->
     <section id="guide" class="page">
-      <article class="hero" style="position: relative; overflow: hidden;">
-        <div class="cyber-grid" aria-hidden="true"></div>
-        <h2 class="reveal-text glow-accent" style="position: relative; z-index: 1;">Official Cert Guide Companion (Vol 1 &amp; Vol 2)</h2>
-        <p style="position: relative; z-index: 1; color: var(--text-muted); margin-bottom: 14px;">Complete 48-chapter study hub, IOS command encyclopedia, A–Z glossary, exam tips, and per-chapter practice drills covering every page of Volume 1 and Volume 2.</p>
-        <div class="grid stats" style="position: relative; z-index: 1; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px;">
+      <article class="hero guide-hero">
+        <div class="guide-hero-top">
+          <div class="guide-hero-copy">
+            <span class="guide-eyebrow">Official Cert Guide · Volume 1 &amp; Volume 2</span>
+            <h2 class="guide-hero-title">Your CCNA field guide.</h2>
+            <p class="guide-hero-desc">Build the knowledge behind every packet, protocol and configuration across all 48 chapters.</p>
+          </div>
+          <div class="guide-hero-progress-pill" aria-label="Study Guide completion summary">
+            <span class="guide-hero-progress-label">Overall Guide Mastery</span>
+            <div class="guide-hero-progress-track">
+              <div id="guideMasteryBarFill" class="guide-hero-progress-fill" style="width: 0%;"></div>
+            </div>
+            <span class="guide-hero-progress-meta" id="guideHeroProgressMeta">0% chapters practiced</span>
+          </div>
+        </div>
+        <div class="grid stats guide-stats-grouped">
           <div class="stat">
-            <div class="k">Total Book Coverage</div>
+            <div class="k">Total Coverage</div>
             <div class="v" id="guideStatChapters">48 (Vol 1 &amp; 2)</div>
           </div>
           <div class="stat">
@@ -1449,32 +1521,35 @@
             <div class="v" id="guideStatPracticed">0 / 48</div>
           </div>
           <div class="stat">
-            <div class="k">CLI Encyclopedia</div>
-            <div class="v" id="guideStatCommands">300+ IOS Commands</div>
+            <div class="k">IOS Command Ref</div>
+            <div class="v" id="guideStatCommands">324+ IOS Commands</div>
           </div>
           <div class="stat">
             <div class="k">Official Glossary</div>
-            <div class="v" id="guideStatTerms">450+ Key Terms</div>
+            <div class="v" id="guideStatTerms">436+ Key Terms</div>
           </div>
         </div>
       </article>
 
       <!-- Search, Filters & Mode Tabs Bar -->
-      <section class="card" style="padding: 16px; margin-bottom: 18px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 0;">
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button data-guide-tab="chapters" class="primary" style="padding: 8px 14px; font-size: 12.5px;">📖 48-Chapter Study Guide</button>
-            <button data-guide-tab="commands" class="secondary" style="padding: 8px 14px; font-size: 12.5px;">💻 Global IOS Command Explorer</button>
-            <button data-guide-tab="glossary" class="secondary" style="padding: 8px 14px; font-size: 12.5px;">🔤 Complete A–Z Glossary</button>
+      <section class="card guide-toolbar-card">
+        <div class="guide-toolbar-inner">
+          <div class="guide-tabs-group" role="tablist" aria-label="Study Guide sections">
+            <button type="button" id="guideTabChapters" data-guide-tab="chapters" class="primary" role="tab" aria-selected="true">48-Chapter Guide</button>
+            <button type="button" id="guideTabCommands" data-guide-tab="commands" class="secondary" role="tab" aria-selected="false">IOS Command Reference</button>
+            <button type="button" id="guideTabGlossary" data-guide-tab="glossary" class="secondary" role="tab" aria-selected="false">Glossary &amp; Flashcards</button>
           </div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap; flex: 1; justify-content: flex-end; min-width: 280px;">
-            <input id="guideSearchInput" type="search" placeholder="🔍 Search 48 chapters, IOS commands, or key terms..." style="flex: 1 1 180px; min-width: 160px; max-width: 250px; margin: 0; padding: 8px 12px; font-size: 12.5px;" />
-            <select id="guideVolumeFilter" aria-label="Filter by Volume" style="width: auto; max-width: 175px; margin: 0; padding: 8px 10px; font-size: 12px;">
+          <div class="guide-filters-group">
+            <div class="guide-search-wrap">
+              <svg class="guide-search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4.5 4.5" stroke-linecap="round"/></svg>
+              <input id="guideSearchInput" type="search" placeholder="Search 48 chapters, IOS commands, or key terms..." aria-label="Search study guide" />
+            </div>
+            <select id="guideVolumeFilter" aria-label="Filter by Volume">
               <option value="all">All Volumes (Vol 1 &amp; 2)</option>
               <option value="1">Volume 1 (Ch 1–29)</option>
               <option value="2">Volume 2 (Ch 1–19)</option>
             </select>
-            <select id="guideDomainFilter" aria-label="Filter by Blueprint Domain" style="width: auto; max-width: 190px; margin: 0; padding: 8px 10px; font-size: 12px;">
+            <select id="guideDomainFilter" aria-label="Filter by Blueprint Domain">
               <option value="all">All 6 Blueprint Domains</option>
               <option value="Network Fundamentals">Network Fundamentals (20%)</option>
               <option value="Network Access">Network Access (20%)</option>
@@ -1488,23 +1563,30 @@
       </section>
 
       <!-- Tab 1: 48-Chapter Sidebar + Reader View -->
-      <div id="guideChaptersShell" class="lab-shell" style="display: grid; grid-template-columns: 310px 1fr; gap: 20px; align-items: flex-start;">
-        <aside class="card" style="padding: 14px; max-height: 82vh; overflow-y: auto; position: sticky; top: 86px;">
-          <h3 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #00f2fe; margin: 0 0 10px 0; padding-bottom: 8px; border-bottom: 1px solid var(--border-color);">Table of Contents</h3>
+      <div id="guideChaptersShell" class="lab-shell guide-workspace">
+        <aside class="card guide-sidebar">
+          <div class="guide-sidebar-header">
+            <h3>Table of Contents</h3>
+            <span id="guideSidebarCount" class="guide-sidebar-count">48 Chapters</span>
+          </div>
           <div class="mobile-guide-toc-controls">
             <select id="guideMobileChapterSelect" aria-label="Jump to Chapter"></select>
-            <button type="button" id="btnToggleMobileToc" class="secondary">📑 Show All 48 Chapters</button>
+            <button type="button" id="btnToggleMobileToc" class="secondary" aria-expanded="false" aria-controls="guideChapterList">Show All 48 Chapters</button>
           </div>
-          <div id="guideChapterList" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          <div id="guideChapterList" class="guide-ch-list"></div>
         </aside>
-        <article id="guideReaderPanel" class="card" style="padding: 24px; margin-bottom: 0;"></article>
+        <article id="guideReaderPanel" class="card guide-reader-panel"></article>
       </div>
 
       <!-- Tab 2: Global IOS Command Explorer -->
-      <section id="guideCommandsView" class="card" style="display: none; padding: 20px;"></section>
+      <section id="guideCommandsView" class="card guide-explorer-card hidden" style="display: none;">
+        <div id="guideCommandsShell" class="hidden"></div>
+      </section>
 
       <!-- Tab 3: Global A-Z Key Terms Glossary -->
-      <section id="guideGlossaryView" class="card" style="display: none; padding: 20px;"></section>
+      <section id="guideGlossaryView" class="card guide-explorer-card hidden" style="display: none;">
+        <div id="guideGlossaryShell" class="hidden"></div>
+      </section>
     </section>
 
     <!-- HELP & SUPPORT PAGE -->
@@ -1702,12 +1784,26 @@
   </main>
 
   <!-- Video Lesson Player Modal -->
-  <div id="videoModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.78); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(12px); padding: 16px;">
-    <div class="card" style="width: 100%; max-width: 900px; padding: 24px; position: relative; border: 1px solid var(--border-color); background: var(--surface-card); box-shadow: var(--shadow-lg); animation: zoomIn 0.22s ease;">
-      <button id="btnCloseVideoModal" class="ghost" aria-label="Close video player" style="position: absolute; top: 16px; right: 16px; font-size: 20px; color: var(--text-muted); border: none; cursor: pointer; padding: 4px; line-height: 1;">✕</button>
-      <h3 id="videoModalTitle" style="margin-top: 0; margin-bottom: 16px; padding-right: 40px; color: var(--text-main);">Video Lesson</h3>
-      <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; background: #000; border: 1px solid var(--border-color);">
-        <iframe id="videoIFrame" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  <div id="videoModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle">
+    <div class="card video-modal-card">
+      <div class="video-modal-header">
+        <div class="video-modal-header-info">
+          <div id="videoModalMeta" class="video-modal-meta">Jeremy's IT Lab</div>
+          <h3 id="videoModalTitle" class="video-modal-title">Video Lesson</h3>
+        </div>
+        <button type="button" id="btnCloseVideoModal" class="ghost video-modal-close" aria-label="Close video player">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="video-player-frame">
+        <iframe id="videoIFrame" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+      <div class="video-modal-footer">
+        <div class="video-modal-nav">
+          <button type="button" id="btnPrevVideoModal" class="secondary">Previous Lesson</button>
+          <button type="button" id="btnNextVideoModal" class="secondary">Next Lesson</button>
+        </div>
+        <button type="button" id="btnToggleWatchedModal" class="secondary">Mark Watched</button>
       </div>
     </div>
   </div>
