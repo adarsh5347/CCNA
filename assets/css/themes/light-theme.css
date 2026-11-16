@@ -508,74 +508,8 @@ html[data-theme="light"] body:not(.high-contrast) #simOsiPanel .osi-layer-desc-b
   color: #cbd5e1 !important;
 }
 
-html[data-theme="light"] body:not(.high-contrast) .flashcard-front,
-html[data-theme="light"] body:not(.high-contrast) .flashcard-back {
-  background: #f8fafc !important;
-  border-color: rgba(15, 23, 42, 0.16) !important;
-  color: #0f172a !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) #flashcardQuestion {
-  color: #0f172a !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) #flashcardTopic,
-html[data-theme="light"] body:not(.high-contrast) #flashcardCount {
-  color: #0369a1 !important;
-  border-color: #7dd3fc !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) #flashcardAnswer {
-  color: #047857 !important;
-}
-
 html[data-theme="light"] body:not(.high-contrast) #labs aside h4 {
   color: #0369a1 !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) #subnetXPDisplay,
-html[data-theme="light"] body:not(.high-contrast) #calcCidrVal,
-html[data-theme="light"] body:not(.high-contrast) #calcNetwork,
-html[data-theme="light"] body:not(.high-contrast) #vlsmCalcCard h4 {
-  color: #0369a1 !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) #subnetStreakDisplay,
-html[data-theme="light"] body:not(.high-contrast) #calcWildcard {
-  color: #b45309 !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) #calcHosts {
-  color: #047857 !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) #subnetRangeDiagram {
-  background: #f8fafc !important;
-  color: #334155 !important;
-  border-color: rgba(15, 23, 42, 0.15) !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) #subnetRangeDiagram th {
-  color: #0369a1 !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) #subnetRangeDiagram td {
-  color: #0f172a !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .cheat-sheet-table {
-  background: #ffffff !important;
-  color: #0f172a !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .cheat-sheet-table th {
-  background: #f1f5f9 !important;
-  color: #0369a1 !important;
-}
-
-html[data-theme="light"] body:not(.high-contrast) .cheat-sheet-row td {
-  color: #0f172a !important;
-  border-bottom-color: rgba(15, 23, 42, 0.08) !important;
 }
 
 html[data-theme="light"] body:not(.high-contrast) .analytics-narrative {
@@ -892,8 +826,4 @@ html[data-theme="light"] body:not(.high-contrast) .domain-focus-pill {
   color: #b45309 !important;
   background: rgba(245, 158, 11, 0.14) !important;
   border-color: rgba(245, 158, 11, 0.32) !important;
-}
-
-#subnetOut:empty {
-  display: none;
 }

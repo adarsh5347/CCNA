@@ -1,0 +1,1769 @@
+/* ==========================================================================
+   NetOps Command — Phase 9: Subnetting Academy, VLSM & Rapid Recall
+   Precision Engineering Identity — Dark, Light & High Contrast Ready
+   ========================================================================== */
+
+/* ─── 1. Home Quick-Recall Flashcard Polish (#flashcardBox) ────────────── */
+#flashcardBox.flashcard-box-home {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 250px;
+  margin-bottom: 0;
+}
+
+.flashcard-home-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.flashcard-home-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.flashcard-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #38bdf8;
+}
+
+.flashcard-home-title-group h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-label);
+}
+
+.flashcard-home-sub {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.flashcard-count-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  color: #38bdf8;
+  white-space: nowrap;
+}
+
+.flashcard-topic-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #38bdf8;
+  margin-bottom: 8px;
+}
+
+.flashcard-question-text {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #f8fafc;
+  line-height: 1.45;
+}
+
+.flashcard-hint-tag {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 10px;
+}
+
+.flashcard-answer-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #10b981;
+  margin-bottom: 6px;
+}
+
+.flashcard-answer-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: #10b981;
+  line-height: 1.4;
+}
+
+.flashcard-note-text {
+  font-size: 11.5px;
+  color: #cbd5e1;
+  line-height: 1.4;
+  margin-top: 6px;
+  text-align: center;
+}
+
+.flashcard-nav-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.flashcard-nav-controls button {
+  min-height: 44px;
+  font-size: 13px;
+  padding: 10px 14px;
+  flex: 1;
+}
+
+#btnFlipFlashcard {
+  flex: 1.35;
+}
+
+/* ─── 2. Academy Hero & Telemetry (#subnet) ──────────────────────────────── */
+#subnet {
+  display: none;
+  flex-direction: column;
+  gap: 20px;
+}
+
+#subnet.active {
+  display: flex;
+}
+
+.subnet-hero-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 26px 28px;
+  background:
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.11), transparent 55%),
+    var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+.subnet-hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.subnet-hero-copy {
+  max-width: 650px;
+}
+
+.subnet-eyebrow,
+.subnet-section-kicker {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #38bdf8;
+  margin-bottom: 6px;
+}
+
+.subnet-hero-title {
+  margin: 0 0 10px 0;
+  font-size: clamp(1.75rem, 3.2vw, 2.55rem);
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.028em;
+  color: var(--color-label);
+}
+
+.subnet-hero-accent {
+  color: #38bdf8;
+}
+
+.subnet-hero-sub {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.subnet-section-nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.subnet-jump-pill {
+  min-height: 44px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.subnet-jump-pill:hover {
+  color: var(--color-label);
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.subnet-jump-pill.is-active {
+  background: rgba(14, 165, 233, 0.16);
+  border-color: rgba(56, 189, 248, 0.55);
+  color: #7dd3fc;
+}
+
+.subnet-telemetry-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+}
+
+.subnet-metric-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.subnet-metric-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.subnet-metric-val {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-label);
+}
+
+.subnet-metric-cell-xp .subnet-metric-val {
+  color: #38bdf8;
+}
+
+/* ─── 3. Trainer & Sidebar Workspace ─────────────────────────────────────── */
+.subnet-workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.9fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.subnet-trainer-card,
+.subnet-anatomy-card,
+.subnet-leaderboard-card,
+.subnet-vlsm-card,
+.subnet-recall-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.subnet-trainer-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.subnet-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.subnet-panel-head h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-label);
+}
+
+.subnet-badge-amber {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(245, 158, 11, 0.34);
+  color: #fbbf24;
+  white-space: nowrap;
+}
+
+#subnet .subnet-mode-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+#subnet .subnet-mode-tabs button {
+  min-height: 44px;
+  padding: 9px 10px;
+  font-size: 12.5px;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+/* Timed Arcade HUD */
+.subnet-arcade-hud {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.subnet-arcade-hud[hidden],
+.subnet-timed-summary[hidden],
+.subnet-hint-drawer[hidden],
+.vlsm-validation-banner[hidden],
+.vlsm-special-callout[hidden] {
+  display: none !important;
+}
+
+.subnet-arcade-hud.is-urgent {
+  border-color: rgba(249, 115, 22, 0.6);
+  background: rgba(124, 45, 18, 0.25);
+}
+
+.subnet-arcade-hud-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.subnet-arcade-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.subnet-arcade-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+}
+
+.subnet-arcade-timer {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.subnet-arcade-hud.is-urgent .subnet-arcade-timer {
+  color: #fb923c;
+}
+
+.subnet-arcade-score {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.subnet-arcade-mult {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.subnet-arcade-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.2);
+  overflow: hidden;
+}
+
+.subnet-arcade-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+  transition: width 0.35s ease;
+}
+
+.subnet-arcade-hud.is-urgent .subnet-arcade-bar-fill {
+  background: linear-gradient(90deg, #ea580c, #f97316);
+}
+
+.subnet-timed-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.34);
+}
+
+.subnet-timed-summary-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.subnet-timed-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.subnet-timed-summary-copy p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+/* Obsidian Console Prompt & Feedback */
+#subnet .noc-dark-surface.subnet-prompt-console,
+#subnet .noc-dark-surface.subnet-feedback-panel {
+  background: #0a101d !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(56, 189, 248, 0.24) !important;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.subnet-prompt-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.subnet-prompt-badge,
+.subnet-prompt-type,
+.subnet-prompt-cidr {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.subnet-prompt-badge {
+  background: rgba(56, 189, 248, 0.16);
+  color: #7dd3fc;
+}
+
+.subnet-prompt-type {
+  background: rgba(148, 163, 184, 0.14);
+  color: #cbd5e1;
+}
+
+.subnet-prompt-cidr {
+  background: rgba(16, 185, 129, 0.14);
+  color: #6ee7b7;
+}
+
+.subnet-prompt-text {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  color: #f8fafc;
+}
+
+.subnet-answer-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subnet-field-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.subnet-answer-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#subnetAnswer {
+  width: 100%;
+  min-height: 46px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  padding: 10px 14px;
+}
+
+.subnet-action-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.subnet-action-row button {
+  min-height: 44px;
+  padding: 10px 16px;
+  font-size: 13px;
+}
+
+.subnet-hint-drawer {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(14, 165, 233, 0.09);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-label);
+}
+
+.subnet-hint-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.subnet-hint-header strong {
+  color: #38bdf8;
+}
+
+.subnet-hint-header span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.subnet-hint-drawer p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+/* Feedback Panel Inside Console */
+.subnet-out-placeholder {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.subnet-fb-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.subnet-fb-head.is-correct strong {
+  color: #34d399;
+  font-size: 15px;
+}
+
+.subnet-fb-head.is-incorrect strong,
+.subnet-fb-head.is-timeout strong {
+  color: #fb923c;
+  font-size: 15px;
+}
+
+.subnet-fb-head span {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.16);
+  color: #e2e8f0;
+}
+
+.subnet-fb-compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.subnet-fb-compare > div {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.subnet-fb-compare small {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.subnet-fb-compare code {
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.subnet-fb-compare code.is-expected {
+  color: #38bdf8;
+}
+
+.subnet-fb-note {
+  margin: 0 0 10px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #cbd5e1;
+}
+
+.subnet-binary-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.subnet-bd-tag {
+  color: #94a3b8;
+}
+
+.subnet-bd-bits {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.bd-net {
+  color: #38bdf8;
+}
+
+.bd-sep {
+  color: #f59e0b;
+  margin: 0 2px;
+}
+
+.bd-host {
+  color: #34d399;
+}
+
+.subnet-bd-mask {
+  color: #cbd5e1;
+  margin-left: auto;
+}
+
+.subnet-fb-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.subnet-inspect-btn {
+  min-height: 44px;
+  font-size: 12.5px;
+  padding: 8px 14px;
+  background: rgba(56, 189, 248, 0.16) !important;
+  border: 1px solid rgba(56, 189, 248, 0.45) !important;
+  color: #e0f2fe !important;
+}
+
+.subnet-inspect-btn:hover {
+  background: rgba(56, 189, 248, 0.28) !important;
+  color: #ffffff !important;
+}
+
+/* Range Diagram & Leaderboard */
+.subnet-range-diagram {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.45);
+  padding: 12px;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.subnet-diagram-placeholder {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.subnet-diagram-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  margin-bottom: 8px;
+}
+
+.subnet-diagram-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+
+.subnet-diagram-table th {
+  text-align: left;
+  padding: 5px 6px;
+  color: var(--text-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.subnet-diagram-table td {
+  padding: 6px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.subnet-diagram-table td:last-child {
+  text-align: right;
+  font-weight: 700;
+}
+
+.subnet-diagram-table .val-net { color: #38bdf8; }
+.subnet-diagram-table .val-host { color: #34d399; }
+.subnet-diagram-table .val-wild { color: #fbbf24; }
+.subnet-diagram-table .val-bcast { color: #f87171; }
+
+.subnet-leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subnet-leaderboard-empty {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.subnet-lb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.subnet-lb-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.subnet-lb-rank {
+  color: #38bdf8;
+  font-weight: 700;
+  min-width: 24px;
+}
+
+.subnet-lb-score {
+  color: var(--color-label);
+}
+
+.subnet-lb-meta {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ─── 4. VLSM & CIDR Address Architect ──────────────────────────────────── */
+.subnet-vlsm-card {
+  gap: 18px;
+}
+
+.subnet-vlsm-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.subnet-vlsm-head h4 {
+  margin: 0 0 4px 0;
+  font-size: clamp(1.25rem, 2.2vw, 1.55rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-label);
+}
+
+.subnet-vlsm-sub {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-muted);
+  max-width: 680px;
+}
+
+.subnet-exam-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  color: #38bdf8;
+}
+
+.vlsm-control-deck {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.vlsm-input-col,
+.vlsm-prefix-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#calcIp {
+  min-height: 46px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+#calcIp.is-invalid,
+.vlsm-cidr-num-input.is-invalid {
+  border-color: #f97316 !important;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.24) !important;
+}
+
+.vlsm-prefix-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.vlsm-prefix-readouts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.vlsm-cidr-num-input {
+  width: 68px;
+  min-height: 36px;
+  padding: 4px 8px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.vlsm-cidr-badge {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgba(56, 189, 248, 0.14);
+  color: #38bdf8;
+  min-width: 44px;
+  text-align: center;
+}
+
+.vlsm-slider-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#calcCidr {
+  width: 100%;
+  min-height: 30px;
+  cursor: pointer;
+  accent-color: #38bdf8;
+}
+
+.vlsm-slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.vlsm-validation-banner {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(249, 115, 22, 0.14);
+  border: 1px solid rgba(249, 115, 22, 0.42);
+  color: #fdba74;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.vlsm-preset-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vlsm-preset-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.calc-preset-btn {
+  min-height: 44px;
+  padding: 8px 13px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.55) !important;
+  border: 1px solid rgba(148, 163, 184, 0.28) !important;
+  color: var(--color-secondary-label);
+}
+
+.calc-preset-btn:hover {
+  border-color: rgba(56, 189, 248, 0.55) !important;
+  color: var(--color-label) !important;
+}
+
+.calc-preset-btn.is-active {
+  background: rgba(14, 165, 233, 0.2) !important;
+  border-color: rgba(56, 189, 248, 0.72) !important;
+  color: #7dd3fc !important;
+}
+
+.subnet-action-row button.ghost {
+  background: rgba(15, 23, 42, 0.5) !important;
+  border: 1px solid rgba(148, 163, 184, 0.26) !important;
+}
+
+.vlsm-special-callout {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.34);
+  color: #6ee7b7;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Obsidian 32-Bit Interactive Matrix */
+#subnet .noc-dark-surface.vlsm-binary-panel {
+  background: #090e1a !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(56, 189, 248, 0.24) !important;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vlsm-binary-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.vlsm-binary-title {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+}
+
+.vlsm-binary-summary {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #f8fafc;
+  margin-top: 2px;
+}
+
+.vlsm-bit-legend {
+  display: flex;
+  gap: 14px;
+  font-size: 11.5px;
+  color: #cbd5e1;
+}
+
+.vlsm-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vlsm-dot-net,
+.vlsm-dot-host {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+}
+
+.vlsm-dot-net {
+  background: rgba(56, 189, 248, 0.28);
+  border: 1px solid #38bdf8;
+}
+
+.vlsm-dot-host {
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid #10b981;
+}
+
+.vlsm-bit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.calc-octet-block {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.calc-octet-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.calc-octet-head strong {
+  color: #f8fafc;
+}
+
+.calc-bit-weights {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 3px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: #64748b;
+}
+
+.calc-bit-weights i {
+  font-style: normal;
+}
+
+.calc-octet-bits {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.bit-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  border-radius: 5px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.bit-cell.net {
+  background: rgba(14, 165, 233, 0.24);
+  border: 1px solid rgba(56, 189, 248, 0.65);
+  color: #7dd3fc;
+}
+
+.bit-cell.host {
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.42);
+  color: #6ee7b7;
+}
+
+.bit-cell.is-boundary {
+  box-shadow: 0 0 0 2px #fbbf24;
+  border-color: #fbbf24;
+}
+
+.bit-cell:hover {
+  transform: translateY(-1px);
+}
+
+.bit-cell:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 1px;
+}
+
+.calc-bit-invalid-msg {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 18px 12px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: #fdba74;
+}
+
+.vlsm-bit-tip {
+  margin: 0;
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+/* Address Space Progression Bar */
+.vlsm-progression-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vlsm-progression-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.vlsm-progression-meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.vlsm-progression-bar {
+  display: flex;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.vlsm-prog-seg {
+  padding: 9px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font-family: var(--font-mono);
+}
+
+.vlsm-prog-seg strong {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vlsm-prog-seg span {
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vlsm-prog-net {
+  flex: 0 0 auto;
+  min-width: 150px;
+  background: rgba(14, 165, 233, 0.22);
+  color: #7dd3fc;
+  border-right: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.vlsm-prog-host {
+  background: rgba(16, 185, 129, 0.18);
+  color: #6ee7b7;
+}
+
+.vlsm-prog-host-flex {
+  flex: 1 1 auto;
+}
+
+.vlsm-prog-peer-b {
+  border-left: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.vlsm-prog-bcast {
+  flex: 0 0 auto;
+  min-width: 150px;
+  background: rgba(249, 115, 22, 0.18);
+  color: #fdba74;
+  border-left: 1px solid rgba(249, 115, 22, 0.35);
+}
+
+.vlsm-prog-invalid {
+  background: rgba(249, 115, 22, 0.16);
+  color: #fdba74;
+  text-align: center;
+}
+
+/* Telemetry Outputs */
+.vlsm-outputs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.vlsm-output-group {
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: rgba(15, 23, 42, 0.42);
+  overflow: hidden;
+}
+
+.vlsm-output-group .review-row {
+  display: grid;
+  grid-template-columns: 145px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.vlsm-output-group .review-row:last-child {
+  border-bottom: none;
+}
+
+.vlsm-output-group .review-row strong {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.vlsm-output-group .review-row > span {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  text-align: right;
+  color: var(--color-label);
+  word-break: break-word;
+}
+
+.vlsm-val-accent { color: #38bdf8 !important; }
+.vlsm-val-amber { color: #fbbf24 !important; }
+.vlsm-val-green { color: #34d399 !important; }
+.vlsm-total-sub { font-weight: 500; color: var(--text-muted); }
+
+/* Searchable Cheat Sheet */
+.vlsm-cheatsheet-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+}
+
+.vlsm-cheatsheet-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.vlsm-cheatsheet-title {
+  margin: 0 0 2px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-label);
+}
+
+.vlsm-cheatsheet-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.vlsm-cheatsheet-search-wrap {
+  width: 280px;
+  max-width: 100%;
+}
+
+#cidrSearchInput {
+  width: 100%;
+  min-height: 44px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  padding: 8px 12px;
+}
+
+.vlsm-table-scroll {
+  width: 100%;
+  max-height: 360px;
+  overflow: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.cheat-val-hosts { color: #34d399; }
+.cheat-val-size { color: #38bdf8; }
+.cheat-sheet-empty {
+  text-align: center;
+  padding: 20px !important;
+  color: var(--text-muted);
+}
+
+/* ─── 5. Integrated Rapid Recall Deck (#subnetRecallSection) ────────────── */
+.subnet-recall-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.subnet-recall-head h3 {
+  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-label);
+}
+
+.subnet-recall-sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 620px;
+}
+
+.subnet-recall-progress-box {
+  min-width: 230px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subnet-recall-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.subnet-shuffle-btn {
+  min-height: 44px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.subnet-shuffle-btn.is-active {
+  border-color: rgba(56, 189, 248, 0.55);
+  color: #38bdf8;
+}
+
+.subnet-recall-progress-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.18);
+  overflow: hidden;
+}
+
+.subnet-recall-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #0ea5e9, #10b981);
+  transition: width 0.25s ease;
+}
+
+.subnet-recall-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.subnet-filter-chip {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: rgba(15, 23, 42, 0.45);
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.subnet-filter-chip.is-active {
+  background: rgba(14, 165, 233, 0.18);
+  border-color: rgba(56, 189, 248, 0.55);
+  color: #7dd3fc;
+}
+
+.subnet-recall-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.subnet-flashcard-container .flashcard-inner {
+  min-height: 220px;
+}
+
+.subnet-flashcard-container .flashcard-question-text {
+  font-size: 16.5px;
+  max-width: 720px;
+}
+
+.subnet-flashcard-container .flashcard-answer-val {
+  font-size: 17px;
+  max-width: 720px;
+}
+
+.subnet-recall-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.subnet-recall-controls button {
+  min-height: 44px;
+  min-width: 135px;
+  padding: 10px 18px;
+  font-size: 13px;
+}
+
+/* ─── 6. Light Theme Overrides (Clean Precision Engineering) ────────────── */
+html[data-theme="light"] body:not(.high-contrast) .flashcard-front,
+html[data-theme="light"] body:not(.high-contrast) .flashcard-back {
+  background: #f8fafc !important;
+  border-color: rgba(15, 23, 42, 0.15) !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .flashcard-question-text {
+  color: #0f172a;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .flashcard-topic-tag,
+html[data-theme="light"] body:not(.high-contrast) .flashcard-kicker,
+html[data-theme="light"] body:not(.high-contrast) .subnet-eyebrow,
+html[data-theme="light"] body:not(.high-contrast) .subnet-section-kicker,
+html[data-theme="light"] body:not(.high-contrast) .subnet-hero-accent,
+html[data-theme="light"] body:not(.high-contrast) .vlsm-val-accent,
+html[data-theme="light"] body:not(.high-contrast) .vlsm-cidr-badge,
+html[data-theme="light"] body:not(.high-contrast) .subnet-metric-cell-xp .subnet-metric-val {
+  color: #0369a1 !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .flashcard-count-pill,
+html[data-theme="light"] body:not(.high-contrast) .subnet-exam-pill {
+  background: #e0f2fe;
+  border-color: #7dd3fc;
+  color: #0369a1;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .flashcard-answer-label,
+html[data-theme="light"] body:not(.high-contrast) .flashcard-answer-val,
+html[data-theme="light"] body:not(.high-contrast) .vlsm-val-green {
+  color: #047857 !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .flashcard-note-text {
+  color: #334155;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .subnet-metric-cell,
+html[data-theme="light"] body:not(.high-contrast) .subnet-range-diagram,
+html[data-theme="light"] body:not(.high-contrast) .subnet-lb-row,
+html[data-theme="light"] body:not(.high-contrast) .vlsm-output-group,
+html[data-theme="light"] body:not(.high-contrast) .subnet-filter-chip {
+  background: #f8fafc;
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+html[data-theme="light"] body:not(.high-contrast) .subnet-jump-pill {
+  background: #ffffff;
+  color: #475569;
+  border-color: rgba(15, 23, 42, 0.14);
+}
+
+html[data-theme="light"] body:not(.high-contrast) .calc-preset-btn {
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.16) !important;
+  color: #334155 !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .subnet-action-row button.ghost {
+  background: #f8fafc !important;
+  border-color: rgba(15, 23, 42, 0.18) !important;
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .subnet-jump-pill.is-active,
+html[data-theme="light"] body:not(.high-contrast) .subnet-filter-chip.is-active,
+html[data-theme="light"] body:not(.high-contrast) .calc-preset-btn.is-active {
+  background: #e0f2fe !important;
+  border-color: #0284c7 !important;
+  color: #0369a1 !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .subnet-badge-amber,
+html[data-theme="light"] body:not(.high-contrast) .vlsm-val-amber {
+  color: #b45309 !important;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .subnet-diagram-banner {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .subnet-diagram-table .val-net { color: #0369a1; }
+html[data-theme="light"] body:not(.high-contrast) .subnet-diagram-table .val-host { color: #047857; }
+html[data-theme="light"] body:not(.high-contrast) .subnet-diagram-table .val-wild { color: #b45309; }
+html[data-theme="light"] body:not(.high-contrast) .subnet-diagram-table .val-bcast { color: #c2410c; }
+
+html[data-theme="light"] body:not(.high-contrast) .vlsm-progression-bar {
+  background: #f1f5f9;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .vlsm-prog-net {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .vlsm-prog-host {
+  background: #dcfce7;
+  color: #047857;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .vlsm-prog-bcast {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .vlsm-validation-banner {
+  background: #fff7ed;
+  border-color: #fb923c;
+  color: #9a3412;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .vlsm-special-callout {
+  background: #ecfdf5;
+  border-color: #34d399;
+  color: #065f46;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .subnet-arcade-hud {
+  background: #f8fafc;
+  border-color: rgba(2, 132, 199, 0.35);
+}
+
+html[data-theme="light"] body:not(.high-contrast) .subnet-arcade-label { color: #475569; }
+html[data-theme="light"] body:not(.high-contrast) .subnet-arcade-timer { color: #0369a1; }
+html[data-theme="light"] body:not(.high-contrast) .subnet-arcade-score { color: #047857; }
+html[data-theme="light"] body:not(.high-contrast) .subnet-arcade-mult { color: #b45309; }
+
+html[data-theme="light"] body:not(.high-contrast) .cheat-sheet-table {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .cheat-sheet-table th {
+  background: #f1f5f9;
+  color: #0369a1;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .cheat-sheet-row td {
+  color: #0f172a;
+  border-bottom-color: rgba(15, 23, 42, 0.08);
+}
+
+html[data-theme="light"] body:not(.high-contrast) .cheat-sheet-row.highlighted-row {
+  background: #e0f2fe !important;
+  color: #0369a1;
+}
+
+html[data-theme="light"] body:not(.high-contrast) .cheat-val-hosts { color: #047857 !important; }
+html[data-theme="light"] body:not(.high-contrast) .cheat-val-size { color: #0369a1 !important; }
+
+/* ─── 7. High Contrast Mode Overrides ───────────────────────────────────── */
+body.high-contrast .subnet-hero-card,
+body.high-contrast .subnet-metric-cell,
+body.high-contrast .subnet-output-group,
+body.high-contrast .subnet-range-diagram,
+body.high-contrast .vlsm-output-group,
+body.high-contrast .subnet-filter-chip,
+body.high-contrast .flashcard-front,
+body.high-contrast .flashcard-back {
+  border: 2px solid #ffffff !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+body.high-contrast .bit-cell {
+  border-width: 2px;
+  color: #ffffff !important;
+}
+
+body.high-contrast .bit-cell.net {
+  border-color: #38bdf8 !important;
+  background: rgba(56, 189, 248, 0.22) !important;
+}
+
+body.high-contrast .bit-cell.host {
+  border-style: dashed !important;
+  border-color: #cbd5e1 !important;
+  background: #000000 !important;
+}
+
+body.high-contrast .bit-cell.is-boundary {
+  border-color: #facc15 !important;
+  box-shadow: 0 0 0 2px #facc15 !important;
+}
+
+body.high-contrast .cheat-sheet-row.highlighted-row {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* ─── 8. Responsive Breakpoints (1024px / 768px / 390px / 360px) ───────── */
+@media (max-width: 980px) {
+  .subnet-workspace-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vlsm-bit-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .subnet-hero-card {
+    padding: 20px 16px;
+  }
+
+  .subnet-telemetry-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .subnet-telemetry-strip .subnet-metric-cell-xp {
+    grid-column: 1 / -1;
+  }
+
+  #subnet .subnet-mode-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .vlsm-control-deck,
+  .vlsm-outputs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vlsm-cheatsheet-search-wrap {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .vlsm-bit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .subnet-fb-compare {
+    grid-template-columns: 1fr;
+  }
+
+  .vlsm-progression-bar {
+    flex-direction: column;
+  }
+
+  .vlsm-prog-seg {
+    width: 100% !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  }
+
+  .vlsm-prog-seg:last-child {
+    border-bottom: none;
+  }
+
+  .vlsm-output-group .review-row {
+    grid-template-columns: 120px 1fr;
+    padding: 9px 10px;
+  }
+
+  .subnet-recall-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  #btnSubnetFlipFlash {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+}

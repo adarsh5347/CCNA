@@ -89,25 +89,6 @@
     align-items: center !important;
   }
   
-  /* Binary Grid wrapping on mobile */
-  #calcBitGrid {
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 8px !important;
-  }
-  #calcBitGrid > span {
-    margin: 2px 0 !important;
-  }
-  /* Hide the dot separator on mobile vertical layout */
-  #calcBitGrid > span[style*="font-size: 16px"] {
-    display: none !important;
-  }
-  
-  /* Cheat sheet scroll wrapper trigger */
-  .cheat-sheet-table {
-    min-width: 520px !important;
-  }
-  
   /* Show mobile button texts, hide full texts */
   .btn-full-text {
     display: none !important;
@@ -448,12 +429,12 @@
   box-sizing: border-box;
 }
 .flashcard-front {
-  background: rgba(6, 9, 19, 0.75);
-  border: 1px solid rgba(0, 242, 254, 0.2);
+  background: rgba(12, 18, 32, 0.92);
+  border: 1px solid rgba(56, 189, 248, 0.24);
 }
 .flashcard-back {
-  background: rgba(6, 9, 19, 0.75);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: rgba(10, 22, 26, 0.94);
+  border: 1px solid rgba(16, 185, 129, 0.28);
   transform: rotateY(180deg);
 }
 
@@ -461,33 +442,40 @@
 .cheat-sheet-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 10px;
+  font-size: 12.5px;
+  text-align: left;
+  margin-top: 8px;
 }
 .cheat-sheet-table th {
-  padding: 8px;
-  background: rgba(255,255,255,0.02);
+  padding: 9px 12px;
+  background: rgba(255, 255, 255, 0.03);
   border-bottom: 1px solid var(--border-color);
   font-weight: 600;
   color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 .cheat-sheet-table td {
-  padding: 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   font-family: var(--font-mono);
 }
 .cheat-sheet-row {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.cheat-sheet-row:hover {
+  background: rgba(56, 189, 248, 0.08);
 }
 .cheat-sheet-row.highlighted-row {
-  background: rgba(0, 242, 254, 0.12) !important;
-  color: #00f2fe;
-  font-weight: bold;
+  background: rgba(14, 165, 233, 0.15) !important;
+  color: #38bdf8;
+  font-weight: 600;
 }
 .cheat-sheet-row.highlighted-row td {
-  border-top: 1px solid rgba(0, 242, 254, 0.4);
-  border-bottom: 1px solid rgba(0, 242, 254, 0.4);
+  border-top: 1px solid rgba(56, 189, 248, 0.35);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.35);
 }
 
 /* Hero Dashboard Surface */

@@ -978,35 +978,38 @@
             <div id="bankStats" class="grid stats"><div class="stat"><div class="k">Total Questions</div><div class="v">635</div></div><div class="stat"><div class="k">Blueprint Coverage</div><div class="v">100%</div></div><div class="stat"><div class="k">Easy</div><div class="v">210</div></div><div class="stat"><div class="k">Medium</div><div class="v">252</div></div><div class="stat"><div class="k">Hard</div><div class="v">173</div></div><div class="stat"><div class="k">Question Types</div><div class="v" style="font-size: 16px; line-height: 1.35; overflow-wrap: anywhere;">Single/Multi/Matching/Drag/Scenario</div></div></div>
           </div>
           
-          <div class="card" id="flashcardBox" style="display: flex; flex-direction: column; gap: 12px; min-height: 250px; margin-bottom: 0;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <h4 style="margin: 0; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: var(--color-label);">💡 CCNA Rapid Recall Flashcards</h4>
-              <span id="flashcardCount" style="font-size: 11px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.2); color: #38bdf8; padding: 3px 8px; border-radius: 6px; font-family: var(--font-mono); font-weight: 600;">Card 1 / 15</span>
+          <div class="card flashcard-box-home" id="flashcardBox">
+            <div class="flashcard-home-head">
+              <div class="flashcard-home-title-group">
+                <span class="flashcard-kicker">RAPID RECALL</span>
+                <h4>CCNA Flashcard Deck</h4>
+              </div>
+              <span id="flashcardCount" class="flashcard-count-pill">Card 1 / 24</span>
             </div>
-            <p style="color: var(--text-muted); font-size: 13px; margin: 0;">Quickly flip through key CCNA parameters, routing metrics, protocol details, and port numbers.</p>
-            
+            <p class="flashcard-home-sub">Quickly flip through key CCNA parameters, routing metrics, protocol details, and port numbers.</p>
+
             <!-- Flip Card Container -->
-            <div class="flashcard-container" style="flex: 1; min-height: 120px;">
+            <div class="flashcard-container">
               <div id="flashcardInner" class="flashcard-inner">
                 <!-- Front Side -->
                 <div class="flashcard-front">
-                  <span id="flashcardTopic" style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #38bdf8; letter-spacing: 1.2px; margin-bottom: 6px;">Routing Protocols</span>
-                  <span id="flashcardQuestion" style="font-size: 14.5px; font-weight: 600; color: #fff; line-height: 1.4;">What is the default Administrative Distance (AD) of OSPF?</span>
-                  <span style="font-size: 9.5px; color: var(--text-muted); margin-top: 8px;">(Click card to reveal answer)</span>
+                  <span id="flashcardTopic" class="flashcard-topic-tag">Routing Protocols (Vol 1 Ch 16)</span>
+                  <span id="flashcardQuestion" class="flashcard-question-text">What is the default Administrative Distance (AD) of OSPF?</span>
+                  <span class="flashcard-hint-tag">Click or swipe card to reveal answer</span>
                 </div>
                 <!-- Back Side -->
                 <div class="flashcard-back">
-                  <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #10b981; letter-spacing: 1.2px; margin-bottom: 6px;">Answer</span>
-                  <span id="flashcardAnswer" style="font-size: 16px; font-weight: 700; color: #10b981; line-height: 1.4;">110</span>
-                  <span id="flashcardNote" style="font-size: 11px; color: var(--text-muted); line-height: 1.3; margin-top: 4px; text-align: center;">OSPF relies on path cost (bandwidth) to select routes, with AD 110.</span>
+                  <span class="flashcard-answer-label">Answer</span>
+                  <span id="flashcardAnswer" class="flashcard-answer-val">110</span>
+                  <span id="flashcardNote" class="flashcard-note-text">Odom Vol 1 Ch 16: Direct=0, Static=1, eBGP=20, EIGRP=90, OSPF=110, RIP=120.</span>
                 </div>
               </div>
             </div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; gap: 8px;">
-              <button id="btnPrevFlashcard" class="secondary" style="padding: 10px 14px; font-size: 13px; min-height: 44px; flex: 1;">◀ Prev</button>
-              <button id="btnFlipFlashcard" class="primary" style="padding: 10px 16px; font-size: 13px; min-height: 44px; flex: 1.5;">🔄 Flip Card</button>
-              <button id="btnNextFlashcard" class="secondary" style="padding: 10px 14px; font-size: 13px; min-height: 44px; flex: 1;">Next ▶</button>
+
+            <div class="flashcard-nav-controls">
+              <button id="btnPrevFlashcard" type="button" class="secondary">◀ Prev</button>
+              <button id="btnFlipFlashcard" type="button" class="primary">Flip Card</button>
+              <button id="btnNextFlashcard" type="button" class="secondary">Next ▶</button>
             </div>
           </div>
         </section>
@@ -1043,185 +1046,349 @@
       </section>
     </section>
 
-    <!-- SUBNETTING ARCADE ACADEMY -->
+    <!-- SUBNETTING ACADEMY, VLSM & RAPID RECALL -->
     <section id="subnet" class="page">
-      <article class="hero" style="position: relative; overflow: hidden;">
-        <!-- Immersive Awwwards-style perspective cyber grid -->
-        <div class="cyber-grid" aria-hidden="true"></div>
-        <h2 class="reveal-text glow-accent" style="position: relative; z-index: 1;">Subnetting Arcade Academy</h2>
-        <p style="position: relative; z-index: 1; color: var(--text-muted); margin-bottom: 0;">CIDR, VLSM, wildcard masks, host counts, and timed challenge practice with streak multipliers and dynamic score rewards.</p>
-      </article>
-
-      <div class="grid labs" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
-        <article class="card" style="display: flex; flex-direction: column; gap: 12px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 4px;">
-            <h3 style="margin-bottom: 0;">Subnetting Trainer</h3>
-            <div id="subnetXPDisplay" style="font-family: var(--font-mono); font-size: 13px; color: #00f2fe; font-weight: 600;">XP: 0</div>
+      <!-- 1. Editorial Academy Hero & Telemetry -->
+      <header class="card subnet-hero-card">
+        <div class="subnet-hero-top">
+          <div class="subnet-hero-copy">
+            <span class="subnet-eyebrow">PRECISION ENGINEERING // SUBNETTING ACADEMY</span>
+            <h2 class="subnet-hero-title">Master the mathematics<br><span class="subnet-hero-accent">of networking.</span></h2>
+            <p class="subnet-hero-sub">Build instant fluency across CIDR prefixes, 32-bit binary boundaries, VLSM address allocation, and core CCNA protocol recall.</p>
           </div>
-          
-          <div class="subnet-mode-tabs" style="display: flex; gap: 6px; flex-wrap: wrap;">
-            <button id="btnSubnetEasy" class="primary magnetic-btn" style="padding: 10px 14px; font-size: 12.5px; min-height: 44px;">Easy (/24 - /26)</button>
-            <button id="btnSubnetMedium" class="secondary magnetic-btn" style="padding: 10px 14px; font-size: 12.5px; min-height: 44px;">Medium (/20 - /28)</button>
-            <button id="btnSubnetHard" class="secondary magnetic-btn" style="padding: 10px 14px; font-size: 12.5px; min-height: 44px;">Hard (/16 - /30)</button>
-            <button id="btnSubnetTimed" class="secondary magnetic-btn" style="padding: 10px 14px; font-size: 12.5px; min-height: 44px;">⏱️ Timed</button>
+          <nav class="subnet-section-nav" aria-label="Subnetting Academy Sections">
+            <button type="button" class="subnet-jump-pill is-active" data-subnet-target="subnetTrainerSection">Trainer &amp; Arcade</button>
+            <button type="button" class="subnet-jump-pill" data-subnet-target="vlsmCalcCard">VLSM Calculator</button>
+            <button type="button" class="subnet-jump-pill" data-subnet-target="subnetRecallSection">Rapid Recall (24)</button>
+          </nav>
+        </div>
+
+        <div class="subnet-telemetry-strip" aria-label="Subnetting Performance Telemetry">
+          <div class="subnet-metric-cell">
+            <span class="subnet-metric-label">Session Attempts</span>
+            <span id="subnetStatAttempted" class="subnet-metric-val">0</span>
+          </div>
+          <div class="subnet-metric-cell">
+            <span class="subnet-metric-label">Session Accuracy</span>
+            <span id="subnetStatAccuracy" class="subnet-metric-val">--</span>
+          </div>
+          <div class="subnet-metric-cell">
+            <span class="subnet-metric-label">Best Streak</span>
+            <span id="subnetStatBestStreak" class="subnet-metric-val">0</span>
+          </div>
+          <div class="subnet-metric-cell">
+            <span class="subnet-metric-label">Modes Available</span>
+            <span class="subnet-metric-val">4 Modes</span>
+          </div>
+          <div class="subnet-metric-cell subnet-metric-cell-xp">
+            <span class="subnet-metric-label">Subnetting XP</span>
+            <span id="subnetXPDisplay" class="subnet-metric-val">XP: 0</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- 2. Subnetting Trainer & Timed Arcade -->
+      <div id="subnetTrainerSection" class="subnet-workspace-grid">
+        <article class="card subnet-trainer-card">
+          <div class="subnet-panel-head">
+            <div>
+              <span class="subnet-section-kicker">INTERACTIVE DRILL // REAL-TIME MATH</span>
+              <h3>Subnetting Trainer</h3>
+            </div>
+            <div class="subnet-status-badges">
+              <span id="subnetStreakDisplay" class="subnet-badge-amber">Multiplier: x1</span>
+            </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
-            <div id="subnetStreakDisplay" style="font-family: var(--font-mono); font-size: 12px; color: #f59e0b; font-weight: bold;">Multiplier: x1</div>
-            <div id="subnetTimerDisplay" style="font-family: var(--font-mono); font-size: 12px; color: #ff5e3a; font-weight: bold; display: none;">Time Left: 30s</div>
+          <div class="subnet-mode-tabs" role="tablist" aria-label="Trainer difficulty modes">
+            <button id="btnSubnetEasy" type="button" class="primary magnetic-btn" role="tab" aria-selected="true">Easy (/24–/26)</button>
+            <button id="btnSubnetMedium" type="button" class="secondary magnetic-btn" role="tab" aria-selected="false">Medium (/20–/28)</button>
+            <button id="btnSubnetHard" type="button" class="secondary magnetic-btn" role="tab" aria-selected="false">Hard (/16–/30)</button>
+            <button id="btnSubnetTimed" type="button" class="secondary magnetic-btn" role="tab" aria-selected="false">Timed Arcade (30s)</button>
           </div>
 
-          <div class="row" style="margin: 6px 0;">
-            <label style="width: 100%;">Your Answer
-              <input id="subnetAnswer" type="text" inputmode="decimal" placeholder="Enter answer..." style="margin-top: 6px; width: 100%;" />
-            </label>
+          <!-- Single-timer Timed Arcade HUD -->
+          <div id="subnetArcadeHud" class="subnet-arcade-hud" hidden>
+            <div class="subnet-arcade-hud-row">
+              <div class="subnet-arcade-stat">
+                <span class="subnet-arcade-label">Countdown</span>
+                <span id="subnetTimerDisplay" class="subnet-arcade-timer">Time Left: 30s</span>
+              </div>
+              <div class="subnet-arcade-stat">
+                <span class="subnet-arcade-label">Round Score</span>
+                <span id="subnetArcadeScore" class="subnet-arcade-score">0 pts</span>
+              </div>
+              <div class="subnet-arcade-stat">
+                <span class="subnet-arcade-label">Streak Boost</span>
+                <span id="subnetArcadeMult" class="subnet-arcade-mult">x1</span>
+              </div>
+            </div>
+            <div class="subnet-arcade-bar" aria-hidden="true">
+              <div id="subnetTimerBarFill" class="subnet-arcade-bar-fill" style="width: 100%;"></div>
+            </div>
           </div>
 
-          <div id="subnetPrompt" class="output terminal-box" style="min-height: 50px; padding: 10px 14px;"></div>
-          
-          <div class="inline" style="margin-top: 4px;">
-            <button id="subnetSubmit" class="primary magnetic-btn">Submit Answer</button>
-            <button id="subnetSkip" class="ghost magnetic-btn">Skip</button>
+          <!-- Timed Round Summary Strip -->
+          <div id="subnetTimedSummary" class="subnet-timed-summary" hidden>
+            <div class="subnet-timed-summary-copy">
+              <span class="subnet-timed-kicker">TIMED ARCADE COMPLETE</span>
+              <strong id="subnetTimedFinalScore">Score: 0 pts</strong>
+              <p id="subnetTimedSummaryNote">Your round has been recorded on the local leaderboard.</p>
+            </div>
+            <button id="btnRetryTimed" type="button" class="primary">Retry 30s Challenge</button>
           </div>
 
-          <div id="subnetOut" class="output terminal-box" style="min-height: 70px; padding: 10px 14px;"></div>
+          <!-- Dark Engineering Prompt Console -->
+          <div id="subnetPrompt" class="output subnet-prompt-console noc-dark-surface" aria-live="polite"></div>
+
+          <!-- Answer Input & Actions -->
+          <div class="subnet-answer-group">
+            <label for="subnetAnswer" class="subnet-field-label">Your Calculation</label>
+            <div class="subnet-answer-controls">
+              <input id="subnetAnswer" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="e.g. 192.168.10.64 or 62" />
+              <div class="inline subnet-action-row">
+                <button id="subnetSubmit" type="button" class="primary magnetic-btn">Submit Answer</button>
+                <button id="subnetSkip" type="button" class="ghost magnetic-btn">Skip</button>
+                <button id="btnSubnetHint" type="button" class="secondary" aria-expanded="false" aria-controls="subnetHintBox">Formula Hint</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Non-spoiler formula hint drawer -->
+          <div id="subnetHintBox" class="subnet-hint-drawer" hidden></div>
+
+          <!-- Calculation Feedback & Binary Verification -->
+          <div id="subnetOut" class="output subnet-feedback-panel noc-dark-surface" aria-live="polite"></div>
         </article>
 
-        <!-- Subnet Visual Range and Local Leaderboard -->
-        <div style="display: flex; flex-direction: column; gap: 20px;">
-          <article class="card" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-            <h3 style="font-size: 16px;">Visual Range Diagram</h3>
-            <div id="subnetRangeDiagram" style="flex: 1; border: 1px solid var(--border-color); border-radius: 12px; background: rgba(0,0,0,0.25); padding: 12px; font-family: var(--font-mono); font-size: 11.5px; color: var(--text-muted); line-height: 1.6; min-height: 120px; display: flex; justify-content: center; align-items: center; text-align: center;">
-              <span style="font-style: italic;">Submit an answer to visualize host ranges, network ID, and broadcast boundaries.</span>
+        <!-- Right Context Column: Anatomy & Leaderboard -->
+        <aside class="subnet-trainer-sidebar">
+          <article class="card subnet-anatomy-card">
+            <div class="subnet-panel-head">
+              <div>
+                <span class="subnet-section-kicker">BOUNDARY INSPECTOR</span>
+                <h3>Subnet Anatomy Diagram</h3>
+              </div>
+            </div>
+            <div id="subnetRangeDiagram" class="subnet-range-diagram">
+              <span class="subnet-diagram-placeholder">Solve or inspect a question to see network ID, usable IP bounds, block increment, and broadcast boundary.</span>
             </div>
           </article>
 
-          <article class="card" style="display: flex; flex-direction: column; gap: 8px;">
-            <h3 style="font-size: 16px;">Arcade Leaderboard</h3>
-            <div id="subnetLeaderboard" style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto;">
-              <span style="font-style: italic;">No high scores registered yet. Complete a Timed Challenge!</span>
+          <article class="card subnet-leaderboard-card">
+            <div class="subnet-panel-head">
+              <div>
+                <span class="subnet-section-kicker">PERSONAL RECORDS</span>
+                <h3>Timed Arcade Leaderboard</h3>
+              </div>
+            </div>
+            <div id="subnetLeaderboard" class="subnet-leaderboard-list">
+              <span class="subnet-leaderboard-empty">No high scores registered yet. Complete a 30s Timed Challenge!</span>
             </div>
           </article>
-        </div>
+        </aside>
       </div>
 
-      <!-- Interactive Subnet Calculator & Cheat Sheet -->
-      <article id="vlsmCalcCard" class="card" style="margin-top: 24px; display: flex; flex-direction: column; gap: 16px;">
-        <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-          <h3 style="margin-bottom: 0; display: flex; align-items: center; gap: 8px;">🧮 Interactive VLSM Subnet Calculator</h3>
-          <span style="font-size: 11px; background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.2); color: #00f2fe; padding: 3px 8px; border-radius: 6px; font-weight: 600;">CCNA Exam Reference Tool</span>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+      <!-- 3. VLSM & CIDR Address Architect -->
+      <article id="vlsmCalcCard" class="card subnet-vlsm-card">
+        <div class="subnet-vlsm-head">
           <div>
-            <label for="calcIp" style="margin-bottom: 6px;">IP Address</label>
-            <input id="calcIp" type="text" value="192.168.1.50" placeholder="e.g. 192.168.1.1" style="margin-top: 0; font-family: var(--font-mono);" />
+            <span class="subnet-section-kicker">VLSM ARCHITECT // 32-BIT PREFIX ENGINE</span>
+            <h4>Design your address space.</h4>
+            <p class="subnet-vlsm-sub">Dial in any IPv4 host and prefix length—or click individual binary bits—to inspect masks, usable ranges, and CIDR alignment.</p>
           </div>
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <label style="margin-bottom: 0;">Subnet Mask (CIDR)</label>
-              <span id="calcCidrVal" style="font-family: var(--font-mono); font-size: 13px; color: #00f2fe; font-weight: bold;">/24</span>
+          <span class="subnet-exam-pill">IPv4 &amp; RFC 3021 Verified</span>
+        </div>
+
+        <div class="vlsm-control-deck">
+          <div class="vlsm-input-col">
+            <label for="calcIp" class="subnet-field-label">IPv4 Address</label>
+            <input id="calcIp" type="text" value="192.168.1.50" autocomplete="off" spellcheck="false" placeholder="e.g. 192.168.10.75" />
+          </div>
+
+          <div class="vlsm-prefix-col">
+            <div class="vlsm-prefix-label-row">
+              <label for="calcCidr" class="subnet-field-label">Prefix Length (CIDR)</label>
+              <div class="vlsm-prefix-readouts">
+                <label for="calcCidrNum" class="sr-only">Numeric CIDR prefix length 0 to 32</label>
+                <input id="calcCidrNum" type="number" min="0" max="32" value="24" class="vlsm-cidr-num-input" />
+                <span id="calcCidrVal" class="vlsm-cidr-badge">/24</span>
+              </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 12px; height: 44px;">
-              <input id="calcCidr" type="range" min="0" max="32" value="24" style="flex: 1; cursor: pointer; accent-color: #00f2fe;" />
+            <div class="vlsm-slider-wrap">
+              <input id="calcCidr" type="range" min="0" max="32" value="24" />
+              <div class="vlsm-slider-ticks" aria-hidden="true">
+                <span>/0</span><span>/8</span><span>/16</span><span>/24</span><span>/32</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Mask presets -->
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: -8px;">
-          <span style="font-size: 10px; color: var(--text-muted); font-weight: bold; text-transform: uppercase;">Presets:</span>
-          <button class="calc-preset-btn ghost" data-mask="30" style="padding: 8px 12px; font-size: 12px; min-height: 44px; border-radius: 6px; border: 1px solid var(--border-color);">/30 WAN Link</button>
-          <button class="calc-preset-btn ghost" data-mask="28" style="padding: 8px 12px; font-size: 12px; min-height: 44px; border-radius: 6px; border: 1px solid var(--border-color);">/28 Small LAN</button>
-          <button class="calc-preset-btn ghost" data-mask="24" style="padding: 8px 12px; font-size: 12px; min-height: 44px; border-radius: 6px; border: 1px solid var(--border-color);">/24 Standard LAN</button>
-          <button class="calc-preset-btn ghost" data-mask="22" style="padding: 8px 12px; font-size: 12px; min-height: 44px; border-radius: 6px; border: 1px solid var(--border-color);">/22 Large LAN</button>
+        <!-- Validation Banner -->
+        <div id="calcValidationMsg" class="vlsm-validation-banner" role="alert" hidden></div>
+
+        <!-- Quick Mask Presets -->
+        <div class="vlsm-preset-bar">
+          <span class="vlsm-preset-label">Presets:</span>
+          <button type="button" class="calc-preset-btn ghost" data-mask="32">/32 Host Route</button>
+          <button type="button" class="calc-preset-btn ghost" data-mask="31">/31 RFC 3021 P2P</button>
+          <button type="button" class="calc-preset-btn ghost" data-mask="30">/30 WAN Link</button>
+          <button type="button" class="calc-preset-btn ghost" data-mask="28">/28 Small LAN</button>
+          <button type="button" class="calc-preset-btn ghost" data-mask="24">/24 Standard LAN</button>
+          <button type="button" class="calc-preset-btn ghost" data-mask="22">/22 Supernet</button>
         </div>
 
-        <!-- Interactive Bit Grid -->
-        <div style="border: 1px solid var(--border-color); border-radius: 12px; background: rgba(0,0,0,0.18); padding: 16px; display: flex; flex-direction: column; gap: 12px;">
-          <h4 style="font-size: 12px; text-transform: uppercase; color: #94a3b8; margin: 0; letter-spacing: 0.5px;">Binary Representation (32-Bit IPv4 Space)</h4>
-          
-          <div id="calcBitGrid" style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 13px; font-weight: 700; padding: 10px 0;"></div>
-          
-          <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: rgba(0, 242, 254, 0.2); border: 1px solid #00f2fe;"></span>
-              <span>Network Bits</span>
+        <!-- /31 or /32 Engineering Callout -->
+        <div id="calcSpecialPrefixNote" class="vlsm-special-callout" hidden></div>
+
+        <!-- Interactive Obsidian 32-Bit Binary Grid -->
+        <div class="vlsm-binary-panel noc-dark-surface">
+          <div class="vlsm-binary-head">
+            <div>
+              <span class="vlsm-binary-title">Interactive 32-Bit Subnet Binary Grid</span>
+              <span id="calcBoundarySummary" class="vlsm-binary-summary">24 Network Bits · 8 Host Bits · Critical Octet #3</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: rgba(255, 94, 58, 0.15); border: 1px solid #ff5e3a;"></span>
-              <span>Host Bits</span>
+            <div class="vlsm-bit-legend">
+              <span class="vlsm-legend-item"><i class="vlsm-dot-net"></i>Network (1)</span>
+              <span class="vlsm-legend-item"><i class="vlsm-dot-host"></i>Host (0)</span>
+            </div>
+          </div>
+
+          <div id="calcBitGrid" class="vlsm-bit-grid" aria-label="Interactive 32-bit binary IPv4 mask matrix"></div>
+          <p class="vlsm-bit-tip">Click any bit cell (1–32) to set the CIDR subnet mask boundary directly.</p>
+        </div>
+
+        <!-- Address Progression Visualization -->
+        <div class="vlsm-progression-card">
+          <div class="vlsm-progression-head">
+            <span class="subnet-field-label">Address Space Breakdown</span>
+            <span id="vlsmProgressionSummary" class="vlsm-progression-meta">256 total addresses · 254 usable hosts</span>
+          </div>
+          <div id="vlsmProgressionBar" class="vlsm-progression-bar"></div>
+        </div>
+
+        <!-- Full Precision Telemetry Outputs -->
+        <div class="vlsm-outputs-grid">
+          <div class="vlsm-output-group">
+            <div class="review-row">
+              <strong>Network Address</strong>
+              <span id="calcNetwork" class="vlsm-val-accent">192.168.1.0</span>
+            </div>
+            <div class="review-row">
+              <strong>Subnet Mask</strong>
+              <span id="calcMask">255.255.255.0</span>
+            </div>
+            <div class="review-row">
+              <strong>Wildcard Mask</strong>
+              <span id="calcWildcard" class="vlsm-val-amber">0.0.0.255</span>
+            </div>
+            <div class="review-row">
+              <strong>Broadcast Address</strong>
+              <span id="calcBroadcast">192.168.1.255</span>
+            </div>
+            <div class="review-row">
+              <strong>Network / Host Bits</strong>
+              <span class="vlsm-bits-split"><span id="calcNetBits">24</span> N / <span id="calcHostBits">8</span> H</span>
+            </div>
+          </div>
+
+          <div class="vlsm-output-group">
+            <div class="review-row">
+              <strong>Usable IP Range</strong>
+              <span id="calcRange">192.168.1.1 - 192.168.1.254</span>
+            </div>
+            <div class="review-row">
+              <strong>First / Last Usable</strong>
+              <span><span id="calcFirstHost">192.168.1.1</span> &rarr; <span id="calcLastHost">192.168.1.254</span></span>
+            </div>
+            <div class="review-row">
+              <strong>Usable Hosts / Total</strong>
+              <span><span id="calcHosts" class="vlsm-val-green">254</span> <small class="vlsm-total-sub">(<span id="calcTotalAddrs">256</span> total)</small></span>
+            </div>
+            <div class="review-row">
+              <strong>Address Class</strong>
+              <span id="calcClass">Class C</span>
+            </div>
+            <div class="review-row">
+              <strong>Address Scope</strong>
+              <span id="calcScope">Private (RFC 1918)</span>
             </div>
           </div>
         </div>
 
-        <!-- Calculated Values Details -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-          <!-- Left Details: Addresses -->
-          <div class="review-table" style="background: rgba(0,0,0,0.1); margin: 0; padding: 4px;">
-            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;">
-              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Subnet Mask</strong>
-              <span id="calcMask" style="font-family: var(--font-mono); font-weight: 600; text-align: right;">255.255.255.0</span>
+        <!-- Searchable CIDR Cheat Sheet Reference -->
+        <div class="vlsm-cheatsheet-section">
+          <div class="vlsm-cheatsheet-head">
+            <div>
+              <h5 class="vlsm-cheatsheet-title">CIDR Reference Cheat Sheet</h5>
+              <span id="cheatSheetCountLabel" class="vlsm-cheatsheet-sub">Showing /32–/16 reference rows · Click any row to load prefix</span>
             </div>
-            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;">
-              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Wildcard Mask</strong>
-              <span id="calcWildcard" style="font-family: var(--font-mono); font-weight: 600; color: #ff9233; text-align: right;">0.0.0.255</span>
-            </div>
-            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;">
-              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Network Address</strong>
-              <span id="calcNetwork" style="font-family: var(--font-mono); font-weight: 600; color: #00f2fe; text-align: right;">192.168.1.0</span>
-            </div>
-            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: none; padding: 8px 12px;">
-              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Broadcast Address</strong>
-              <span id="calcBroadcast" style="font-family: var(--font-mono); font-weight: 600; text-align: right;">192.168.1.255</span>
+            <div class="vlsm-cheatsheet-search-wrap">
+              <label for="cidrSearchInput" class="sr-only">Filter CIDR reference table</label>
+              <input id="cidrSearchInput" type="search" placeholder="Filter /prefix, mask, or hosts..." autocomplete="off" />
             </div>
           </div>
-
-          <!-- Right Details: Hosts and Info -->
-          <div class="review-table" style="background: rgba(0,0,0,0.1); margin: 0; padding: 4px;">
-            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;">
-              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Usable IP Range</strong>
-              <span id="calcRange" style="font-family: var(--font-mono); font-weight: 600; font-size: 12.5px; text-align: right;">192.168.1.1 - 192.168.1.254</span>
-            </div>
-            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;">
-              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Usable Hosts</strong>
-              <span id="calcHosts" style="font-family: var(--font-mono); font-weight: 600; text-align: right; color: #10b981;">254</span>
-            </div>
-            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 12px;">
-              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Address Class</strong>
-              <span id="calcClass" style="font-family: var(--font-mono); font-weight: 600; text-align: right;">Class C</span>
-            </div>
-            <div class="review-row" style="grid-template-columns: 140px 1fr; border-bottom: none; padding: 8px 12px;">
-              <strong style="color: var(--text-muted); font-size: 11px; text-transform: uppercase;">Address Scope</strong>
-              <span id="calcScope" style="font-family: var(--font-mono); font-weight: 600; text-align: right;">Private (RFC 1918)</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Dynamic Subnetting Cheat Sheet -->
-        <div style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 16px;">
-          <h4 style="font-size: 13px; color: #00f2fe; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-            <span>Subnetting Cheat Sheet Reference</span>
-            <span style="font-size: 10px; color: var(--text-muted); text-transform: none; font-weight: normal; font-style: italic;">↔ Swipe to scroll</span>
-          </h4>
-          <div style="overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px;">
+          <div class="vlsm-table-scroll">
             <table class="cheat-sheet-table">
               <thead>
                 <tr>
-                  <th style="padding: 6px;">CIDR</th>
-                  <th style="padding: 6px;">Subnet Mask</th>
-                  <th style="padding: 6px;">Wildcard Mask</th>
-                  <th style="padding: 6px;">Usable Hosts</th>
-                  <th style="padding: 6px;">Block Size</th>
+                  <th>CIDR</th>
+                  <th>Subnet Mask</th>
+                  <th>Wildcard Mask</th>
+                  <th>Usable Hosts</th>
+                  <th>Block Size</th>
                 </tr>
               </thead>
-              <tbody id="cheatSheetBody">
-                <!-- Will be populated dynamically in app.js -->
-              </tbody>
+              <tbody id="cheatSheetBody"></tbody>
             </table>
           </div>
         </div>
       </article>
+
+      <!-- 4. Integrated Rapid Recall Flashcards Workspace -->
+      <section id="subnetRecallSection" class="card subnet-recall-card" aria-label="CCNA Rapid Recall Flashcards">
+        <div class="subnet-recall-head">
+          <div>
+            <span class="subnet-section-kicker">SPACED PRACTICE // 24 EXAM ESSENTIALS</span>
+            <h3>CCNA Rapid Recall Flashcards</h3>
+            <p class="subnet-recall-sub">Flip, filter by domain, or shuffle key CCNA parameters—routing distances, OSPF states, STP roles, port numbers, and security defaults.</p>
+          </div>
+          <div class="subnet-recall-progress-box">
+            <div class="subnet-recall-meta-row">
+              <span id="subnetFlashCount" class="flashcard-count-pill">Card 1 / 24</span>
+              <button id="btnSubnetShuffleFlash" type="button" class="secondary subnet-shuffle-btn">Shuffle Deck</button>
+            </div>
+            <div class="subnet-recall-progress-bar" aria-hidden="true">
+              <div id="subnetFlashProgressFill" class="subnet-recall-progress-fill" style="width: 4.16%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="subnetRecallFilters" class="subnet-recall-filters" role="group" aria-label="Filter flashcards by CCNA topic"></div>
+
+        <div class="subnet-recall-stage">
+          <div id="subnetFlashContainer" class="flashcard-container subnet-flashcard-container">
+            <div id="subnetFlashInner" class="flashcard-inner">
+              <div class="flashcard-front">
+                <span id="subnetFlashTopic" class="flashcard-topic-tag">Routing Protocols (Vol 1 Ch 16)</span>
+                <span id="subnetFlashQuestion" class="flashcard-question-text">What is the default Administrative Distance (AD) of OSPF?</span>
+                <span class="flashcard-hint-tag">Click or swipe card to flip</span>
+              </div>
+              <div class="flashcard-back">
+                <span class="flashcard-answer-label">Verified Answer</span>
+                <span id="subnetFlashAnswer" class="flashcard-answer-val">110</span>
+                <span id="subnetFlashNote" class="flashcard-note-text">Odom Vol 1 Ch 16: Direct=0, Static=1, eBGP=20, EIGRP=90, OSPF=110, RIP=120.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="subnet-recall-controls">
+            <button id="btnSubnetPrevFlash" type="button" class="secondary">◀ Previous Card</button>
+            <button id="btnSubnetFlipFlash" type="button" class="primary">Flip Card</button>
+            <button id="btnSubnetNextFlash" type="button" class="secondary">Next Card ▶</button>
+          </div>
+        </div>
+      </section>
     </section>
 
     <!-- CCNA LAB CENTER -->
