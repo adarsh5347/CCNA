@@ -153,9 +153,9 @@
     font-size: 11px !important;
     border-radius: 6px !important;
     margin: 0 !important;
-    background: rgba(0, 242, 254, 0.05) !important;
-    border: 1px solid rgba(0, 242, 254, 0.15) !important;
-    color: #00f2fe !important;
+    background: var(--surface-2) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--color-tint) !important;
   }
   .meta strong {
     display: inline !important;

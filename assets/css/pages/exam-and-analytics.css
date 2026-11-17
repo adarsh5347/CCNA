@@ -100,7 +100,7 @@
 .exam-header strong {
   font-family: var(--font-mono);
   font-size: 15px;
-  color: #00f2fe;
+  color: var(--color-tint);
 }
 
 .progress {
@@ -313,8 +313,8 @@
   box-shadow: var(--elev-glow-cyan);
 }
 .opt:hover .opt-key {
-  border-color: rgba(0,242,254,0.4);
-  color: #00f2fe;
+  border-color: var(--color-tint);
+  color: var(--color-tint);
 }
 
 .opt:active { transform: scale(0.995); }
@@ -335,9 +335,9 @@
   background: var(--state-selected-bg);
 }
 .opt.selected .opt-key {
-  background: rgba(0,242,254,0.15);
-  border-color: #00f2fe;
-  color: #00f2fe;
+  background: rgba(41, 151, 255, 0.16);
+  border-color: var(--color-tint);
+  color: var(--color-tint);
 }
 
 /* Correct / Wrong post-submit states */
@@ -541,7 +541,7 @@
 .domain-header span.pct {
   font-family: var(--font-mono);
   font-weight: 600;
-  color: #00f2fe;
+  color: var(--color-tint);
 }
 
 /* Sidebar drawer defaults for desktop layout */

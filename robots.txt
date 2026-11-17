@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ccna-prep-platform.vercel.app/sitemap.xml

@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const DIST = path.join(ROOT, "dist");
 
-const STATIC_ROOT_FILES = ["index.html", "ccna.html", "manifest.json", "sw.js"];
+const STATIC_ROOT_FILES = ["index.html", "ccna.html", "manifest.json", "sw.js", "robots.txt", "sitemap.xml"];
 const INLINE_CSS_START_MARKER = "<!-- INLINE_CSS_START -->";
 const INLINE_CSS_END_MARKER = "<!-- INLINE_CSS_END -->";
 

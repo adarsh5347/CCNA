@@ -1,11 +1,11 @@
 {
   "name": "NetOps Command — CCNA 200-301 Engine",
   "short_name": "NetOps Command",
-  "description": "Master the Cisco CCNA 200-301 exam with NetOps Command adaptive quizzes and lab simulators.",
+  "description": "Independent Cisco CCNA 200-301 study workspace featuring 635 blueprint questions across 48 chapters, 126 video lectures, 10 virtual IOS CLI labs, packet simulator, and timed exam mode.",
   "start_url": "/?source=pwa",
   "display": "standalone",
   "background_color": "#060913",
-  "theme_color": "#00f2fe",
+  "theme_color": "#060913",
   "icons": [
     {
       "src": "assets/icon.svg",

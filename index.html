@@ -4,12 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>NetOps Command | Cisco CCNA 200-301 Engine</title>
-  <meta name="description" content="NetOps Command — The ultimate Cisco CCNA 200-301 preparation platform featuring adaptive quizzes, interactive Packet Tracer lab simulations, and realistic Pearson VUE exam drills." />
-  <meta name="keywords" content="NetOps Command, Cisco, CCNA, 200-301, OSPF, Subnetting, Routing, VLANs, Switch, Exam Simulation, Prep Engine" />
+  <meta name="description" content="NetOps Command — Independent Cisco CCNA 200-301 study platform featuring 635 blueprint questions across 48 chapters, 126 video lectures, 10 virtual IOS CLI labs, packet simulator, and timed exam mode." />
+  <meta name="keywords" content="NetOps Command, CCNA 200-301, Cisco Certification Study Guide, OSPF, Subnetting, VLSM, VLANs, Virtual IOS Labs, Network Simulation" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://ccna-prep-platform.vercel.app/" />
   <meta property="og:title" content="NetOps Command | Cisco CCNA 200-301 Engine" />
-  <meta property="og:description" content="NetOps Command — Prepare for your Cisco CCNA certification with realistic simulated exams, spaced-repetition quizzes, and interactive lab topology engines." />
+  <meta property="og:description" content="Independent Cisco CCNA 200-301 study workspace with 635 blueprint questions, 48 chapters, 126 video lectures, and 10 virtual IOS CLI labs." />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ccna-prep-platform.vercel.app/" />
   <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="NetOps Command | Cisco CCNA 200-301 Engine" />
+  <meta name="twitter:description" content="Interactive CCNA 200-301 preparation with 635 blueprint questions, 48 chapters, 126 video lectures, and 10 virtual IOS labs." />
   <link rel="icon" type="image/svg+xml" href="assets/icon.svg" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#060913" />
@@ -39,6 +44,7 @@
   <!-- INLINE_CSS_END -->
 </head>
 <body>
+<a href="#mainContent" class="skip-link">Skip to main content</a>
 <noscript>
   <div style="background: #000000; color: #f5f5f7; font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 40px; text-align: center; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
     <div>
@@ -126,7 +132,7 @@
     </div>
   </header>
 
-  <main class="container">
+  <main id="mainContent" class="container" tabindex="-1">
     <!-- HOME PAGE -->
     <section id="home" class="page active">
       <div id="resumeQuizBanner" class="card resume-banner hidden" role="region" aria-label="Resume unfinished quiz"></div>
@@ -1875,51 +1881,51 @@
 
     <!-- HELP & SUPPORT PAGE -->
     <section id="support" class="page">
-      <article class="hero" style="position: relative; overflow: hidden;">
-        <!-- Immersive Awwwards-style perspective cyber grid -->
+      <article class="hero support-hero">
         <div class="cyber-grid" aria-hidden="true"></div>
-        <h2 class="reveal-text glow-accent" style="position: relative; z-index: 1;">IT Support Desk & Network Operations Center</h2>
-        <p style="position: relative; z-index: 1; color: var(--text-muted); margin-bottom: 0;">Submit incident tickets or reach out directly to the Network Administrator for CCNA Platform issues.</p>
+        <h2 class="reveal-text glow-accent">IT Support Desk &amp; Network Operations Center</h2>
+        <p class="support-hero-desc">Report platform defects, syllabus errata, or offline synchronization issues using the incident form below.</p>
       </article>
 
-      <div class="grid labs">
-        <article class="card">
-          <h3>Contact Network Administrator</h3>
-          <p>For urgent network configurations or platform issues, please submit an incident ticket using the form below. The administrator will be notified automatically.</p>
-          <div class="output" style="text-align: center; padding: 16px;">
-            <span style="color: var(--text-muted); font-size: 13px;">📋 Use the <strong>Open Incident Ticket</strong> form to reach the admin team securely.</span>
+      <div class="grid labs support-grid">
+        <article class="card support-info-card">
+          <h3>Before You Submit</h3>
+          <p>Include the affected page or module, browser version, and exact steps to reproduce so reports are actionable.</p>
+          <div class="output support-info-note">
+            <strong>Delivery Behavior:</strong> When connected online with cloud services reachable, your incident report is stored in Cloud Firestore. When offline or when cloud sync is unreachable, reports are saved locally in browser storage with honest offline status.
           </div>
         </article>
 
-        <article class="card">
+        <article class="card support-form-card">
           <h3>Open Incident Ticket</h3>
-          <p>Describe the issue or ask a technical question. The incident tracking system will capture the details.</p>
-          <form id="supportForm" onsubmit="return false;">
-            <input id="supportWebsite" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;" />
-            <div class="row row-compact" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0;">
-              <label>Your Name
-                <input id="supportName" type="text" placeholder="John Doe" required />
+          <p>Provide contact details and a clear description (at least 10 characters).</p>
+          <form id="supportForm" class="support-form" novalidate>
+            <input id="supportWebsite" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" class="support-honeypot" />
+            <div class="row row-compact support-row">
+              <label for="supportName">Your Name
+                <input id="supportName" name="name" type="text" placeholder="Alex Rivera" autocomplete="name" required />
               </label>
-              <label>Contact Email
-                <input id="supportEmail" type="email" placeholder="john@domain.com" required style="width: 100%; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; background: rgba(6, 9, 19, 0.65); color: var(--text-main); font-size: 14px; padding: 11px 14px; margin-top: 6px;" />
+              <label for="supportEmail">Contact Email
+                <input id="supportEmail" name="email" type="email" placeholder="alex@example.com" autocomplete="email" required />
               </label>
             </div>
-            <label>Incident Priority
-              <select id="supportPriority" style="margin-top: 6px;">
+            <label for="supportPriority">Incident Priority
+              <select id="supportPriority" name="priority">
                 <option>Severity 4 - Low</option>
                 <option>Severity 3 - Medium</option>
                 <option>Severity 2 - High</option>
                 <option>Severity 1 - Critical</option>
               </select>
             </label>
-            <label style="margin-top: 12px;">Description / Query
-              <textarea id="supportDesc" rows="4" placeholder="Detail your issue here..." required></textarea>
+            <label for="supportDesc" class="support-desc-label">Description / Query
+              <textarea id="supportDesc" name="description" rows="4" placeholder="Detail the module, expected behavior, and observed issue..." required></textarea>
             </label>
+            <div id="supportFormError" class="support-form-alert hidden" role="alert" aria-live="assertive"></div>
             <div class="inline mt-12">
-              <button id="btnSubmitSupport" class="primary">Open Ticket</button>
+              <button id="btnSubmitSupport" type="submit" class="primary">Open Ticket</button>
             </div>
           </form>
-          <div id="supportOut" class="output hidden"></div>
+          <div id="supportOut" class="output hidden" role="status" aria-live="polite"></div>
         </article>
       </div>
     </section>
@@ -2006,70 +2012,93 @@
 
     <!-- ═══════════════════════════════════════════════════════ PRICING PAGE -->
     <section id="pricing" class="page">
-      <div class="card" style="max-width:800px;margin:0 auto;text-align:center;padding:36px 24px;">
-        <div style="margin-bottom:24px;">
-          <h2 style="font-size:32px;font-weight:700;letter-spacing:-0.022em;color:var(--text-main);margin-bottom:8px;">100% Free &amp; Full Access</h2>
-          <p style="color:var(--text-muted);font-size:15px;max-width:540px;margin:0 auto 24px auto;">Every Cisco CCNA 200-301 training resource is permanently unlocked for all candidates. No paywalls, no subscriptions, no credit card required.</p>
+      <div class="card pricing-page-card">
+        <div class="pricing-page-header">
+          <span id="pricingFreeCtaText" class="pricing-status-badge">Active — 100% Free</span>
+          <h2>100% Free &amp; Full Access</h2>
+          <p>Every CCNA 200-301 study resource is permanently unlocked for all candidates. No paywalls, no subscriptions, no credit card required.</p>
         </div>
 
-        <div class="grid stats" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px;text-align:left;">
-          <div class="card" style="border:1px solid var(--border-color);padding:18px;">
-            <h3 style="color:var(--color-tint);margin:0 0 6px 0;font-size:15px;">✔ Adaptive Quiz Engine</h3>
-            <p style="font-size:12px;color:var(--text-muted);margin:0;">635 Official Cert Guide questions across all 48 chapters, full 120-question exam drills, smart spaced repetition.</p>
+        <div class="grid stats pricing-pillars">
+          <div class="card card-grouped pricing-pillar-card">
+            <h3 class="pricing-pillar-title is-tint">Adaptive Quiz Engine</h3>
+            <p>635 blueprint questions across all 48 chapters, full 120-question exam drills, and spaced repetition.</p>
           </div>
-          <div class="card" style="border:1px solid var(--border-color);padding:18px;">
-            <h3 style="color:var(--color-success);margin:0 0 6px 0;font-size:15px;">✔ 10 Virtual IOS Labs</h3>
-            <p style="font-size:12px;color:var(--text-muted);margin:0;">All guided labs: VLANs, ROAS, OSPF, ACLs, DHCP, NAT Overload, STP, EtherChannel, WLC, VPN.</p>
+          <div class="card card-grouped pricing-pillar-card">
+            <h3 class="pricing-pillar-title is-success">10 Virtual IOS Labs</h3>
+            <p>All guided CLI labs: VLANs, ROAS, OSPF, ACLs, DHCP, NAT Overload, STP, EtherChannel, WLC, and VPN.</p>
           </div>
-          <div class="card" style="border:1px solid var(--border-color);padding:18px;">
-            <h3 style="color:var(--color-warning);margin:0 0 6px 0;font-size:15px;">✔ 126 Video Lessons</h3>
-            <p style="font-size:12px;color:var(--text-muted);margin:0;">Complete structured CCNA syllabus videos with interactive progress tracking.</p>
+          <div class="card card-grouped pricing-pillar-card">
+            <h3 class="pricing-pillar-title is-warn">126 Video Lessons</h3>
+            <p>Complete structured CCNA video curriculum with interactive progress tracking.</p>
           </div>
         </div>
 
-        <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
-          <button class="primary" style="padding:12px 28px;" onclick="window.setPage && window.setPage('engine')">Start Practice Drills</button>
-          <button class="secondary" style="padding:12px 28px;" onclick="window.setPage && window.setPage('labs')">Open IOS Labs</button>
+        <div class="pricing-cta-row">
+          <button type="button" class="primary" onclick="window.setPage && window.setPage('engine')">Start Practice Drills</button>
+          <button type="button" class="secondary" onclick="window.setPage && window.setPage('labs')">Open IOS Labs</button>
         </div>
       </div>
     </section>
 
     <!-- ═══════════════════════════════════════════════════════ ACCOUNT PAGE -->
     <section id="account" class="page">
-      <div class="card" style="max-width:680px;margin:0 auto;">
-        <div style="display:flex;align-items:center;gap:16px;margin-bottom:28px;flex-wrap:wrap;">
-          <img id="accountUserPhoto" src="" alt="" style="width:64px;height:64px;border-radius:50%;border:2px solid var(--color-tint);display:none;" />
-          <div>
-            <h2 id="accountUserName" style="font-size:24px;font-weight:700;letter-spacing:-0.02em;margin:0;color:var(--text-main);">Engineer</h2>
-            <p id="accountUserEmail" style="color:var(--text-muted);font-size:13px;margin:0;"></p>
+      <div class="card account-page-card">
+        <div class="account-header-row">
+          <div class="account-avatar-wrap">
+            <img id="accountUserPhoto" class="account-avatar-img" src="" alt="" />
+            <span id="accountAvatarFallback" class="account-avatar-fallback" aria-hidden="true">GE</span>
+          </div>
+          <div class="account-identity">
+            <div class="account-name-row">
+              <h2 id="accountUserName">Guest Engineer</h2>
+              <span id="accountAuthBadge" class="account-auth-badge">Guest Mode · Local Only</span>
+            </div>
+            <p id="accountUserEmail" class="account-email-meta">Guest session · Progress saved in local browser storage</p>
+          </div>
+          <div class="account-auth-actions">
+            <button id="accountBtnSignIn" type="button" class="primary">Sign In with Google</button>
+            <button id="accountBtnSignOut" type="button" class="secondary hidden">Sign Out</button>
           </div>
         </div>
 
-        <div class="card" style="border:1px solid var(--border-color);padding:20px;margin-bottom:20px;">
-          <h3 style="margin:0 0 12px 0;font-size:16px;">Current Access Level</h3>
-          <div id="accountPlanLabel" style="font-size:20px;font-weight:700;color:var(--color-tint);margin-bottom:8px;">⭐ Full Access (100% Free)</div>
-          <div id="accountPlanDetails">
-            <p style="color:var(--color-success);font-size:13px;margin:0;">✅ All Features Fully Unlocked — All 10 virtual IOS labs, 120-question exam drills, and 126 video lectures are permanently accessible.</p>
-            <p style="color:var(--text-muted);font-size:12px;margin:4px 0 0 0;">Status: Full Unlocked Access · No subscription or payments required.</p>
+        <div class="card card-grouped account-sync-card">
+          <h3>Sync &amp; Local Telemetry</h3>
+          <p id="accountSyncStatus" class="account-sync-copy">Sign in with Google to synchronize quiz attempts, streaks, watched lessons, and lab completions across devices.</p>
+          <div id="accountSessionStats" class="grid stats account-session-stats"></div>
+          <div class="account-backup-actions">
+            <button id="accountBtnExport" type="button" class="secondary">Export Progress JSON</button>
+            <button id="accountBtnImport" type="button" class="secondary">Import Progress JSON</button>
           </div>
+        </div>
+
+        <div class="card card-grouped account-plan-card">
+          <h3>Current Access Level</h3>
+          <div id="accountPlanLabel" class="account-plan-label">Full Access (100% Free)</div>
+          <div id="accountPlanDetails" class="account-plan-details">
+            <p class="account-access-ok">All Features Unlocked — 635 blueprint questions, 48 chapters, 10 virtual IOS CLI labs, and 126 video lessons require no subscription.</p>
+            <p class="account-access-note">Status: Permanent Unrestricted Access</p>
+          </div>
+          <div id="accountUpgradeSection" class="hidden"></div>
+          <div id="accountPaymentHistory" class="account-payment-history"></div>
         </div>
       </div>
     </section>
 
     <!-- ═══════════════════════════════════════════════════════ ADMIN PAGE -->
     <section id="admin" class="page">
-      <div class="card" style="max-width:900px;margin:0 auto;">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:8px;">
-          <h2 style="font-size:24px;font-weight:700;letter-spacing:-0.02em;color:var(--text-main);margin:0;">NOC Command Station</h2>
-          <span style="background:rgba(48,209,88,0.12);color:var(--color-success);font-size:12px;font-weight:600;padding:4px 12px;border-radius:12px;border:1px solid rgba(48,209,88,0.3);">ALL SYSTEMS OPERATIONAL</span>
+      <div class="card admin-page-card">
+        <div class="admin-header-row">
+          <h2>NOC Command Station</h2>
+          <span id="adminStatusBadge" class="admin-status-badge">OWNER STATION</span>
         </div>
-        <p style="color:var(--text-muted);font-size:13px;margin-bottom:24px;">Platform telemetry, station diagnostics, and operational controls. 100% Full Access Mode.</p>
+        <p class="admin-page-subtitle">Platform telemetry, station diagnostics, and operational controls. Protected by client and Firestore security rules.</p>
 
         <div id="adminContent">
-          <section style="margin-bottom:24px;">
-            <h3 style="font-size:15px;margin-bottom:16px;color:var(--text-main);">Platform Telemetry</h3>
+          <section class="admin-telemetry-section">
+            <h3>Platform Telemetry</h3>
             <div id="adminStats">
-              <p style="color:var(--text-muted);">Aggregating station parameters...</p>
+              <p class="admin-loading-copy">Verifying administrator session...</p>
             </div>
           </section>
 
@@ -2106,37 +2135,37 @@
 
   <!-- Welcome Onboarding Modal -->
 
-  <div id="onboardingModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="onboardingModalTitle" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.72); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(12px); padding: 16px;">
-    <div class="card" style="max-width: 500px; width: 100%; background: var(--surface-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 28px; box-shadow: var(--shadow-lg); animation: zoomIn 0.22s ease;">
-      <h2 id="onboardingModalTitle" style="font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: var(--text-main); margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">Welcome to NetOps Command</h2>
-      <p style="color: var(--text-muted); font-size: 14px; line-height: 1.6;">You are now in command of the CCNA 200-301 Network Operations Command. Let's brief your station parameters:</p>
+  <div id="onboardingModal" class="modal-overlay onboarding-modal hidden" role="dialog" aria-modal="true" aria-labelledby="onboardingModalTitle">
+    <div class="card onboarding-modal-card">
+      <h2 id="onboardingModalTitle" class="onboarding-modal-title">Welcome to NetOps Command</h2>
+      <p class="onboarding-modal-desc">You are in command of the CCNA 200-301 study environment. Here are your primary workspaces:</p>
       
-      <div style="margin: 20px 0; display: flex; flex-direction: column; gap: 14px;">
-        <div style="display: flex; gap: 12px; align-items: flex-start;">
-          <span style="font-size: 20px;">⚡</span>
+      <div class="onboarding-modal-list">
+        <div class="onboarding-modal-item">
+          <span class="onboarding-modal-icon" aria-hidden="true">⚡</span>
           <div>
-            <strong style="color: var(--text-main); font-size: 14px;">Adaptive Quiz Engine</strong>
-            <p style="margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted);">Configure custom drills or take full 120-question timed exam simulations.</p>
+            <strong>Adaptive Quiz Engine</strong>
+            <p>Configure custom drills across 635 questions or take 120-question timed exam simulations.</p>
           </div>
         </div>
-        <div style="display: flex; gap: 12px; align-items: flex-start;">
-          <span style="font-size: 20px;">🕸️</span>
+        <div class="onboarding-modal-item">
+          <span class="onboarding-modal-icon" aria-hidden="true">🕸️</span>
           <div>
-            <strong style="color: var(--text-main); font-size: 14px;">Packet Traversal Simulator</strong>
-            <p style="margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted);">Visualize frame encapsulation, Layer 2 header updates, and routing hops live.</p>
+            <strong>Packet Traversal Simulator</strong>
+            <p>Visualize frame encapsulation, Layer 2 header updates, and routing hops live.</p>
           </div>
         </div>
-        <div style="display: flex; gap: 12px; align-items: flex-start;">
-          <span style="font-size: 20px;">🧪</span>
+        <div class="onboarding-modal-item">
+          <span class="onboarding-modal-icon" aria-hidden="true">🧪</span>
           <div>
-            <strong style="color: var(--text-main); font-size: 14px;">10 Virtual IOS Labs</strong>
-            <p style="margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted);">Step-by-step, Challenge, and Exam configuration CLI environments.</p>
+            <strong>10 Virtual IOS Labs</strong>
+            <p>Step-by-step, Challenge, and Exam configuration CLI environments.</p>
           </div>
         </div>
       </div>
       
-      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
-        <button id="btnOnboardingDismiss" class="primary" style="padding: 10px 20px; font-size: 13px; border-radius: 8px;">Acknowledge & Begin</button>
+      <div class="onboarding-modal-actions">
+        <button id="btnOnboardingDismiss" type="button" class="primary">Acknowledge &amp; Begin</button>
       </div>
     </div>
   </div>

@@ -419,10 +419,69 @@ function syncMobileBottomNav(page, overrideTab = null) {
   });
 }
 
-function handleMoreSheetKeyDown(e) {
-  if (e.key === "Escape") {
-    e.preventDefault();
-    closeMobileMoreSheet(true);
+const _modalFocusState = new WeakMap();
+
+function getModalFocusableElements(modal) {
+  if (!modal) return [];
+  return [...modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')].filter((el) => {
+    const style = window.getComputedStyle(el);
+    return style.display !== "none" && style.visibility !== "hidden" && !el.closest(".hidden");
+  });
+}
+
+function activateModalFocus(modal, initialFocusEl, onEscapeClose) {
+  if (!modal) return;
+  const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const existing = _modalFocusState.get(modal);
+  if (existing && existing.onKeyDown) {
+    document.removeEventListener("keydown", existing.onKeyDown);
+  }
+
+  const onKeyDown = (e) => {
+    if (!modal || modal.classList.contains("hidden")) return;
+    if (e.key === "Escape") {
+      e.preventDefault();
+      if (typeof onEscapeClose === "function") onEscapeClose(true);
+      return;
+    }
+    if (e.key === "Tab") {
+      const focusables = getModalFocusableElements(modal);
+      if (focusables.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      e.preventDefault();
+      const idx = focusables.indexOf(document.activeElement);
+      const nextIdx = idx === -1
+        ? (e.shiftKey ? focusables.length - 1 : 0)
+        : (idx + (e.shiftKey ? -1 : 1) + focusables.length) % focusables.length;
+      focusables[nextIdx].focus();
+    }
+  };
+
+  _modalFocusState.set(modal, { previousFocus, onKeyDown });
+  document.addEventListener("keydown", onKeyDown);
+
+  requestAnimationFrame(() => {
+    const target = (initialFocusEl && !initialFocusEl.disabled) ? initialFocusEl : getModalFocusableElements(modal)[0];
+    if (target && typeof target.focus === "function") target.focus();
+  });
+}
+
+function deactivateModalFocus(modal, restoreFocus = true, fallbackEl = null) {
+  if (!modal) return;
+  const entry = _modalFocusState.get(modal);
+  if (entry) {
+    if (entry.onKeyDown) document.removeEventListener("keydown", entry.onKeyDown);
+    if (restoreFocus) {
+      const target = (entry.previousFocus && entry.previousFocus.isConnected && entry.previousFocus.offsetParent !== null)
+        ? entry.previousFocus
+        : fallbackEl;
+      if (target && typeof target.focus === "function") target.focus();
+    }
+    _modalFocusState.delete(modal);
+  } else if (restoreFocus && fallbackEl && typeof fallbackEl.focus === "function") {
+    fallbackEl.focus();
   }
 }
 
@@ -436,6 +495,7 @@ function openMobileMoreSheet() {
     sheet.classList.remove("hidden");
     sheet.classList.add("active");
     sheet.setAttribute("aria-hidden", "false");
+    activateModalFocus(sheet, byId("btnCloseMobileMore"), () => closeMobileMoreSheet(true));
   }
   if (backdrop) {
     backdrop.classList.remove("hidden");
@@ -443,7 +503,6 @@ function openMobileMoreSheet() {
   }
   if (moreBtn) moreBtn.setAttribute("aria-expanded", "true");
   document.body.classList.add("more-sheet-open");
-  document.addEventListener("keydown", handleMoreSheetKeyDown);
 }
 
 function closeMobileMoreSheet(restoreFocus = false) {
@@ -454,6 +513,7 @@ function closeMobileMoreSheet(restoreFocus = false) {
     sheet.classList.remove("active");
     sheet.classList.add("hidden");
     sheet.setAttribute("aria-hidden", "true");
+    deactivateModalFocus(sheet, restoreFocus, moreBtn);
   }
   if (backdrop) {
     backdrop.classList.remove("active");
@@ -464,7 +524,6 @@ function closeMobileMoreSheet(restoreFocus = false) {
     if (restoreFocus) moreBtn.focus();
   }
   document.body.classList.remove("more-sheet-open");
-  document.removeEventListener("keydown", handleMoreSheetKeyDown);
 }
 
 function navSetup() {
@@ -505,12 +564,15 @@ function openExamBriefingModal() {
     return;
   }
   modal.classList.remove("hidden");
-  byId("btnConfirmStartExam")?.focus();
+  activateModalFocus(modal, byId("btnConfirmStartExam"), closeExamBriefingModal);
 }
 
-function closeExamBriefingModal() {
+function closeExamBriefingModal(restoreFocus = true) {
   const modal = byId("examBriefModal");
-  if (modal) modal.classList.add("hidden");
+  if (modal) {
+    modal.classList.add("hidden");
+    deactivateModalFocus(modal, restoreFocus, byId("startExam"));
+  }
 }
 
 function updateSectionQuizSummary() {
@@ -1034,11 +1096,19 @@ function wireEvents() {
   const dismissBtn = byId("btnOnboardingDismiss");
   if (onboarding && dismissBtn) {
     onboarding.classList.add("hidden");
-    window.openOnboardingModal = () => onboarding.classList.remove("hidden");
-    dismissBtn.addEventListener("click", () => {
+    const closeOnboarding = (restoreFocus = true) => {
       playNetSound("success");
       onboarding.classList.add("hidden");
       safeSetStorage(localStorage, "ccna_onboarded", "true");
+      deactivateModalFocus(onboarding, restoreFocus);
+    };
+    window.openOnboardingModal = () => {
+      onboarding.classList.remove("hidden");
+      activateModalFocus(onboarding, dismissBtn, closeOnboarding);
+    };
+    dismissBtn.addEventListener("click", () => closeOnboarding(true));
+    onboarding.addEventListener("click", (e) => {
+      if (e.target === onboarding) closeOnboarding(true);
     });
   }
 
@@ -1099,8 +1169,8 @@ function wireEvents() {
       outBox.style.display = "block";
 
       let planHtml = `
-        <h4 style="color:#00f2fe; margin-top:0; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">📋 Generated Study Route</h4>
-        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-weight:bold; font-size:12.5px;">
+        <h4 class="study-plan-title">Generated Study Route</h4>
+        <div class="study-plan-meta">
           <span>Days Remaining: ${diffDays}</span>
           <span>Estimated Hours Needed: ${remainingHours}h</span>
         </div>
@@ -1108,32 +1178,32 @@ function wireEvents() {
 
       if (dailyHours < requiredHoursPerDay) {
         planHtml += `
-          <div style="background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.25); color:#f87171; padding:8px 12px; border-radius:6px; margin-bottom:12px; font-size:11.5px;">
-            <strong>⚠ Schedule Alert:</strong> Your target of ${dailyHours} hours/day is insufficient to cover the remaining ${remainingHours} hours. Increase daily target to <strong>${requiredHoursPerDay.toFixed(1)}</strong> hours or push back exam date.
+          <div class="study-plan-alert is-warn">
+            <strong>Schedule Alert:</strong> Your target of ${dailyHours} hours/day is insufficient to cover the remaining ${remainingHours} hours. Increase daily target to <strong>${requiredHoursPerDay.toFixed(1)}</strong> hours or push back exam date.
           </div>
         `;
       } else {
         planHtml += `
-          <div style="background:rgba(16, 185, 129, 0.08); border:1px solid rgba(16, 185, 129, 0.25); color:#34d399; padding:8px 12px; border-radius:6px; margin-bottom:12px; font-size:11.5px;">
-            <strong>✔ Target Achievable:</strong> You are fully on track! A study pace of ${dailyHours} hours/day exceeds the required ${requiredHoursPerDay.toFixed(1)} hours/day.
+          <div class="study-plan-alert is-ok">
+            <strong>Target Achievable:</strong> You are on track. A study pace of ${dailyHours} hours/day exceeds the required ${requiredHoursPerDay.toFixed(1)} hours/day.
           </div>
         `;
       }
 
       const weakDomains = state.weakDomains || [];
       planHtml += `
-        <div style="margin-bottom:10px;">
+        <div class="study-plan-metrics">
           <strong>Target Practice Metrics:</strong><br />
           • Solve at least <strong>${Math.max(5, Math.round(15 / dailyHours))}</strong> questions per day.<br />
-          • Practice 1 CLI lab configurations twice a week.
+          • Practice 1 CLI lab configuration twice a week.
         </div>
       `;
 
       if (weakDomains.length > 0) {
         planHtml += `
-          <div style="margin-top:10px; border-top:1px solid rgba(255,255,255,0.05); padding-top:8px;">
-            <strong>Domain Focus Recommendations:</strong> Use Spaced Repetition or Smart Adaptive practice filters focusing on your weakest domains: 
-            <span style="color:#f59e0b; font-weight:bold;">${safeHTML(weakDomains.join(", "))}</span>.
+          <div class="study-plan-rec">
+            <strong>Domain Focus Recommendations:</strong> Use Spaced Repetition or Smart Adaptive practice filters focusing on your weakest domains:
+            <span class="study-plan-weak">${safeHTML(weakDomains.join(", "))}</span>.
           </div>
         `;
       }
@@ -2062,12 +2132,15 @@ function init() {
 
 
 function setupSupportDesk() {
+  const form = byId("supportForm");
   const btn = byId("btnSubmitSupport");
   const out = byId("supportOut");
-  if (!btn || !out) return;
+  const errBox = byId("supportFormError");
+  if (!btn || !out || !form) return;
 
   let lastSubmitTs = 0;
   let lastPayloadSig = "";
+  let isSubmitting = false;
   const ALLOWED_PRIORITIES = [
     "Severity 4 - Low",
     "Severity 3 - Medium",
@@ -2076,36 +2149,74 @@ function setupSupportDesk() {
   ];
   const EMAIL_RE = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-  btn.addEventListener("click", async () => {
+  const nameEl = byId("supportName");
+  const emailEl = byId("supportEmail");
+  const priorityEl = byId("supportPriority");
+  const descEl = byId("supportDesc");
+
+  const clearValidationState = () => {
+    [nameEl, emailEl, priorityEl, descEl].forEach((el) => {
+      if (el) el.removeAttribute("aria-invalid");
+    });
+    if (errBox) {
+      errBox.textContent = "";
+      errBox.classList.add("hidden");
+    }
+  };
+
+  [nameEl, emailEl, priorityEl, descEl].forEach((el) => {
+    if (el) {
+      el.addEventListener("input", clearValidationState);
+      el.addEventListener("change", clearValidationState);
+    }
+  });
+
+  const failValidation = (message, focusTarget = null) => {
+    if (focusTarget) {
+      focusTarget.setAttribute("aria-invalid", "true");
+      focusTarget.focus();
+    }
+    if (errBox) {
+      errBox.textContent = message;
+      errBox.classList.remove("hidden");
+    }
+    showToast(message, "warn");
+  };
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    clearValidationState();
+
     const honeypot = byId("supportWebsite");
     if (honeypot && honeypot.value.trim() !== "") {
       showToast("Submission rejected by automated spam filter.", "error");
       return;
     }
 
-    const name = (byId("supportName")?.value || "").trim();
-    const email = (byId("supportEmail")?.value || "").trim();
-    const priority = (byId("supportPriority")?.value || "").trim();
-    const desc = (byId("supportDesc")?.value || "").trim();
+    const name = (nameEl?.value || "").trim();
+    const email = (emailEl?.value || "").trim();
+    const priority = (priorityEl?.value || "").trim();
+    const desc = (descEl?.value || "").trim();
 
-    if (!name || !email || !desc) {
-      showToast("Please fill in all required fields.", "warn");
+    if (!name) {
+      failValidation("Please enter your name (2–80 characters).", nameEl);
       return;
     }
     if (name.length < 2 || name.length > 80) {
-      showToast("Name must be between 2 and 80 characters.", "warn");
+      failValidation("Name must be between 2 and 80 characters.", nameEl);
       return;
     }
-    if (email.length > 120 || !EMAIL_RE.test(email)) {
-      showToast("Please enter a valid contact email address.", "warn");
+    if (!email || email.length > 120 || !EMAIL_RE.test(email)) {
+      failValidation("Please enter a valid contact email address.", emailEl);
       return;
     }
     if (!ALLOWED_PRIORITIES.includes(priority)) {
-      showToast("Invalid incident priority selected.", "warn");
+      failValidation("Invalid incident priority selected.", priorityEl);
       return;
     }
-    if (desc.length < 10 || desc.length > 2000) {
-      showToast("Description must be between 10 and 2,000 characters.", "warn");
+    if (!desc || desc.length < 10 || desc.length > 2000) {
+      failValidation("Description must be between 10 and 2,000 characters.", descEl);
       return;
     }
 
@@ -2113,21 +2224,22 @@ function setupSupportDesk() {
     const storedLastTs = Number(localStorage.getItem("ccna_support_last_ts") || 0);
     if (now - Math.max(lastSubmitTs, storedLastTs) < 60000) {
       const waitSec = Math.ceil((60000 - (now - Math.max(lastSubmitTs, storedLastTs))) / 1000);
-      showToast(`Please wait ${waitSec}s before opening another ticket.`, "warn");
+      failValidation(`Please wait ${waitSec}s before opening another ticket.`);
       return;
     }
 
     const payloadSig = `${name.toLowerCase()}|${email.toLowerCase()}|${priority}|${desc.toLowerCase()}`;
     const storedLastSig = localStorage.getItem("ccna_support_last_sig") || "";
     if (payloadSig === lastPayloadSig || payloadSig === storedLastSig) {
-      showToast("Duplicate incident ticket detected. Your previous ticket is already logged.", "warn");
+      failValidation("Duplicate incident ticket detected. Your previous ticket was already recorded.");
       return;
     }
 
-    lastSubmitTs = now;
-    lastPayloadSig = payloadSig;
-    safeSetStorage(localStorage, "ccna_support_last_ts", String(now));
-    safeSetStorage(localStorage, "ccna_support_last_sig", payloadSig);
+    isSubmitting = true;
+    const prevBtnText = btn.textContent;
+    btn.disabled = true;
+    btn.setAttribute("aria-busy", "true");
+    btn.textContent = "Submitting...";
 
     const ticketId = `INC-${Math.floor(100000 + Math.random() * 900000)}`;
     const ticketPayload = {
@@ -2140,27 +2252,63 @@ function setupSupportDesk() {
     };
 
     try {
-      const existingTickets = JSON.parse(localStorage.getItem("ccna_support_tickets") || "[]");
-      existingTickets.push({ ticketId, ...ticketPayload });
-      safeSetStorage(localStorage, "ccna_support_tickets", JSON.stringify(existingTickets.slice(-25)));
-    } catch (e) {}
+      let cloudDocId = null;
+      if (navigator.onLine !== false) {
+        try {
+          cloudDocId = await saveSupportTicket(ticketPayload);
+        } catch {
+          cloudDocId = null;
+        }
+      }
 
-    saveSupportTicket(ticketPayload).catch(() => {});
+      lastSubmitTs = now;
+      lastPayloadSig = payloadSig;
+      safeSetStorage(localStorage, "ccna_support_last_ts", String(now));
+      safeSetStorage(localStorage, "ccna_support_last_sig", payloadSig);
 
-    showToast("Incident ticket successfully logged ✓", "ok", 3000);
-    const safePriority = safeHTML(priority);
-    out.innerHTML = `
-      <strong style="color: var(--color-ok);">Incident Logged Successfully!</strong><br />
-      <strong>Ticket ID:</strong> ${safeHTML(ticketId)}<br />
-      <strong>Severity:</strong> ${safePriority}<br />
-      <strong>Status:</strong> Assigned to Platform Admin<br />
-      <span style="font-size: 12px; color: var(--text-muted);">Your incident has been logged. The admin team will follow up via the email address you provided.</span>
-    `;
-    out.classList.remove("hidden");
+      try {
+        const existingTickets = JSON.parse(localStorage.getItem("ccna_support_tickets") || "[]");
+        existingTickets.push({
+          ticketId,
+          syncStatus: cloudDocId ? "cloud" : "local-only",
+          cloudDocId: cloudDocId || null,
+          ...ticketPayload
+        });
+        safeSetStorage(localStorage, "ccna_support_tickets", JSON.stringify(existingTickets.slice(-25)));
+      } catch {}
 
-    byId("supportName").value = "";
-    byId("supportEmail").value = "";
-    byId("supportDesc").value = "";
+      const safePriority = safeHTML(priority);
+      const safeId = safeHTML(ticketId);
+
+      if (cloudDocId) {
+        showToast("Incident ticket logged to cloud", "ok", 3000);
+        out.innerHTML = `
+          <strong class="support-status-ok">Incident Logged to Cloud</strong><br />
+          <strong>Ticket ID:</strong> ${safeId}<br />
+          <strong>Cloud Reference:</strong> <code>${safeHTML(cloudDocId)}</code><br />
+          <strong>Severity:</strong> ${safePriority}<br />
+          <span class="support-status-note">Your report has been recorded in the platform support queue (a local receipt was also saved in this browser).</span>
+        `;
+      } else {
+        showToast("Saved locally only — cloud delivery unavailable", "warn", 4000);
+        out.innerHTML = `
+          <strong class="support-status-warn">Saved Locally Only (Cloud Unavailable)</strong><br />
+          <strong>Ticket ID:</strong> ${safeId}<br />
+          <strong>Severity:</strong> ${safePriority}<br />
+          <span class="support-status-note">Cloud Firestore could not be reached right now (${navigator.onLine === false ? "device is offline" : "cloud write unavailable"}). This ticket was stored locally in this browser only and has not been delivered remotely.</span>
+        `;
+      }
+      out.classList.remove("hidden");
+
+      if (nameEl) nameEl.value = "";
+      if (emailEl) emailEl.value = "";
+      if (descEl) descEl.value = "";
+    } finally {
+      isSubmitting = false;
+      btn.disabled = false;
+      btn.removeAttribute("aria-busy");
+      btn.textContent = prevBtnText;
+    }
   });
 }
 
@@ -2331,14 +2479,6 @@ function initVideos() {
       syncModalControls();
     });
   }
-
-  document.addEventListener("keydown", (e) => {
-    const modal = byId("videoModal");
-    if (!modal || modal.classList.contains("hidden")) return;
-    if (e.key === "Escape") {
-      closeVideoPlayer();
-    }
-  });
 }
 
 function stepModalVideo(delta) {
@@ -2564,6 +2704,7 @@ function playVideo(youtubeId, title, vidId) {
 
   if (!modal || !iframe || !/^[a-zA-Z0-9_-]{11}$/.test(youtubeId)) return;
 
+  const wasOpen = !modal.classList.contains("hidden");
   activeModalVideoId = vidId || null;
   modalTitle.textContent = title;
   iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
@@ -2579,6 +2720,9 @@ function playVideo(youtubeId, title, vidId) {
     }
   }
   syncModalControls();
+  if (!wasOpen) {
+    activateModalFocus(modal, byId("btnCloseVideoModal"), closeVideoPlayer);
+  }
 }
 
 function closeVideoPlayer() {
@@ -2586,9 +2730,14 @@ function closeVideoPlayer() {
   const iframe = byId("videoIFrame");
   if (!modal || !iframe) return;
 
+  const closedVidId = activeModalVideoId;
   iframe.src = "";
   activeModalVideoId = null;
   modal.classList.add("hidden");
+  const fallbackBtn = closedVidId
+    ? document.querySelector(`#videoLessonsGrid .btn-watch-video[data-video-id="${closedVidId}"]`)
+    : null;
+  deactivateModalFocus(modal, true, fallbackBtn);
   playNetSound("click");
 }
 

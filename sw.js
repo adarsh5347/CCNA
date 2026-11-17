@@ -1,7 +1,8 @@
-const CACHE_NAME = 'ccna-prep-v85';
+const CACHE_NAME = 'ccna-prep-v86';
 const ASSETS = [
   '/',
   '/index.html',
+  '/manifest.json',
   '/assets/css/styles.css',
   '/assets/js/app.js',
   '/assets/js/core.js',
@@ -20,6 +21,13 @@ const ASSETS = [
   '/assets/js/qb/chapters/v1p3.js',
   '/assets/js/qb/chapters/v2p1.js',
   '/assets/js/qb/chapters/v2p2.js',
+  '/assets/js/guide-ui.js',
+  '/assets/js/guide/index.js',
+  '/assets/js/guide/v1p1.js',
+  '/assets/js/guide/v1p2.js',
+  '/assets/js/guide/v1p3.js',
+  '/assets/js/guide/v2p1.js',
+  '/assets/js/guide/v2p2.js',
   '/assets/js/firebase.js',
   '/assets/js/firebase-lazy.js',
   '/assets/js/videos.js',
@@ -61,16 +69,30 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // Network-first strategy: always try the network, fall back to cache when offline
+  // Network-first strategy: always try the network, fall back to cache (with query-string normalization and SPA navigation fallback)
   e.respondWith(
     fetch(e.request)
       .then(networkResponse => {
-        if (networkResponse && networkResponse.status === 200) {
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
           const clone = networkResponse.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
         }
         return networkResponse;
       })
-      .catch(() => caches.match(e.request, { ignoreSearch: true }))
+      .catch(async () => {
+        const cached = await caches.match(e.request, { ignoreSearch: true });
+        if (cached) return cached;
+        if (e.request.mode === 'navigate') {
+          return (
+            (await caches.match('/index.html', { ignoreSearch: true })) ||
+            (await caches.match('/', { ignoreSearch: true }))
+          );
+        }
+        return new Response('Offline resource unavailable', {
+          status: 503,
+          statusText: 'Service Unavailable',
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+        });
+      })
   );
 });

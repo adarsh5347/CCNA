@@ -549,7 +549,7 @@ html[data-theme="light"] body:not(.high-contrast) .output:not(.terminal-box) {
 }
 
 html[data-theme="light"] body:not(.high-contrast) .play-icon-overlay {
-  color: #00f2fe !important;
+  color: #38bdf8 !important;
 }
 
 html[data-theme="light"] body:not(.high-contrast) #accountPlanDetails p:first-child {

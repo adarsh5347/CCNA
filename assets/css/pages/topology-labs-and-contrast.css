@@ -105,13 +105,13 @@
   transition: var(--transition-smooth);
 }
 .osi-layer:hover {
-  background: rgba(0, 242, 254, 0.05);
-  border-color: rgba(0, 242, 254, 0.3);
+  background: rgba(41, 151, 255, 0.08);
+  border-color: rgba(41, 151, 255, 0.35);
 }
 .osi-layer.active {
-  background: rgba(0, 242, 254, 0.12) !important;
-  border-color: #00f2fe !important;
-  box-shadow: 0 0 10px rgba(0, 242, 254, 0.15);
+  background: rgba(41, 151, 255, 0.14) !important;
+  border-color: var(--color-tint) !important;
+  box-shadow: 0 0 10px rgba(41, 151, 255, 0.18);
 }
 .osi-layer-num {
   font-family: var(--font-mono);
@@ -120,7 +120,7 @@
   color: var(--text-muted);
 }
 .osi-layer.active .osi-layer-num {
-  color: #00f2fe;
+  color: var(--color-tint);
 }
 .osi-layer-name {
   font-size: 13px;
@@ -275,6 +275,19 @@ body.high-contrast button {
 body.high-contrast button.primary {
   background: #ffffff !important;
   color: #000000 !important;
+}
+body.high-contrast input,
+body.high-contrast select,
+body.high-contrast textarea {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+body.high-contrast .modal-overlay .card,
+body.high-contrast [role="dialog"] {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
 }
 body.high-contrast .card {
   border: 2px solid #ffffff !important;

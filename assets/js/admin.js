@@ -25,6 +25,16 @@ export async function renderAdminDashboard() {
   const statsEl = byId("adminStats");
   const activityEl = byId("adminRecentActivity");
 
+  if (!isAdmin() || !state.user) {
+    if (statsEl) {
+      statsEl.innerHTML = `<div class="output admin-denied-banner" role="alert">Administrator authentication required to access NOC Command Station telemetry.</div>`;
+    }
+    if (activityEl) {
+      activityEl.innerHTML = "";
+    }
+    return;
+  }
+
   const totalQuestions = (state.bank && state.bank.length) || 635;
   const labsCount = 10;
   const videosCount = 126;
@@ -36,63 +46,57 @@ export async function renderAdminDashboard() {
 
   if (statsEl) {
     statsEl.innerHTML = `
-      <div class="grid stats" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">
+      <div class="grid stats admin-stats-grid">
         <div class="stat">
           <div class="k">Platform Mode</div>
-          <div class="v" style="color:#10b981;font-size:16px;">100% UNLOCKED</div>
+          <div class="v admin-val-success">100% UNLOCKED</div>
         </div>
         <div class="stat">
           <div class="k">Question Bank</div>
-          <div class="v" style="color:#00f2fe;">${totalQuestions} Drills</div>
+          <div class="v admin-val-tint">${totalQuestions} Drills</div>
         </div>
         <div class="stat">
           <div class="k">Virtual Labs</div>
-          <div class="v" style="color:#10b981;">${labsCount} / 10 Active</div>
+          <div class="v admin-val-success">${labsCount} / 10 Active</div>
         </div>
         <div class="stat">
           <div class="k">Video Lessons</div>
-          <div class="v" style="color:#f59e0b;">${videosCount} Categorized</div>
+          <div class="v admin-val-warn">${videosCount} Categorized</div>
         </div>
         <div class="stat">
           <div class="k">Network Status</div>
-          <div class="v" style="color:${isOnline ? "#10b981" : "#f59e0b"};">${isOnline ? "Online (Cloud)" : "Offline (PWA)"}</div>
+          <div class="v ${isOnline ? "admin-val-success" : "admin-val-warn"}">${isOnline ? "Online (Cloud)" : "Offline (PWA)"}</div>
         </div>
         <div class="stat">
           <div class="k">Session XP</div>
-          <div class="v" style="color:#00f2fe;">${userXp} XP</div>
+          <div class="v admin-val-tint">${userXp} XP</div>
         </div>
         <div class="stat">
           <div class="k">Labs Passed</div>
-          <div class="v" style="color:#a78bfa;">${userLabsCompleted} / 10</div>
+          <div class="v admin-val-main">${userLabsCompleted} / 10</div>
         </div>
         <div class="stat">
           <div class="k">Active Streak</div>
-          <div class="v" style="color:#f59e0b;">🔥 ${userStreak} ${streakUnit}</div>
+          <div class="v admin-val-warn">${userStreak} ${streakUnit}</div>
         </div>
       </div>
     `;
   }
 
   if (activityEl) {
-    const currentUid = state.user ? state.user.uid : "Local Guest Engineer";
-    const currentName = state.user ? (state.user.displayName || state.user.email) : "Adarsh Poojari (Owner)";
-    
+    const currentUid = state.user.uid;
+    const currentName = state.user.displayName || state.user.email || "Authenticated Admin";
+
     activityEl.innerHTML = `
-      <div class="card" style="border:1px solid var(--border-color);padding:20px;margin-top:20px;">
-        <h4 style="margin-top:0;color:#00f2fe;font-size:15px;">Station Controls & Utilities</h4>
-        <p style="color:var(--text-muted);font-size:12px;margin-bottom:16px;">
-          Active Station: <strong>${safeHTML(currentName)}</strong> &nbsp;·&nbsp; UID: <code>${safeHTML(currentUid)}</code>
+      <div class="card admin-controls-card">
+        <h4 class="admin-controls-heading">Station Controls &amp; Utilities</h4>
+        <p class="admin-controls-meta">
+          Active Operator: <strong>${safeHTML(currentName)}</strong> · UID: <code>${safeHTML(currentUid)}</code>
         </p>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;">
-          <button id="adminBtnForceRefresh" class="secondary" style="font-size:12px;padding:8px 14px;">
-            🔄 Force Reload PWA Cache
-          </button>
-          <button id="adminBtnTestAudio" class="secondary" style="font-size:12px;padding:8px 14px;">
-            🔊 Test Audio Engine
-          </button>
-          <button id="adminBtnExportAnalytics" class="secondary" style="font-size:12px;padding:8px 14px;">
-            💾 Export Station Analytics
-          </button>
+        <div class="admin-controls-actions">
+          <button id="adminBtnForceRefresh" type="button" class="secondary">Force Reload PWA Cache</button>
+          <button id="adminBtnTestAudio" type="button" class="secondary">Test Audio Engine</button>
+          <button id="adminBtnExportAnalytics" type="button" class="secondary">Export Station Analytics</button>
         </div>
       </div>
     `;
@@ -102,11 +106,11 @@ export async function renderAdminDashboard() {
     if (btnRefresh && !btnRefresh._bound) {
       btnRefresh._bound = true;
       btnRefresh.addEventListener("click", () => {
-        showToast("Updating Service Worker and refreshing...", "info");
+        showToast("Checking Service Worker update...", "info");
         if ("serviceWorker" in navigator) {
-          navigator.serviceWorker.getRegistrations().then(regs => {
-            for (let reg of regs) reg.update();
-            setTimeout(() => window.location.reload(true), 600);
+          navigator.serviceWorker.getRegistrations().then((regs) => {
+            for (const reg of regs) reg.update();
+            setTimeout(() => window.location.reload(), 600);
           });
         } else {
           window.location.reload();
@@ -128,11 +132,15 @@ export async function renderAdminDashboard() {
       btnExport._bound = true;
       btnExport.addEventListener("click", () => {
         try {
-          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.analytics, null, 2));
+          const blob = new Blob([JSON.stringify(state.analytics, null, 2)], { type: "application/json" });
+          const blobUrl = URL.createObjectURL(blob);
           const dlAnchor = document.createElement("a");
-          dlAnchor.setAttribute("href", dataStr);
-          dlAnchor.setAttribute("download", `ccna_analytics_backup_${Date.now()}.json`);
+          dlAnchor.href = blobUrl;
+          dlAnchor.download = `ccna_analytics_backup_${Date.now()}.json`;
+          document.body.appendChild(dlAnchor);
           dlAnchor.click();
+          dlAnchor.remove();
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
           showToast("Analytics export downloaded.", "ok");
         } catch (e) {
           showToast("Export failed: " + e.message, "error");

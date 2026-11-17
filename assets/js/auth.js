@@ -8,6 +8,7 @@ function refreshUI() {
   if (window.renderHome) window.renderHome();
   if (window.renderAnalytics) window.renderAnalytics();
   if (window.renderVideos) window.renderVideos();
+  if (window.renderAccountPage) window.renderAccountPage();
 }
 
 export function updateHeaderProfile() {
@@ -77,7 +78,16 @@ export function setupAuth() {
         previousUid = user.uid;
         btnSignIn.classList.add("hidden");
         userProfile.classList.remove("hidden");
-        userPhoto.src = user.photoURL || "";
+        if (userPhoto) {
+          userPhoto.onerror = () => { userPhoto.style.display = "none"; };
+          if (user.photoURL) {
+            userPhoto.src = user.photoURL;
+            userPhoto.style.display = "block";
+          } else {
+            userPhoto.removeAttribute("src");
+            userPhoto.style.display = "none";
+          }
+        }
         userName.textContent = user.displayName || user.email;
 
         showToast(`Welcome back, ${user.displayName || "Engineer"}!`, "ok");
@@ -167,7 +177,10 @@ export function setupAuth() {
       } else {
         btnSignIn.classList.remove("hidden");
         userProfile.classList.add("hidden");
-        userPhoto.src = "";
+        if (userPhoto) {
+          userPhoto.removeAttribute("src");
+          userPhoto.style.display = "none";
+        }
         userName.textContent = "";
 
         state.subscription = createDefaultSubscription();
