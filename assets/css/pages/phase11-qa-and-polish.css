@@ -5,6 +5,10 @@
    ========================================================================== */
 
 /* ─── Support Desk (#support) ─── */
+.support-grid {
+  align-items: start;
+}
+
 .support-hero {
   position: relative;
   overflow: hidden;

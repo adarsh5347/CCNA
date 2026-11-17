@@ -384,6 +384,9 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
   font-size: 13.5px;
   font-weight: 500;
+  line-height: 1.35;
+  min-height: 44px;
+  min-width: 0;
   text-transform: none;
   letter-spacing: normal;
   color: var(--color-label);
@@ -393,6 +396,10 @@ input[type="range"]::-moz-range-thumb {
     border-color var(--dur-fast) var(--ease-std),
     color var(--dur-fast) var(--ease-std);
   user-select: none;
+}
+
+.checks label input[type="checkbox"] {
+  flex-shrink: 0;
 }
 
 .checks label:hover {
@@ -830,24 +837,35 @@ input[type="range"]::-moz-range-thumb {
   grid-column: span 3;
 }
 
-@media (max-width: 1080px) {
+@media (min-width: 769px) and (max-width: 1080px) {
   .practice-modes-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .practice-modes-grid > .mode-card {
-    grid-column: span 1 !important;
+    grid-column: span 1;
   }
   .practice-modes-grid > .mode-card:nth-child(3) {
-    grid-column: span 2 !important;
+    grid-column: span 2;
   }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 768px) {
   .practice-modes-grid {
     grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+  .practice-modes-grid > .mode-card,
+  .practice-modes-grid > .mode-card:nth-child(n) {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
   }
   .practice-modes-grid > .mode-card {
-    grid-column: span 1 !important;
+    justify-content: flex-start;
+    padding: 18px;
+  }
+  .practice-modes-grid .mode-Status-box {
+    flex-grow: 0;
   }
 }
 
@@ -1372,6 +1390,33 @@ input[type="range"]::-moz-range-thumb {
   line-height: 1.55;
   color: var(--color-secondary-label);
   margin: 0 0 24px 0;
+}
+
+.home-flashcard-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  align-items: start;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+#bankStats {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+#bankStats .stat {
+  min-width: 0;
+}
+#bankStats .stat:nth-child(1),
+#bankStats .stat:nth-child(2) {
+  grid-column: span 3;
+}
+#bankStats .stat:nth-child(3),
+#bankStats .stat:nth-child(4),
+#bankStats .stat:nth-child(5) {
+  grid-column: span 2;
+}
+#bankStats .stat:nth-child(6) {
+  grid-column: 1 / -1;
 }
 
 .home-cta-actions {

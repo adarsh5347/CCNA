@@ -20,6 +20,11 @@ export function safeSetStorage(storage, key, value) {
 export function showToast(message, type = "info", duration = 3500) {
   const container = document.getElementById("toastContainer");
   if (!container) return;
+  const activeToasts = [...container.querySelectorAll(".toast:not(.dismissing)")];
+  while (activeToasts.length >= 2) {
+    const oldest = activeToasts.shift();
+    if (oldest) oldest.remove();
+  }
   const toast = document.createElement("div");
   toast.className = `toast toast-${type}`;
   toast.setAttribute("role", "alert");
@@ -33,6 +38,9 @@ export function dismissToast(toast) {
   if (toast.classList.contains("dismissing")) return;
   toast.classList.add("dismissing");
   toast.addEventListener("animationend", () => toast.remove(), { once: true });
+  setTimeout(() => {
+    if (toast.isConnected) toast.remove();
+  }, 280);
 }
 
 export function safeHTML(str) {

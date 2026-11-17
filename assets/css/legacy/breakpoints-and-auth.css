@@ -293,8 +293,8 @@
 }
 
 @media (max-width: 600px) {
-  .brand div:last-child {
-    display: none !important;
+  .brand p {
+    display: none;
   }
   .topbar {
     padding: 8px 12px !important;

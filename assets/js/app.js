@@ -336,6 +336,7 @@ export function setPage(page, push = true) {
   const targetPage = byId(page);
   if (targetPage) targetPage.classList.add("active");
   document.body.dataset.activePage = page;
+  document.body.classList.remove("modal-open");
   closeMobileMoreSheet();
   syncMobileBottomNav(page);
   if (page !== "engine") {
@@ -563,6 +564,7 @@ function openExamBriefingModal() {
     startSession("exam");
     return;
   }
+  document.body.classList.add("modal-open");
   modal.classList.remove("hidden");
   activateModalFocus(modal, byId("btnConfirmStartExam"), closeExamBriefingModal);
 }
@@ -573,6 +575,7 @@ function closeExamBriefingModal(restoreFocus = true) {
     modal.classList.add("hidden");
     deactivateModalFocus(modal, restoreFocus, byId("startExam"));
   }
+  document.body.classList.remove("modal-open");
 }
 
 function updateSectionQuizSummary() {
@@ -1099,10 +1102,12 @@ function wireEvents() {
     const closeOnboarding = (restoreFocus = true) => {
       playNetSound("success");
       onboarding.classList.add("hidden");
+      document.body.classList.remove("modal-open");
       safeSetStorage(localStorage, "ccna_onboarded", "true");
       deactivateModalFocus(onboarding, restoreFocus);
     };
     window.openOnboardingModal = () => {
+      document.body.classList.add("modal-open");
       onboarding.classList.remove("hidden");
       activateModalFocus(onboarding, dismissBtn, closeOnboarding);
     };
@@ -2708,6 +2713,7 @@ function playVideo(youtubeId, title, vidId) {
   activeModalVideoId = vidId || null;
   modalTitle.textContent = title;
   iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
+  document.body.classList.add("modal-open");
   modal.classList.remove("hidden");
   playNetSound("success");
 
@@ -2734,6 +2740,7 @@ function closeVideoPlayer() {
   iframe.src = "";
   activeModalVideoId = null;
   modal.classList.add("hidden");
+  document.body.classList.remove("modal-open");
   const fallbackBtn = closedVidId
     ? document.querySelector(`#videoLessonsGrid .btn-watch-video[data-video-id="${closedVidId}"]`)
     : null;

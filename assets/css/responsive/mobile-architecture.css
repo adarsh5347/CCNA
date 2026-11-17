@@ -122,47 +122,7 @@
     justify-content: space-between !important;
   }
 
-  /* STEP 9: Revamp metadata to be extremely compact on mobile.
-     Instead of large vertical blocks, render it as a single centered line
-     of bullet-separated text. Hide the redundant Topic Domain block. */
-  body[data-active-page="engine"] .meta {
-    display: block !important;
-    text-align: center !important;
-    font-size: 11px !important;
-    color: var(--text-muted) !important;
-    margin: 10px 0 !important;
-    border: none !important;
-    background: none !important;
-    padding: 0 !important;
-  }
-  body[data-active-page="engine"] .meta > div {
-    display: inline !important;
-    border: none !important;
-    background: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    color: var(--text-muted) !important;
-    font-size: 11px !important;
-  }
-  body[data-active-page="engine"] .meta > div:not(:last-child)::after {
-    content: "  •  " !important;
-    color: rgba(255, 255, 255, 0.15) !important;
-    font-weight: bold !important;
-  }
-  body[data-active-page="engine"] .meta > div:nth-child(3) {
-    display: none !important; /* Hide redundant domain chip */
-  }
-  body[data-active-page="engine"] .meta strong {
-    display: inline !important;
-    font-weight: 500 !important;
-    font-size: 10px !important;
-    color: rgba(255, 255, 255, 0.4) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    margin-right: 4px !important;
-  }
-
-  /* STEP 10: Make the question text slightly more compact on mobile */
+  /* STEP 9 & 10: Compact mobile metadata pills & question heading */
   body[data-active-page="engine"] .scroll h3 {
     font-size: 14.5px !important;
     line-height: 1.4 !important;
@@ -307,22 +267,31 @@
     flex: 1 1 auto !important;
   }
 
+  header.topbar .brand > div:last-child {
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
   header.topbar .logo-container {
     width: 32px !important;
     height: 32px !important;
     flex-shrink: 0 !important;
   }
 
+  header.topbar .brand h1,
   header.topbar .brand strong {
     display: block !important;
-    font-size: 14px !important;
-    letter-spacing: -0.015em !important;
+    font-size: clamp(12px, 3.6vw, 15px) !important;
+    letter-spacing: -0.02em !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     color: var(--color-label) !important;
   }
 
+  header.topbar .brand p,
   header.topbar .brand .sub {
     display: none !important;
   }
@@ -330,14 +299,15 @@
   header.topbar .topbar-utils {
     display: flex !important;
     align-items: center !important;
-    gap: 6px !important;
+    gap: 4px !important;
     flex-shrink: 0 !important;
   }
 
   header.topbar .nav-util-btn {
-    width: 40px !important;
-    height: 40px !important;
-    min-height: 40px !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 38px !important;
+    min-height: 38px !important;
     padding: 0 !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -350,8 +320,8 @@
 
   #btnSignIn {
     min-height: 38px !important;
-    padding: 6px 12px !important;
-    font-size: 12.5px !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
   }
 
   #userProfile button[data-page="account"],
@@ -366,8 +336,9 @@
     font-size: 12px !important;
   }
 
-  /* Lock background scroll when More sheet is open */
-  body.more-sheet-open {
+  /* Lock background scroll when More sheet or Modal is open */
+  body.more-sheet-open,
+  body.modal-open {
     overflow: hidden !important;
   }
 
@@ -730,6 +701,12 @@
   .analytics-domains-grid,
   .noc-drawer-grid {
     grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .practice-modes-grid > .mode-card,
+  .practice-modes-grid > .mode-card:nth-child(n) {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
   .home-cta-actions,
   .analytics-hero-actions {
@@ -1097,12 +1074,17 @@
     gap: 4px !important;
     padding: 3px 8px !important;
     border-radius: 6px !important;
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    background: var(--surface-2) !important;
+    border: 1px solid var(--color-separator) !important;
     font-size: 11px !important;
   }
 
-  body[data-active-page="engine"] .meta > div::after {
+  body[data-active-page="engine"] .meta > div:nth-child(3) {
+    display: none !important;
+  }
+
+  body[data-active-page="engine"] .meta > div::after,
+  body[data-active-page="engine"] .meta > div:not(:last-child)::after {
     content: none !important;
   }
 
@@ -1227,6 +1209,40 @@
     font-size: 11.5px !important;
     margin: 0 !important;
     white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 380px) {
+  header.topbar {
+    padding: calc(8px + var(--safe-top)) 8px 8px 8px !important;
+    gap: 4px !important;
+  }
+  header.topbar .brand {
+    gap: 5px !important;
+  }
+  header.topbar .logo-container {
+    width: 26px !important;
+    height: 26px !important;
+    padding: 4px !important;
+  }
+  header.topbar .brand h1 {
+    font-size: 11px !important;
+    letter-spacing: -0.025em !important;
+  }
+  header.topbar .topbar-utils {
+    gap: 2px !important;
+  }
+  header.topbar .nav-util-btn {
+    width: 29px !important;
+    min-width: 29px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    font-size: 13px !important;
+  }
+  #btnSignIn {
+    padding: 4px 8px !important;
+    min-height: 36px !important;
+    font-size: 11px !important;
   }
 }
 

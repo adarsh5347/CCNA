@@ -301,7 +301,7 @@ export function renderHome() {
     { k: "Easy", v: easy || 75 },
     { k: "Medium", v: medium || 101 },
     { k: "Hard", v: hard || 65 },
-    { k: "Question Types", v: "Single/Multi/Matching/Drag/Scenario" }
+    { k: "Question Types", v: "Single / Multi / Matching / Drag / Scenario" }
   ]);
 
   // Identify two weakest domains for Smart Adaptive Quiz
