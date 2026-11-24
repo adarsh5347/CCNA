@@ -218,7 +218,11 @@
 
 /* ─── 3. Distraction-Free Exam Workstation (#engine) ────────────────────── */
 #engine .exam-shell {
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 88px);
+  min-height: 540px;
+  max-height: 820px;
   border-top: 3px solid #0284c7;
   background: #0b111e;
   backdrop-filter: none;
@@ -335,7 +339,8 @@
 
 .exam-workspace-body {
   display: flex;
-  min-height: 70vh;
+  flex: 1;
+  min-height: 0;
   position: relative;
   overflow: hidden;
 }
@@ -343,9 +348,20 @@
 .exam-main-column {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   background: #0b111e;
+}
+
+#engine .scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+#engine .exam-footer {
+  flex-shrink: 0;
 }
 
 /* ─── 4. Slide-Out Question Navigator Drawer ───────────────────────────── */

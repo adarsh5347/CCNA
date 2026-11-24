@@ -256,7 +256,7 @@ async function runPhase11Suite() {
   assert(distManifest.theme_color === "#060913", `Expected manifest theme_color #060913, got ${distManifest.theme_color}`);
   assert(distManifest.background_color === "#060913", `Expected manifest background_color #060913`);
   const swText = fs.readFileSync(path.join(DIST_DIR, "sw.js"), "utf8");
-  assert(swText.includes("ccna-prep-v87"), "Expected dist/sw.js to use cache version ccna-prep-v87");
+  assert(swText.includes("ccna-prep-v88"), "Expected dist/sw.js to use cache version ccna-prep-v88");
   const swAssetMatch = swText.match(/\[(["'\/][^\]]+)\]/);
   const rootSwText = fs.readFileSync(path.join(ROOT_DIR, "sw.js"), "utf8");
   const assetsBlock = rootSwText.slice(rootSwText.indexOf("const ASSETS"), rootSwText.indexOf("];") + 2);
@@ -656,10 +656,10 @@ async function runPhase11Suite() {
           return { ready, keys, regCount: regs.length };
         })()
       `);
-      if (swInfo.ready && swInfo.keys.includes("ccna-prep-v87")) break;
+      if (swInfo.ready && swInfo.keys.includes("ccna-prep-v88")) break;
       await sleep(250);
     }
-    assert(swInfo && swInfo.ready && swInfo.keys.includes("ccna-prep-v87"), `SW failed to activate ccna-prep-v87: ${JSON.stringify(swInfo)}`);
+    assert(swInfo && swInfo.ready && swInfo.keys.includes("ccna-prep-v88"), `SW failed to activate ccna-prep-v88: ${JSON.stringify(swInfo)}`);
     pass("Check 12 (Service Worker Registration & Precache)", `SW activated with cache ${JSON.stringify(swInfo.keys)}`);
 
     // Perform first online reload so document controller is attached cleanly

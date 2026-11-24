@@ -101,9 +101,9 @@ html[data-theme="light"] body:not(.high-contrast) nav [data-page].active svg {
 
 html[data-theme="light"] body:not(.high-contrast) .xp-badge,
 html[data-theme="light"] body:not(.high-contrast) #headerXPBadge {
-  color: #515154 !important;
-  background: rgba(0, 0, 0, 0.04) !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #0058b0 !important;
+  background: rgba(0, 113, 227, 0.08) !important;
+  border-color: rgba(0, 113, 227, 0.24) !important;
 }
 
 html[data-theme="light"] body:not(.high-contrast) .toast {

@@ -1385,6 +1385,15 @@ function initLabSelector() {
     });
   }
 
+  const jumpTermBtn = byId("btnJumpToTerminal");
+  if (jumpTermBtn) {
+    jumpTermBtn.addEventListener("click", () => {
+      playNetSound("click");
+      byId("labWorkspace")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      byId("labManualCliInput")?.focus({ preventScroll: true });
+    });
+  }
+
   const prevBtn = byId("btnPrevLab");
   const nextBtn = byId("btnNextLab");
   const retryTopBtn = byId("btnRetryLabTop");

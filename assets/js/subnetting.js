@@ -131,7 +131,17 @@ function renderSubnetRangeDiagram(details, headingLabel = "Example Anatomy (192.
   const diagram = byId("subnetRangeDiagram");
   if (!diagram) return;
   if (!details) {
-    diagram.innerHTML = `<span class="subnet-diagram-placeholder">Submit an answer to visualize network ID, usable IP bounds, block increment, and broadcast boundaries.</span>`;
+    diagram.innerHTML = `
+      <div class="subnet-diagram-empty">
+        <span class="subnet-diagram-placeholder">Boundary visualization ready &mdash; submit an answer to inspect all 4 CIDR segments:</span>
+        <div class="subnet-diagram-legend" aria-hidden="true">
+          <span class="legend-chip legend-net">Network ID</span>
+          <span class="legend-chip legend-first">First Usable</span>
+          <span class="legend-chip legend-last">Last Usable</span>
+          <span class="legend-chip legend-bcast">Broadcast</span>
+        </div>
+      </div>
+    `;
     return;
   }
   const blockSize = details.prefix === 0 ? "4,294,967,296" : Math.pow(2, 32 - details.prefix).toLocaleString();

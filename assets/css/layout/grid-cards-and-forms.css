@@ -619,8 +619,12 @@ input[type="range"]::-moz-range-thumb {
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .noc-console-status {
@@ -628,6 +632,19 @@ input[type="range"]::-moz-range-thumb {
   font-size: 10px;
   font-weight: 700;
   color: #34d399;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .noc-console-bar {
+    padding: 7px 10px;
+    gap: 6px;
+  }
+  .noc-console-title,
+  .noc-console-status {
+    font-size: 9px;
+  }
 }
 
 .home-hero-svg {
@@ -815,6 +832,19 @@ input[type="range"]::-moz-range-thumb {
   color: var(--color-tint);
 }
 
+.qa-ico {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.quick-access-btn:hover .qa-ico {
+  opacity: 1;
+}
+
 /* ─── Practice Modes Grid (Symmetric 3 + 2 Composition) ─── */
 .home-modes-section {
   margin-bottom: 36px;
@@ -957,6 +987,22 @@ input[type="range"]::-moz-range-thumb {
   gap: 6px !important;
   max-height: none !important;
   overflow: visible !important;
+  padding: 8px !important;
+}
+
+@media (min-width: 769px) {
+  .checks-compact-grid label {
+    padding: 7px 10px;
+    min-height: 38px;
+    font-size: 12px;
+    gap: 8px;
+  }
+  .mode-card {
+    gap: 4px;
+  }
+  .mode-card > .btn {
+    margin-top: auto;
+  }
 }
 
 @media (max-width: 480px) {
